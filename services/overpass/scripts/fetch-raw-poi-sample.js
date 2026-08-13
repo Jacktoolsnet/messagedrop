@@ -19,7 +19,7 @@ async function main() {
       north: finiteNumber('OVERPASS_SAMPLE_NORTH', '52.43'),
       east: finiteNumber('OVERPASS_SAMPLE_EAST', '9.85')
     },
-    categories: (process.env.OVERPASS_SAMPLE_CATEGORIES || 'hotel,accommodation,tourism')
+    categories: (process.env.OVERPASS_SAMPLE_CATEGORIES || 'accommodation,tourism')
       .split(',').map((value) => value.trim()).filter(Boolean),
     limit: positiveInteger('OVERPASS_SAMPLE_LIMIT', '500')
   };

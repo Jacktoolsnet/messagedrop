@@ -24,12 +24,20 @@ Example request body:
     "north": 52.43,
     "east": 9.85
   },
-  "categories": ["hotel", "accommodation", "tourism"],
+  "categories": ["accommodation", "amenities"],
+  "subcategories": {
+    "accommodation": ["hotel", "guest_house", "hostel"],
+    "amenities": ["toilets"]
+  },
   "limit": 200
 }
 ```
 
 Supported categories are defined in `categories.js`. The viewport area and result count are limited by `OVERPASS_MAX_BBOX_AREA` and `OVERPASS_MAX_RESULTS`.
+The server validates every requested subcategory against that catalog. The
+`amenities/toilets` selection covers public toilets and excludes objects marked
+with `access=private`, `access=customers`, or `access=no`; paid public toilets
+remain included.
 
 ## Website header metadata
 

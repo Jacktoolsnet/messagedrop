@@ -1,4 +1,4 @@
-const { categoryNames } = require('./categories');
+const { categoryNames, subcategoryNames } = require('./categories');
 
 const VALID_CATEGORIES = new Set(categoryNames());
 
@@ -21,11 +21,31 @@ function validateNearbyRequest(body, {
     return invalid('invalid_nearby_categories');
   }
 
+  const subcategories = validateSubcategories(body.subcategories, categories);
+  if (!subcategories) return invalid('invalid_nearby_subcategories');
+
   const limit = body.limit === undefined ? Math.min(200, maxResults) : Number(body.limit);
   if (!Number.isInteger(limit) || limit < 1 || limit > maxResults) {
     return invalid('invalid_nearby_limit');
   }
-  return { ok: true, value: { bounds, categories, limit } };
+  return { ok: true, value: { bounds, categories, subcategories, limit } };
+}
+
+function validateSubcategories(value, categories) {
+  if (value === undefined) {
+    return Object.fromEntries(categories.map((category) => [category, subcategoryNames(category)]));
+  }
+  if (!isPlainObject(value) || Object.keys(value).some((category) => !categories.includes(category))) return null;
+  const result = {};
+  for (const category of categories) {
+    const requested = value[category];
+    if (!Array.isArray(requested)) return null;
+    const normalized = [...new Set(requested.map(normalizeString).filter(Boolean))];
+    const allowed = new Set(subcategoryNames(category));
+    if (normalized.length < 1 || normalized.some((subcategory) => !allowed.has(subcategory))) return null;
+    result[category] = normalized;
+  }
+  return result;
 }
 
 function boundingBox(value) {
@@ -67,4 +87,4 @@ function invalid(message) {
   return { ok: false, message };
 }
 
-module.exports = { validateNearbyRequest, boundingBox, bboxArea };
+module.exports = { validateNearbyRequest, validateSubcategories, boundingBox, bboxArea };

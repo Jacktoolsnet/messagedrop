@@ -28,7 +28,7 @@ By default the query includes `hotel` and `accommodation` and returns at most
 500 elements. Both settings can be changed without editing the script:
 
 ```bash
-OVERPASS_SAMPLE_CATEGORIES=hotel,accommodation,tourism \
+OVERPASS_SAMPLE_CATEGORIES=accommodation,tourism \
 OVERPASS_SAMPLE_LIMIT=500 \
 ./docs/overpass/fetch-samples.sh
 ```

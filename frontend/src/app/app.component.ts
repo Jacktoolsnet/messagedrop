@@ -77,7 +77,8 @@ import { Note } from './interfaces/note';
 import { NotificationAction } from './interfaces/notification-action';
 import { Place } from './interfaces/place';
 import { PlusCodeArea } from './interfaces/plus-code-area';
-import { DEFAULT_SEARCH_SETTINGS, SearchSettings } from './interfaces/search-settings';
+import { DEFAULT_SEARCH_SETTINGS, SearchSettings, normalizePoiSetting } from './interfaces/search-settings';
+import { OVERPASS_SUBCATEGORIES, OverpassCategory, OverpassSubcategory } from './interfaces/overpass';
 import {
   DEFAULT_ROUTE_OPTIONS,
   RouteOptions,
@@ -125,6 +126,7 @@ import { SharedContentService } from './services/shared-content.service';
 import { SystemNotificationService } from './services/system-notification.service';
 import { TripGoStopsMapStateService } from './services/tripgo-stops-map-state.service';
 import { WikipediaMapStateService } from './services/wikipedia-map-state.service';
+import { OverpassMapStateService } from './services/overpass-map-state.service';
 import { WikipediaService } from './services/wikipedia.service';
 import { TranslationHelperService } from './services/translation-helper.service';
 import { UsageProtectionService } from './services/usage-protection.service';
@@ -226,6 +228,7 @@ export class AppComponent implements OnInit {
   private readonly externalContentConsent = inject(ExternalContentConsentService);
   private readonly wikipediaMapState = inject(WikipediaMapStateService);
   private readonly tripGoStopsMapState = inject(TripGoStopsMapStateService);
+  private readonly overpassMapState = inject(OverpassMapStateService);
   private readonly wikipediaService = inject(WikipediaService);
   private readonly experienceBookmarkService = inject(ExperienceBookmarkService);
   private readonly airQualityService = inject(AirQualityService);
@@ -379,6 +382,11 @@ export class AppComponent implements OnInit {
     });
 
     effect(() => {
+      this.overpassMapState.pois();
+      untracked(() => this.createMarkerLocations());
+    });
+
+    effect(() => {
       const mapSetTrigger = this.mapService.mapSet();
       this.networkService.browserOnline();
       this.networkService.backendOnline();
@@ -389,6 +397,7 @@ export class AppComponent implements OnInit {
       untracked(() => {
         this.syncWikipediaMapState();
         this.syncTripGoStopsMapState();
+        this.syncOverpassMapState();
       });
     });
 
@@ -1804,6 +1813,7 @@ export class AppComponent implements OnInit {
     // newer viewport or delay Wikipedia until another map interaction.
     this.syncWikipediaMapState(settings, zoom);
     this.syncTripGoStopsMapState(settings, zoom);
+    this.syncOverpassMapState(settings, zoom);
 
     // notes from local device
     if (this.userService.isReady()) {
@@ -1884,6 +1894,29 @@ export class AppComponent implements OnInit {
     this.tripGoStopsMapState.setEnabled(canSearchStops);
   }
 
+  private syncOverpassMapState(
+    settings = this.normalizeSearchSettings(this.searchSettings),
+    zoom = this.mapService.getMapZoom()
+  ): void {
+    if (!this.networkService.browserOnline() || !this.networkService.backendOnline() || this.maintenanceActive()) {
+      this.overpassMapState.setViewport(null);
+      return;
+    }
+    const categories: Partial<Record<OverpassCategory, OverpassSubcategory[]>> = {};
+    (Object.keys(OVERPASS_SUBCATEGORIES) as OverpassCategory[]).forEach((category) => {
+      const setting = settings[category];
+      if (!setting.enabled || zoom < setting.minZoom) return;
+      const selected = OVERPASS_SUBCATEGORIES[category]
+        .filter((subcategory) => setting.subcategories[subcategory]) as OverpassSubcategory[];
+      if (selected.length) categories[category] = selected;
+    });
+    const bounds = this.mapService.getVisibleMapBoundingBoxes().filter((box) =>
+      (box.latMax - box.latMin) * (box.lonMax - box.lonMin) <= 0.05);
+    this.overpassMapState.setViewport(Object.keys(categories).length && bounds.length
+      ? { bounds, zoom, categories }
+      : null);
+  }
+
   private async loadSearchSettings(): Promise<void> {
     const stored = await this.indexedDbService.getSetting<SearchSettings>('searchSettings');
     this.searchSettings = this.normalizeSearchSettings(stored ?? DEFAULT_SEARCH_SETTINGS);
@@ -1915,7 +1948,12 @@ export class AppComponent implements OnInit {
           16,
           settings?.publicTransportStops?.minZoom ?? DEFAULT_SEARCH_SETTINGS.publicTransportStops.minZoom
         ))
-      }
+      },
+      accommodation: normalizePoiSetting('accommodation', settings?.accommodation),
+      tourism: normalizePoiSetting('tourism', settings?.tourism),
+      leisure: normalizePoiSetting('leisure', settings?.leisure),
+      food_drink: normalizePoiSetting('food_drink', settings?.food_drink),
+      amenities: normalizePoiSetting('amenities', settings?.amenities)
     };
   }
 
@@ -1974,6 +2012,11 @@ export class AppComponent implements OnInit {
         if (event.publicTransportStop) {
           this.openPublicTransportStopDialog(event.publicTransportStop);
         }
+        break;
+      case MarkerType.OVERPASS_POI:
+        // A dedicated POI detail dialog, including lazy website metadata, is
+        // intentionally the next frontend step. The marker already exposes
+        // the publisher name as its accessible title/tooltip.
         break;
       case MarkerType.MULTI:
         if (
@@ -3888,6 +3931,26 @@ export class AppComponent implements OnInit {
         documents: [],
         publicTransportStop: stop,
         type: MarkerType.PUBLIC_TRANSPORT_STOP
+      });
+    });
+
+    // Overpass POIs intentionally keep individual markers so their main
+    // category icon remains visible instead of being folded into generic
+    // Plus-Code clusters.
+    this.overpassMapState.pois().forEach((poi) => {
+      const location: Location = {
+        latitude: poi.latitude,
+        longitude: poi.longitude,
+        plusCode: this.geolocationService.getPlusCode(poi.latitude, poi.longitude)
+      };
+      this.markerLocations.set(`overpass:${poi.id}`, {
+        location,
+        messages: [],
+        notes: [],
+        images: [],
+        documents: [],
+        overpassPoi: poi,
+        type: MarkerType.OVERPASS_POI
       });
     });
 

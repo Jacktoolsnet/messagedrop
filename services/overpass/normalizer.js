@@ -1,25 +1,25 @@
 const { categoryForTags } = require('./categories');
 
-function normalizeOverpassResponse(payload, requestedCategories) {
+function normalizeOverpassResponse(payload, requestedCategories, requestedSubcategories = {}) {
   const elements = Array.isArray(payload?.elements) ? payload.elements : [];
-  return elements.map((element) => normalizeElement(element, requestedCategories)).filter(Boolean);
+  return elements.map((element) => normalizeElement(element, requestedCategories, requestedSubcategories)).filter(Boolean);
 }
 
-function normalizeElement(element, requestedCategories) {
+function normalizeElement(element, requestedCategories, requestedSubcategories = {}) {
   if (!element || !['node', 'way', 'relation'].includes(element.type)
       || !Number.isSafeInteger(Number(element.id))) return null;
   const latitude = finiteCoordinate(element.lat ?? element.center?.lat, -90, 90);
   const longitude = finiteCoordinate(element.lon ?? element.center?.lon, -180, 180);
   if (latitude === null || longitude === null) return null;
   const tags = plainTags(element.tags);
-  const category = categoryForTags(tags, requestedCategories);
-  if (!category) return null;
+  const classification = categoryForTags(tags, requestedCategories, requestedSubcategories);
+  if (!classification) return null;
   return {
     id: `osm:${element.type}:${element.id}`,
     osmType: element.type,
     osmId: Number(element.id),
-    category,
-    subtype: subtype(tags),
+    category: classification.category,
+    subtype: classification.subcategory,
     name: firstText(tags.name, tags['name:en'], tags.brand, tags.operator),
     latitude,
     longitude,
@@ -49,13 +49,6 @@ function normalizeElement(element, requestedCategories) {
       url: `https://www.openstreetmap.org/${element.type}/${element.id}`
     }
   };
-}
-
-function subtype(tags) {
-  for (const key of ['tourism', 'leisure', 'amenity', 'historic']) {
-    if (typeof tags[key] === 'string' && tags[key].trim()) return tags[key].trim();
-  }
-  return null;
 }
 
 function plainTags(value) {

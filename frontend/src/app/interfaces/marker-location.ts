@@ -8,6 +8,7 @@ import { SecretDrop } from "./secret-drop";
 import { ExperienceResult, ViatorDestinationLookup } from "./viator";
 import { WikipediaArticle } from "./wikipedia";
 import { TripGoStop } from "./tripgo";
+import { OverpassPoi } from "./overpass";
 
 export interface MarkerLocation {
     location: Location,
@@ -20,5 +21,6 @@ export interface MarkerLocation {
     secretDrops?: SecretDrop[];
     wikipediaArticles?: WikipediaArticle[];
     publicTransportStop?: TripGoStop;
+    overpassPoi?: OverpassPoi;
     type: MarkerType
 }

@@ -68,3 +68,20 @@
 .slider-value {
   font-weight: 600;
 }
+
+.subcategories {
+  border-block: 1px solid var(--mat-card-outlined-outline-color);
+  padding-block: 0.5rem;
+}
+
+.subcategories summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.subcategory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: 0.15rem 0.75rem;
+  margin-top: 0.5rem;
+}

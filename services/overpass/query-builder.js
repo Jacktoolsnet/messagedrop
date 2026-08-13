@@ -1,6 +1,6 @@
-const { CATEGORY_DEFINITIONS } = require('./categories');
+const { selectedDefinitions } = require('./categories');
 
-function buildNearbyQuery({ bounds, categories, limit }, {
+function buildNearbyQuery({ bounds, categories, subcategories = {}, limit }, {
   timeoutSeconds = Number(process.env.OVERPASS_QUERY_TIMEOUT_SECONDS || 15)
 } = {}) {
   const timeout = Number.isInteger(timeoutSeconds) && timeoutSeconds > 0 && timeoutSeconds <= 180
@@ -10,9 +10,11 @@ function buildNearbyQuery({ bounds, categories, limit }, {
     .map(formatCoordinate).join(',');
   const clauses = [];
   for (const category of categories) {
-    for (const definition of CATEGORY_DEFINITIONS[category] || []) {
+    for (const definition of selectedDefinitions(category, subcategories[category])) {
       for (const value of definition.values) {
-        clauses.push(`  nwr[${quote(definition.key)}=${quote(value)}](${bbox});`);
+        const exclusions = definition.exclude.map(({ key, values }) =>
+          `[${quote(key)}!~${quote(`^(${values.map(escapeRegex).join('|')})$`)}]`).join('');
+        clauses.push(`  nwr[${quote(definition.key)}=${quote(value)}]${exclusions}(${bbox});`);
       }
     }
   }
@@ -23,6 +25,10 @@ function buildNearbyQuery({ bounds, categories, limit }, {
     ');',
     `out tags center qt ${limit};`
   ].join('\n');
+}
+
+function escapeRegex(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/gu, '\\$&');
 }
 
 function formatCoordinate(value) {

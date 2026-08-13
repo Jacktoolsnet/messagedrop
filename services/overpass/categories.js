@@ -1,61 +1,108 @@
 const CATEGORY_DEFINITIONS = Object.freeze({
-  hotel: Object.freeze([
-    Object.freeze({ key: 'tourism', values: Object.freeze(['hotel']) }),
-    // Some hotels in OSM are mapped only as hotel buildings and do not carry
-    // the otherwise customary tourism=hotel tag (for example the ParkHotel
-    // Altes Kaffeehaus in Wolfenbüttel).
-    Object.freeze({ key: 'building', values: Object.freeze(['hotel']) })
+  accommodation: definitions([
+    ['hotel', 'tourism', ['hotel']],
+    ['hotel', 'building', ['hotel']],
+    ['guest_house', 'tourism', ['guest_house']],
+    ['hostel', 'tourism', ['hostel']],
+    ['motel', 'tourism', ['motel']],
+    ['apartment', 'tourism', ['apartment']],
+    ['chalet', 'tourism', ['chalet']],
+    ['resort', 'tourism', ['resort']],
+    ['camp_site', 'tourism', ['camp_site']],
+    ['caravan_site', 'tourism', ['caravan_site']],
+    ['alpine_hut', 'tourism', ['alpine_hut']],
+    ['wilderness_hut', 'tourism', ['wilderness_hut']]
   ]),
-  accommodation: Object.freeze([
-    Object.freeze({
-      key: 'tourism',
-      values: Object.freeze([
-        'guest_house', 'hostel', 'motel', 'apartment', 'chalet', 'resort',
-        'camp_site', 'caravan_site', 'alpine_hut', 'wilderness_hut'
-      ])
-    })
+  tourism: definitions([
+    ['attraction', 'tourism', ['attraction']],
+    ['museum', 'tourism', ['museum']],
+    ['gallery', 'tourism', ['gallery']],
+    ['viewpoint', 'tourism', ['viewpoint']],
+    ['zoo', 'tourism', ['zoo']],
+    ['aquarium', 'tourism', ['aquarium']],
+    ['theme_park', 'tourism', ['theme_park']],
+    ['artwork', 'tourism', ['artwork']],
+    ['picnic_site', 'tourism', ['picnic_site']],
+    ['information', 'tourism', ['information']],
+    ['castle', 'historic', ['castle']],
+    ['monument', 'historic', ['monument']],
+    ['memorial', 'historic', ['memorial']],
+    ['ruins', 'historic', ['ruins']],
+    ['archaeological_site', 'historic', ['archaeological_site']]
   ]),
-  tourism: Object.freeze([
-    Object.freeze({
-      key: 'tourism',
-      values: Object.freeze([
-        'attraction', 'museum', 'gallery', 'viewpoint', 'zoo', 'aquarium',
-        'theme_park', 'artwork', 'picnic_site', 'information'
-      ])
-    }),
-    Object.freeze({
-      key: 'historic',
-      values: Object.freeze(['castle', 'monument', 'memorial', 'ruins', 'archaeological_site'])
-    })
+  leisure: definitions([
+    ['park', 'leisure', ['park']],
+    ['nature_reserve', 'leisure', ['nature_reserve']],
+    ['playground', 'leisure', ['playground']],
+    ['fitness_centre', 'leisure', ['fitness_centre']],
+    ['sports_centre', 'leisure', ['sports_centre']],
+    ['swimming_pool', 'leisure', ['swimming_pool']],
+    ['water_park', 'leisure', ['water_park']],
+    ['miniature_golf', 'leisure', ['miniature_golf']],
+    ['golf_course', 'leisure', ['golf_course']],
+    ['marina', 'leisure', ['marina']],
+    ['beach_resort', 'leisure', ['beach_resort']],
+    ['bowling_alley', 'leisure', ['bowling_alley']]
   ]),
-  leisure: Object.freeze([
-    Object.freeze({
-      key: 'leisure',
-      values: Object.freeze([
-        'park', 'nature_reserve', 'playground', 'fitness_centre', 'sports_centre',
-        'swimming_pool', 'water_park', 'miniature_golf', 'golf_course', 'marina',
-        'beach_resort', 'bowling_alley'
-      ])
-    })
+  food_drink: definitions([
+    ['restaurant', 'amenity', ['restaurant']],
+    ['cafe', 'amenity', ['cafe']],
+    ['bar', 'amenity', ['bar']],
+    ['pub', 'amenity', ['pub']],
+    ['fast_food', 'amenity', ['fast_food']],
+    ['biergarten', 'amenity', ['biergarten']]
   ]),
-  food_drink: Object.freeze([
-    Object.freeze({
-      key: 'amenity',
-      values: Object.freeze(['restaurant', 'cafe', 'bar', 'pub', 'fast_food', 'biergarten'])
-    })
+  amenities: definitions([
+    ['toilets', 'amenity', ['toilets'], [{ key: 'access', values: ['private', 'customers', 'no'] }]]
   ])
 });
+
+function definitions(items) {
+  return Object.freeze(items.map(([subcategory, key, values, exclude = []]) => Object.freeze({
+    subcategory,
+    key,
+    values: Object.freeze(values),
+    exclude: Object.freeze(exclude.map((rule) => Object.freeze({
+      key: rule.key,
+      values: Object.freeze(rule.values)
+    })))
+  })));
+}
 
 function categoryNames() {
   return Object.keys(CATEGORY_DEFINITIONS);
 }
 
-function categoryForTags(tags, requestedCategories = categoryNames()) {
+function subcategoryNames(category) {
+  return [...new Set((CATEGORY_DEFINITIONS[category] || []).map(({ subcategory }) => subcategory))];
+}
+
+function categoryCatalog() {
+  return Object.fromEntries(categoryNames().map((category) => [category, subcategoryNames(category)]));
+}
+
+function selectedDefinitions(category, selectedSubcategories) {
+  const definitionsForCategory = CATEGORY_DEFINITIONS[category] || [];
+  if (!selectedSubcategories) return definitionsForCategory;
+  const selected = new Set(selectedSubcategories);
+  return definitionsForCategory.filter(({ subcategory }) => selected.has(subcategory));
+}
+
+function categoryForTags(tags, requestedCategories = categoryNames(), requestedSubcategories = {}) {
   for (const category of requestedCategories) {
-    const definitions = CATEGORY_DEFINITIONS[category] || [];
-    if (definitions.some(({ key, values }) => values.includes(tags?.[key]))) return category;
+    const matched = selectedDefinitions(category, requestedSubcategories[category])
+      .find(({ key, values, exclude }) => values.includes(tags?.[key])
+        && exclude.every((rule) => !rule.values.includes(tags?.[rule.key])));
+    if (matched) return { category, subcategory: matched.subcategory };
   }
   return null;
 }
 
-module.exports = { CATEGORY_DEFINITIONS, categoryNames, categoryForTags };
+module.exports = {
+  CATEGORY_DEFINITIONS,
+  categoryNames,
+  subcategoryNames,
+  categoryCatalog,
+  selectedDefinitions,
+  categoryForTags
+};

@@ -17,6 +17,21 @@
         {{ 'common.searchSettings.toggle' | transloco }}
       </mat-slide-toggle>
 
+      @if (item.poiCategory; as category) {
+      <details class="subcategories">
+        <summary>{{ 'common.searchSettings.subcategories' | transloco }}</summary>
+        <div class="subcategory-grid">
+          @for (subcategory of getSubcategories(category); track subcategory) {
+          <mat-checkbox [checked]="isSubcategoryEnabled(category, subcategory)"
+            [disabled]="!searchSettings[item.key].enabled"
+            (change)="updateSubcategory(category, subcategory, $event.checked)">
+            {{ ('common.searchSettings.subcategoryItems.' + subcategory) | transloco }}
+          </mat-checkbox>
+          }
+        </div>
+      </details>
+      }
+
       <div class="preview">
         <app-search-settings-map-preview [center]="previewLocation" [zoom]="searchSettings[item.key].minZoom"
           [markers]="getPreviewMarkers(item.key)" [markerIconUrl]="getPreviewMarkerIcon(item.key)"

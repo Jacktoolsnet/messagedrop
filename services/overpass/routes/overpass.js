@@ -5,7 +5,7 @@ const { requireServiceJwt } = require('../utils/serviceJwt');
 const { validateNearbyRequest } = require('../validation');
 const { buildNearbyQuery } = require('../query-builder');
 const { normalizeOverpassResponse } = require('../normalizer');
-const { categoryNames } = require('../categories');
+const { categoryNames, categoryCatalog } = require('../categories');
 
 function createOverpassRouter({
   client, metadataClient, cache, persistentCache,
@@ -29,7 +29,7 @@ function createOverpassRouter({
 
   router.get('/categories', (_req, res) => {
     metrics.categories = (metrics.categories || 0) + 1;
-    return res.status(200).json({ status: 200, categories: categoryNames() });
+    return res.status(200).json({ status: 200, categories: categoryNames(), catalog: categoryCatalog() });
   });
 
   router.post('/nearby', async (req, res, next) => {
@@ -44,7 +44,11 @@ function createOverpassRouter({
       const fetchAndCache = async () => {
         const query = buildNearbyQuery(validated.value);
         const upstream = await client.query(query);
-        const pois = normalizeOverpassResponse(upstream.data, validated.value.categories);
+        const pois = normalizeOverpassResponse(
+          upstream.data,
+          validated.value.categories,
+          validated.value.subcategories
+        );
         const result = {
           status: 200,
           pois,

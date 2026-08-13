@@ -6,6 +6,7 @@ import { MarkerLocation } from '../interfaces/marker-location';
 import { MapContextMenuEvent } from '../interfaces/map-context-menu-event';
 import { MarkerType } from '../interfaces/marker-type';
 import { TripGoStop } from '../interfaces/tripgo';
+import { OverpassCategory, OverpassPoi } from '../interfaces/overpass';
 import { GeolocationService } from './geolocation.service';
 
 const messageMarker = leaflet.icon({
@@ -147,6 +148,32 @@ function publicTransportIcons(stop: TripGoStop): string[] {
   add(values.some((value) => value.includes('gondola') || value.includes('cablecar')), 'gondola_lift');
 
   return icons.length ? icons : ['directions_transit'];
+}
+
+const OVERPASS_MARKER_ICONS: Record<OverpassCategory, string> = {
+  accommodation: 'hotel',
+  tourism: 'photo_camera',
+  leisure: 'sports_soccer',
+  food_drink: 'restaurant',
+  amenities: 'wc'
+};
+
+export function overpassPoiMarker(poi: OverpassPoi): leaflet.DivIcon {
+  return overpassCategoryMarker(poi.category);
+}
+
+export function overpassCategoryMarker(category: OverpassCategory): leaflet.DivIcon {
+  const icon = OVERPASS_MARKER_ICONS[category] || 'location_on';
+  return leaflet.divIcon({
+    className: 'overpass-poi-marker-host',
+    html: `<svg viewBox="0 0 32 40" width="32" height="40" aria-hidden="true">
+      <image href="assets/markers/empty-marker.svg" x="0" y="0" width="32" height="40" />
+      <text x="16" y="16" text-anchor="middle" dominant-baseline="middle"
+        style="font-family:'Material Symbols Outlined';font-size:16px;fill:white">${icon}</text>
+    </svg>`,
+    iconSize: [32, 40],
+    iconAnchor: [16, 40]
+  });
 }
 @Injectable({
   providedIn: 'root'
@@ -580,6 +607,15 @@ export class MapService {
             zIndexOffset: 16,
             title: markerLocation.publicTransportStop.name,
             alt: markerLocation.publicTransportStop.name
+          })
+          : null;
+      case MarkerType.OVERPASS_POI:
+        return markerLocation.overpassPoi
+          ? leaflet.marker(latLng, {
+            icon: overpassPoiMarker(markerLocation.overpassPoi),
+            zIndexOffset: 14,
+            title: markerLocation.overpassPoi.name || markerLocation.overpassPoi.subtype,
+            alt: markerLocation.overpassPoi.name || markerLocation.overpassPoi.subtype
           })
           : null;
       default:

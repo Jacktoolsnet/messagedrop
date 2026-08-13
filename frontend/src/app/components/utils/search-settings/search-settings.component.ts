@@ -2,13 +2,21 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Location } from '../../../interfaces/location';
-import { DEFAULT_SEARCH_SETTINGS, SearchSettings, SearchSettingsKey } from '../../../interfaces/search-settings';
+import {
+  DEFAULT_SEARCH_SETTINGS,
+  PoiSearchSettingsEntry,
+  SearchSettings,
+  SearchSettingsKey,
+  normalizePoiSetting
+} from '../../../interfaces/search-settings';
+import { OVERPASS_SUBCATEGORIES, OverpassCategory } from '../../../interfaces/overpass';
 import { HelpDialogService } from '../help-dialog/help-dialog.service';
 import { SearchSettingsMapPreviewComponent } from './search-settings-map-preview.component';
 import { UserService } from '../../../services/user.service';
@@ -46,13 +54,19 @@ const SEARCH_SETTING_MARKER_ICONS: Record<SearchSettingsKey, string> = {
   experiences: 'assets/markers/experience-marker.svg',
   myExperiences: 'assets/markers/my-experience-marker.svg',
   wikipedia: 'assets/markers/wikipedia-marker.svg',
-  publicTransportStops: 'assets/markers/transport-marker.svg'
+  publicTransportStops: 'assets/markers/transport-marker.svg',
+  accommodation: 'assets/markers/empty-marker.svg',
+  tourism: 'assets/markers/empty-marker.svg',
+  leisure: 'assets/markers/empty-marker.svg',
+  food_drink: 'assets/markers/empty-marker.svg',
+  amenities: 'assets/markers/empty-marker.svg'
 };
 
 interface SearchSettingsItem {
   key: SearchSettingsKey;
   icon: string;
   titleKey: string;
+  poiCategory?: OverpassCategory;
 }
 
 interface SearchSettingsDialogData {
@@ -70,6 +84,7 @@ interface SearchSettingsDialogData {
     MatDialogContent,
     MatDialogActions,
     MatButtonModule,
+    MatCheckboxModule,
     MatIconModule,
     MatSlideToggleModule,
     MatSliderModule,
@@ -101,6 +116,26 @@ export class SearchSettingsComponent {
       key: 'publicTransportStops',
       icon: 'directions_bus',
       titleKey: 'common.searchSettings.items.publicTransportStops'
+    },
+    {
+      key: 'accommodation', icon: 'hotel', titleKey: 'common.searchSettings.items.accommodation',
+      poiCategory: 'accommodation'
+    },
+    {
+      key: 'tourism', icon: 'photo_camera', titleKey: 'common.searchSettings.items.tourism',
+      poiCategory: 'tourism'
+    },
+    {
+      key: 'leisure', icon: 'sports_soccer', titleKey: 'common.searchSettings.items.leisure',
+      poiCategory: 'leisure'
+    },
+    {
+      key: 'food_drink', icon: 'restaurant', titleKey: 'common.searchSettings.items.foodDrink',
+      poiCategory: 'food_drink'
+    },
+    {
+      key: 'amenities', icon: 'wc', titleKey: 'common.searchSettings.items.amenities',
+      poiCategory: 'amenities'
     }
   ];
   readonly items = computed(() => {
@@ -114,6 +149,7 @@ export class SearchSettingsComponent {
       || item.key === 'experiences'
       || item.key === 'wikipedia'
       || item.key === 'publicTransportStops'
+      || item.poiCategory !== undefined
     );
   });
   readonly minZoom = 3;
@@ -151,22 +187,49 @@ export class SearchSettingsComponent {
     };
   }
 
+  updateSubcategory(category: OverpassCategory, subcategory: string, enabled: boolean): void {
+    const setting = this.searchSettings[category] as PoiSearchSettingsEntry;
+    this.searchSettings = {
+      ...this.searchSettings,
+      [category]: {
+        ...setting,
+        subcategories: { ...setting.subcategories, [subcategory]: enabled }
+      }
+    };
+  }
+
+  getSubcategories(category: OverpassCategory): readonly string[] {
+    return OVERPASS_SUBCATEGORIES[category];
+  }
+
+  isSubcategoryEnabled(category: OverpassCategory, subcategory: string): boolean {
+    return (this.searchSettings[category] as PoiSearchSettingsEntry).subcategories[subcategory] ?? false;
+  }
+
   getMinZoom(key: SearchSettingsKey): number {
     if (key === 'publicTransportStops') {
       return 16;
     }
-    return key === 'wikipedia' ? 14 : this.minZoom;
+    if (key === 'wikipedia' || key === 'accommodation' || key === 'tourism'
+      || key === 'leisure' || key === 'food_drink' || key === 'amenities') return 14;
+    return this.minZoom;
   }
 
   getPreviewMarkerIcon(key: SearchSettingsKey): string {
     return SEARCH_SETTING_MARKER_ICONS[key];
   }
 
-  getPreviewMarkers(key: SearchSettingsKey): { latitude: number; longitude: number; iconUrl: string }[] {
+  getPreviewMarkers(key: SearchSettingsKey): {
+    latitude: number;
+    longitude: number;
+    iconUrl: string;
+    overpassCategory?: OverpassCategory;
+  }[] {
     return [{
       latitude: this.previewLocation.latitude,
       longitude: this.previewLocation.longitude,
-      iconUrl: this.getPreviewMarkerIcon(key)
+      iconUrl: this.getPreviewMarkerIcon(key),
+      overpassCategory: Object.hasOwn(OVERPASS_SUBCATEGORIES, key) ? key as OverpassCategory : undefined
     }];
   }
 
@@ -191,7 +254,12 @@ export class SearchSettingsComponent {
           16,
           settings.publicTransportStops?.minZoom ?? DEFAULT_SEARCH_SETTINGS.publicTransportStops.minZoom
         ))
-      }
+      },
+      accommodation: normalizePoiSetting('accommodation', settings.accommodation),
+      tourism: normalizePoiSetting('tourism', settings.tourism),
+      leisure: normalizePoiSetting('leisure', settings.leisure),
+      food_drink: normalizePoiSetting('food_drink', settings.food_drink),
+      amenities: normalizePoiSetting('amenities', settings.amenities)
     };
   }
 
