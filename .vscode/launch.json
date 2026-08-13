@@ -19,6 +19,9 @@
                 "<node_internals>/**"
             ],
             "env": {
+                "OVERPASS_BASE_URL": "http://localhost",
+                "OVERPASS_PORT": "3900",
+                "SERVICE_JWT_AUDIENCE_OVERPASS": "service.overpass",
                 "SERVICE_JWT_ISSUER": "service.admin-backend",
                 "SERVICE_JWT_AUDIENCE": "service.admin-backend",
                 "SERVICE_JWT_TRUSTED_JWKS_PATH": "${workspaceFolder}/platform/admin/backend/config/service-jwks.json"
