@@ -140,6 +140,21 @@
             "type": "node"
         },
         {
+            "name": "Overpass-Service",
+            "program": "${workspaceFolder}/services/overpass/app.js",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "env": {
+                "SERVICE_JWT_ISSUER": "service.overpass",
+                "SERVICE_JWT_AUDIENCE": "service.overpass",
+                "SERVICE_JWT_TRUSTED_JWKS_PATH": "${workspaceFolder}/services/overpass/config/service-jwks.json"
+            },
+            "type": "node"
+        },
+        {
             "name": "Messagedrop-App",
             "type": "node",
             "request": "launch",

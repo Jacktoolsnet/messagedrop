@@ -1,0 +1,37 @@
+{
+  "version": 0.6,
+  "osm3s": { "timestamp_osm_base": "2026-08-13T10:00:00Z" },
+  "elements": [
+    {
+      "type": "node",
+      "id": 1,
+      "lat": 52.1,
+      "lon": 10.2,
+      "tags": {
+        "tourism": "hotel",
+        "name": "Hotel Café",
+        "addr:street": "Main Street",
+        "addr:housenumber": "1",
+        "website": "https://example.test",
+        "stars": "4"
+      }
+    },
+    {
+      "type": "way",
+      "id": 2,
+      "center": { "lat": 52.1002, "lon": 10.2002 },
+      "tags": { "tourism": "hotel", "name": "Hotel Cafe" }
+    },
+    {
+      "type": "relation",
+      "id": 3,
+      "center": { "lat": 52.2, "lon": 10.3 },
+      "tags": { "leisure": "park", "name": "Test Park" }
+    },
+    {
+      "type": "way",
+      "id": 4,
+      "tags": { "tourism": "museum", "name": "Missing center" }
+    }
+  ]
+}

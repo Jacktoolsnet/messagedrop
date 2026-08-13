@@ -90,6 +90,7 @@ const airQualtiy = require('./routes/air-quality');
 const nominatim = require('./routes/nominatim');
 const wikipedia = require('./routes/wikipedia');
 const tripgo = require('./routes/tripgo');
+const overpass = require('./routes/overpass');
 const viator = require('./routes/viator');
 const tenor = require('./routes/tenor');
 const klipy = require('./routes/klipy');
@@ -547,6 +548,13 @@ const tripgoLimit = rateLimit({
   message: rateLimitMessage('Too many TripGo requests, please try again later.')
 });
 
+const overpassLimit = rateLimit({
+  windowMs: Number(process.env.OVERPASS_PUBLIC_RATE_LIMIT_WINDOW_MS || 10 * 60 * 1000),
+  limit: Number(process.env.OVERPASS_PUBLIC_RATE_LIMIT || 120),
+  ...rateLimitDefaults,
+  message: rateLimitMessage('Too many Overpass requests, please try again later.')
+});
+
 const viatorLimit = rateLimit({
   windowMs: 10 * 60 * 1000,
   limit: 120,
@@ -674,6 +682,11 @@ const slowRequestWikipedia = slowRequestMw({
   category: 'external-api',
   upstream: 'wikipedia'
 });
+const slowRequestOverpass = slowRequestMw({
+  thresholdMs: process.env.SLOW_REQUEST_OVERPASS_THRESHOLD_MS || 3000,
+  category: 'external-api',
+  upstream: 'overpass'
+});
 
 // ROUTES
 app.get('/', basicLimit, slowRequestDefault, root);
@@ -700,6 +713,7 @@ app.use('/notification', notificationLimit, slowRequestDefault, notification);
 app.use('/nominatim', nominatimLimit, slowRequestNominatim, nominatim);
 app.use('/wikipedia', wikipediaLimit, slowRequestWikipedia, wikipedia);
 app.use('/tripgo', tripgoLimit, slowRequestDefault, tripgo);
+app.use('/overpass', overpassLimit, slowRequestOverpass, overpass);
 app.use('/viator', viatorLimit, slowRequestDefault, viator);
 app.use('/openai', openAiLimit, slowRequestDefault, openAi);
 app.use('/place', placeLimit, slowRequestDefault, place);
