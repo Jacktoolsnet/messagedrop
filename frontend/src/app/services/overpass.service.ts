@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, forkJoin, map, of, shareReplay } from 'rxjs';
+import { Observable, forkJoin, map, of } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { BoundingBox } from '../interfaces/bounding-box';
 import {
@@ -19,16 +19,11 @@ export class OverpassService {
     'x-skip-ui': 'true',
     'x-skip-backend-status': 'true'
   });
-  private readonly availabilityRequest = this.http.get<OverpassAvailabilityResponse>(
-    `${environment.apiUrl}/overpass/availability`,
-    { headers: this.silentHeaders }
-  ).pipe(
-    map((response) => this.normalizeAvailability(response)),
-    shareReplay({ bufferSize: 1, refCount: false })
-  );
-
   getAvailability(): Observable<OverpassAvailability> {
-    return this.availabilityRequest;
+    return this.http.get<OverpassAvailabilityResponse>(
+      `${environment.apiUrl}/overpass/availability`,
+      { headers: this.silentHeaders }
+    ).pipe(map((response) => this.normalizeAvailability(response)));
   }
 
   getNearby(

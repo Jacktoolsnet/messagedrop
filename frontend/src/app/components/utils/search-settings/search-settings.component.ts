@@ -236,8 +236,7 @@ export class SearchSettingsComponent {
     if (key === 'publicTransportStops') {
       return 16;
     }
-    if (key === 'wikipedia' || key === 'accommodation' || key === 'tourism'
-      || key === 'leisure' || key === 'food_drink' || key === 'amenities' || key === 'religion') return 14;
+    if (key === 'wikipedia' || Object.hasOwn(OVERPASS_SUBCATEGORIES, key)) return 14;
     return this.minZoom;
   }
 

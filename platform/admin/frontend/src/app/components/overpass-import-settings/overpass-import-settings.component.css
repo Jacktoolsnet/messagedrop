@@ -111,8 +111,13 @@ mat-toolbar {
 }
 
 .selection-copy > mat-icon { color: #0f766e; }
-.selection-copy span { display: grid; gap: .16rem; }
+.selection-copy span { display: grid; gap: .16rem; min-width: 0; overflow-wrap: anywhere; }
 .selection-copy small { color: var(--muted); }
+
+.selection-row > mat-slide-toggle,
+.subcategory-row > mat-slide-toggle {
+  flex: 0 0 auto;
+}
 
 .bulk-actions { display: flex; flex-wrap: wrap; gap: .6rem; margin-bottom: .85rem; }
 .subcategory-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .55rem; }
@@ -126,6 +131,12 @@ mat-toolbar {
   border: 1px solid rgba(148, 163, 184, .22);
   border-radius: 14px;
   background: rgba(248, 250, 252, .82);
+}
+
+.subcategory-row > span {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .category-hint, .empty-state, .empty-card mat-card-content {

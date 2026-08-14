@@ -84,10 +84,10 @@ router.get('/availability', [metric.count('overpass.availability', { when: 'alwa
         headers: { Authorization: `Bearer ${token}`, Accept: 'application/json', 'x-request-id': req.traceId }
       });
       if (upstream.status >= 200 && upstream.status < 300) {
-        availabilityCache = {
-          payload: upstream.data,
-          expiresAt: Date.now() + Math.max(1000, Number(process.env.OVERPASS_AVAILABILITY_CACHE_MS || 60000))
-        };
+        const cacheMs = Math.max(0, Number(process.env.OVERPASS_AVAILABILITY_CACHE_MS || 0));
+        availabilityCache = cacheMs > 0
+          ? { payload: upstream.data, expiresAt: Date.now() + cacheMs }
+          : null;
       }
       return res.status(upstream.status).json(upstream.data);
     } catch (error) {

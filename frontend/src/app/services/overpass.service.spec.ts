@@ -43,7 +43,9 @@ describe('OverpassService', () => {
 
   it('loads and normalizes categories enabled by the admin settings', () => {
     service.getAvailability().subscribe((availability) => expect(availability).toEqual({
-      accommodation: ['hotel'], amenities: ['toilets']
+      accommodation: ['hotel'],
+      amenities: ['toilets', 'government_office'],
+      religion: ['church', 'cathedral']
     }));
 
     const request = http.expectOne(`${environment.apiUrl}/overpass/availability`);
@@ -51,9 +53,31 @@ describe('OverpassService', () => {
     expect(request.request.headers.get('x-skip-ui')).toBe('true');
     request.flush({
       status: 200,
-      categories: ['accommodation', 'amenities'],
-      subcategories: { accommodation: ['hotel'], amenities: ['toilets'], tourism: ['museum'] },
+      categories: ['accommodation', 'amenities', 'religion'],
+      subcategories: {
+        accommodation: ['hotel'],
+        amenities: ['toilets', 'government_office'],
+        religion: ['church', 'cathedral'],
+        tourism: ['museum']
+      },
       updatedAt: 123
+    });
+  });
+
+  it('reloads availability so changed admin settings become visible', () => {
+    service.getAvailability().subscribe();
+    http.expectOne(`${environment.apiUrl}/overpass/availability`).flush({
+      status: 200, categories: ['amenities'], subcategories: { amenities: ['toilets'] }, updatedAt: 1
+    });
+
+    service.getAvailability().subscribe((availability) => expect(availability).toEqual({
+      amenities: ['toilets', 'government_office']
+    }));
+    http.expectOne(`${environment.apiUrl}/overpass/availability`).flush({
+      status: 200,
+      categories: ['amenities'],
+      subcategories: { amenities: ['toilets', 'government_office'] },
+      updatedAt: 2
     });
   });
 });
