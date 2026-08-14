@@ -3,7 +3,6 @@
 const fs = require('node:fs');
 const fsPromises = require('node:fs/promises');
 const path = require('node:path');
-const readline = require('node:readline');
 const { spawn } = require('node:child_process');
 const { randomUUID } = require('node:crypto');
 require('dotenv').config({ path: path.resolve(__dirname, '../../../.env'), quiet: true });
@@ -129,7 +128,7 @@ async function prepareDataset(dataset, options, progress = createProgressTracker
   await progress.update('converting', null);
   await command('osmium', [
     'export', '--overwrite', '--output-format', 'geojsonseq',
-    '--attributes', 'type,id', '--format-option', 'print_record_separator=false',
+    '--attributes', 'type,id',
     '--output', geoJsonPath,
     exportPath
   ]);
@@ -167,15 +166,11 @@ async function readPois(
   let processedBytes = 0;
   let lastProgressAt = 0;
   const totalBytes = (await fsPromises.stat(inputPath)).size;
-  const lines = readline.createInterface({
-    input: fs.createReadStream(inputPath, { encoding: 'utf8' }),
-    crlfDelay: Infinity
-  });
-  for await (const rawLine of lines) {
-    processedBytes += Buffer.byteLength(rawLine) + 1;
-    const line = (rawLine.charCodeAt(0) === 0x1e ? rawLine.slice(1) : rawLine).trim();
-    if (!line) continue;
-    const feature = JSON.parse(line);
+  let recordNumber = 0;
+  for await (const rawRecord of readGeoJsonSequence(inputPath)) {
+    recordNumber += 1;
+    processedBytes += Buffer.byteLength(rawRecord) + 1;
+    const feature = parseGeoJsonRecord(rawRecord, recordNumber);
     const element = featureToElement(feature);
     const poi = element ? normalizeElement(element, categories, subcategories) : null;
     if (poi) unique.set(poi.id, poi);
@@ -200,6 +195,82 @@ async function readPois(
   }
   if (onProgress) await onProgress(100, { processedBytes: totalBytes, totalBytes, processedItems: poiCount });
   return poiCount;
+}
+
+/**
+ * Osmium writes RFC 8142 GeoJSON text sequences. Records are separated by the
+ * ASCII record-separator byte (0x1e), not by line breaks. Splitting by lines is
+ * unsafe because real-world OSM tag values can contain line breaks.
+ *
+ * The line-delimited fallback keeps tests and older, already exported files
+ * readable. New exports always use the unambiguous record separator.
+ */
+async function* readGeoJsonSequence(inputPath) {
+  let buffer = '';
+  let mode = null;
+  for await (const chunk of fs.createReadStream(inputPath, { encoding: 'utf8' })) {
+    buffer += chunk;
+    if (!mode) {
+      const firstContent = buffer.search(/\S/u);
+      if (firstContent < 0) continue;
+      mode = buffer.charCodeAt(firstContent) === 0x1e ? 'sequence' : 'lines';
+    }
+    const separator = mode === 'sequence' ? '\x1e' : '\n';
+    let index;
+    while ((index = buffer.indexOf(separator)) >= 0) {
+      const record = buffer.slice(0, index).trim();
+      buffer = buffer.slice(index + 1);
+      if (record) yield record;
+    }
+  }
+  const record = buffer.trim();
+  if (record) yield record;
+}
+
+function parseGeoJsonRecord(record, recordNumber) {
+  try {
+    return JSON.parse(record);
+  } catch (originalError) {
+    // Some historic/third-party exporters have emitted literal control
+    // characters inside JSON strings. They are valid OSM tag contents but must
+    // be escaped in JSON. Repair only those characters and retry once.
+    try {
+      return JSON.parse(escapeJsonStringControls(record));
+    } catch {
+      throw new Error(`Invalid GeoJSON sequence record ${recordNumber}: ${originalError.message}`);
+    }
+  }
+}
+
+function escapeJsonStringControls(value) {
+  let result = '';
+  let inString = false;
+  let escaped = false;
+  for (const character of value) {
+    if (!inString) {
+      result += character;
+      if (character === '"') inString = true;
+      continue;
+    }
+    if (escaped) {
+      result += character;
+      escaped = false;
+      continue;
+    }
+    if (character === '\\') {
+      result += character;
+      escaped = true;
+    } else if (character === '"') {
+      result += character;
+      inString = false;
+    } else if (character === '\n') result += '\\n';
+    else if (character === '\r') result += '\\r';
+    else if (character === '\t') result += '\\t';
+    else if (character.charCodeAt(0) < 0x20) {
+      result += `\\u${character.charCodeAt(0).toString(16).padStart(4, '0')}`;
+    } else result += character;
+  }
+  return result;
 }
 
 async function cleanupWorkingFiles(paths) {
@@ -431,5 +502,6 @@ module.exports = {
   filterExpressions,
   geometryCenter,
   parseArguments,
+  parseGeoJsonRecord,
   readPois
 };

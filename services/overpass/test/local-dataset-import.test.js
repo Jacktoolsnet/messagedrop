@@ -1,11 +1,15 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs/promises');
+const os = require('node:os');
+const path = require('node:path');
 const {
   createProgressTracker,
   featureToElement,
   filterExpressions,
   geometryCenter,
-  parseArguments
+  parseArguments,
+  readPois
 } = require('../scripts/import-local-dataset');
 const { normalizeElement } = require('../normalizer');
 
@@ -80,4 +84,24 @@ test('reports a numbered import step and weighted overall progress', async () =>
   assert.equal(updates[0].progress, 22);
   assert.equal(updates[1].details.stepNumber, 3);
   assert.equal(updates[1].details.stepProgress, null);
+});
+
+test('reads record-separated GeoJSON with line breaks in OSM tag values', async (t) => {
+  const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'overpass-geojsonseq-'));
+  t.after(() => fs.rm(directory, { recursive: true, force: true }));
+  const inputPath = path.join(directory, 'pois.geojsonseq');
+  const records = [
+    '{"type":"Feature","geometry":{"type":"Point","coordinates":[10.5,52.1]},"properties":{"@type":"node","@id":1,"tourism":"hotel","name":"Hotel first line\nsecond line"}}',
+    '{"type":"Feature","geometry":{"type":"Point","coordinates":[10.6,52.2]},"properties":{"@type":"node","@id":2,"amenity":"toilets","name":"WC"}}'
+  ];
+  await fs.writeFile(inputPath, `\x1e${records[0]}\n\x1e${records[1]}\n`);
+
+  const batches = [];
+  const count = await readPois(inputPath, ['accommodation', 'amenities'], {
+    accommodation: ['hotel'], amenities: ['toilets']
+  }, async (batch) => batches.push(...batch));
+
+  assert.equal(count, 2);
+  assert.equal(batches[0].name, 'Hotel first line\nsecond line');
+  assert.equal(batches[1].subtype, 'toilets');
 });
