@@ -65,7 +65,7 @@ function discoverWebsites(db, callback) {
 }
 
 function listDue(db, refreshDays, limit, callback) {
-  const days = Math.max(1, Number(refreshDays) || 7);
+  const days = Math.max(1, Number(refreshDays) || 30);
   const safeLimit = Math.max(1, Math.min(100000, Number(limit) || 100000));
   db.all(`
     SELECT websiteUrl, metadata, status, fetchedAt, attemptCount
@@ -98,7 +98,7 @@ function markFetching(db, websiteUrl, callback) {
 }
 
 function markSucceeded(db, websiteUrl, metadata, refreshDays, callback) {
-  const days = Math.max(1, Number(refreshDays) || 7);
+  const days = Math.max(1, Number(refreshDays) || 30);
   db.run(`UPDATE ${METADATA_TABLE} SET metadata = ?::jsonb, status = 'succeeded', fetchedAt = CURRENT_TIMESTAMP,
     nextAttemptAt = CURRENT_TIMESTAMP + (? * INTERVAL '1 day'), lastError = NULL, updatedAt = CURRENT_TIMESTAMP
     WHERE websiteUrl = ?`, [JSON.stringify(metadata), days, websiteUrl], callback);

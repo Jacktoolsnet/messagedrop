@@ -7,7 +7,7 @@ class WebsiteMetadataJobManager {
     this.database = database;
     this.client = client;
     this.logger = logger;
-    this.refreshDays = positiveNumber(refreshDays ?? process.env.OVERPASS_WEBSITE_METADATA_REFRESH_DAYS, 7);
+    this.refreshDays = positiveNumber(refreshDays ?? process.env.OVERPASS_WEBSITE_METADATA_REFRESH_DAYS, 30);
     this.retryHours = positiveNumber(retryHours ?? process.env.OVERPASS_WEBSITE_METADATA_RETRY_HOURS, 24);
     this.delayMs = nonNegativeNumber(delayMs ?? process.env.OVERPASS_WEBSITE_METADATA_DELAY_MS, 1000);
     this.maxUrls = positiveNumber(maxUrls ?? process.env.OVERPASS_WEBSITE_METADATA_JOB_MAX_URLS, 100000);
@@ -22,7 +22,9 @@ class WebsiteMetadataJobManager {
   }
 
   async trigger(reason = 'manual') {
-    if (this.running) return this.running;
+    if (this.running) {
+      return callbackResult((callback) => this.store.runningJob(this.database.db, callback));
+    }
     const active = await callbackResult((callback) => this.store.runningJob(this.database.db, callback));
     if (active) return active;
     await this.discover();

@@ -105,7 +105,7 @@ const { normalizeErrorResponses, notFoundHandler, errorHandler } = require('./mi
 const { cleanupClosedDsaCases } = require('./utils/dsaCleanup');
 const { parseRetentionMs, DAY_MS } = require('./utils/logRetention');
 const { runCertificateHealthCheck } = require('./utils/certificateHealth');
-const { runScheduledImports } = require('./utils/overpassImport');
+const { requestService, runScheduledImports } = require('./utils/overpassImport');
 const robotsSitemap = require('./middleware/robots-sitemap');
 
 // ExpressJs
@@ -697,6 +697,17 @@ cron.schedule('*/5 * * * *', () => {
     logger.error('Scheduled Overpass import failed', { error: error?.message || error });
   });
 });
+
+// Check once a day for missing or stale website metadata. The Overpass service
+// only requests URLs whose persisted refresh timestamp is due.
+const overpassMetadataCron = process.env.OVERPASS_METADATA_CRON || '0 4 * * *';
+const overpassMetadataTimezone = process.env.OVERPASS_METADATA_TIMEZONE || 'Europe/Berlin';
+cron.schedule(overpassMetadataCron, () => {
+  void requestService('post', '/overpass/metadata-jobs', { reason: 'daily-cron' })
+    .catch((error) => logger.error('Scheduled Overpass metadata refresh failed', {
+      error: error?.message || error
+    }));
+}, { timezone: overpassMetadataTimezone });
 
 const infoRetentionMs = parseRetentionMs(LOG_RETENTION_INFO, 2 * DAY_MS);
 const errorRetentionMs = parseRetentionMs(LOG_RETENTION_ERROR, 2 * DAY_MS);

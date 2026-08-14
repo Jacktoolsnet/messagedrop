@@ -13,6 +13,7 @@ The service-to-service endpoints require a JWT with audience `service.overpass`:
 - `POST /overpass/nearby`
 - `POST /overpass/website-metadata`
 - `GET /overpass/metadata-jobs`
+- `POST /overpass/metadata-jobs`
 - `GET /overpass/metrics`
 
 Example request body:
@@ -66,9 +67,12 @@ configured with `OVERPASS_WEBSITE_METADATA_*`.
 After every successful country import, a separate durable enrichment job finds
 the distinct HTTPS websites referenced by active POIs. Each normalized website
 is requested only once per refresh cycle. Requests run sequentially with a
-one-second delay by default. Successful metadata is refreshed after seven days;
-failed websites are retried after 24 hours. On every service start, interrupted
-jobs are recovered and missing or stale metadata is processed automatically.
+one-second delay by default. Successful metadata is refreshed after 30 days;
+failed websites are retried after 24 hours. The admin backend triggers a
+due-check every day at 04:00 in `Europe/Berlin` by default. The schedule is
+configurable with `OVERPASS_METADATA_CRON` and
+`OVERPASS_METADATA_TIMEZONE`. On every service start, interrupted jobs are
+recovered and missing or stale metadata is processed automatically.
 Metadata is stored once per normalized URL and added to local POI responses as
 `websiteMetadata`.
 

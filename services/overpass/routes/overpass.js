@@ -83,6 +83,17 @@ function createOverpassRouter({
     } catch (error) { return next(error); }
   });
 
+  router.post('/metadata-jobs', async (req, res, next) => {
+    if (!websiteMetadataJobManager) return res.status(503).json({ error: 'metadata_jobs_unavailable' });
+    try {
+      const reason = typeof req.body?.reason === 'string' && req.body.reason.trim()
+        ? req.body.reason.trim().slice(0, 100)
+        : 'api';
+      const job = await websiteMetadataJobManager.trigger(reason);
+      return res.status(job ? 202 : 200).json({ status: job ? 202 : 200, job });
+    } catch (error) { return next(error); }
+  });
+
   router.post('/nearby', async (req, res, next) => {
     metrics.nearby = (metrics.nearby || 0) + 1;
     const validated = validateNearbyRequest(req.body);

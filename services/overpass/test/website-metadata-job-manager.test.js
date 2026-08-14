@@ -76,3 +76,21 @@ test('records individual website failures without failing the complete metadata 
   assert.equal(store.state.job.failedUrls, 1);
   assert.equal(store.state.metadata.get('https://broken.example/').status, 'failed');
 });
+
+test('returns the running job immediately when a scheduled check overlaps with enrichment', async () => {
+  const store = memoryStore(['https://slow.example/']);
+  let finishFetch;
+  const fetchFinished = new Promise((resolve) => { finishFetch = resolve; });
+  const manager = new WebsiteMetadataJobManager({
+    database: { db: {} }, store, delayMs: 0,
+    client: { fetch() { return fetchFinished; } }
+  });
+
+  const started = await manager.trigger('service-start');
+  const overlapping = await manager.trigger('daily-cron');
+
+  assert.equal(started.status, 'running');
+  assert.equal(overlapping.metadataJobId, started.metadataJobId);
+  finishFetch({ title: 'Slow website' });
+  await manager.running;
+});
