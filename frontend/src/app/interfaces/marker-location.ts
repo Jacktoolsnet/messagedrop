@@ -23,5 +23,6 @@ export interface MarkerLocation {
     publicTransportStop?: TripGoStop;
     overpassPoi?: OverpassPoi;
     overpassPois?: OverpassPoi[];
+    overpassGrouped?: boolean;
     type: MarkerType
 }
