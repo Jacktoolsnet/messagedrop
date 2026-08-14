@@ -6,7 +6,7 @@ import { MarkerLocation } from '../interfaces/marker-location';
 import { MapContextMenuEvent } from '../interfaces/map-context-menu-event';
 import { MarkerType } from '../interfaces/marker-type';
 import { TripGoStop } from '../interfaces/tripgo';
-import { OverpassCategory, OverpassPoi } from '../interfaces/overpass';
+import { OVERPASS_CATEGORY_ICONS, OverpassCategory, OverpassPoi } from '../interfaces/overpass';
 import { GeolocationService } from './geolocation.service';
 
 const messageMarker = leaflet.icon({
@@ -150,20 +150,12 @@ function publicTransportIcons(stop: TripGoStop): string[] {
   return icons.length ? icons : ['directions_transit'];
 }
 
-const OVERPASS_MARKER_ICONS: Record<OverpassCategory, string> = {
-  accommodation: 'hotel',
-  tourism: 'photo_camera',
-  leisure: 'sports_soccer',
-  food_drink: 'restaurant',
-  amenities: 'wc'
-};
-
 export function overpassPoiMarker(poi: OverpassPoi): leaflet.DivIcon {
   return overpassCategoryMarker(poi.category);
 }
 
 export function overpassCategoryMarker(category: OverpassCategory): leaflet.DivIcon {
-  const icon = OVERPASS_MARKER_ICONS[category] || 'location_on';
+  const icon = OVERPASS_CATEGORY_ICONS[category] || 'location_on';
   return leaflet.divIcon({
     className: 'overpass-poi-marker-host',
     html: `<svg class="overpass-poi-marker" viewBox="0 0 32 40" width="32" height="40" aria-hidden="true">

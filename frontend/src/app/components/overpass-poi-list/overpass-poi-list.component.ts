@@ -10,7 +10,7 @@ import {
 } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { OverpassCategory, OverpassPoi } from '../../interfaces/overpass';
+import { OVERPASS_CATEGORY_ICONS, OverpassCategory, OverpassPoi } from '../../interfaces/overpass';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 
@@ -20,14 +20,6 @@ export interface OverpassPoiListResult {
   action: OverpassPoiListAction;
   poi: OverpassPoi;
 }
-
-const CATEGORY_ICONS: Record<OverpassCategory, string> = {
-  accommodation: 'hotel',
-  tourism: 'photo_camera',
-  leisure: 'sports_soccer',
-  food_drink: 'restaurant',
-  amenities: 'wc'
-};
 
 @Component({
   selector: 'app-overpass-poi-list',
@@ -53,7 +45,7 @@ export class OverpassPoiListComponent {
   private readonly failedImages = signal<ReadonlySet<string>>(new Set());
 
   categoryIcon(category: OverpassCategory): string {
-    return CATEGORY_ICONS[category];
+    return OVERPASS_CATEGORY_ICONS[category];
   }
 
   address(poi: OverpassPoi): string {

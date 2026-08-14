@@ -22,6 +22,14 @@ export const OVERPASS_SUBCATEGORIES = {
 export type OverpassCategory = keyof typeof OVERPASS_SUBCATEGORIES;
 export type OverpassSubcategory = typeof OVERPASS_SUBCATEGORIES[OverpassCategory][number];
 
+export const OVERPASS_CATEGORY_ICONS: Record<OverpassCategory, string> = {
+  accommodation: 'hotel',
+  tourism: 'photo_camera',
+  leisure: 'sports_soccer',
+  food_drink: 'restaurant',
+  amenities: 'wc'
+};
+
 export type OverpassAvailability = Partial<Record<OverpassCategory, readonly OverpassSubcategory[]>>;
 
 export interface OverpassAvailabilityResponse {

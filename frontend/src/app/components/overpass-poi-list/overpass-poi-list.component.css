@@ -102,18 +102,21 @@
   place-items: center;
 }
 
-.pin-avatar img {
+.dynamic-poi-marker {
+  display: block;
   width: 2.35rem;
-  height: 2.85rem;
+  height: 2.95rem;
+  overflow: visible;
+  filter: drop-shadow(0 2px 2px color-mix(in srgb, var(--mat-sys-shadow) 35%, transparent));
 }
 
-.pin-avatar mat-icon {
-  position: absolute;
-  top: 0.42rem;
-  width: 1.2rem;
-  height: 1.2rem;
-  color: white;
-  font-size: 1.2rem;
+.dynamic-poi-marker__icon {
+  color: #5f6368;
+  fill: #5f6368;
+  font-size: 17px;
+  text-anchor: middle;
+  dominant-baseline: hanging;
+  font-variation-settings: 'FILL' 0, 'wght' 600, 'GRAD' 0, 'opsz' 20;
 }
 
 .identity-text {
