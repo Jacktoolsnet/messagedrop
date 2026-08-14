@@ -23,3 +23,17 @@ test('normalizes nodes and area centers without leaking raw tags', () => {
   assert.equal(pois[1].latitude, 52.1002);
   assert.equal(pois[2].category, 'leisure');
 });
+
+test('classifies religious buildings and generic places of worship', () => {
+  const pois = normalizeOverpassResponse({ elements: [
+    { type: 'node', id: 10, lat: 52.1, lon: 10.2,
+      tags: { amenity: 'place_of_worship', building: 'cathedral', tourism: 'attraction', name: 'Test Cathedral' } },
+    { type: 'node', id: 11, lat: 52.2, lon: 10.3,
+      tags: { amenity: 'place_of_worship', religion: 'sikh', name: 'Test Gurdwara' } }
+  ] }, ['tourism', 'religion']);
+
+  assert.equal(pois[0].category, 'religion');
+  assert.equal(pois[0].subtype, 'cathedral');
+  assert.equal(pois[1].category, 'religion');
+  assert.equal(pois[1].subtype, 'place_of_worship');
+});

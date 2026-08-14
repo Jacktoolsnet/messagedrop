@@ -24,6 +24,7 @@ export interface SearchSettings {
   leisure: PoiSearchSettingsEntry;
   food_drink: PoiSearchSettingsEntry;
   amenities: PoiSearchSettingsEntry;
+  religion: PoiSearchSettingsEntry;
 }
 
 export type SearchSettingsKey = keyof SearchSettings;
@@ -50,7 +51,8 @@ export const DEFAULT_SEARCH_SETTINGS: SearchSettings = {
   tourism: poiDefaults('tourism'),
   leisure: poiDefaults('leisure'),
   food_drink: poiDefaults('food_drink'),
-  amenities: poiDefaults('amenities', 15)
+  amenities: poiDefaults('amenities', 15),
+  religion: poiDefaults('religion')
 };
 
 export function normalizePoiSetting(

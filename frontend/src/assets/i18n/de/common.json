@@ -1739,7 +1739,8 @@
         "tourism": "Tourismus und Sehenswürdigkeiten",
         "leisure": "Freizeit",
         "foodDrink": "Essen und Trinken",
-        "amenities": "Praktisches"
+        "amenities": "Praktisches",
+        "religion": "Glaubensstätten"
       },
       "subcategories": "Unterkategorien",
       "subcategoryItems": {
@@ -1787,7 +1788,16 @@
         "pub": "Pubs",
         "fast_food": "Schnellrestaurants",
         "biergarten": "Biergärten",
-        "toilets": "Öffentliche Toiletten"
+        "toilets": "Öffentliche Toiletten",
+        "cathedral": "Kathedralen",
+        "church": "Kirchen",
+        "chapel": "Kapellen",
+        "mosque": "Moscheen",
+        "synagogue": "Synagogen",
+        "temple": "Tempel",
+        "shrine": "Schreine",
+        "monastery": "Klöster",
+        "place_of_worship": "Sonstige Glaubensstätten"
       }
     },
     "routeOptions": {

@@ -16,7 +16,11 @@ export const OVERPASS_SUBCATEGORIES = {
     'beach_resort', 'bowling_alley'
   ],
   food_drink: ['restaurant', 'cafe', 'bar', 'pub', 'fast_food', 'biergarten'],
-  amenities: ['toilets']
+  amenities: ['toilets'],
+  religion: [
+    'cathedral', 'church', 'chapel', 'mosque', 'synagogue', 'temple', 'shrine',
+    'monastery', 'place_of_worship'
+  ]
 } as const;
 
 export type OverpassCategory = keyof typeof OVERPASS_SUBCATEGORIES;
@@ -27,7 +31,8 @@ export const OVERPASS_CATEGORY_ICONS: Record<OverpassCategory, string> = {
   tourism: 'photo_camera',
   leisure: 'sports_soccer',
   food_drink: 'restaurant',
-  amenities: 'wc'
+  amenities: 'wc',
+  religion: 'church'
 };
 
 export type OverpassAvailability = Partial<Record<OverpassCategory, readonly OverpassSubcategory[]>>;

@@ -261,6 +261,7 @@ export class OverpassImportSettingsComponent {
   label(value: string): string {
     const labels: Record<string, string> = {
       accommodation: 'Accommodation', tourism: 'Tourism', leisure: 'Leisure', food_drink: 'Food & drink', amenities: 'Public amenities',
+      religion: 'Places of worship',
       hotel: 'Hotels', guest_house: 'Guest houses', hostel: 'Hostels', motel: 'Motels', apartment: 'Holiday apartments', chalet: 'Chalets', resort: 'Resorts',
       camp_site: 'Campsites', caravan_site: 'Caravan sites', alpine_hut: 'Alpine huts', wilderness_hut: 'Wilderness huts',
       attraction: 'Attractions', museum: 'Museums', gallery: 'Galleries', viewpoint: 'Viewpoints', zoo: 'Zoos', aquarium: 'Aquariums',
@@ -269,9 +270,18 @@ export class OverpassImportSettingsComponent {
       nature_reserve: 'Nature reserves', playground: 'Playgrounds', fitness_centre: 'Fitness centres', sports_centre: 'Sports centres',
       swimming_pool: 'Swimming pools', water_park: 'Water parks', miniature_golf: 'Miniature golf', golf_course: 'Golf courses',
       marina: 'Marinas', beach_resort: 'Beach resorts', bowling_alley: 'Bowling alleys', restaurant: 'Restaurants', cafe: 'Cafés',
-      bar: 'Bars', pub: 'Pubs', fast_food: 'Fast food', biergarten: 'Beer gardens', toilets: 'Public toilets'
+      bar: 'Bars', pub: 'Pubs', fast_food: 'Fast food', biergarten: 'Beer gardens', toilets: 'Public toilets',
+      cathedral: 'Cathedrals', church: 'Churches', chapel: 'Chapels', mosque: 'Mosques', synagogue: 'Synagogues',
+      temple: 'Temples', shrine: 'Shrines', monastery: 'Monasteries', place_of_worship: 'Other places of worship'
     };
     return this.i18n.t(labels[value] ?? value.replaceAll('_', ' ').replace(/^./, (letter) => letter.toUpperCase()));
+  }
+
+  categoryIcon(category: string): string {
+    return ({
+      accommodation: 'hotel', tourism: 'museum', leisure: 'park', food_drink: 'restaurant',
+      amenities: 'wc', religion: 'church'
+    } as Record<string, string>)[category] ?? 'category';
   }
 
   stageLabel(stage: string): string {

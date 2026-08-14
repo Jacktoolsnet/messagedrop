@@ -2,7 +2,7 @@ const tableName = 'tableOverpassImportSettings';
 
 const DEFAULTS = Object.freeze({
   id: 1, enabled: false, datasets: ['germany'],
-  categories: ['accommodation', 'tourism', 'leisure', 'food_drink', 'amenities'],
+  categories: ['accommodation', 'tourism', 'leisure', 'food_drink', 'amenities', 'religion'],
   subcategories: {},
   scheduleType: 'weekly', weekday: 0, hour: 3, minute: 0,
   timezone: 'Europe/Berlin', refreshSource: true, lastTriggeredAt: 0, updatedAt: 0

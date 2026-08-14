@@ -48,7 +48,7 @@
           @for (category of categoryNames(); track category) {
             <div class="selection-row" [class.selected]="selectedCategory() === category" (click)="selectCategory(category)">
               <button type="button" class="selection-copy" (click)="selectCategory(category)">
-                <mat-icon>{{ category === 'accommodation' ? 'hotel' : category === 'tourism' ? 'museum' : category === 'leisure' ? 'park' : category === 'food_drink' ? 'restaurant' : 'wc' }}</mat-icon>
+                <mat-icon>{{ categoryIcon(category) }}</mat-icon>
                 <span>
                   <strong>{{ label(category) }}</strong>
                   <small>{{ catalog()?.categories?.[category]?.length ?? 0 }} {{ i18n.t('subcategories') }}</small>

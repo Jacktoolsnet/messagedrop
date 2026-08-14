@@ -5,7 +5,7 @@ const { resolveBaseUrl } = require('./adminLogForwarder');
 const settingsTable = require('../db/tableOverpassImportSettings');
 const dispatchTable = require('../db/tableOverpassImportDispatch');
 
-const CATEGORIES = ['accommodation', 'tourism', 'leisure', 'food_drink', 'amenities'];
+const CATEGORIES = ['accommodation', 'tourism', 'leisure', 'food_drink', 'amenities', 'religion'];
 
 function callbackResult(register) {
   return new Promise((resolve, reject) => register((error, value) => error ? reject(error) : resolve(value)));

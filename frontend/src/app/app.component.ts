@@ -1966,7 +1966,8 @@ export class AppComponent implements OnInit {
       tourism: normalizePoiSetting('tourism', settings?.tourism),
       leisure: normalizePoiSetting('leisure', settings?.leisure),
       food_drink: normalizePoiSetting('food_drink', settings?.food_drink),
-      amenities: normalizePoiSetting('amenities', settings?.amenities)
+      amenities: normalizePoiSetting('amenities', settings?.amenities),
+      religion: normalizePoiSetting('religion', settings?.religion)
     };
   }
 

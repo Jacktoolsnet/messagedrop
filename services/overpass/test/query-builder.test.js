@@ -25,3 +25,15 @@ test('only emits selected allowlisted subcategories', () => {
   assert.match(query, /nwr\["amenity"="toilets"\]\["access"!~"\^\(private\|customers\|no\)\$"\]/u);
   assert.doesNotMatch(query, /restaurant/u);
 });
+
+test('queries selected religious buildings and places of worship', () => {
+  const query = buildNearbyQuery({
+    bounds: { south: 52.1, west: 10.1, north: 52.2, east: 10.2 },
+    categories: ['religion'],
+    subcategories: { religion: ['church', 'place_of_worship'] },
+    limit: 25
+  });
+  assert.match(query, /nwr\["building"="church"\]/u);
+  assert.match(query, /nwr\["amenity"="place_of_worship"\]/u);
+  assert.doesNotMatch(query, /building"="cathedral/u);
+});

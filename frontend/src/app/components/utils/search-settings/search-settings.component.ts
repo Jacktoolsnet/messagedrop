@@ -62,7 +62,8 @@ const SEARCH_SETTING_MARKER_ICONS: Record<SearchSettingsKey, string> = {
   tourism: 'assets/markers/empty-marker.svg',
   leisure: 'assets/markers/empty-marker.svg',
   food_drink: 'assets/markers/empty-marker.svg',
-  amenities: 'assets/markers/empty-marker.svg'
+  amenities: 'assets/markers/empty-marker.svg',
+  religion: 'assets/markers/empty-marker.svg'
 };
 
 interface SearchSettingsItem {
@@ -143,6 +144,10 @@ export class SearchSettingsComponent {
     {
       key: 'amenities', icon: 'wc', titleKey: 'common.searchSettings.items.amenities',
       poiCategory: 'amenities'
+    },
+    {
+      key: 'religion', icon: 'church', titleKey: 'common.searchSettings.items.religion',
+      poiCategory: 'religion'
     }
   ];
   readonly items = computed(() => {
@@ -232,7 +237,7 @@ export class SearchSettingsComponent {
       return 16;
     }
     if (key === 'wikipedia' || key === 'accommodation' || key === 'tourism'
-      || key === 'leisure' || key === 'food_drink' || key === 'amenities') return 14;
+      || key === 'leisure' || key === 'food_drink' || key === 'amenities' || key === 'religion') return 14;
     return this.minZoom;
   }
 
@@ -280,7 +285,8 @@ export class SearchSettingsComponent {
       tourism: normalizePoiSetting('tourism', settings.tourism),
       leisure: normalizePoiSetting('leisure', settings.leisure),
       food_drink: normalizePoiSetting('food_drink', settings.food_drink),
-      amenities: normalizePoiSetting('amenities', settings.amenities)
+      amenities: normalizePoiSetting('amenities', settings.amenities),
+      religion: normalizePoiSetting('religion', settings.religion)
     };
   }
 

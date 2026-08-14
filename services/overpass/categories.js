@@ -54,8 +54,28 @@ const CATEGORY_DEFINITIONS = Object.freeze({
   ]),
   amenities: definitions([
     ['toilets', 'amenity', ['toilets'], [{ key: 'access', values: ['private', 'customers', 'no'] }]]
+  ]),
+  religion: definitions([
+    ['cathedral', 'building', ['cathedral']],
+    ['church', 'building', ['church']],
+    ['chapel', 'building', ['chapel']],
+    ['mosque', 'building', ['mosque']],
+    ['synagogue', 'building', ['synagogue']],
+    ['temple', 'building', ['temple']],
+    ['shrine', 'building', ['shrine']],
+    ['shrine', 'historic', ['wayside_shrine']],
+    ['monastery', 'building', ['monastery']],
+    ['monastery', 'amenity', ['monastery']],
+    ['place_of_worship', 'amenity', ['place_of_worship']]
   ])
 });
+
+// Prefer the semantic purpose over a broad tourism tag when an object belongs
+// to more than one selected category (for example a cathedral that is also
+// tagged as tourism=attraction).
+const CLASSIFICATION_PRIORITY = Object.freeze([
+  'accommodation', 'religion', 'tourism', 'leisure', 'food_drink', 'amenities'
+]);
 
 function definitions(items) {
   return Object.freeze(items.map(([subcategory, key, values, exclude = []]) => Object.freeze({
@@ -89,7 +109,12 @@ function selectedDefinitions(category, selectedSubcategories) {
 }
 
 function categoryForTags(tags, requestedCategories = categoryNames(), requestedSubcategories = {}) {
-  for (const category of requestedCategories) {
+  const requested = new Set(requestedCategories);
+  const orderedCategories = [
+    ...CLASSIFICATION_PRIORITY.filter((category) => requested.has(category)),
+    ...requestedCategories.filter((category) => !CLASSIFICATION_PRIORITY.includes(category))
+  ];
+  for (const category of orderedCategories) {
     const matched = selectedDefinitions(category, requestedSubcategories[category])
       .find(({ key, values, exclude }) => values.includes(tags?.[key])
         && exclude.every((rule) => !rule.values.includes(tags?.[rule.key])));

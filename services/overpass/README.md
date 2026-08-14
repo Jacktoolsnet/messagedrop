@@ -41,6 +41,11 @@ The server validates every requested subcategory against that catalog. The
 with `access=private`, `access=customers`, or `access=no`; paid public toilets
 remain included.
 
+The `religion` category covers churches, cathedrals, chapels, mosques,
+synagogues, temples, shrines, monasteries, and other active places of worship.
+Specific religious building types take precedence over a broad
+`tourism=attraction` classification.
+
 ## Website header metadata
 
 Metadata for a POI website can be loaded separately after obtaining its URL
