@@ -3985,8 +3985,9 @@ export class AppComponent implements OnInit {
     });
 
     // Apply the same Plus-Code grouping as Wikipedia and other map content.
-    // At close zoom levels each POI gets its own category marker; farther out
-    // nearby POIs are represented by the generic summary marker.
+    // All Overpass POIs in a cell form one "public places" content group. A
+    // summary marker is only needed when another content group already exists
+    // in the same cell; multiple POIs alone still open the POI list directly.
     this.overpassMapState.pois().forEach((poi) => {
       const poiLocation: Location = {
         latitude: poi.latitude,
@@ -4012,7 +4013,9 @@ export class AppComponent implements OnInit {
       if (existing) {
         existing.overpassPois ??= existing.overpassPoi ? [existing.overpassPoi] : [];
         existing.overpassPois.push(poi);
-        existing.type = MarkerType.MULTI;
+        if (existing.type !== MarkerType.OVERPASS_POI) {
+          existing.type = MarkerType.MULTI;
+        }
       } else {
         this.markerLocations.set(key, {
           location: center,

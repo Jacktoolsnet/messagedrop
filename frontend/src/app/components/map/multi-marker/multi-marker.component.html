@@ -62,12 +62,12 @@
     {{ 'common.map.multiMarker.showWikipedia' | transloco }}
   </button>
   }
-  @for (group of overpassCategoryGroups; track group.category) {
-    <button mat-stroked-button [mat-dialog-close]="{type: 'overpass', overpassPois: group.pois}"
-      matBadge="{{group.pois.length | shortNumber}}" matBadgePosition="after" matBadgeColor="accent"
+  @if (data.overpassPois.length) {
+    <button mat-stroked-button [mat-dialog-close]="{type: 'overpass', overpassPois: data.overpassPois}"
+      matBadge="{{data.overpassPois.length | shortNumber}}" matBadgePosition="after" matBadgeColor="accent"
       matBadgeOverlap="true">
-      <mat-icon>{{ group.icon }}</mat-icon>
-      {{ group.labelKey | transloco }}
+      <mat-icon>place</mat-icon>
+      {{ 'common.map.multiMarker.showPlaces' | transloco }}
     </button>
   }
 </mat-dialog-content>
