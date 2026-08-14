@@ -41,6 +41,11 @@ The server validates every requested subcategory against that catalog. The
 with `access=private`, `access=customers`, or `access=no`; paid public toilets
 remain included.
 
+The remaining `amenities` selections cover town halls, courthouses, general
+government offices, public-service offices, tax offices, and register offices.
+Specific `government=*` values take precedence over the generic
+`office=government` fallback.
+
 The `religion` category covers churches, cathedrals, chapels, mosques,
 synagogues, temples, shrines, monasteries, and other active places of worship.
 Specific religious building types take precedence over a broad

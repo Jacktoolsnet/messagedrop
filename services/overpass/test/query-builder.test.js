@@ -37,3 +37,16 @@ test('queries selected religious buildings and places of worship', () => {
   assert.match(query, /nwr\["amenity"="place_of_worship"\]/u);
   assert.doesNotMatch(query, /building"="cathedral/u);
 });
+
+test('queries selected public authorities', () => {
+  const query = buildNearbyQuery({
+    bounds: { south: 52.1, west: 10.1, north: 52.2, east: 10.2 },
+    categories: ['amenities'],
+    subcategories: { amenities: ['townhall', 'tax_office', 'government_office'] },
+    limit: 25
+  });
+  assert.match(query, /nwr\["amenity"="townhall"\]/u);
+  assert.match(query, /nwr\["government"="tax"\]/u);
+  assert.match(query, /nwr\["office"="government"\]/u);
+  assert.doesNotMatch(query, /courthouse/u);
+});

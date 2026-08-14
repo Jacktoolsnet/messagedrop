@@ -37,3 +37,15 @@ test('classifies religious buildings and generic places of worship', () => {
   assert.equal(pois[1].category, 'religion');
   assert.equal(pois[1].subtype, 'place_of_worship');
 });
+
+test('classifies specific government offices before the generic government fallback', () => {
+  const pois = normalizeOverpassResponse({ elements: [
+    { type: 'node', id: 20, lat: 52.1, lon: 10.2,
+      tags: { office: 'government', government: 'tax', name: 'Tax office' } },
+    { type: 'node', id: 21, lat: 52.2, lon: 10.3,
+      tags: { office: 'government', name: 'Public authority' } }
+  ] }, ['amenities']);
+
+  assert.equal(pois[0].subtype, 'tax_office');
+  assert.equal(pois[1].subtype, 'government_office');
+});

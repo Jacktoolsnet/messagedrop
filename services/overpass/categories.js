@@ -53,7 +53,13 @@ const CATEGORY_DEFINITIONS = Object.freeze({
     ['biergarten', 'amenity', ['biergarten']]
   ]),
   amenities: definitions([
-    ['toilets', 'amenity', ['toilets'], [{ key: 'access', values: ['private', 'customers', 'no'] }]]
+    ['toilets', 'amenity', ['toilets'], [{ key: 'access', values: ['private', 'customers', 'no'] }]],
+    ['townhall', 'amenity', ['townhall']],
+    ['courthouse', 'amenity', ['courthouse']],
+    ['tax_office', 'government', ['tax']],
+    ['register_office', 'government', ['register_office']],
+    ['public_service_office', 'government', ['public_service']],
+    ['government_office', 'office', ['government']]
   ]),
   religion: definitions([
     ['cathedral', 'building', ['cathedral']],
@@ -74,7 +80,7 @@ const CATEGORY_DEFINITIONS = Object.freeze({
 // to more than one selected category (for example a cathedral that is also
 // tagged as tourism=attraction).
 const CLASSIFICATION_PRIORITY = Object.freeze([
-  'accommodation', 'religion', 'tourism', 'leisure', 'food_drink', 'amenities'
+  'accommodation', 'religion', 'amenities', 'tourism', 'leisure', 'food_drink'
 ]);
 
 function definitions(items) {

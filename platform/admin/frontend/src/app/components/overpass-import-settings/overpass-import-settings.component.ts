@@ -271,6 +271,8 @@ export class OverpassImportSettingsComponent {
       swimming_pool: 'Swimming pools', water_park: 'Water parks', miniature_golf: 'Miniature golf', golf_course: 'Golf courses',
       marina: 'Marinas', beach_resort: 'Beach resorts', bowling_alley: 'Bowling alleys', restaurant: 'Restaurants', cafe: 'Cafés',
       bar: 'Bars', pub: 'Pubs', fast_food: 'Fast food', biergarten: 'Beer gardens', toilets: 'Public toilets',
+      townhall: 'Town halls', courthouse: 'Courthouses', tax_office: 'Tax offices', register_office: 'Register offices',
+      public_service_office: 'Public service offices', government_office: 'Government offices',
       cathedral: 'Cathedrals', church: 'Churches', chapel: 'Chapels', mosque: 'Mosques', synagogue: 'Synagogues',
       temple: 'Temples', shrine: 'Shrines', monastery: 'Monasteries', place_of_worship: 'Other places of worship'
     };
@@ -280,7 +282,7 @@ export class OverpassImportSettingsComponent {
   categoryIcon(category: string): string {
     return ({
       accommodation: 'hotel', tourism: 'museum', leisure: 'park', food_drink: 'restaurant',
-      amenities: 'wc', religion: 'church'
+      amenities: 'account_balance', religion: 'church'
     } as Record<string, string>)[category] ?? 'category';
   }
 

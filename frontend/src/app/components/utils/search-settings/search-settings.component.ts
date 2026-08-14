@@ -142,7 +142,7 @@ export class SearchSettingsComponent {
       poiCategory: 'food_drink'
     },
     {
-      key: 'amenities', icon: 'wc', titleKey: 'common.searchSettings.items.amenities',
+      key: 'amenities', icon: 'account_balance', titleKey: 'common.searchSettings.items.amenities',
       poiCategory: 'amenities'
     },
     {

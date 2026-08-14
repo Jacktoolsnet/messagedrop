@@ -16,7 +16,10 @@ export const OVERPASS_SUBCATEGORIES = {
     'beach_resort', 'bowling_alley'
   ],
   food_drink: ['restaurant', 'cafe', 'bar', 'pub', 'fast_food', 'biergarten'],
-  amenities: ['toilets'],
+  amenities: [
+    'toilets', 'townhall', 'courthouse', 'tax_office', 'register_office',
+    'public_service_office', 'government_office'
+  ],
   religion: [
     'cathedral', 'church', 'chapel', 'mosque', 'synagogue', 'temple', 'shrine',
     'monastery', 'place_of_worship'
@@ -31,7 +34,7 @@ export const OVERPASS_CATEGORY_ICONS: Record<OverpassCategory, string> = {
   tourism: 'photo_camera',
   leisure: 'sports_soccer',
   food_drink: 'restaurant',
-  amenities: 'wc',
+  amenities: 'account_balance',
   religion: 'church'
 };
 
