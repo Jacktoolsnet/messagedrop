@@ -67,8 +67,12 @@ configured with `OVERPASS_WEBSITE_METADATA_*`.
 After every successful country import, a separate durable enrichment job finds
 the distinct HTTPS websites referenced by active POIs. Each normalized website
 is requested only once per refresh cycle. Requests run sequentially with a
-one-second delay by default. Successful metadata is refreshed after 30 days;
-failed websites are retried after 24 hours. The admin backend triggers a
+one-second delay by default. Successful metadata is refreshed after 30 days.
+Reachable pages without useful head metadata and permanent failures such as
+HTTP 404/410, missing domains, non-HTML responses, and invalid redirects are
+not requested again automatically. Transient network, rate-limit, and server
+failures use retry delays of 1 hour, 6 hours, 24 hours, 3 days, and finally 7
+days; `Retry-After` is respected when provided. The admin backend triggers a
 due-check every day at 04:00 in `Europe/Berlin` by default. The schedule is
 configurable with `OVERPASS_METADATA_CRON` and
 `OVERPASS_METADATA_TIMEZONE`. On every service start, interrupted jobs are

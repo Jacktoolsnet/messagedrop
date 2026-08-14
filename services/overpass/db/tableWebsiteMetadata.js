@@ -13,6 +13,9 @@ function init(db, callback) {
       lastAttemptAt TIMESTAMPTZ,
       nextAttemptAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
       lastError TEXT,
+      outcome TEXT,
+      errorCode TEXT,
+      httpStatus INTEGER,
       createdAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updatedAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
@@ -40,6 +43,10 @@ function init(db, callback) {
     );
     CREATE UNIQUE INDEX IF NOT EXISTS idx_overpass_metadata_job_running
       ON ${JOB_TABLE} ((1)) WHERE status = 'running';
+    ALTER TABLE ${METADATA_TABLE} ALTER COLUMN nextAttemptAt DROP NOT NULL;
+    ALTER TABLE ${METADATA_TABLE} ADD COLUMN IF NOT EXISTS outcome TEXT;
+    ALTER TABLE ${METADATA_TABLE} ADD COLUMN IF NOT EXISTS errorCode TEXT;
+    ALTER TABLE ${METADATA_TABLE} ADD COLUMN IF NOT EXISTS httpStatus INTEGER;
   `, callback);
 }
 
@@ -47,6 +54,7 @@ function recover(db, callback) {
   db.exec(`
     UPDATE ${METADATA_TABLE}
       SET status = 'failed', nextAttemptAt = CURRENT_TIMESTAMP,
+        outcome = 'retryable_error', errorCode = 'service_restarted_during_metadata_fetch',
         lastError = 'Service restarted during metadata fetch', updatedAt = CURRENT_TIMESTAMP
       WHERE status = 'fetching';
     UPDATE ${JOB_TABLE}
@@ -71,6 +79,7 @@ function listDue(db, refreshDays, limit, callback) {
     SELECT websiteUrl, metadata, status, fetchedAt, attemptCount
     FROM ${METADATA_TABLE}
     WHERE status <> 'fetching'
+      AND nextAttemptAt IS NOT NULL
       AND nextAttemptAt <= CURRENT_TIMESTAMP
       AND (fetchedAt IS NULL OR fetchedAt < CURRENT_TIMESTAMP - (? * INTERVAL '1 day'))
     ORDER BY fetchedAt ASC NULLS FIRST, websiteUrl
@@ -100,15 +109,29 @@ function markFetching(db, websiteUrl, callback) {
 function markSucceeded(db, websiteUrl, metadata, refreshDays, callback) {
   const days = Math.max(1, Number(refreshDays) || 30);
   db.run(`UPDATE ${METADATA_TABLE} SET metadata = ?::jsonb, status = 'succeeded', fetchedAt = CURRENT_TIMESTAMP,
-    nextAttemptAt = CURRENT_TIMESTAMP + (? * INTERVAL '1 day'), lastError = NULL, updatedAt = CURRENT_TIMESTAMP
+    nextAttemptAt = CURRENT_TIMESTAMP + (? * INTERVAL '1 day'), outcome = 'metadata',
+    lastError = NULL, errorCode = NULL, httpStatus = NULL, updatedAt = CURRENT_TIMESTAMP
     WHERE websiteUrl = ?`, [JSON.stringify(metadata), days, websiteUrl], callback);
 }
 
-function markFailed(db, websiteUrl, error, retryHours, callback) {
-  const hours = Math.max(1, Number(retryHours) || 24);
+function markNoMetadata(db, websiteUrl, callback) {
+  db.run(`UPDATE ${METADATA_TABLE} SET metadata = NULL, status = 'succeeded', fetchedAt = CURRENT_TIMESTAMP,
+    nextAttemptAt = NULL, outcome = 'no_metadata', lastError = NULL, errorCode = NULL,
+    httpStatus = NULL, updatedAt = CURRENT_TIMESTAMP WHERE websiteUrl = ?`, [websiteUrl], callback);
+}
+
+function markRetryableFailed(db, websiteUrl, { error, errorCode, httpStatus, retryAt }, callback) {
   db.run(`UPDATE ${METADATA_TABLE} SET status = 'failed',
-    nextAttemptAt = CURRENT_TIMESTAMP + (? * INTERVAL '1 hour'), lastError = ?, updatedAt = CURRENT_TIMESTAMP
-    WHERE websiteUrl = ?`, [hours, String(error || 'Metadata fetch failed').slice(0, 2000), websiteUrl], callback);
+    nextAttemptAt = ?::timestamptz, outcome = 'retryable_error', lastError = ?, errorCode = ?, httpStatus = ?,
+    updatedAt = CURRENT_TIMESTAMP WHERE websiteUrl = ?`, [retryAt,
+    String(error || 'Metadata fetch failed').slice(0, 2000), errorCode || null, httpStatus || null, websiteUrl], callback);
+}
+
+function markPermanentFailed(db, websiteUrl, { error, errorCode, httpStatus }, callback) {
+  db.run(`UPDATE ${METADATA_TABLE} SET metadata = NULL, status = 'failed', nextAttemptAt = NULL,
+    outcome = 'permanent_error', lastError = ?, errorCode = ?, httpStatus = ?, updatedAt = CURRENT_TIMESTAMP
+    WHERE websiteUrl = ?`, [String(error || 'Metadata fetch failed').slice(0, 2000),
+    errorCode || null, httpStatus || null, websiteUrl], callback);
 }
 
 function createJob(db, { jobId, reason, total }, callback) {
@@ -142,5 +165,6 @@ function listJobs(db, limit, callback) {
 
 module.exports = {
   METADATA_TABLE, REFERENCE_TABLE, JOB_TABLE, init, recover, discoverWebsites, listDue, get, ensure, ensureReference,
-  markFetching, markSucceeded, markFailed, createJob, updateJob, completeJob, failJob, runningJob, listJobs
+  markFetching, markSucceeded, markNoMetadata, markRetryableFailed, markPermanentFailed,
+  createJob, updateJob, completeJob, failJob, runningJob, listJobs
 };

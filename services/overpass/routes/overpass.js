@@ -186,7 +186,10 @@ function createOverpassRouter({
     try {
       if (websiteMetadataJobManager) {
         const result = await websiteMetadataJobManager.getOrFetch(normalizedUrl);
-        return res.status(200).json({ status: 200, metadata: result.metadata, cache: result.cache });
+        return res.status(200).json({
+          status: 200, metadata: result.metadata, cache: result.cache, outcome: result.outcome || 'metadata',
+          retryAt: result.retryAt || null, errorCode: result.errorCode || null, httpStatus: result.httpStatus || null
+        });
       }
       const persisted = await persistentCache?.get(key);
       if (persisted && persisted.ageMs <= cacheTtlMs) {

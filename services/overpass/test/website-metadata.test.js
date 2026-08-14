@@ -2,6 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
   parseWebsiteMetadata,
+  parseRetryAfter,
   validateWebsiteUrl,
   isPublicIp
 } = require('../website-metadata');
@@ -38,6 +39,13 @@ test('extracts only metadata represented in the HTML head', () => {
     twitterCard: { card: 'summary_large_image' },
     structuredData: [{ '@type': 'Hotel', name: 'ParkHotel' }]
   });
+});
+
+test('parses Retry-After seconds and HTTP dates', () => {
+  const now = Date.parse('2026-08-14T08:00:00Z');
+  assert.equal(parseRetryAfter('120', now), 120000);
+  assert.equal(parseRetryAfter('Fri, 14 Aug 2026 08:05:00 GMT', now), 300000);
+  assert.equal(parseRetryAfter('invalid', now), null);
 });
 
 test('does not invent a description when the head has none', () => {

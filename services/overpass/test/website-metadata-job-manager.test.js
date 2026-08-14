@@ -1,6 +1,11 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { WebsiteMetadataJobManager } = require('../website-metadata-job-manager');
+const {
+  WebsiteMetadataJobManager,
+  classifyMetadataError,
+  hasUsefulMetadata,
+  retryDelayMs
+} = require('../website-metadata-job-manager');
 
 function memoryStore(websites) {
   const state = { metadata: new Map(), references: new Map(), job: null, recovered: false };
@@ -24,12 +29,21 @@ function memoryStore(websites) {
     }); done(callback); },
     completeJob(_db, _id, callback) { state.job.status = 'succeeded'; done(callback); },
     failJob(_db, _id, error, callback) { state.job.status = 'failed'; state.job.error = error; done(callback); },
-    markFetching(_db, url, callback) { state.metadata.get(url).status = 'fetching'; done(callback); },
-    markSucceeded(_db, url, metadata, _days, callback) {
-      Object.assign(state.metadata.get(url), { status: 'succeeded', metadata }); done(callback);
+    markFetching(_db, url, callback) {
+      const row = state.metadata.get(url);
+      row.status = 'fetching'; row.attemptCount = Number(row.attemptCount || 0) + 1; done(callback);
     },
-    markFailed(_db, url, error, _hours, callback) {
-      Object.assign(state.metadata.get(url), { status: 'failed', error }); done(callback);
+    markSucceeded(_db, url, metadata, _days, callback) {
+      Object.assign(state.metadata.get(url), { status: 'succeeded', outcome: 'metadata', metadata }); done(callback);
+    },
+    markNoMetadata(_db, url, callback) {
+      Object.assign(state.metadata.get(url), { status: 'succeeded', outcome: 'no_metadata', metadata: null }); done(callback);
+    },
+    markRetryableFailed(_db, url, value, callback) {
+      Object.assign(state.metadata.get(url), { status: 'failed', outcome: 'retryable_error', ...value }); done(callback);
+    },
+    markPermanentFailed(_db, url, value, callback) {
+      Object.assign(state.metadata.get(url), { status: 'failed', outcome: 'permanent_error', ...value }); done(callback);
     },
     get(_db, url, callback) { done(callback, state.metadata.get(url) || null); },
     listJobs(_db, _limit, callback) { done(callback, state.job ? [state.job] : []); }
@@ -74,7 +88,7 @@ test('records individual website failures without failing the complete metadata 
   assert.equal(store.state.job.status, 'succeeded');
   assert.equal(store.state.job.succeededUrls, 1);
   assert.equal(store.state.job.failedUrls, 1);
-  assert.equal(store.state.metadata.get('https://broken.example/').status, 'failed');
+  assert.equal(store.state.metadata.get('https://broken.example/').outcome, 'retryable_error');
 });
 
 test('returns the running job immediately when a scheduled check overlaps with enrichment', async () => {
@@ -93,4 +107,58 @@ test('returns the running job immediately when a scheduled check overlaps with e
   assert.equal(overlapping.metadataJobId, started.metadataJobId);
   finishFetch({ title: 'Slow website' });
   await manager.running;
+});
+
+test('stores reachable pages without useful head metadata as terminal no-metadata results', async () => {
+  const store = memoryStore(['https://empty.example/']);
+  const manager = new WebsiteMetadataJobManager({
+    database: { db: {} }, store, delayMs: 0,
+    client: { async fetch(url) { return { url, fetchedAt: new Date().toISOString() }; } }
+  });
+
+  await manager.trigger('daily-cron');
+  if (manager.running) await manager.running;
+
+  assert.equal(store.state.metadata.get('https://empty.example/').outcome, 'no_metadata');
+  assert.equal(store.state.metadata.get('https://empty.example/').metadata, null);
+});
+
+test('stores HTTP 404 as a permanent failure without another retry time', async () => {
+  const store = memoryStore(['https://missing.example/']);
+  const manager = new WebsiteMetadataJobManager({
+    database: { db: {} }, store, delayMs: 0,
+    logger: { info() {}, warn() {}, error() {} },
+    client: { async fetch() {
+      throw Object.assign(new Error('website_metadata_http_error'), {
+        errorCode: 'website_metadata_http_error', httpStatus: 404, status: 404
+      });
+    } }
+  });
+
+  await manager.trigger('daily-cron');
+  if (manager.running) await manager.running;
+
+  const row = store.state.metadata.get('https://missing.example/');
+  assert.equal(row.outcome, 'permanent_error');
+  assert.equal(row.retryAt, undefined);
+});
+
+test('classifies permanent and retryable metadata failures', () => {
+  assert.equal(classifyMetadataError({
+    message: 'website_metadata_http_error', errorCode: 'website_metadata_http_error', httpStatus: 404
+  }).kind, 'permanent');
+  assert.equal(classifyMetadataError({
+    message: 'website_metadata_upstream_error', cause: { code: 'ENOTFOUND' }
+  }).kind, 'permanent');
+  const retryable = classifyMetadataError({
+    message: 'website_metadata_http_error', errorCode: 'website_metadata_http_error',
+    httpStatus: 429, retryAfterMs: 120000
+  });
+  assert.equal(retryable.kind, 'retryable');
+  assert.ok(new Date(retryable.retryAt).getTime() > Date.now());
+  assert.equal(retryDelayMs(1), 60 * 60 * 1000);
+  assert.equal(retryDelayMs(2), 6 * 60 * 60 * 1000);
+  assert.equal(retryDelayMs(5), 7 * 24 * 60 * 60 * 1000);
+  assert.equal(hasUsefulMetadata({ url: 'https://empty.example/', fetchedAt: 'now' }), false);
+  assert.equal(hasUsefulMetadata({ url: 'https://hotel.example/', title: 'Hotel' }), true);
 });

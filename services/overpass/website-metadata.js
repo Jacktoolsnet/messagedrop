@@ -30,7 +30,9 @@ function createWebsiteMetadataClient({
         };
       } catch (error) {
         if (error?.status) throw error;
-        const wrapped = clientError('website_metadata_upstream_error', 502);
+        const wrapped = clientError('website_metadata_upstream_error', 502, {
+          networkCode: error?.code || null
+        });
         wrapped.cause = error;
         throw wrapped;
       }
@@ -84,7 +86,10 @@ async function fetchHtmlHead(url, options, redirectCount = 0) {
       }
       if (status < 200 || status >= 300) {
         response.resume();
-        rejectOnce(clientError('website_metadata_upstream_error', status >= 500 ? 502 : status));
+        rejectOnce(clientError('website_metadata_http_error', status >= 500 ? 502 : status, {
+          httpStatus: status,
+          retryAfterMs: parseRetryAfter(response.headers['retry-after'])
+        }));
         return;
       }
       const contentType = String(response.headers['content-type'] || '').toLowerCase();
@@ -297,15 +302,27 @@ function nonNegativeInteger(value, fallback) {
   return Number.isInteger(Number(value)) && Number(value) >= 0 ? Number(value) : fallback;
 }
 
-function clientError(message, status) {
+function parseRetryAfter(value, now = Date.now()) {
+  if (Array.isArray(value)) value = value[0];
+  if (typeof value !== 'string' || !value.trim()) return null;
+  const seconds = Number(value);
+  if (Number.isFinite(seconds) && seconds >= 0) return seconds * 1000;
+  const timestamp = Date.parse(value);
+  return Number.isFinite(timestamp) && timestamp > now ? timestamp - now : null;
+}
+
+function clientError(message, status, details = {}) {
   const error = new Error(message);
   error.status = status;
+  error.errorCode = message;
+  Object.assign(error, details);
   return error;
 }
 
 module.exports = {
   createWebsiteMetadataClient,
   parseWebsiteMetadata,
+  parseRetryAfter,
   validateWebsiteUrl,
   isPublicIp
 };
