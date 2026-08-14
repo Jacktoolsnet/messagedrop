@@ -39,9 +39,13 @@
 
 .tile-header {
   position: relative;
-  min-height: 10rem;
+  min-height: 5.35rem;
   overflow: hidden;
   background: color-mix(in srgb, var(--mat-card-filled-container-color) 88%, var(--mat-primary-color));
+}
+
+.tile-header.has-image {
+  min-height: 8.5rem;
 }
 
 .tile-header::before {
@@ -162,6 +166,13 @@
   gap: 0.55rem;
 }
 
+.poi-subtiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
+  gap: 0.75rem;
+  align-items: start;
+}
+
 .detail-row {
   display: flex;
   align-items: flex-start;
@@ -179,6 +190,91 @@
   color: var(--mat-card-subtitle-text-color);
   font-size: 1.2rem;
 }
+
+.poi-subtile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.7rem;
+  border: 1px solid var(--mat-card-outlined-outline-color);
+  border-radius: 0.9rem;
+  background: color-mix(in srgb, var(--mat-card-filled-container-color) 88%, var(--mat-sys-surface-container));
+}
+
+.detail-section-title,
+.opening-hours-row,
+.opening-periods,
+.opening-closed,
+.accessibility-status {
+  display: flex;
+  align-items: center;
+}
+
+.detail-section-title {
+  gap: 0.45rem;
+  font-weight: 600;
+}
+
+.detail-section-title mat-icon,
+.opening-closed mat-icon {
+  width: 1.2rem;
+  height: 1.2rem;
+  font-size: 1.2rem;
+}
+
+.opening-hours-row {
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.opening-days {
+  min-width: 5.5rem;
+  color: var(--mat-card-subtitle-text-color);
+  font-weight: 500;
+}
+
+.opening-periods {
+  justify-content: flex-end;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.time-chip,
+.opening-closed {
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  background: var(--mat-sys-surface-container-high);
+  font-size: 0.78rem;
+}
+
+.opening-closed {
+  gap: 0.3rem;
+  color: var(--mat-sys-error);
+}
+
+.accessibility-status {
+  width: fit-content;
+  gap: 0.55rem;
+}
+
+.accessibility-status mat-icon {
+  width: 1.3rem;
+  height: 1.3rem;
+  font-size: 1.3rem;
+}
+
+.accessibility-status mat-icon:first-child {
+  flex: 0 0 1.25rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--mat-card-subtitle-text-color);
+  font-size: 1.2rem;
+}
+
+.accessibility-status.status-positive { color: var(--mat-sys-primary); }
+.accessibility-status.status-warning { color: #a15c00; }
+.accessibility-status.status-negative { color: var(--mat-sys-error); }
+.accessibility-status.status-unknown { color: var(--mat-card-subtitle-text-color); }
 
 .tile-actions {
   display: flex;

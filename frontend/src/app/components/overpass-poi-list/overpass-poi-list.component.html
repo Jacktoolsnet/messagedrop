@@ -44,38 +44,69 @@
             @if (poi.websiteMetadata?.description) {
               <p class="poi-description">{{ poi.websiteMetadata?.description }}</p>
             }
-            <div class="poi-details">
-              @if (address(poi)) {
-                <div class="detail-row"><mat-icon>home_pin</mat-icon><span>{{ address(poi) }}</span></div>
+            <div class="poi-subtiles">
+              @if (openingHoursRows(poi); as openingHours) {
+                @if (openingHours.length) {
+                  <section class="poi-subtile opening-hours" [attr.aria-label]="'common.overpass.openingHours' | transloco">
+                    <div class="detail-section-title">
+                      <mat-icon>schedule</mat-icon><span>{{ 'common.overpass.openingHours' | transloco }}</span>
+                    </div>
+                    @for (row of openingHours; track $index) {
+                      <div class="opening-hours-row">
+                        @if (row.days) { <span class="opening-days">{{ row.days }}</span> }
+                        @if (row.closed) {
+                          <span class="opening-closed"><mat-icon>event_busy</mat-icon>{{ 'common.overpass.closed' | transloco }}</span>
+                        } @else {
+                          <span class="opening-periods">
+                            @for (period of row.periods; track period) { <span class="time-chip">{{ period }}</span> }
+                          </span>
+                        }
+                      </div>
+                    }
+                  </section>
+                }
               }
-              @if (poi.websiteMetadata?.siteName) {
-                <div class="detail-row"><mat-icon>domain</mat-icon><span>{{ poi.websiteMetadata?.siteName }}</span></div>
-              }
-              @if (poi.properties.stars) {
-                <div class="detail-row"><mat-icon>star</mat-icon><span>{{ poi.properties.stars }} {{ 'common.overpass.stars' | transloco }}</span></div>
-              }
-              @if (poi.properties.rooms) {
-                <div class="detail-row"><mat-icon>meeting_room</mat-icon><span>{{ 'common.overpass.rooms' | transloco }}: {{ poi.properties.rooms }}</span></div>
-              }
-              @if (poi.properties.beds) {
-                <div class="detail-row"><mat-icon>bed</mat-icon><span>{{ 'common.overpass.beds' | transloco }}: {{ poi.properties.beds }}</span></div>
-              }
-              @if (poi.properties.openingHours) {
-                <div class="detail-row"><mat-icon>schedule</mat-icon><span>{{ poi.properties.openingHours }}</span></div>
-              }
-              @if (poi.properties.wheelchair) {
-                <div class="detail-row"><mat-icon>accessible</mat-icon><span>{{ 'common.overpass.wheelchair' | transloco }}: {{ poi.properties.wheelchair }}</span></div>
-              }
-              @if (poi.contact.phone) {
-                <a class="detail-row" [href]="'tel:' + poi.contact.phone"><mat-icon>call</mat-icon><span>{{ poi.contact.phone }}</span></a>
-              }
-              @if (poi.contact.email) {
-                <a class="detail-row" [href]="'mailto:' + poi.contact.email"><mat-icon>mail</mat-icon><span>{{ poi.contact.email }}</span></a>
-              }
-              @if (website(poi); as websiteUrl) {
-                <a class="detail-row" [href]="websiteUrl" target="_blank" rel="noopener noreferrer">
-                  <mat-icon>language</mat-icon><span>{{ poi.websiteMetadata?.title || websiteUrl }}</span>
-                </a>
+              @if (hasAdditionalDetails(poi)) {
+                <section class="poi-subtile additional-details" [attr.aria-label]="'common.overpass.details' | transloco">
+                  <div class="detail-section-title">
+                    <mat-icon>info</mat-icon><span>{{ 'common.overpass.details' | transloco }}</span>
+                  </div>
+                  <div class="poi-details">
+                    @if (address(poi)) {
+                      <div class="detail-row"><mat-icon>home_pin</mat-icon><span>{{ address(poi) }}</span></div>
+                    }
+                    @if (poi.websiteMetadata?.siteName) {
+                      <div class="detail-row"><mat-icon>domain</mat-icon><span>{{ poi.websiteMetadata?.siteName }}</span></div>
+                    }
+                    @if (poi.properties.stars) {
+                      <div class="detail-row"><mat-icon>star</mat-icon><span>{{ poi.properties.stars }} {{ 'common.overpass.stars' | transloco }}</span></div>
+                    }
+                    @if (poi.properties.rooms) {
+                      <div class="detail-row"><mat-icon>meeting_room</mat-icon><span>{{ 'common.overpass.rooms' | transloco }}: {{ poi.properties.rooms }}</span></div>
+                    }
+                    @if (poi.properties.beds) {
+                      <div class="detail-row"><mat-icon>bed</mat-icon><span>{{ 'common.overpass.beds' | transloco }}: {{ poi.properties.beds }}</span></div>
+                    }
+                    @if (poi.properties.wheelchair) {
+                      <div class="accessibility-status" [class]="wheelchairStatusClass(poi.properties.wheelchair)"
+                        [attr.aria-label]="wheelchairLabelKey(poi.properties.wheelchair) | transloco"
+                        [matTooltip]="wheelchairLabelKey(poi.properties.wheelchair) | transloco">
+                        <mat-icon>accessible</mat-icon><mat-icon>{{ wheelchairIcon(poi.properties.wheelchair) }}</mat-icon>
+                      </div>
+                    }
+                    @if (poi.contact.phone) {
+                      <a class="detail-row" [href]="'tel:' + poi.contact.phone"><mat-icon>call</mat-icon><span>{{ poi.contact.phone }}</span></a>
+                    }
+                    @if (poi.contact.email) {
+                      <a class="detail-row" [href]="'mailto:' + poi.contact.email"><mat-icon>mail</mat-icon><span>{{ poi.contact.email }}</span></a>
+                    }
+                    @if (website(poi); as websiteUrl) {
+                      <a class="detail-row" [href]="websiteUrl" target="_blank" rel="noopener noreferrer">
+                        <mat-icon>language</mat-icon><span>{{ poi.websiteMetadata?.title || websiteUrl }}</span>
+                      </a>
+                    }
+                  </div>
+                </section>
               }
             </div>
           </mat-card-content>
