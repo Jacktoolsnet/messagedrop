@@ -41,8 +41,17 @@
           </div>
 
           <mat-card-content class="poi-content">
-            @if (poi.websiteMetadata?.description) {
-              <p class="poi-description">{{ poi.websiteMetadata?.description }}</p>
+            @if (description(poi); as descriptionText) {
+              <p class="poi-description">{{ descriptionText }}</p>
+            }
+            @if (inscription(poi); as inscriptionText) {
+              <div class="poi-inscription">
+                <mat-icon aria-hidden="true">format_quote</mat-icon>
+                <div>
+                  <strong>{{ 'common.overpass.inscription' | transloco }}</strong>
+                  <span>{{ inscriptionText }}</span>
+                </div>
+              </div>
             }
             <div class="poi-subtiles">
               @if (openingHoursRows(poi); as openingHours) {

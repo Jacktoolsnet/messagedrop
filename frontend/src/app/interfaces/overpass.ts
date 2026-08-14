@@ -62,6 +62,10 @@ export interface OverpassPoi {
     beds?: string;
     wheelchair?: string;
     openingHours?: string;
+    description?: string;
+    descriptions?: Partial<Record<'de' | 'en' | 'es' | 'fr', string>>;
+    inscription?: string;
+    inscriptions?: Partial<Record<'de' | 'en' | 'es' | 'fr', string>>;
     wikidata?: string;
     wikipedia?: string;
   };

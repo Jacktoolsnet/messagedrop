@@ -77,6 +77,18 @@ export class OverpassPoiListComponent {
     }
   }
 
+  description(poi: OverpassPoi): string | null {
+    return this.localizedOsmText(poi.properties.descriptions, poi.properties.description)
+      || poi.websiteMetadata?.description?.trim()
+      || null;
+  }
+
+  inscription(poi: OverpassPoi): string | null {
+    const value = this.localizedOsmText(poi.properties.inscriptions, poi.properties.inscription);
+    if (!value || value === this.description(poi)) return null;
+    return value.replace(/\s*\|\s*/gu, '\n');
+  }
+
   website(poi: OverpassPoi): string | null {
     const value = poi.contact.website;
     if (!value) return null;
@@ -153,6 +165,20 @@ export class OverpassPoiListComponent {
 
   imageFailed(poi: OverpassPoi): void {
     this.failedImages.update((current) => new Set([...current, poi.id]));
+  }
+
+  private localizedOsmText(
+    translations: Partial<Record<'de' | 'en' | 'es' | 'fr', string>> | undefined,
+    fallback: string | undefined
+  ): string | null {
+    const activeLanguage = (this.transloco.getActiveLang() || 'en').split('-')[0] as 'de' | 'en' | 'es' | 'fr';
+    return translations?.[activeLanguage]?.trim()
+      || fallback?.trim()
+      || translations?.de?.trim()
+      || translations?.en?.trim()
+      || translations?.es?.trim()
+      || translations?.fr?.trim()
+      || null;
   }
 
   headerBackground(poi: OverpassPoi): string {

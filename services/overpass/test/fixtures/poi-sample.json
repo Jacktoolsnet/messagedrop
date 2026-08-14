@@ -13,7 +13,11 @@
         "addr:street": "Main Street",
         "addr:housenumber": "1",
         "website": "https://example.test",
-        "stars": "4"
+        "stars": "4",
+        "description": "Historic hotel",
+        "description:de": "Historisches Hotel",
+        "inscription": "First line|Second line",
+        "inscription:fr": "Première ligne|Deuxième ligne"
       }
     },
     {

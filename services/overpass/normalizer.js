@@ -41,6 +41,10 @@ function normalizeElement(element, requestedCategories, requestedSubcategories =
       beds: firstText(tags.beds),
       wheelchair: firstText(tags.wheelchair),
       openingHours: firstText(tags.opening_hours),
+      description: firstText(tags.description),
+      descriptions: localizedTags(tags, 'description'),
+      inscription: firstText(tags.inscription),
+      inscriptions: localizedTags(tags, 'inscription'),
       wikidata: firstText(tags.wikidata),
       wikipedia: firstText(tags.wikipedia)
     }),
@@ -64,6 +68,12 @@ function finiteCoordinate(value, min, max) {
 
 function firstText(...values) {
   return values.find((value) => typeof value === 'string' && value.trim())?.trim() || null;
+}
+
+function localizedTags(tags, key) {
+  const values = compact(Object.fromEntries(['de', 'en', 'es', 'fr']
+    .map((language) => [language, firstText(tags[`${key}:${language}`])])));
+  return Object.keys(values).length ? values : null;
 }
 
 function compact(value) {

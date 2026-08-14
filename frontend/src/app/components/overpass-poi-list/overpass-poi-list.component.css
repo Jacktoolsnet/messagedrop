@@ -158,6 +158,38 @@
 .poi-description {
   margin: 0 0 0.9rem;
   color: var(--mat-card-subtitle-text-color);
+  white-space: pre-line;
+}
+
+.poi-inscription {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  margin: 0 0 0.9rem;
+  padding: 0.75rem;
+  border-inline-start: 3px solid var(--mat-primary-color);
+  border-radius: 0.25rem 0.75rem 0.75rem 0.25rem;
+  background: color-mix(in srgb, var(--mat-card-filled-container-color) 88%, var(--mat-primary-color));
+}
+
+.poi-inscription mat-icon {
+  flex: 0 0 1.25rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--mat-primary-color);
+}
+
+.poi-inscription div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.poi-inscription span {
+  color: var(--mat-card-subtitle-text-color);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
 }
 
 .poi-details {

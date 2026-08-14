@@ -11,7 +11,13 @@ test('normalizes nodes and area centers without leaking raw tags', () => {
     name: 'Hotel Café', latitude: 52.1, longitude: 10.2,
     address: { street: 'Main Street', houseNumber: '1' },
     contact: { website: 'https://example.test' },
-    properties: { stars: '4' },
+    properties: {
+      stars: '4',
+      description: 'Historic hotel',
+      descriptions: { de: 'Historisches Hotel' },
+      inscription: 'First line|Second line',
+      inscriptions: { fr: 'Première ligne|Deuxième ligne' }
+    },
     source: { provider: 'OpenStreetMap', url: 'https://www.openstreetmap.org/node/1' }
   });
   assert.equal(pois[1].latitude, 52.1002);
