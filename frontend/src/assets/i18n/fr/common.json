@@ -2222,7 +2222,17 @@
       "emptyReplies": "Aucune réponse pour le moment. Écris la première réponse."
     },
     "overpass": {
-      "places": "Lieux dans cette zone"
+      "places": "Lieux dans cette zone",
+      "placeCount": "{{ count }} lieux",
+      "stars": "étoiles",
+      "rooms": "Chambres",
+      "beds": "Lits",
+      "wheelchair": "Accès en fauteuil roulant",
+      "showOnMap": "Afficher sur la carte",
+      "calculateRoute": "Calculer l’itinéraire",
+      "openInMaps": "Ouvrir dans l’application de cartes",
+      "webSearch": "Lancer une recherche web",
+      "openOsm": "Ouvrir la fiche source dans OpenStreetMap"
     }
   },
   "errors": {

@@ -2231,7 +2231,17 @@
       "emptyReplies": "No replies yet. Write the first reply."
     },
     "overpass": {
-      "places": "Places in this area"
+      "places": "Places in this area",
+      "placeCount": "{{ count }} places",
+      "stars": "stars",
+      "rooms": "Rooms",
+      "beds": "Beds",
+      "wheelchair": "Wheelchair access",
+      "showOnMap": "Jump to map",
+      "calculateRoute": "Calculate route",
+      "openInMaps": "Open in maps app",
+      "webSearch": "Start web search",
+      "openOsm": "Open source record on OpenStreetMap"
     }
   },
   "errors": {

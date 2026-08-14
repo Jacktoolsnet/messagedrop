@@ -1436,6 +1436,20 @@
   "pinHint": {
     "title": "Indice PIN"
   },
+  "overpassPoiList": {
+    "title": "Lieux et POI",
+    "intro": "Cette vue présente les données OpenStreetMap disponibles pour un lieu ainsi que les métadonnées complémentaires de son site web. Les champs affichés dépendent des données sources disponibles.",
+    "items": {
+      "flyTo": { "title": "Afficher sur la carte", "desc": "Centre la carte MessageDrop sur le lieu sélectionné et effectue un zoom avant." },
+      "route": { "title": "Calculer l’itinéraire", "desc": "Ouvre la planification d’itinéraire avec ce lieu comme destination. Si aucun mode de transport n’est sélectionné, les options d’itinéraire s’ouvrent d’abord." },
+      "openMaps": { "title": "Ouvrir dans l’application de cartes", "desc": "Ouvre les coordonnées du lieu dans Google Maps dans une nouvelle fenêtre ou un nouvel onglet." },
+      "webSearch": { "title": "Lancer une recherche web", "desc": "Lance une recherche Google avec le nom et l’adresse. Cette action est proposée uniquement pour les lieux nommés." },
+      "website": { "title": "Site web et coordonnées", "desc": "Ouvre les liens disponibles vers le site web, le téléphone ou l’e-mail. Lorsqu’elles existent, la description et l’image proviennent des métadonnées de l’en-tête du site." },
+      "close": { "title": "Fermer", "desc": "Ferme la liste des lieux et revient à la carte." },
+      "help": { "title": "Aide", "desc": "Ouvre cette vue d’aide." },
+      "privacy": { "title": "Confidentialité et services externes", "desc": "Les données POI proviennent d’OpenStreetMap. Une image de métadonnées peut être chargée directement depuis le site du lieu. L’ouverture d’un site web, d’un e-mail, d’un lien téléphonique, d’OpenStreetMap, de Google Maps ou d’une recherche web est soumise aux conditions du fournisseur externe concerné et peut transmettre des données techniques de connexion." }
+    }
+  },
   "placeList": {
     "title": "Mes lieux",
     "intro": "Cette vue gère vos lieux enregistrés. Vous pouvez ouvrir des lieux, centrer la carte, gérer les tuiles, vous abonner et ajouter de nouveaux lieux.",

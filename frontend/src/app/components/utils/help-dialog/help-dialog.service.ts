@@ -2088,6 +2088,52 @@ const HELP_TOPICS = {
     introKey: 'common.intros.info',
     items: ITEMS.info
   },
+  overpassPoiList: {
+    titleKey: 'overpassPoiList.title',
+    introKey: 'overpassPoiList.intro',
+    items: [
+      {
+        icon: 'place',
+        titleKey: 'overpassPoiList.items.flyTo.title',
+        descriptionKey: 'overpassPoiList.items.flyTo.desc'
+      },
+      {
+        icon: 'route',
+        titleKey: 'overpassPoiList.items.route.title',
+        descriptionKey: 'overpassPoiList.items.route.desc'
+      },
+      {
+        icon: 'map',
+        titleKey: 'overpassPoiList.items.openMaps.title',
+        descriptionKey: 'overpassPoiList.items.openMaps.desc'
+      },
+      {
+        icon: 'travel_explore',
+        titleKey: 'overpassPoiList.items.webSearch.title',
+        descriptionKey: 'overpassPoiList.items.webSearch.desc'
+      },
+      {
+        icon: 'language',
+        titleKey: 'overpassPoiList.items.website.title',
+        descriptionKey: 'overpassPoiList.items.website.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'overpassPoiList.items.close.title',
+        descriptionKey: 'overpassPoiList.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'overpassPoiList.items.help.title',
+        descriptionKey: 'overpassPoiList.items.help.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'overpassPoiList.items.privacy.title',
+        descriptionKey: 'overpassPoiList.items.privacy.desc'
+      }
+    ]
+  },
   placeList: {
     titleKey: 'placeList.title',
     introKey: 'placeList.intro',

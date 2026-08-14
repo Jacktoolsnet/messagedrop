@@ -2231,7 +2231,17 @@
       "emptyReplies": "Noch keine Antworten. Schreibe die erste Antwort."
     },
     "overpass": {
-      "places": "Orte in diesem Bereich"
+      "places": "Orte in diesem Bereich",
+      "placeCount": "{{ count }} Orte",
+      "stars": "Sterne",
+      "rooms": "Zimmer",
+      "beds": "Betten",
+      "wheelchair": "Rollstuhlgerecht",
+      "showOnMap": "Auf Karte anspringen",
+      "calculateRoute": "Route berechnen",
+      "openInMaps": "In Karten-App öffnen",
+      "webSearch": "Websuche starten",
+      "openOsm": "Quelldatensatz bei OpenStreetMap öffnen"
     }
   },
   "errors": {

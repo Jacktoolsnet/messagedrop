@@ -46,7 +46,10 @@ import { SharedContentComponent } from './components/shared-content/shared-conte
 import { SystemMessageDialogComponent } from './components/system-messages/system-message-dialog/system-message-dialog.component';
 import { TripGoRouteDialogComponent } from './components/tripgo-route-dialog/tripgo-route-dialog.component';
 import { TripGoStopDialogComponent } from './components/tripgo-stop-dialog/tripgo-stop-dialog.component';
-import { OverpassPoiListComponent } from './components/overpass-poi-list/overpass-poi-list.component';
+import {
+  OverpassPoiListComponent,
+  OverpassPoiListResult
+} from './components/overpass-poi-list/overpass-poi-list.component';
 import { DeleteUserComponent } from './components/user/delete-user/delete-user.component';
 import { UserProfileComponent } from './components/user/user-profile/user-profile.component';
 import { UserComponent } from './components/user/user.component';
@@ -2742,13 +2745,24 @@ export class AppComponent implements OnInit {
       backdropClass: 'dialog-backdrop',
       autoFocus: false
     });
-    dialogRef.afterClosed().subscribe((poi?: OverpassPoi) => {
-      if (!poi) return;
-      this.mapService.flyToWithZoom({
-        latitude: poi.latitude,
-        longitude: poi.longitude,
-        plusCode: this.geolocationService.getPlusCode(poi.latitude, poi.longitude)
-      }, Math.max(18, this.mapService.getMapZoom()));
+    dialogRef.afterClosed().subscribe((result?: OverpassPoiListResult) => {
+      if (!result) return;
+      const destination: Location = {
+        latitude: result.poi.latitude,
+        longitude: result.poi.longitude,
+        plusCode: this.geolocationService.getPlusCode(result.poi.latitude, result.poi.longitude)
+      };
+      if (result.action === 'show_on_map') {
+        this.mapService.flyToWithZoom(destination, Math.max(18, this.mapService.getMapZoom()));
+        return;
+      }
+      if (result.action === 'calculate_route') {
+        if (!hasEnabledRouteVariant(this.routeOptions)) {
+          this.openRouteOptions(true, destination);
+        } else {
+          this.openRouteDialog(destination);
+        }
+      }
     });
   }
 

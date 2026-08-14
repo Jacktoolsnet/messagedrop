@@ -1436,6 +1436,20 @@
   "pinHint": {
     "title": "Ayuda de PIN"
   },
+  "overpassPoiList": {
+    "title": "Lugares y POI",
+    "intro": "Aquí se muestran los datos disponibles de OpenStreetMap sobre un lugar y los metadatos complementarios de su sitio web. Los campos visibles dependen de los datos de origen disponibles.",
+    "items": {
+      "flyTo": { "title": "Ir al mapa", "desc": "Centra el mapa de MessageDrop en el lugar seleccionado y acerca la vista." },
+      "route": { "title": "Calcular ruta", "desc": "Abre la planificación de ruta con este lugar como destino. Si no se han elegido medios de transporte, primero se abren las opciones de ruta." },
+      "openMaps": { "title": "Abrir en la aplicación de mapas", "desc": "Abre las coordenadas del lugar en Google Maps en una nueva ventana o pestaña." },
+      "webSearch": { "title": "Iniciar búsqueda web", "desc": "Inicia una búsqueda web de Google con el nombre y la dirección. Solo está disponible para lugares con nombre." },
+      "website": { "title": "Sitio web y contacto", "desc": "Abre los enlaces disponibles del sitio web, teléfono o correo electrónico. La descripción y la imagen proceden, si existen, de los metadatos de la cabecera del sitio web." },
+      "close": { "title": "Cerrar", "desc": "Cierra la lista de lugares y vuelve al mapa." },
+      "help": { "title": "Ayuda", "desc": "Abre esta vista de ayuda." },
+      "privacy": { "title": "Privacidad y servicios externos", "desc": "Los datos de POI proceden de OpenStreetMap. Una imagen de metadatos puede cargarse directamente desde el sitio web del lugar. Al abrir un sitio web, correo, teléfono, OpenStreetMap, Google Maps o una búsqueda web, se aplican las condiciones del proveedor externo y pueden transferirse datos técnicos de conexión." }
+    }
+  },
   "placeList": {
     "title": "Mis lugares",
     "intro": "Esta vista gestiona tus lugares guardados. Puedes abrir lugares, centrar su posición en el mapa, gestionar tarjetas, suscribirte y añadir nuevos lugares.",
