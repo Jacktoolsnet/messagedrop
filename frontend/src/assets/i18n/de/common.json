@@ -678,7 +678,12 @@
         "showMyExperiences": "Meine Erlebnisse",
         "showSecretDrops": "GeheimnisDrops anzeigen",
         "showWikipedia": "Wikipedia-Artikel anzeigen",
-        "showPlaces": "Orte anzeigen"
+        "showPlaces": "Orte anzeigen",
+        "showAccommodation": "Unterkünfte anzeigen",
+        "showTourism": "Tourismus anzeigen",
+        "showLeisure": "Freizeit anzeigen",
+        "showFoodDrink": "Essen und Trinken anzeigen",
+        "showAmenities": "Praktisches anzeigen"
       }
     },
     "messageList": {

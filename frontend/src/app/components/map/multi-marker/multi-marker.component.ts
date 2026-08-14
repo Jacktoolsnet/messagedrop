@@ -16,7 +16,19 @@ import { SecretDrop } from '../../../interfaces/secret-drop';
 import { ExperienceResult, ViatorDestinationLookup } from '../../../interfaces/viator';
 import { ShortNumberPipe } from '../../../pipes/short-number.pipe';
 import { WikipediaArticle } from '../../../interfaces/wikipedia';
-import { OverpassPoi } from '../../../interfaces/overpass';
+import { OverpassCategory, OverpassPoi } from '../../../interfaces/overpass';
+
+const OVERPASS_CATEGORY_BUTTONS: ReadonlyArray<{
+    category: OverpassCategory;
+    icon: string;
+    labelKey: string;
+}> = [
+    { category: 'accommodation', icon: 'hotel', labelKey: 'common.map.multiMarker.showAccommodation' },
+    { category: 'tourism', icon: 'photo_camera', labelKey: 'common.map.multiMarker.showTourism' },
+    { category: 'leisure', icon: 'sports_soccer', labelKey: 'common.map.multiMarker.showLeisure' },
+    { category: 'food_drink', icon: 'restaurant', labelKey: 'common.map.multiMarker.showFoodDrink' },
+    { category: 'amenities', icon: 'wc', labelKey: 'common.map.multiMarker.showAmenities' }
+];
 
 @Component({
     selector: 'app-edit-user',
@@ -49,4 +61,11 @@ export class MultiMarkerComponent {
         wikipediaArticles: WikipediaArticle[];
         overpassPois: OverpassPoi[];
     }>(MAT_DIALOG_DATA);
+
+    readonly overpassCategoryGroups = OVERPASS_CATEGORY_BUTTONS
+        .map((button) => ({
+            ...button,
+            pois: this.data.overpassPois.filter((poi) => poi.category === button.category)
+        }))
+        .filter((group) => group.pois.length > 0);
 }
