@@ -1461,6 +1461,7 @@
       "flyTo": { "title": "Jump to map", "desc": "Centers the MessageDrop map on the selected place and zooms in." },
       "route": { "title": "Calculate route", "desc": "Opens route planning with this place as the destination. If no transport modes have been selected, route options open first." },
       "openMaps": { "title": "Open in maps app", "desc": "Opens the place coordinates in Google Maps in a new window or tab." },
+      "openOsm": { "title": "Details on OpenStreetMap", "desc": "Opens the place’s specific source record on OpenStreetMap in a new window or tab." },
       "webSearch": { "title": "Start web search", "desc": "Starts a Google web search using the name and address. This action is available only for named places." },
       "website": { "title": "Website and contact details", "desc": "Opens available website, telephone, or email links. When available, the description and image come from metadata in the website header." },
       "close": { "title": "Close", "desc": "Closes the place list and returns to the map." },

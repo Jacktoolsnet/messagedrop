@@ -32,14 +32,12 @@
                   {{ poi.name || (('common.searchSettings.subcategoryItems.' + poi.subtype) | transloco) }}
                 </span>
                 <span class="subtitle">
-                  {{ ('common.searchSettings.subcategoryItems.' + poi.subtype) | transloco }}
+                  <a class="identity-source" href="https://www.openstreetmap.org/copyright"
+                    target="_blank" rel="noopener noreferrer"
+                    [attr.aria-label]="'common.overpass.openOsm' | transloco">© OpenStreetMap contributors</a>
                 </span>
               </div>
             </div>
-            <a class="osm-badge" [href]="poi.source.url" target="_blank" rel="noopener noreferrer"
-              [attr.aria-label]="'common.overpass.openOsm' | transloco">
-              OpenStreetMap
-            </a>
           </div>
 
           <mat-card-content class="poi-content">
@@ -95,6 +93,10 @@
               [attr.aria-label]="'common.overpass.openInMaps' | transloco">
               <mat-icon>map</mat-icon>
             </button>
+            <a mat-mini-fab color="primary" [href]="poi.source.url" target="_blank" rel="noopener noreferrer"
+              [attr.aria-label]="'common.overpass.openOsmObject' | transloco">
+              <mat-icon>open_in_new</mat-icon>
+            </a>
             @if (poi.name) {
               <button mat-mini-fab color="primary" type="button" (click)="webSearch(poi)"
                 [attr.aria-label]="'common.overpass.webSearch' | transloco">

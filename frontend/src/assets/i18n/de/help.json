@@ -1461,6 +1461,7 @@
       "flyTo": { "title": "Auf Karte anspringen", "desc": "Zentriert die MessageDrop-Karte auf den ausgewählten Ort und zoomt näher heran." },
       "route": { "title": "Route berechnen", "desc": "Öffnet die Routenplanung mit diesem Ort als Ziel. Falls noch keine Verkehrsarten gewählt wurden, werden zuerst die Routenoptionen geöffnet." },
       "openMaps": { "title": "In Karten-App öffnen", "desc": "Öffnet die Koordinaten des Ortes in Google Maps in einem neuen Fenster oder Tab." },
+      "openOsm": { "title": "Details bei OpenStreetMap", "desc": "Öffnet den konkreten Quelldatensatz des Ortes bei OpenStreetMap in einem neuen Fenster oder Tab." },
       "webSearch": { "title": "Websuche starten", "desc": "Startet eine Google-Websuche nach Name und Adresse. Die Aktion wird nur für benannte Orte angeboten." },
       "website": { "title": "Webseite und Kontaktdaten", "desc": "Öffnet vorhandene Webseiten-, Telefon- oder E-Mail-Links. Beschreibung und Bild stammen, sofern vorhanden, aus den Metadaten im Kopfbereich der Webseite." },
       "close": { "title": "Schließen", "desc": "Schließt die Ortsliste und kehrt zur Karte zurück." },

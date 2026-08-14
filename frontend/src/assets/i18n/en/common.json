@@ -2237,11 +2237,12 @@
       "rooms": "Rooms",
       "beds": "Beds",
       "wheelchair": "Wheelchair access",
+      "openOsmObject": "Details on OpenStreetMap",
       "showOnMap": "Jump to map",
       "calculateRoute": "Calculate route",
       "openInMaps": "Open in maps app",
       "webSearch": "Start web search",
-      "openOsm": "Open source record on OpenStreetMap"
+      "openOsm": "Open OpenStreetMap licence and attribution"
     }
   },
   "errors": {

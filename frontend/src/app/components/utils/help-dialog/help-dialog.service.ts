@@ -2108,6 +2108,11 @@ const HELP_TOPICS = {
         descriptionKey: 'overpassPoiList.items.openMaps.desc'
       },
       {
+        icon: 'open_in_new',
+        titleKey: 'overpassPoiList.items.openOsm.title',
+        descriptionKey: 'overpassPoiList.items.openOsm.desc'
+      },
+      {
         icon: 'travel_explore',
         titleKey: 'overpassPoiList.items.webSearch.title',
         descriptionKey: 'overpassPoiList.items.webSearch.desc'

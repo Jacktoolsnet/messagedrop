@@ -1443,6 +1443,7 @@
       "flyTo": { "title": "Afficher sur la carte", "desc": "Centre la carte MessageDrop sur le lieu sélectionné et effectue un zoom avant." },
       "route": { "title": "Calculer l’itinéraire", "desc": "Ouvre la planification d’itinéraire avec ce lieu comme destination. Si aucun mode de transport n’est sélectionné, les options d’itinéraire s’ouvrent d’abord." },
       "openMaps": { "title": "Ouvrir dans l’application de cartes", "desc": "Ouvre les coordonnées du lieu dans Google Maps dans une nouvelle fenêtre ou un nouvel onglet." },
+      "openOsm": { "title": "Détails sur OpenStreetMap", "desc": "Ouvre la fiche source précise du lieu sur OpenStreetMap dans une nouvelle fenêtre ou un nouvel onglet." },
       "webSearch": { "title": "Lancer une recherche web", "desc": "Lance une recherche Google avec le nom et l’adresse. Cette action est proposée uniquement pour les lieux nommés." },
       "website": { "title": "Site web et coordonnées", "desc": "Ouvre les liens disponibles vers le site web, le téléphone ou l’e-mail. Lorsqu’elles existent, la description et l’image proviennent des métadonnées de l’en-tête du site." },
       "close": { "title": "Fermer", "desc": "Ferme la liste des lieux et revient à la carte." },

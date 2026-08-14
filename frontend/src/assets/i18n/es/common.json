@@ -2228,11 +2228,12 @@
       "rooms": "Habitaciones",
       "beds": "Camas",
       "wheelchair": "Acceso en silla de ruedas",
+      "openOsmObject": "Detalles en OpenStreetMap",
       "showOnMap": "Ir al mapa",
       "calculateRoute": "Calcular ruta",
       "openInMaps": "Abrir en la aplicación de mapas",
       "webSearch": "Iniciar búsqueda web",
-      "openOsm": "Abrir el registro de origen en OpenStreetMap"
+      "openOsm": "Abrir la licencia y atribución de OpenStreetMap"
     }
   },
   "errors": {

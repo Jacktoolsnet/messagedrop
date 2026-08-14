@@ -133,22 +133,18 @@
 }
 
 .identity-text .subtitle {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 0;
   color: var(--mat-card-subtitle-text-color);
   font-size: 0.75rem;
+  white-space: nowrap;
 }
 
-.osm-badge {
-  position: absolute;
-  z-index: 1;
-  right: 0.65rem;
-  bottom: 0.65rem;
-  padding: 0.22rem 0.55rem;
-  border-radius: 999px;
+.identity-source {
   color: inherit;
-  background: color-mix(in srgb, var(--mat-card-filled-container-color) 88%, transparent);
-  font-size: 0.68rem;
-  text-decoration: none;
-  backdrop-filter: blur(6px);
+  text-decoration: underline;
 }
 
 .poi-content {
