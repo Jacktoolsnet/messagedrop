@@ -23,11 +23,11 @@ const OVERPASS_CATEGORY_BUTTONS: ReadonlyArray<{
     icon: string;
     labelKey: string;
 }> = [
-    { category: 'accommodation', icon: 'hotel', labelKey: 'common.map.multiMarker.showAccommodation' },
-    { category: 'tourism', icon: 'photo_camera', labelKey: 'common.map.multiMarker.showTourism' },
-    { category: 'leisure', icon: 'sports_soccer', labelKey: 'common.map.multiMarker.showLeisure' },
-    { category: 'food_drink', icon: 'restaurant', labelKey: 'common.map.multiMarker.showFoodDrink' },
-    { category: 'amenities', icon: 'wc', labelKey: 'common.map.multiMarker.showAmenities' }
+    { category: 'accommodation', icon: 'hotel', labelKey: 'common.searchSettings.items.accommodation' },
+    { category: 'tourism', icon: 'photo_camera', labelKey: 'common.searchSettings.items.tourism' },
+    { category: 'leisure', icon: 'sports_soccer', labelKey: 'common.searchSettings.items.leisure' },
+    { category: 'food_drink', icon: 'restaurant', labelKey: 'common.searchSettings.items.foodDrink' },
+    { category: 'amenities', icon: 'wc', labelKey: 'common.searchSettings.items.amenities' }
 ];
 
 @Component({

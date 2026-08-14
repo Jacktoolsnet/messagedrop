@@ -677,13 +677,8 @@
         "showExperiences": "Experiences",
         "showMyExperiences": "My experiences",
         "showSecretDrops": "Show SecretDrops",
-        "showWikipedia": "Show Wikipedia articles",
-        "showPlaces": "Show places",
-        "showAccommodation": "Show accommodation",
-        "showTourism": "Show tourism",
-        "showLeisure": "Show leisure",
-        "showFoodDrink": "Show food and drink",
-        "showAmenities": "Show amenities"
+        "showWikipedia": "Wikipedia articles",
+        "showPlaces": "Show places"
       }
     },
     "messageList": {
