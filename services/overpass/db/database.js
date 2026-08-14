@@ -57,7 +57,14 @@ const ROW_KEY_MAP = new Map(Object.entries({
   nextattemptat: 'nextAttemptAt',
   lasterror: 'lastError',
   errorcode: 'errorCode',
-  httpstatus: 'httpStatus'
+  httpstatus: 'httpStatus',
+  stepnumber: 'stepNumber',
+  stepcount: 'stepCount',
+  stepprogress: 'stepProgress',
+  processedbytes: 'processedBytes',
+  totalbytes: 'totalBytes',
+  processeditems: 'processedItems',
+  stepstartedat: 'stepStartedAt'
 }));
 
 function normalizeRow(row) {

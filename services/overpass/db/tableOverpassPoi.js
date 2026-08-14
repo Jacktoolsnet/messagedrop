@@ -51,6 +51,13 @@ function init(db, callback) {
       status TEXT NOT NULL CHECK (status IN ('queued', 'running', 'succeeded', 'failed')),
       stage TEXT NOT NULL DEFAULT 'queued',
       progress INTEGER NOT NULL DEFAULT 0 CHECK (progress BETWEEN 0 AND 100),
+      stepNumber INTEGER NOT NULL DEFAULT 0,
+      stepCount INTEGER NOT NULL DEFAULT 0,
+      stepProgress INTEGER,
+      processedBytes BIGINT,
+      totalBytes BIGINT,
+      processedItems BIGINT,
+      stepStartedAt TIMESTAMPTZ,
       requestedConfig JSONB NOT NULL DEFAULT '{}'::jsonb,
       versionId TEXT,
       error TEXT,
@@ -62,7 +69,14 @@ function init(db, callback) {
       ON ${JOB_TABLE} (datasetId, createdAt DESC)`,
     `CREATE UNIQUE INDEX IF NOT EXISTS idx_overpass_import_job_one_active
       ON ${JOB_TABLE} (datasetId)
-      WHERE status IN ('queued', 'running')`
+      WHERE status IN ('queued', 'running')`,
+    `ALTER TABLE ${JOB_TABLE} ADD COLUMN IF NOT EXISTS stepNumber INTEGER NOT NULL DEFAULT 0`,
+    `ALTER TABLE ${JOB_TABLE} ADD COLUMN IF NOT EXISTS stepCount INTEGER NOT NULL DEFAULT 0`,
+    `ALTER TABLE ${JOB_TABLE} ADD COLUMN IF NOT EXISTS stepProgress INTEGER`,
+    `ALTER TABLE ${JOB_TABLE} ADD COLUMN IF NOT EXISTS processedBytes BIGINT`,
+    `ALTER TABLE ${JOB_TABLE} ADD COLUMN IF NOT EXISTS totalBytes BIGINT`,
+    `ALTER TABLE ${JOB_TABLE} ADD COLUMN IF NOT EXISTS processedItems BIGINT`,
+    `ALTER TABLE ${JOB_TABLE} ADD COLUMN IF NOT EXISTS stepStartedAt TIMESTAMPTZ`
   ], callback);
 }
 
@@ -140,18 +154,33 @@ function startJob(db, jobId, callback) {
   db.run(`
     UPDATE ${JOB_TABLE}
     SET status = 'running', stage = 'starting', progress = 1,
+      stepNumber = 0, stepProgress = NULL, processedBytes = NULL, totalBytes = NULL,
+      processedItems = NULL, stepStartedAt = CURRENT_TIMESTAMP,
       startedAt = CURRENT_TIMESTAMP, error = NULL
     WHERE jobId = ? AND status = 'queued'
   `, [jobId], callback);
 }
 
-function updateJobProgress(db, jobId, stage, progress, callback) {
+function updateJobProgress(db, jobId, stage, progress, details, callback) {
+  if (typeof details === 'function') {
+    callback = details;
+    details = {};
+  }
   const normalizedProgress = Math.max(0, Math.min(99, Math.round(Number(progress) || 0)));
+  const stepProgress = details?.stepProgress == null
+    ? null
+    : Math.max(0, Math.min(100, Math.round(Number(details.stepProgress) || 0)));
+  const normalizedStage = String(stage || 'running').slice(0, 100);
   db.run(`
     UPDATE ${JOB_TABLE}
-    SET stage = ?, progress = ?
+    SET stage = ?, progress = ?, stepNumber = ?, stepCount = ?, stepProgress = ?,
+      processedBytes = ?, totalBytes = ?, processedItems = ?,
+      stepStartedAt = CASE WHEN stage <> ? THEN CURRENT_TIMESTAMP ELSE COALESCE(stepStartedAt, CURRENT_TIMESTAMP) END
     WHERE jobId = ? AND status = 'running'
-  `, [String(stage || 'running').slice(0, 100), normalizedProgress, jobId], callback);
+  `, [normalizedStage, normalizedProgress, Math.max(0, Number(details?.stepNumber) || 0),
+    Math.max(0, Number(details?.stepCount) || 0), stepProgress,
+    finiteOrNull(details?.processedBytes), finiteOrNull(details?.totalBytes), finiteOrNull(details?.processedItems),
+    normalizedStage, jobId], callback);
 }
 
 function failJob(db, jobId, error, callback) {
@@ -236,7 +265,8 @@ async function activateVersion(db, { jobId, versionId, datasetId, poiCount }) {
     await run(transaction, `UPDATE ${DATASET_TABLE} SET activeVersionId = ?, updatedAt = CURRENT_TIMESTAMP
       WHERE datasetId = ?`, [versionId, datasetId]);
     await run(transaction, `UPDATE ${JOB_TABLE}
-      SET status = 'succeeded', stage = 'completed', progress = 100, versionId = ?, completedAt = CURRENT_TIMESTAMP
+      SET status = 'succeeded', stage = 'completed', progress = 100, stepProgress = 100,
+        stepNumber = stepCount, versionId = ?, completedAt = CURRENT_TIMESTAMP
       WHERE jobId = ? AND status = 'running'`, [versionId, jobId]);
   });
 }
@@ -287,6 +317,11 @@ function run(db, sql, params) {
     if (error) reject(error);
     else resolve();
   }));
+}
+
+function finiteOrNull(value) {
+  const number = Number(value);
+  return Number.isFinite(number) && number >= 0 ? Math.round(number) : null;
 }
 
 module.exports = {

@@ -601,7 +601,11 @@ app.use('/moderation', adminLogLimit, moderation);
 app.use('/content', adminContentLimit, content);
 app.use('/maintenance', adminUserLimit, maintenance);
 app.use('/certificate-health', adminUserLimit, certificateHealth);
-app.use('/overpass-import', adminUserLimit, overpassImport);
+// Import progress is polled while a potentially long-running download is active.
+// The global admin limiter still protects these authenticated routes; the much
+// tighter user limiter (30 requests / 5 minutes) would otherwise lock the whole
+// Overpass settings area after roughly 90 seconds of 3-second polling.
+app.use('/overpass-import', overpassImport);
 
 
 // DSA

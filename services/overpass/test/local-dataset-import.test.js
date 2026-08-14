@@ -1,6 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
+  createProgressTracker,
   featureToElement,
   filterExpressions,
   geometryCenter,
@@ -61,4 +62,22 @@ test('parses the repeatable Wolfenbuettel import options', () => {
   );
   assert.throws(() => parseArguments(['--unknown']), /Unknown argument/u);
   assert.throws(() => parseArguments(['--categories', 'invalid']), /Categories/u);
+});
+
+test('reports a numbered import step and weighted overall progress', async () => {
+  const updates = [];
+  const tracker = createProgressTracker({ clipToBounds: true }, async (stage, progress, details) => {
+    updates.push({ stage, progress, details });
+  });
+
+  await tracker.update('downloading', 50, { processedBytes: 50, totalBytes: 100 });
+  await tracker.update('filtering', null);
+
+  assert.equal(updates[0].stage, 'downloading');
+  assert.equal(updates[0].details.stepNumber, 1);
+  assert.equal(updates[0].details.stepCount, 8);
+  assert.equal(updates[0].details.stepProgress, 50);
+  assert.equal(updates[0].progress, 22);
+  assert.equal(updates[1].details.stepNumber, 3);
+  assert.equal(updates[1].details.stepProgress, null);
 });

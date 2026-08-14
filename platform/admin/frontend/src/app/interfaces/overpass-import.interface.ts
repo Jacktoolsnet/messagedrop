@@ -40,6 +40,13 @@ export interface OverpassImportJob {
   status: 'queued' | 'running' | 'succeeded' | 'failed';
   stage: string;
   progress: number;
+  stepNumber?: number;
+  stepCount?: number;
+  stepProgress?: number | null;
+  processedBytes?: number | string | null;
+  totalBytes?: number | string | null;
+  processedItems?: number | string | null;
+  stepStartedAt?: string | null;
   error: string | null;
   createdAt: string;
   startedAt: string | null;

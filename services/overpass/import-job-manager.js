@@ -37,7 +37,8 @@ class ImportJobManager {
     let entries;
     try { entries = await fs.readdir(directory); } catch { return; }
     const generated = entries.filter((name) => name.endsWith('.osm.pbf') || name.endsWith('.osm.pbf.part')
-      || name.endsWith('.geojsonseq') || name.endsWith('-poi-filter-expressions.txt'));
+      || name.endsWith('.geojsonseq') || name.endsWith('-poi-filter-expressions.txt')
+      || name.endsWith('-download-headers.txt'));
     await Promise.all(generated.map((name) => fs.rm(path.join(directory, name), { force: true })));
   }
 

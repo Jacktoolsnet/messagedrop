@@ -39,16 +39,17 @@ async function main() {
   await callbackResult((callback) => tableOverpassPoi.startJob(database.db, jobId, callback));
   process.stdout.write(`Started import job ${jobId}.\n`);
   try {
-    const updateProgress = (stage, progress) => callbackResult((callback) =>
-      tableOverpassPoi.updateJobProgress(database.db, jobId, stage, progress, callback));
+    const updateProgress = (stage, progress, details = {}) => callbackResult((callback) =>
+      tableOverpassPoi.updateJobProgress(database.db, jobId, stage, progress, details, callback));
+    const progress = createProgressTracker(dataset, updateProgress);
     await tableOverpassPoi.stageVersion(database.db, {
       versionId, dataset: { ...dataset, sourceTimestamp: null }, categories: options.categories
     });
     staged = true;
-    const poiCount = await prepareDataset(dataset, options, updateProgress, async (batch) => {
+    const poiCount = await prepareDataset(dataset, options, progress, async (batch) => {
       await tableOverpassPoi.insertPoiBatch(database.db, versionId, batch);
     });
-    await updateProgress('activating', 95);
+    await progress.update('activating', null);
     await tableOverpassPoi.activateVersion(database.db, { jobId, versionId, datasetId: dataset.id, poiCount });
     if (dataset.supersedes?.length) {
       await callbackResult((callback) => tableOverpassPoi.deleteDatasets(database.db, dataset.supersedes, callback));
@@ -75,7 +76,7 @@ async function main() {
   }
 }
 
-async function prepareDataset(dataset, options, updateProgress = async () => {}, persistBatch = null) {
+async function prepareDataset(dataset, options, progress = createProgressTracker(dataset), persistBatch = null) {
   const outputDirectory = downloadDirectory();
   await fsPromises.mkdir(outputDirectory, { recursive: true });
   const sourcePath = path.join(outputDirectory, dataset.sourceFile);
@@ -84,57 +85,78 @@ async function prepareDataset(dataset, options, updateProgress = async () => {},
   const clippedPath = path.join(outputDirectory, `${dataset.id}-poi-clipped.osm.pbf`);
   const geoJsonPath = path.join(outputDirectory, `${dataset.id}-poi.geojsonseq`);
   const expressionsPath = path.join(outputDirectory, `${dataset.id}-poi-filter-expressions.txt`);
-  await cleanupWorkingFiles([sourcePath, partialSourcePath, filteredPath, clippedPath, geoJsonPath, expressionsPath]);
+  const downloadHeadersPath = path.join(outputDirectory, `${dataset.id}-download-headers.txt`);
+  const workingFiles = [sourcePath, partialSourcePath, filteredPath, clippedPath, geoJsonPath,
+    expressionsPath, downloadHeadersPath];
+  await cleanupWorkingFiles(workingFiles);
   try {
   if (!await exists(sourcePath)) {
-    await updateProgress('downloading', 5);
-    await command('curl', [
+    await progress.update('downloading', 0, { processedBytes: 0 });
+    await downloadWithProgress([
       '--fail', '--location', '--retry', '3', '--continue-at', '-',
+      '--silent', '--show-error', '--dump-header', downloadHeadersPath,
       '--output', partialSourcePath, dataset.sourceUrl
-    ]);
+    ], partialSourcePath, downloadHeadersPath, (stepProgress, metrics) =>
+      progress.update('downloading', stepProgress, metrics));
     await fsPromises.rename(partialSourcePath, sourcePath);
   }
+  await progress.update('preparing_filter', 0);
   await fsPromises.writeFile(
     expressionsPath,
     `${filterExpressions(options.categories, options.subcategories).join('\n')}\n`,
     { mode: 0o600 }
   );
-  await updateProgress('filtering', 55);
+  await progress.update('preparing_filter', 100);
+  await progress.update('filtering', null);
   await command('osmium', [
     'tags-filter', '--overwrite', '--expressions', expressionsPath,
     '--output', filteredPath,
     sourcePath
   ]);
+  await progress.update('filtering', 100);
   await fsPromises.rm(sourcePath, { force: true });
   let exportPath = filteredPath;
   if (dataset.clipToBounds) {
     const bounds = dataset.bounds;
-    await updateProgress('extracting', 65);
+    await progress.update('extracting', null);
     await command('osmium', ['extract', '--overwrite',
       '--bbox', `${bounds.west},${bounds.south},${bounds.east},${bounds.north}`,
       '--output', clippedPath, filteredPath]);
+    await progress.update('extracting', 100);
     await fsPromises.rm(filteredPath, { force: true });
     exportPath = clippedPath;
   }
-  await updateProgress('converting', 70);
+  await progress.update('converting', null);
   await command('osmium', [
     'export', '--overwrite', '--output-format', 'geojsonseq',
     '--attributes', 'type,id', '--format-option', 'print_record_separator=false',
     '--output', geoJsonPath,
     exportPath
   ]);
+  await progress.update('converting', 100);
   await fsPromises.rm(exportPath, { force: true });
 
-  await updateProgress('normalizing', 80);
-  const poiCount = await readPois(geoJsonPath, options.categories, options.subcategories, persistBatch);
+  const inputSize = (await fsPromises.stat(geoJsonPath)).size;
+  await progress.update('importing', 0, { processedBytes: 0, totalBytes: inputSize, processedItems: 0 });
+  const poiCount = await readPois(geoJsonPath, options.categories, options.subcategories, persistBatch,
+    (stepProgress, metrics) => progress.update('importing', stepProgress, metrics));
   if (!poiCount) throw new Error('The filtered dataset contains no supported POIs');
+  await progress.update('cleanup', null);
+  await cleanupWorkingFiles(workingFiles);
+  await progress.update('cleanup', 100);
   return poiCount;
   } finally {
-    await cleanupWorkingFiles([sourcePath, partialSourcePath, filteredPath, clippedPath, geoJsonPath, expressionsPath]);
+    await cleanupWorkingFiles(workingFiles);
   }
 }
 
-async function readPois(inputPath, categories = categoryNames(), selectedSubcategories = null, persistBatch = null) {
+async function readPois(
+  inputPath,
+  categories = categoryNames(),
+  selectedSubcategories = null,
+  persistBatch = null,
+  onProgress = null
+) {
   const subcategories = Object.fromEntries(categories.map((category) => [category,
     Array.isArray(selectedSubcategories?.[category])
       ? selectedSubcategories[category]
@@ -142,11 +164,15 @@ async function readPois(inputPath, categories = categoryNames(), selectedSubcate
   ]));
   const unique = new Map();
   let poiCount = 0;
+  let processedBytes = 0;
+  let lastProgressAt = 0;
+  const totalBytes = (await fsPromises.stat(inputPath)).size;
   const lines = readline.createInterface({
     input: fs.createReadStream(inputPath, { encoding: 'utf8' }),
     crlfDelay: Infinity
   });
   for await (const rawLine of lines) {
+    processedBytes += Buffer.byteLength(rawLine) + 1;
     const line = (rawLine.charCodeAt(0) === 0x1e ? rawLine.slice(1) : rawLine).trim();
     if (!line) continue;
     const feature = JSON.parse(line);
@@ -158,6 +184,12 @@ async function readPois(inputPath, categories = categoryNames(), selectedSubcate
       await persistBatch(batch);
       poiCount += batch.length;
       unique.clear();
+      if (onProgress && Date.now() - lastProgressAt >= 1000) {
+        lastProgressAt = Date.now();
+        await onProgress(percent(processedBytes, totalBytes), {
+          processedBytes: Math.min(processedBytes, totalBytes), totalBytes, processedItems: poiCount
+        });
+      }
     }
   }
   if (!persistBatch) return [...unique.values()];
@@ -166,6 +198,7 @@ async function readPois(inputPath, categories = categoryNames(), selectedSubcate
     await persistBatch(batch);
     poiCount += batch.length;
   }
+  if (onProgress) await onProgress(100, { processedBytes: totalBytes, totalBytes, processedItems: poiCount });
   return poiCount;
 }
 
@@ -280,10 +313,93 @@ async function requireCommand(name, hint = '') {
   }
 }
 
-function command(program, args, { quiet = false } = {}) {
+function createProgressTracker(dataset, updateProgress = async () => {}) {
+  const steps = [
+    { stage: 'downloading', weight: 45 },
+    { stage: 'preparing_filter', weight: 1 },
+    { stage: 'filtering', weight: 19 },
+    ...(dataset?.clipToBounds ? [{ stage: 'extracting', weight: 5 }] : []),
+    { stage: 'converting', weight: 10 },
+    { stage: 'importing', weight: 15 },
+    { stage: 'cleanup', weight: 2 },
+    { stage: 'activating', weight: 3 }
+  ];
+  const totalWeight = steps.reduce((sum, step) => sum + step.weight, 0);
+  let updateChain = Promise.resolve();
+  return {
+    steps,
+    update(stage, stepProgress = null, metrics = {}) {
+      const index = Math.max(0, steps.findIndex((step) => step.stage === stage));
+      const completedWeight = steps.slice(0, index).reduce((sum, step) => sum + step.weight, 0);
+      const currentWeight = stepProgress == null ? 0 : steps[index].weight * Math.max(0, Math.min(100, stepProgress)) / 100;
+      const overallProgress = Math.min(99, Math.floor((completedWeight + currentWeight) / totalWeight * 100));
+      updateChain = updateChain.then(() => updateProgress(stage, overallProgress, {
+        stepNumber: index + 1,
+        stepCount: steps.length,
+        stepProgress,
+        processedBytes: metrics.processedBytes,
+        totalBytes: metrics.totalBytes,
+        processedItems: metrics.processedItems
+      }));
+      return updateChain;
+    }
+  };
+}
+
+async function downloadWithProgress(args, outputPath, headersPath, onProgress) {
+  let progressChain = Promise.resolve();
+  const report = () => {
+    progressChain = progressChain.then(async () => {
+      const [processedBytes, totalBytes] = await Promise.all([
+        fileSize(outputPath),
+        contentLengthFromHeaders(headersPath)
+      ]);
+      await onProgress(totalBytes ? percent(processedBytes, totalBytes) : null, {
+        processedBytes,
+        totalBytes
+      });
+    });
+  };
+  const timer = setInterval(report, 1000);
+  try {
+    await command('curl', args, { stdio: ['ignore', 'ignore', 'inherit'] });
+  } finally {
+    clearInterval(timer);
+  }
+  report();
+  await progressChain;
+  const processedBytes = await fileSize(outputPath);
+  await onProgress(100, { processedBytes, totalBytes: processedBytes });
+}
+
+async function fileSize(filePath) {
+  try { return (await fsPromises.stat(filePath)).size; } catch { return 0; }
+}
+
+async function contentLengthFromHeaders(filePath) {
+  try {
+    const headers = await fsPromises.readFile(filePath, 'utf8');
+    const responses = headers.split(/\r?\n\r?\n/gu).filter(Boolean).reverse();
+    for (const response of responses) {
+      if (!/^HTTP\/\S+\s+2\d\d\b/iu.test(response)) continue;
+      const value = Number(response.match(/^content-length:\s*(\d+)\s*$/imu)?.[1]);
+      return Number.isFinite(value) && value > 0 ? value : null;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function percent(value, total) {
+  if (!Number.isFinite(value) || !Number.isFinite(total) || total <= 0) return null;
+  return Math.max(0, Math.min(100, Math.round(value / total * 100)));
+}
+
+function command(program, args, { quiet = false, stdio } = {}) {
   if (!quiet) process.stdout.write(`> ${program} ${args.join(' ')}\n`);
   return new Promise((resolve, reject) => {
-    const child = spawn(program, args, { stdio: quiet ? 'ignore' : 'inherit' });
+    const child = spawn(program, args, { stdio: stdio || (quiet ? 'ignore' : 'inherit') });
     child.once('error', reject);
     child.once('exit', (code, signal) => {
       if (code === 0) resolve();
@@ -310,6 +426,7 @@ if (require.main === module) {
 
 module.exports = {
   DATASETS,
+  createProgressTracker,
   featureToElement,
   filterExpressions,
   geometryCenter,

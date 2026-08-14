@@ -12,8 +12,13 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterLink } from '@angular/router';
-import { finalize, forkJoin } from 'rxjs';
-import { OverpassDatabaseInfo, OverpassImportCatalog, OverpassImportSettings } from '../../interfaces/overpass-import.interface';
+import { catchError, EMPTY, finalize, forkJoin, switchMap, timer } from 'rxjs';
+import {
+  OverpassDatabaseInfo,
+  OverpassImportCatalog,
+  OverpassImportJob,
+  OverpassImportSettings
+} from '../../interfaces/overpass-import.interface';
 import { DisplayMessageService } from '../../services/display-message.service';
 import { OverpassImportService } from '../../services/overpass-import.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
@@ -84,6 +89,12 @@ export class OverpassImportSettingsComponent {
 
   constructor() {
     this.load();
+    timer(5000, 5000).pipe(
+      switchMap(() => this.hasActiveImport()
+        ? this.service.getJobs().pipe(catchError(() => EMPTY))
+        : EMPTY),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe((value) => this.databaseInfo.update((current) => current ? { ...current, jobs: value.jobs } : current));
   }
 
   load(): void {
@@ -223,7 +234,14 @@ export class OverpassImportSettingsComponent {
     this.loadingDatabaseInfo.set(true);
     this.service.getDatabaseInfo()
       .pipe(finalize(() => this.loadingDatabaseInfo.set(false)), takeUntilDestroyed(this.destroyRef))
-      .subscribe({ next: (value) => this.databaseInfo.set(value), error: () => this.databaseInfo.set(null) });
+      .subscribe({
+        next: (value) => this.databaseInfo.set(value),
+        error: () => this.showError(this.i18n.t('Could not load database information.'))
+      });
+  }
+
+  private hasActiveImport(): boolean {
+    return this.databaseInfo()?.jobs.some((job) => job.status === 'queued' || job.status === 'running') ?? false;
   }
 
   startImport(): void {
@@ -254,6 +272,88 @@ export class OverpassImportSettingsComponent {
       bar: 'Bars', pub: 'Pubs', fast_food: 'Fast food', biergarten: 'Beer gardens', toilets: 'Public toilets'
     };
     return this.i18n.t(labels[value] ?? value.replaceAll('_', ' ').replace(/^./, (letter) => letter.toUpperCase()));
+  }
+
+  stageLabel(stage: string): string {
+    const labels: Record<string, string> = {
+      queued: 'Waiting',
+      starting: 'Preparing import',
+      downloading: 'Downloading source data',
+      preparing_filter: 'Preparing POI filters',
+      filtering: 'Filtering required POIs',
+      extracting: 'Extracting region',
+      converting: 'Converting geodata',
+      importing: 'Normalizing and storing POIs',
+      cleanup: 'Deleting temporary files',
+      activating: 'Activating new data version',
+      completed: 'Import completed',
+      failed: 'Import failed'
+    };
+    return this.i18n.t(labels[stage] ?? stage.replaceAll('_', ' '));
+  }
+
+  stepLabel(job: OverpassImportJob): string {
+    if (!job.stepNumber || !job.stepCount) return this.stageLabel(job.stage);
+    return this.i18n.t('Step {{current}} of {{total}} – {{stage}}', {
+      current: job.stepNumber,
+      total: job.stepCount,
+      stage: this.stageLabel(job.stage)
+    });
+  }
+
+  formatBytes(value: number | string | null | undefined): string {
+    const bytes = Number(value);
+    if (!Number.isFinite(bytes) || bytes < 0) return '—';
+    const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+    let unit = 0;
+    let amount = bytes;
+    while (amount >= 1024 && unit < units.length - 1) {
+      amount /= 1024;
+      unit += 1;
+    }
+    return `${new Intl.NumberFormat(this.i18n.lang(), { maximumFractionDigits: unit ? 1 : 0 }).format(amount)} ${units[unit]}`;
+  }
+
+  processedDetails(job: OverpassImportJob): string | null {
+    const processedBytes = Number(job.processedBytes);
+    const totalBytes = Number(job.totalBytes);
+    if (job.processedBytes != null && Number.isFinite(processedBytes) && processedBytes >= 0) {
+      const bytes = job.totalBytes != null && Number.isFinite(totalBytes) && totalBytes > 0
+        ? `${this.formatBytes(processedBytes)} / ${this.formatBytes(totalBytes)}`
+        : this.formatBytes(processedBytes);
+      return job.processedItems == null
+        ? bytes
+        : `${bytes} · ${new Intl.NumberFormat(this.i18n.lang()).format(Number(job.processedItems) || 0)} ${this.i18n.t('POIs')}`;
+    }
+    if (job.processedItems != null) {
+      return `${new Intl.NumberFormat(this.i18n.lang()).format(Number(job.processedItems) || 0)} ${this.i18n.t('POIs')}`;
+    }
+    return null;
+  }
+
+  elapsed(job: OverpassImportJob): string | null {
+    if (!job.startedAt) return null;
+    const start = new Date(job.startedAt).getTime();
+    const end = job.completedAt ? new Date(job.completedAt).getTime() : Date.now();
+    return Number.isFinite(start) && Number.isFinite(end) ? this.formatDuration(Math.max(0, end - start)) : null;
+  }
+
+  remaining(job: OverpassImportJob): string | null {
+    if (job.status !== 'running' || job.stepProgress == null
+      || !job.startedAt || job.progress <= 1 || job.progress >= 100) return null;
+    const elapsed = Date.now() - new Date(job.startedAt).getTime();
+    if (!Number.isFinite(elapsed) || elapsed <= 0) return null;
+    return this.formatDuration(elapsed / job.progress * (100 - job.progress));
+  }
+
+  private formatDuration(milliseconds: number): string {
+    const totalMinutes = Math.max(0, Math.round(milliseconds / 60000));
+    if (totalMinutes < 60) return this.i18n.t('{{count}} min', { count: Math.max(1, totalMinutes) });
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return minutes
+      ? this.i18n.t('{{hours}} h {{minutes}} min', { hours, minutes })
+      : this.i18n.t('{{count}} h', { count: hours });
   }
 
   private initialSubcategories(settings: OverpassImportSettings, category: string, catalog = this.catalog()): string[] {

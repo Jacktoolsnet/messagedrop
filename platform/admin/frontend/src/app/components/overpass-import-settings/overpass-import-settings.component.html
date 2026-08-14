@@ -234,9 +234,33 @@
                 <h3>{{ i18n.t('Recent import jobs') }}</h3>
                 <div class="job-list">
                   @for (job of info.jobs; track job.jobId) {
-                    <article class="job-row">
+                    <article class="job-row" [class.active-job]="job.status === 'running' || job.status === 'queued'">
                       <mat-icon>{{ job.status === 'succeeded' ? 'check_circle' : job.status === 'failed' ? 'error' : 'sync' }}</mat-icon>
-                      <span><strong>{{ job.datasetId }}</strong><small>{{ job.stage }} · {{ job.progress }} %</small>
+                      <span class="job-content"><strong>{{ job.datasetId }}</strong>
+                        <small>{{ stepLabel(job) }}</small>
+                        @if (job.status === 'running') {
+                          <div class="progress-section">
+                            <div class="progress-caption">
+                              <span>{{ i18n.t('Current step') }}</span>
+                              <strong>{{ job.stepProgress == null ? i18n.t('Processing…') : job.stepProgress + ' %' }}</strong>
+                            </div>
+                            <mat-progress-bar [mode]="job.stepProgress == null ? 'indeterminate' : 'determinate'"
+                              [value]="job.stepProgress ?? 0"></mat-progress-bar>
+                            <div class="progress-caption overall-progress">
+                              <span>{{ i18n.t('Overall progress') }}</span><strong>{{ job.progress }} %</strong>
+                            </div>
+                            <mat-progress-bar mode="determinate" [value]="job.progress"></mat-progress-bar>
+                            <div class="progress-details">
+                              @if (processedDetails(job); as details) { <span><mat-icon>data_usage</mat-icon>{{ details }}</span> }
+                              @if (elapsed(job); as duration) { <span><mat-icon>schedule</mat-icon>{{ i18n.t('Elapsed') }}: {{ duration }}</span> }
+                              @if (remaining(job); as duration) { <span><mat-icon>hourglass_top</mat-icon>{{ i18n.t('Estimated remaining') }}: {{ duration }}</span> }
+                            </div>
+                          </div>
+                        } @else {
+                          <small>{{ job.progress }} %
+                            @if (elapsed(job); as duration) { · {{ i18n.t('Duration') }}: {{ duration }} }
+                          </small>
+                        }
                         @if (job.error) { <small class="job-error">{{ job.error }}</small> }
                       </span>
                       <span class="job-status" [class]="'job-status status-' + job.status">{{ job.status }}</span>

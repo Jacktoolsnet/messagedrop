@@ -227,6 +227,14 @@ The POST body contains `datasetId`, `categories`, and `refresh`. It returns
 immediately with a job record; Osmium continues in a child process. Starting an
 already active dataset is idempotent and returns the existing job.
 
+Import jobs expose a numbered current step, the total step count, weighted
+overall progress, step progress where it can be measured, byte counters,
+processed POI counters, and step timestamps. Downloads and database imports are
+reported with determinate progress. Osmium filtering, extraction, and conversion
+use an indeterminate step indicator because Osmium does not expose a reliable
+percentage. The admin frontend polls only the lightweight job endpoint while it
+is open and shows elapsed time plus an estimate during measurable steps.
+
 The admin backend stores its schedule in `tableOverpassImportSettings` and its
 trigger history in `tableOverpassImportDispatch`. Both tables are created with
 `CREATE TABLE IF NOT EXISTS` during a normal admin-backend startup, including
