@@ -3986,11 +3986,10 @@ export class AppComponent implements OnInit {
     });
 
     // Apply the same Plus-Code grouping as Wikipedia and other map content.
-    // All Overpass POIs in a cell form one "public places" content group. A
-    // summary marker is only needed when another content group already exists
-    // in the same cell; multiple POIs alone still open the POI list directly.
-    // While Plus-Code grouping is active, the marker uses the neutral public-
-    // places icon instead of an arbitrary category icon from the cell.
+    // All Overpass POIs in a cell form one "public places" content group.
+    // Even at high zoom, separate OSM objects in the same small Plus-Code cell
+    // share one marker so several indistinguishable pins are not stacked. The
+    // neutral public-places icon identifies every grouped POI marker.
     this.overpassMapState.pois().forEach((poi) => {
       const poiLocation: Location = {
         latitude: poi.latitude,
@@ -4011,12 +4010,12 @@ export class AppComponent implements OnInit {
           plusCode: groupedPlusCode
         };
       }
-      const key = this.mapService.getMapZoom() > 17 ? `overpass:${poi.id}` : center.plusCode;
+      const key = center.plusCode;
       const existing = this.markerLocations.get(key);
       if (existing) {
         existing.overpassPois ??= existing.overpassPoi ? [existing.overpassPoi] : [];
         existing.overpassPois.push(poi);
-        existing.overpassGrouped = this.mapService.getMapZoom() <= 17;
+        existing.overpassGrouped = this.mapService.getMapZoom() <= 17 || existing.overpassPois.length > 1;
         if (existing.type !== MarkerType.OVERPASS_POI) {
           existing.type = MarkerType.MULTI;
         }

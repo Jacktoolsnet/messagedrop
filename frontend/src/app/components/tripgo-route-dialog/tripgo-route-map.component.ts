@@ -22,7 +22,8 @@ import { MarkerType } from '../../interfaces/marker-type';
 import { DEFAULT_SEARCH_SETTINGS, SearchSettings } from '../../interfaces/search-settings';
 import { TripGoLocation, TripGoRouteOption, TripGoRouteSegment, TripGoStop, TripGoTurnInstruction } from '../../interfaces/tripgo';
 import { WikipediaArticle } from '../../interfaces/wikipedia';
-import { publicTransportStopMarker } from '../../services/map.service';
+import { GeolocationService } from '../../services/geolocation.service';
+import { overpassPlacesMarker, overpassPoiMarker, publicTransportStopMarker } from '../../services/map.service';
 import { TripGoRouteContent, TripGoRouteContentService } from '../../services/tripgo-route-content.service';
 import { WikipediaService } from '../../services/wikipedia.service';
 import { DisplayMessage } from '../utils/display-message/display-message.component';
@@ -73,7 +74,7 @@ const routeContentIcons: Partial<Record<MarkerType, leaflet.Icon>> = {
 const WIKIPEDIA_ROUTE_RADIUS_METERS = 200;
 const MAX_WIKIPEDIA_SIMULATION_SEARCHES = 80;
 const EMPTY_ROUTE_CONTENT: TripGoRouteContent = {
-  messages: [], notes: [], images: [], documents: [], experiences: [], myExperiences: [], secretDrops: []
+  messages: [], notes: [], images: [], documents: [], experiences: [], myExperiences: [], secretDrops: [], overpassPois: []
 };
 
 @Component({
@@ -173,6 +174,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
 
   readonly mapId = `tripgo-route-map-${Math.random().toString(36).slice(2)}`;
   private readonly transloco = inject(TranslocoService);
+  private readonly geolocation = inject(GeolocationService);
   private readonly wikipedia = inject(WikipediaService);
   private readonly routeContent = inject(TripGoRouteContentService);
   private readonly dialog = inject(MatDialog);
@@ -1553,14 +1555,21 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     this.clearRouteContentMarkers();
     if (!this.map) return;
     const groups = new Map<string, MarkerLocation>();
-    const add = (type: MarkerType, item: unknown, location?: Location) => {
+    const add = (
+      type: MarkerType,
+      item: unknown,
+      location?: Location,
+      keyOverride?: string,
+      overpassGrouped = false
+    ) => {
       if (!location || !Number.isFinite(location.latitude) || !Number.isFinite(location.longitude)) return;
-      const key = `${Number(location.latitude).toFixed(5)}:${Number(location.longitude).toFixed(5)}`;
+      const key = keyOverride || `${Number(location.latitude).toFixed(5)}:${Number(location.longitude).toFixed(5)}`;
       let group = groups.get(key);
       if (!group) {
         group = {
           location: { ...location, plusCode: location.plusCode || `route:${key}` },
           messages: [], notes: [], images: [], documents: [], experiences: [], myExperiences: [], secretDrops: [],
+          overpassPois: [], overpassGrouped,
           type
         };
         groups.set(key, group);
@@ -1575,6 +1584,11 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
         case MarkerType.EXPERIENCE_DESTINATION: group.experiences?.push(item as NonNullable<typeof group.experiences>[number]); break;
         case MarkerType.MY_EXPERIENCE: group.myExperiences?.push(item as NonNullable<typeof group.myExperiences>[number]); break;
         case MarkerType.SECRET_DROP: group.secretDrops?.push(item as NonNullable<typeof group.secretDrops>[number]); break;
+        case MarkerType.OVERPASS_POI:
+          group.overpassPoi ??= item as NonNullable<typeof group.overpassPoi>;
+          group.overpassPois?.push(item as NonNullable<typeof group.overpassPois>[number]);
+          group.overpassGrouped ||= overpassGrouped || (group.overpassPois?.length ?? 0) > 1;
+          break;
       }
     };
 
@@ -1607,9 +1621,34 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
           plusCode: item.plusCode || item.discoveryPlusCode || item.location?.plusCode || ''
         }));
     }
+    content.overpassPois.forEach((poi) => {
+      if (!this.routeContentVisible(poi.category, zoom)
+        || !this.searchSettings[poi.category].subcategories[poi.subtype]) return;
+      const sourceLocation: Location = {
+        latitude: poi.latitude,
+        longitude: poi.longitude,
+        plusCode: this.geolocation.getPlusCode(poi.latitude, poi.longitude)
+      };
+      if (zoom > 17) {
+        // Separate OSM objects can share practically the same coordinates.
+        // Group those objects instead of drawing several indistinguishable pins
+        // on top of each other; clicking the neutral pin opens their POI list.
+        add(MarkerType.OVERPASS_POI, poi, sourceLocation, `overpass-location:${sourceLocation.plusCode}`);
+        return;
+      }
+      const plusCode = this.geolocation.getGroupedPlusCodeBasedOnMapZoom(sourceLocation, zoom);
+      const area = this.geolocation.getGridFromPlusCode(plusCode);
+      add(MarkerType.OVERPASS_POI, poi, {
+        latitude: area.latitudeCenter,
+        longitude: area.longitudeCenter,
+        plusCode
+      }, `overpass-group:${plusCode}`, true);
+    });
 
     groups.forEach((group) => {
-      const icon = routeContentIcons[group.type] ?? routeContentIcons[MarkerType.MULTI];
+      const icon = group.type === MarkerType.OVERPASS_POI && group.overpassPoi
+        ? (group.overpassGrouped ? overpassPlacesMarker() : overpassPoiMarker(group.overpassPoi))
+        : routeContentIcons[group.type] ?? routeContentIcons[MarkerType.MULTI];
       if (!icon) return;
       const marker = leaflet.marker([group.location.latitude, group.location.longitude], {
         icon, zIndexOffset: 1_450
@@ -1647,7 +1686,10 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
       secretDrops: content.secretDrops.filter((item) => this.distanceToRouteInMeters({
         latitude: Number(item.latitude ?? item.location?.latitude),
         longitude: Number(item.longitude ?? item.location?.longitude)
-      }) <= WIKIPEDIA_ROUTE_RADIUS_METERS)
+      }) <= WIKIPEDIA_ROUTE_RADIUS_METERS),
+      overpassPois: content.overpassPois.filter((item) =>
+        this.distanceToRouteInMeters({ latitude: item.latitude, longitude: item.longitude })
+          <= WIKIPEDIA_ROUTE_RADIUS_METERS)
     };
   }
 
@@ -1661,7 +1703,8 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
       documents: unique(contents.flatMap((item) => item.documents), (item) => item.id),
       experiences: unique(contents.flatMap((item) => item.experiences), (item) => item.destinationId),
       myExperiences: unique(contents.flatMap((item) => item.myExperiences), (item) => item.result.productCode || item.result.trackId),
-      secretDrops: unique(contents.flatMap((item) => item.secretDrops), (item) => item.uuid)
+      secretDrops: unique(contents.flatMap((item) => item.secretDrops), (item) => item.uuid),
+      overpassPois: unique(contents.flatMap((item) => item.overpassPois), (item) => item.id)
     });
   }
 

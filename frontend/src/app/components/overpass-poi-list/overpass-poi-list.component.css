@@ -173,10 +173,12 @@
 }
 
 .poi-inscription mat-icon {
-  flex: 0 0 1.25rem;
-  width: 1.25rem;
-  height: 1.25rem;
+  flex: 0 0 1.5rem;
+  width: 1.5rem;
+  height: 1.5rem;
   color: var(--mat-primary-color);
+  font-size: 1.5rem;
+  line-height: 1;
 }
 
 .poi-inscription div {

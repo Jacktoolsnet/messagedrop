@@ -86,7 +86,14 @@ export class OverpassPoiListComponent {
   inscription(poi: OverpassPoi): string | null {
     const value = this.localizedOsmText(poi.properties.inscriptions, poi.properties.inscription);
     if (!value || value === this.description(poi)) return null;
-    return value.replace(/\s*\|\s*/gu, '\n');
+    return value
+      // OSM inscriptions sometimes contain escaped line breaks as literal "\\n" text.
+      .replace(/\\r\\n|\\n|\\r/gu, '\n')
+      .replace(/\r\n?|\s*\|\s*/gu, '\n')
+      .split('\n')
+      .map((line) => line.trim())
+      .join('\n')
+      .trim();
   }
 
   website(poi: OverpassPoi): string | null {
