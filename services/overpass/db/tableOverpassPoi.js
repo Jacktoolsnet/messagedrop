@@ -23,6 +23,9 @@ function init(db, callback) {
       status TEXT NOT NULL CHECK (status IN ('importing', 'active', 'retired', 'failed')),
       sourceUrl TEXT NOT NULL,
       sourceTimestamp TIMESTAMPTZ,
+      sourceEtag TEXT,
+      sourceContentLength BIGINT,
+      importConfigHash TEXT,
       categories JSONB NOT NULL DEFAULT '[]'::jsonb,
       createdAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
       activatedAt TIMESTAMPTZ,
@@ -57,6 +60,9 @@ function init(db, callback) {
       processedBytes BIGINT,
       totalBytes BIGINT,
       processedItems BIGINT,
+      sourceTimestamp TIMESTAMPTZ,
+      sourceEtag TEXT,
+      sourceChanged BOOLEAN,
       stepStartedAt TIMESTAMPTZ,
       requestedConfig JSONB NOT NULL DEFAULT '{}'::jsonb,
       versionId TEXT,
@@ -76,7 +82,13 @@ function init(db, callback) {
     `ALTER TABLE ${JOB_TABLE} ADD COLUMN IF NOT EXISTS processedBytes BIGINT`,
     `ALTER TABLE ${JOB_TABLE} ADD COLUMN IF NOT EXISTS totalBytes BIGINT`,
     `ALTER TABLE ${JOB_TABLE} ADD COLUMN IF NOT EXISTS processedItems BIGINT`,
-    `ALTER TABLE ${JOB_TABLE} ADD COLUMN IF NOT EXISTS stepStartedAt TIMESTAMPTZ`
+    `ALTER TABLE ${JOB_TABLE} ADD COLUMN IF NOT EXISTS stepStartedAt TIMESTAMPTZ`,
+    `ALTER TABLE ${JOB_TABLE} ADD COLUMN IF NOT EXISTS sourceTimestamp TIMESTAMPTZ`,
+    `ALTER TABLE ${JOB_TABLE} ADD COLUMN IF NOT EXISTS sourceEtag TEXT`,
+    `ALTER TABLE ${JOB_TABLE} ADD COLUMN IF NOT EXISTS sourceChanged BOOLEAN`,
+    `ALTER TABLE ${VERSION_TABLE} ADD COLUMN IF NOT EXISTS sourceEtag TEXT`,
+    `ALTER TABLE ${VERSION_TABLE} ADD COLUMN IF NOT EXISTS sourceContentLength BIGINT`,
+    `ALTER TABLE ${VERSION_TABLE} ADD COLUMN IF NOT EXISTS importConfigHash TEXT`
   ], callback);
 }
 
@@ -186,6 +198,33 @@ function updateJobProgress(db, jobId, stage, progress, details, callback) {
     normalizedStage, jobId], callback);
 }
 
+function activeSource(db, datasetId, callback) {
+  db.get(`
+    SELECT v.versionId, v.sourceUrl, v.sourceTimestamp, v.sourceEtag,
+      v.sourceContentLength, v.importConfigHash, v.activatedAt
+    FROM ${DATASET_TABLE} d
+    JOIN ${VERSION_TABLE} v ON v.versionId = d.activeVersionId AND v.status = 'active'
+    WHERE d.datasetId = ?
+  `, [datasetId], callback);
+}
+
+function updateJobSource(db, jobId, source, changed, callback) {
+  db.run(`
+    UPDATE ${JOB_TABLE}
+    SET sourceTimestamp = ?, sourceEtag = ?, sourceChanged = ?
+    WHERE jobId = ? AND status = 'running'
+  `, [source?.lastModified || null, source?.etag || null, changed == null ? null : Boolean(changed), jobId], callback);
+}
+
+function completeUnchangedJob(db, jobId, versionId, callback) {
+  db.run(`
+    UPDATE ${JOB_TABLE}
+    SET status = 'succeeded', stage = 'up_to_date', progress = 100, stepProgress = 100,
+      stepNumber = stepCount, versionId = ?, sourceChanged = FALSE, completedAt = CURRENT_TIMESTAMP
+    WHERE jobId = ? AND status = 'running'
+  `, [versionId, jobId], callback);
+}
+
 function failJob(db, jobId, error, callback) {
   db.run(`
     UPDATE ${JOB_TABLE}
@@ -239,9 +278,14 @@ async function stageVersion(db, { versionId, dataset, categories }) {
     `, [dataset.id, dataset.bounds.south, dataset.bounds.west, dataset.bounds.north, dataset.bounds.east]);
     await run(transaction, `
       INSERT INTO ${VERSION_TABLE}
-        (versionId, datasetId, status, sourceUrl, sourceTimestamp, categories, poiCount)
-      VALUES (?, ?, 'importing', ?, ?, ?::jsonb, 0)
-    `, [versionId, dataset.id, dataset.sourceUrl, dataset.sourceTimestamp || null, JSON.stringify(categories)]);
+        (versionId, datasetId, status, sourceUrl, sourceTimestamp, sourceEtag,
+          sourceContentLength, importConfigHash, categories, poiCount)
+      VALUES (?, ?, 'importing', ?, ?, ?, ?, ?, ?::jsonb, 0)
+    `, [versionId, dataset.id, dataset.sourceUrl, dataset.sourceTimestamp || null,
+      dataset.sourceEtag || null,
+      dataset.sourceContentLength == null ? null : finiteOrNull(dataset.sourceContentLength),
+      dataset.importConfigHash || null,
+      JSON.stringify(categories)]);
   });
 }
 
@@ -335,6 +379,9 @@ module.exports = {
   createJob,
   startJob,
   updateJobProgress,
+  activeSource,
+  updateJobSource,
+  completeUnchangedJob,
   failJob,
   getJob,
   listJobs,

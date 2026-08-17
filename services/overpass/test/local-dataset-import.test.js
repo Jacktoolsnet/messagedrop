@@ -5,11 +5,14 @@ const os = require('node:os');
 const path = require('node:path');
 const {
   createProgressTracker,
+  createImportConfigHash,
   featureToElement,
   filterExpressions,
   geometryCenter,
+  isImportCurrent,
   parseArguments,
-  readPois
+  readPois,
+  sourceInfoFromHeaders
 } = require('../scripts/import-local-dataset');
 const { normalizeElement } = require('../normalizer');
 
@@ -51,6 +54,7 @@ test('parses the repeatable Wolfenbuettel import options', () => {
   const defaults = parseArguments([]);
   assert.equal(defaults.dataset, 'wolfenbuettel');
   assert.equal(defaults.refresh, false);
+  assert.equal(defaults.force, false);
   assert.equal(defaults.keepVersions, 0);
   assert.ok(defaults.categories.includes('accommodation'));
   assert.deepEqual(
@@ -58,12 +62,14 @@ test('parses the repeatable Wolfenbuettel import options', () => {
     {
       dataset: 'wolfenbuettel',
       refresh: true,
+      force: false,
       categories: ['accommodation', 'amenities'],
       keepVersions: 1,
       jobId: null,
       subcategories: null
     }
   );
+  assert.equal(parseArguments(['--force']).force, true);
   assert.throws(() => parseArguments(['--unknown']), /Unknown argument/u);
   assert.throws(() => parseArguments(['--categories', 'invalid']), /Categories/u);
 });
@@ -78,12 +84,42 @@ test('reports a numbered import step and weighted overall progress', async () =>
   await tracker.update('filtering', null);
 
   assert.equal(updates[0].stage, 'downloading');
-  assert.equal(updates[0].details.stepNumber, 1);
-  assert.equal(updates[0].details.stepCount, 8);
+  assert.equal(updates[0].details.stepNumber, 2);
+  assert.equal(updates[0].details.stepCount, 9);
   assert.equal(updates[0].details.stepProgress, 50);
-  assert.equal(updates[0].progress, 22);
-  assert.equal(updates[1].details.stepNumber, 3);
+  assert.equal(updates[0].progress, 23);
+  assert.equal(updates[1].details.stepNumber, 4);
   assert.equal(updates[1].details.stepProgress, null);
+});
+
+test('detects unchanged sources only when source and import configuration match', () => {
+  const configHash = createImportConfigHash(['amenities', 'accommodation'], {
+    accommodation: ['hotel'], amenities: ['toilets']
+  });
+  assert.equal(configHash, createImportConfigHash(['accommodation', 'amenities'], {
+    amenities: ['toilets'], accommodation: ['hotel']
+  }));
+  const active = {
+    sourceUrl: 'https://download.test/germany-latest.osm.pbf', sourceEtag: '"v2"',
+    sourceTimestamp: '2026-08-17T04:00:00.000Z', importConfigHash: configHash
+  };
+  assert.equal(isImportCurrent(active, { etag: '"v2"' }, configHash, active.sourceUrl), true);
+  assert.equal(isImportCurrent(active, { etag: '"v3"' }, configHash, active.sourceUrl), false);
+  assert.equal(isImportCurrent(active, { etag: '"v2"' }, 'different', active.sourceUrl), false);
+});
+
+test('reads ETag, timestamp and size from the final successful HTTP response', async (t) => {
+  const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'overpass-headers-'));
+  t.after(() => fs.rm(directory, { recursive: true, force: true }));
+  const headersPath = path.join(directory, 'headers.txt');
+  await fs.writeFile(headersPath, [
+    'HTTP/1.1 302 Found', 'location: https://download.test/current.pbf', '',
+    'HTTP/2 200', 'etag: "source-v2"', 'last-modified: Sun, 17 Aug 2026 04:00:00 GMT',
+    'content-length: 4294967296', '', ''
+  ].join('\r\n'));
+  assert.deepEqual(await sourceInfoFromHeaders(headersPath), {
+    etag: '"source-v2"', lastModified: '2026-08-17T04:00:00.000Z', contentLength: 4294967296
+  });
 });
 
 test('reads record-separated GeoJSON with line breaks in OSM tag values', async (t) => {

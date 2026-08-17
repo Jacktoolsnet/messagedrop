@@ -46,7 +46,7 @@ router.post('/jobs', async (req, res, next) => {
   try {
     const stored = await callbackResult((cb) => settingsTable.get(req.database.db, cb));
     const selected = req.body && Object.keys(req.body).length ? validateSettings({ ...stored, ...req.body, enabled: true }) : stored;
-    const jobs = await dispatchImports(req.database.db, selected, 'manual');
+    const jobs = await dispatchImports(req.database.db, selected, 'manual', { force: Boolean(req.body?.force) });
     return res.status(202).json({ status: 202, jobs });
   } catch (error) { return next(error); }
 });

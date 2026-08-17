@@ -193,13 +193,12 @@
                   </mat-select>
                 </mat-form-field>
               </div>
-              <label class="setting-toggle">
-                <span><strong>{{ i18n.t('Download a fresh source file') }}</strong><small>{{ i18n.t('Fetch the latest Geofabrik extract before each scheduled import.') }}</small></span>
-                <mat-slide-toggle [checked]="refreshSource()" (change)="refreshSource.set($event.checked)"></mat-slide-toggle>
-              </label>
               <div class="manual-actions">
                 <button mat-flat-button type="button" (click)="startImport()" [disabled]="hasChanges() || importing()">
                   <mat-icon>play_arrow</mat-icon>{{ importing() ? i18n.t('Starting…') : i18n.t('Import now') }}
+                </button>
+                <button mat-stroked-button type="button" (click)="startImport(true)" [disabled]="hasChanges() || importing()">
+                  <mat-icon>sync</mat-icon>{{ i18n.t('Force import') }}
                 </button>
                 @if (hasChanges()) { <small>{{ i18n.t('Save your changes before starting a manual import.') }}</small> }
               </div>
@@ -238,6 +237,9 @@
                       <mat-icon>{{ job.status === 'succeeded' ? 'check_circle' : job.status === 'failed' ? 'error' : 'sync' }}</mat-icon>
                       <span class="job-content"><strong>{{ job.datasetId }}</strong>
                         <small>{{ stepLabel(job) }}</small>
+                        @if (job.sourceTimestamp) {
+                          <small>{{ i18n.t('Source data') }}: {{ job.sourceTimestamp | date:'medium' }}</small>
+                        }
                         @if (job.status === 'running') {
                           <div class="progress-section">
                             <div class="progress-caption">

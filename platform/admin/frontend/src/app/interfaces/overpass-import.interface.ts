@@ -46,6 +46,9 @@ export interface OverpassImportJob {
   processedBytes?: number | string | null;
   totalBytes?: number | string | null;
   processedItems?: number | string | null;
+  sourceTimestamp?: string | null;
+  sourceEtag?: string | null;
+  sourceChanged?: boolean | null;
   stepStartedAt?: string | null;
   error: string | null;
   createdAt: string;

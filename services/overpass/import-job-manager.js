@@ -38,7 +38,7 @@ class ImportJobManager {
     try { entries = await fs.readdir(directory); } catch { return; }
     const generated = entries.filter((name) => name.endsWith('.osm.pbf') || name.endsWith('.osm.pbf.part')
       || name.endsWith('.geojsonseq') || name.endsWith('-poi-filter-expressions.txt')
-      || name.endsWith('-download-headers.txt'));
+      || name.endsWith('-download-headers.txt') || name.endsWith('-source-check-headers.txt'));
     await Promise.all(generated.map((name) => fs.rm(path.join(directory, name), { force: true })));
   }
 
@@ -49,7 +49,7 @@ class ImportJobManager {
     }));
   }
 
-  async start({ datasetId, categories = categoryNames(), subcategories = {}, refresh = true }) {
+  async start({ datasetId, categories = categoryNames(), subcategories = {}, refresh = true, force = false }) {
     const catalog = await this.datasetCatalog.get();
     const dataset = catalog.definitions[datasetId];
     if (!dataset) throw Object.assign(new Error('unknown_import_dataset'), { status: 400 });
@@ -80,7 +80,8 @@ class ImportJobManager {
       id: jobId, datasetId, requestedConfig: {
         categories: importCategories,
         subcategories: importSubcategories,
-        refresh: Boolean(refresh)
+        refresh: Boolean(refresh),
+        force: Boolean(force)
       }
     }, callback));
     void this.launchNext();
@@ -117,6 +118,7 @@ class ImportJobManager {
     ];
     args.push('--subcategories-json', JSON.stringify(config.subcategories || {}));
     if (config.refresh) args.push('--refresh');
+    if (config.force) args.push('--force');
     const child = spawn(process.execPath, args, { cwd: __dirname, env: process.env, stdio: ['ignore', 'pipe', 'pipe'] });
     this.children.set(jobId, child);
     child.stdout.on('data', (data) => this.logger.info('Overpass import', { jobId, output: String(data).trim() }));

@@ -79,11 +79,12 @@ function isDue(settings, now = new Date()) {
   return localParts(new Date(Number(settings.lastTriggeredAt)), settings.timezone).date !== current.date;
 }
 
-async function dispatchImports(db, settings, triggerType) {
+async function dispatchImports(db, settings, triggerType, options = {}) {
   const results = [];
   for (const datasetId of settings.datasets) {
     const dispatchId = randomUUID();
-    const config = { datasetId, categories: settings.categories, subcategories: settings.subcategories || {}, refresh: settings.refreshSource };
+    const config = { datasetId, categories: settings.categories, subcategories: settings.subcategories || {},
+      refresh: settings.refreshSource, force: Boolean(options.force) };
     try {
       const response = await requestService('post', '/overpass/import-jobs', config);
       await callbackResult((callback) => dispatchTable.create(db, { dispatchId, serviceJobId: response.job?.jobId,

@@ -36,7 +36,7 @@ export class OverpassImportService {
     return this.http.get<{ status: number; jobs: OverpassImportJob[]; metadataJobs: OverpassMetadataJob[] }>(`${this.baseUrl}/jobs`);
   }
 
-  startImport(): Observable<{ status: number; jobs: unknown[] }> {
-    return this.http.post<{ status: number; jobs: unknown[] }>(`${this.baseUrl}/jobs`, {});
+  startImport(force = false): Observable<{ status: number; jobs: unknown[] }> {
+    return this.http.post<{ status: number; jobs: unknown[] }>(`${this.baseUrl}/jobs`, { force });
   }
 }

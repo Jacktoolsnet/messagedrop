@@ -263,10 +263,10 @@ export class OverpassImportSettingsComponent {
     return this.databaseInfo()?.metadataJobs?.some((job) => job.status === 'running') ?? false;
   }
 
-  startImport(): void {
+  startImport(force = false): void {
     if (this.importing() || this.hasChanges()) return;
     this.importing.set(true);
-    this.service.startImport()
+    this.service.startImport(force)
       .pipe(finalize(() => this.importing.set(false)), takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
@@ -309,6 +309,8 @@ export class OverpassImportSettingsComponent {
     const labels: Record<string, string> = {
       queued: 'Waiting',
       starting: 'Preparing import',
+      checking_source: 'Checking source data',
+      up_to_date: 'Data already up to date',
       downloading: 'Downloading source data',
       preparing_filter: 'Preparing POI filters',
       filtering: 'Filtering required POIs',

@@ -187,13 +187,22 @@ npm run dataset:import:wolfenbuettel -- \
   --categories accommodation,tourism,amenities
 ```
 
-The initial Geofabrik download can be several gigabytes. The source PBF is
-deleted immediately after filtering and is downloaded again for the next
-update. To force refresh semantics for a manual import:
+The initial Geofabrik download can be several gigabytes. Before later imports,
+the service performs a small HTTP header request and compares the remote ETag
+or Last-Modified timestamp with the active version. When both the source and
+the selected categories/subcategories are unchanged, the job finishes as
+`up_to_date` without downloading or processing the PBF. The source PBF is still
+deleted immediately after filtering. To deliberately rebuild an unchanged
+source, for example after importer changes:
 
 ```bash
-npm run dataset:import:wolfenbuettel -- --refresh
+npm run dataset:import:wolfenbuettel -- --force
 ```
+
+Older active versions do not yet contain a source fingerprint. Their first
+update after this feature is deployed therefore runs normally and stores the
+fingerprint used by subsequent checks. If the remote server does not provide a
+usable ETag or Last-Modified value, the safe fallback is also a normal import.
 
 Temporary downloads and the cached Geofabrik catalog are stored below
 `services/overpass/downloads/` by default. Set `OVERPASS_DOWNLOAD_DIR` to use

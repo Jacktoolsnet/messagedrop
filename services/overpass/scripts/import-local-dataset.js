@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const fsPromises = require('node:fs/promises');
 const path = require('node:path');
 const { spawn } = require('node:child_process');
-const { randomUUID } = require('node:crypto');
+const { createHash, randomUUID } = require('node:crypto');
 require('dotenv').config({ path: path.resolve(__dirname, '../../../.env'), quiet: true });
 const Database = require('../db/database');
 const tableOverpassPoi = require('../db/tableOverpassPoi');
@@ -32,7 +32,8 @@ async function main() {
     await callbackResult((callback) => tableOverpassPoi.createJob(database.db, {
       id: jobId,
       datasetId: dataset.id,
-      requestedConfig: { categories: options.categories, subcategories: options.subcategories, refresh: options.refresh }
+      requestedConfig: { categories: options.categories, subcategories: options.subcategories,
+        refresh: options.refresh, force: options.force }
     }, callback));
   }
   await callbackResult((callback) => tableOverpassPoi.startJob(database.db, jobId, callback));
@@ -41,8 +42,33 @@ async function main() {
     const updateProgress = (stage, progress, details = {}) => callbackResult((callback) =>
       tableOverpassPoi.updateJobProgress(database.db, jobId, stage, progress, details, callback));
     const progress = createProgressTracker(dataset, updateProgress);
+    await progress.update('checking_source', null);
+    const activeSource = await callbackResult((callback) =>
+      tableOverpassPoi.activeSource(database.db, dataset.id, callback));
+    const sourceInfo = await inspectRemoteSource(dataset, progress);
+    const importConfigHash = createImportConfigHash(options.categories, options.subcategories);
+    const sourceChanged = options.force || !isImportCurrent(activeSource, sourceInfo, importConfigHash, dataset.sourceUrl);
+    await callbackResult((callback) => tableOverpassPoi.updateJobSource(
+      database.db, jobId, sourceInfo, sourceChanged, callback
+    ));
+    await progress.update('checking_source', 100);
+    if (!sourceChanged) {
+      await callbackResult((callback) => tableOverpassPoi.completeUnchangedJob(
+        database.db, jobId, activeSource.versionId, callback
+      ));
+      process.stdout.write(`Dataset ${dataset.id} is already up to date; download skipped.\n`);
+      return;
+    }
     await tableOverpassPoi.stageVersion(database.db, {
-      versionId, dataset: { ...dataset, sourceTimestamp: null }, categories: options.categories
+      versionId,
+      dataset: {
+        ...dataset,
+        sourceTimestamp: sourceInfo?.lastModified || null,
+        sourceEtag: sourceInfo?.etag || null,
+        sourceContentLength: sourceInfo?.contentLength || null,
+        importConfigHash
+      },
+      categories: options.categories
     });
     staged = true;
     const poiCount = await prepareDataset(dataset, options, progress, async (batch) => {
@@ -147,6 +173,68 @@ async function prepareDataset(dataset, options, progress = createProgressTracker
   } finally {
     await cleanupWorkingFiles(workingFiles);
   }
+}
+
+async function inspectRemoteSource(dataset, progress = null) {
+  const outputDirectory = downloadDirectory();
+  await fsPromises.mkdir(outputDirectory, { recursive: true });
+  const headersPath = path.join(outputDirectory, `${dataset.id}-source-check-headers.txt`);
+  try {
+    await command('curl', [
+      '--fail', '--location', '--retry', '2', '--connect-timeout', '15', '--max-time', '60',
+      '--silent', '--show-error', '--head', '--dump-header', headersPath,
+      '--output', '/dev/null', dataset.sourceUrl
+    ]);
+    const info = await sourceInfoFromHeaders(headersPath);
+    if (!info?.etag && !info?.lastModified) {
+      process.stderr.write(`Source ${dataset.sourceUrl} supplied neither ETag nor Last-Modified; import will continue.\n`);
+    }
+    return info;
+  } catch (error) {
+    process.stderr.write(`Could not check source freshness (${error.message}); import will continue.\n`);
+    return null;
+  } finally {
+    await fsPromises.rm(headersPath, { force: true });
+    if (progress) await progress.update('checking_source', null);
+  }
+}
+
+async function sourceInfoFromHeaders(headersPath) {
+  const headers = await fsPromises.readFile(headersPath, 'utf8');
+  const responses = headers.split(/\r?\n\r?\n/gu).filter(Boolean).reverse();
+  const response = responses.find((value) => /^HTTP\/\S+\s+2\d\d\b/iu.test(value));
+  if (!response) return null;
+  const header = (name) => response.match(new RegExp(`^${name}:\\s*(.+?)\\s*$`, 'imu'))?.[1]?.trim() || null;
+  const lastModifiedValue = header('last-modified');
+  const lastModifiedDate = lastModifiedValue ? new Date(lastModifiedValue) : null;
+  const contentLength = Number(header('content-length'));
+  return {
+    etag: header('etag'),
+    lastModified: lastModifiedDate && Number.isFinite(lastModifiedDate.getTime()) ? lastModifiedDate.toISOString() : null,
+    contentLength: Number.isFinite(contentLength) && contentLength >= 0 ? contentLength : null
+  };
+}
+
+function createImportConfigHash(categories, subcategories) {
+  const selectedCategories = [...new Set(categories || [])].sort();
+  const normalizedSubcategories = Object.fromEntries(selectedCategories.map((category) => [
+    category,
+    [...new Set(subcategories?.[category] || subcategoryNames(category))].sort()
+  ]));
+  return createHash('sha256').update(JSON.stringify({
+    formatVersion: 1,
+    categories: selectedCategories,
+    subcategories: normalizedSubcategories
+  })).digest('hex');
+}
+
+function isImportCurrent(activeSource, remoteSource, importConfigHash, sourceUrl) {
+  if (!activeSource || activeSource.sourceUrl !== sourceUrl || activeSource.importConfigHash !== importConfigHash) return false;
+  if (activeSource.sourceEtag && remoteSource?.etag) return activeSource.sourceEtag === remoteSource.etag;
+  if (activeSource.sourceTimestamp && remoteSource?.lastModified) {
+    return new Date(activeSource.sourceTimestamp).getTime() === new Date(remoteSource.lastModified).getTime();
+  }
+  return false;
 }
 
 async function readPois(
@@ -341,6 +429,7 @@ function parseArguments(args) {
   const options = {
     dataset: 'wolfenbuettel',
     refresh: false,
+    force: false,
     categories: categoryNames(),
     keepVersions: Number(process.env.OVERPASS_DATASET_RETIRED_VERSIONS || 0),
     jobId: null,
@@ -348,6 +437,7 @@ function parseArguments(args) {
   };
   for (let index = 0; index < args.length; index += 1) {
     if (args[index] === '--refresh') options.refresh = true;
+    else if (args[index] === '--force') options.force = true;
     else if (args[index] === '--dataset' && args[index + 1]) options.dataset = args[++index];
     else if (args[index] === '--categories' && args[index + 1]) {
       options.categories = [...new Set(args[++index].split(',').map((value) => value.trim()).filter(Boolean))];
@@ -386,6 +476,7 @@ async function requireCommand(name, hint = '') {
 
 function createProgressTracker(dataset, updateProgress = async () => {}) {
   const steps = [
+    { stage: 'checking_source', weight: 1 },
     { stage: 'downloading', weight: 45 },
     { stage: 'preparing_filter', weight: 1 },
     { stage: 'filtering', weight: 19 },
@@ -501,7 +592,11 @@ module.exports = {
   featureToElement,
   filterExpressions,
   geometryCenter,
+  createImportConfigHash,
+  inspectRemoteSource,
+  isImportCurrent,
   parseArguments,
   parseGeoJsonRecord,
-  readPois
+  readPois,
+  sourceInfoFromHeaders
 };
