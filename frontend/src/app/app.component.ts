@@ -156,6 +156,7 @@ interface RememberedExifLocationChoice {
 const PRODUCTION_APP_URL = 'https://app.messagedrop.de/';
 const SHARED_LOCATION_DEFAULT_ZOOM = 18;
 const SHARED_LOCATION_MESSAGE_RADIUS_METERS = 30;
+const OVERPASS_POI_GROUP_RADIUS_METERS = 10;
 const Q_STAGE_WARNING_SESSION_KEY = 'messagedrop.qStageWarningSeen';
 
 @Component({
@@ -4010,7 +4011,17 @@ export class AppComponent implements OnInit {
           plusCode: groupedPlusCode
         };
       }
-      const key = center.plusCode;
+      let key = center.plusCode;
+      if (this.mapService.getMapZoom() > 17 && !this.markerLocations.has(key)) {
+        const nearbyOverpassGroup = [...this.markerLocations.entries()].find(([, marker]) =>
+          (marker.overpassPois?.length ?? 0) > 0
+          && this.geolocationService.areLocationsNear(
+            marker.location,
+            poiLocation,
+            OVERPASS_POI_GROUP_RADIUS_METERS
+          ));
+        key = nearbyOverpassGroup?.[0] || key;
+      }
       const existing = this.markerLocations.get(key);
       if (existing) {
         existing.overpassPois ??= existing.overpassPoi ? [existing.overpassPoi] : [];

@@ -78,6 +78,12 @@ const FLIGHT_CATEGORY: RouteCategoryConfig = {
 const DESTINATION_REACHED_RADIUS_METERS = 50;
 const MAX_ROUTE_ENDPOINT_SNAP_METERS = 250;
 const MIN_FLIGHT_DISTANCE_METERS = 300_000;
+const ROUTE_CATEGORY_PRIORITY: readonly TripGoRouteCategory[] = [
+  'walk-transit',
+  'bicycle-transit',
+  'car-transit',
+  'flight'
+];
 
 type RoutePointDetails = TripGoRoutePointDetails;
 
@@ -141,8 +147,8 @@ export class TripGoRouteDialogComponent implements OnInit, OnDestroy {
       this.destination.set(restoredSession.destination);
       this.originDetails.set(restoredSession.originDetails);
       this.destinationDetails.set(restoredSession.destinationDetails);
-      this.routes.set(restoredSession.routes);
-      this.requestedRouteCategories.set(restoredSession.requestedRouteCategories);
+      this.routes.set(this.sortRoutesByPriority(restoredSession.routes));
+      this.requestedRouteCategories.set(this.sortRouteCategories(restoredSession.requestedRouteCategories));
       this.expandedRouteIds.set(new Set(restoredSession.expandedRouteIds));
       this.state.set('ready');
       return;
@@ -617,10 +623,15 @@ export class TripGoRouteDialogComponent implements OnInit, OnDestroy {
     this.state.set('routing');
     const locale = this.transloco.getActiveLang() || 'de';
     const categories: RouteCategoryConfig[] = [];
-    if (this.routeOptions.car) {
+    if (this.routeOptions.walking) {
+      const walkingOnly = !this.routeOptions.walkingPublicTransport
+        || distanceMeters <= this.routeOptions.walkingPureMaxKm * 1_000;
       categories.push({
-        ...CAR_CATEGORY,
-        fallbackModes: this.routeOptions.carPublicTransport ? ['me_car', 'pt_pub'] : undefined
+        category: 'walk-transit',
+        primaryModes: walkingOnly ? ['wa_wal'] : ['wa_wal', 'pt_pub'],
+        fallbackModes: walkingOnly && this.routeOptions.walkingPublicTransport
+          ? ['wa_wal', 'pt_pub']
+          : undefined
       });
     }
     if (this.routeOptions.bicycle) {
@@ -634,15 +645,10 @@ export class TripGoRouteDialogComponent implements OnInit, OnDestroy {
           : undefined
       });
     }
-    if (this.routeOptions.walking) {
-      const walkingOnly = !this.routeOptions.walkingPublicTransport
-        || distanceMeters <= this.routeOptions.walkingPureMaxKm * 1_000;
+    if (this.routeOptions.car) {
       categories.push({
-        category: 'walk-transit',
-        primaryModes: walkingOnly ? ['wa_wal'] : ['wa_wal', 'pt_pub'],
-        fallbackModes: walkingOnly && this.routeOptions.walkingPublicTransport
-          ? ['wa_wal', 'pt_pub']
-          : undefined
+        ...CAR_CATEGORY,
+        fallbackModes: this.routeOptions.carPublicTransport ? ['me_car', 'pt_pub'] : undefined
       });
     }
     if (this.routeOptions.flights && distanceMeters >= MIN_FLIGHT_DISTANCE_METERS) {
@@ -716,6 +722,17 @@ export class TripGoRouteDialogComponent implements OnInit, OnDestroy {
     this.routeMap?.stopSimulation();
     this.simulationState.set('idle');
     this.selectedRoute.set(route);
+  }
+
+  private sortRouteCategories(categories: TripGoRouteCategory[]): TripGoRouteCategory[] {
+    return [...categories].sort((left, right) =>
+      ROUTE_CATEGORY_PRIORITY.indexOf(left) - ROUTE_CATEGORY_PRIORITY.indexOf(right));
+  }
+
+  private sortRoutesByPriority(routes: TripGoRouteOption[]): TripGoRouteOption[] {
+    return [...routes].sort((left, right) =>
+      ROUTE_CATEGORY_PRIORITY.indexOf(left.category || 'walk-transit')
+      - ROUTE_CATEGORY_PRIORITY.indexOf(right.category || 'walk-transit'));
   }
 
   private selectedRouteIndex(): number {

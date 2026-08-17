@@ -73,6 +73,7 @@ const routeContentIcons: Partial<Record<MarkerType, leaflet.Icon>> = {
 };
 const WIKIPEDIA_ROUTE_RADIUS_METERS = 200;
 const MAX_WIKIPEDIA_SIMULATION_SEARCHES = 80;
+const OVERPASS_POI_GROUP_RADIUS_METERS = 10;
 const EMPTY_ROUTE_CONTENT: TripGoRouteContent = {
   messages: [], notes: [], images: [], documents: [], experiences: [], myExperiences: [], secretDrops: [], overpassPois: []
 };
@@ -1631,9 +1632,22 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
       };
       if (zoom > 17) {
         // Separate OSM objects can share practically the same coordinates.
-        // Group those objects instead of drawing several indistinguishable pins
-        // on top of each other; clicking the neutral pin opens their POI list.
-        add(MarkerType.OVERPASS_POI, poi, sourceLocation, `overpass-location:${sourceLocation.plusCode}`);
+        // A Plus-Code boundary can run directly between two practically
+        // adjacent objects. Prefer an existing nearby POI group in that case
+        // so their pins cannot cover each other during the simulation.
+        const nearbyGroupKey = [...groups.entries()].find(([, group]) =>
+          (group.overpassPois?.length ?? 0) > 0
+          && this.geolocation.areLocationsNear(
+            group.location,
+            sourceLocation,
+            OVERPASS_POI_GROUP_RADIUS_METERS
+          ))?.[0];
+        add(
+          MarkerType.OVERPASS_POI,
+          poi,
+          sourceLocation,
+          nearbyGroupKey || `overpass-location:${sourceLocation.plusCode}`
+        );
         return;
       }
       const plusCode = this.geolocation.getGroupedPlusCodeBasedOnMapZoom(sourceLocation, zoom);
@@ -1825,7 +1839,9 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
 
     for (const segment of this.route.segments) {
       if (segment.type !== 'scheduled' && !segment.modeIdentifier?.startsWith('pt_')) continue;
+      addStop(segment.from, segment, segment.service?.startPlatform);
       for (const stop of segment.service?.intermediateStops || []) addStop(stop, segment, stop.platform);
+      addStop(segment.to, segment, segment.service?.endPlatform);
     }
     return stops;
   }

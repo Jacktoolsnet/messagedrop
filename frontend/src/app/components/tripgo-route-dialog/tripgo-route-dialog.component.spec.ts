@@ -111,6 +111,10 @@ describe('TripGoRouteDialogComponent', () => {
     expect(tripGo.calculateRoute.calls.allArgs().some((args) =>
       args[3].join(',') === 'me_car,pt_pub')).toBeFalse();
     expect(tripGo.calculateRoute.calls.allArgs().some((args) => args[3].includes('in_air'))).toBeFalse();
+    expect(tripGo.calculateRoute.calls.allArgs().map((args) => args[3].join(',')))
+      .toEqual(['wa_wal', 'wa_wal,pt_pub', 'me_mic_bic', 'me_mic_bic,pt_pub', 'me_car']);
+    expect(fixture.componentInstance.requestedRouteCategories())
+      .toEqual(['walk-transit', 'bicycle-transit', 'car-transit']);
     expect(fixture.componentInstance.state()).toBe('ready');
   });
 
@@ -191,7 +195,7 @@ describe('TripGoRouteDialogComponent', () => {
     fixture.componentInstance.calculateRoute();
 
     expect(tripGo.calculateRoute.calls.allArgs().map((args) => args[3].join(',')))
-      .toEqual(['me_mic_bic', 'wa_wal']);
+      .toEqual(['wa_wal', 'me_mic_bic']);
   });
 
   it('waits for the explicit action after selecting another destination', () => {
