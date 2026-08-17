@@ -1570,6 +1570,18 @@
       },
       "dataSources": {
         "title": "Fuentes de datos y licencias",
+        "tabs": {
+          "geodata": "Geodatos",
+          "nominatim": "Búsqueda de lugares",
+          "weather": "Tiempo",
+          "mobility": "Movilidad",
+          "experiences": "Experiencias"
+        },
+        "openProvider": "Abrir proveedor",
+        "documentation": "Documentación",
+        "termsOfUse": "Condiciones de uso",
+        "usagePolicy": "Política de uso",
+        "licenseTitle": "Licencia y atribución",
         "openStreetMap": "Los datos cartográficos y de puntos de interés proceden de OpenStreetMap y están disponibles bajo la Open Database License 1.0 (ODbL).",
         "copyrightAndLicense": "Derechos de autor y licencia",
         "downloadDataset": "Descargar datos ODbL",
@@ -1578,7 +1590,34 @@
         "processingTitle": "Tratamiento por MessageDrop",
         "processing": "MessageDrop filtra los extractos por países y categorías activados, normaliza campos seleccionados y almacena los registros necesarios en su propia base de geodatos. El origen en OpenStreetMap y la licencia ODbL no cambian.",
         "qualityTitle": "Calidad de los datos",
-        "quality": "La información mantenida por la comunidad puede faltar, estar desactualizada, duplicada o ser incorrecta. Verifica los datos importantes, como dirección, horarios, accesibilidad y estado de funcionamiento, en el lugar o con el operador correspondiente."
+        "quality": "La información mantenida por la comunidad puede faltar, estar desactualizada, duplicada o ser incorrecta. Verifica los datos importantes, como dirección, horarios, accesibilidad y estado de funcionamiento, en el lugar o con el operador correspondiente.",
+        "nominatim": {
+          "source": "MessageDrop utiliza Nominatim para buscar lugares y direcciones y para asociar direcciones a coordenadas.",
+          "license": "Los resultados de búsqueda se basan en datos de OpenStreetMap. Estos datos están sujetos a la Open Database License 1.0 (ODbL) y a la atribución a los colaboradores de OpenStreetMap.",
+          "quality": "Los resultados de búsqueda y las direcciones pueden ser incompletos, ambiguos, estar desactualizados o ser imprecisos."
+        },
+        "wikipedia": {
+          "source": "MessageDrop muestra resúmenes de artículos relacionados con el lugar y, cuando están disponibles, imágenes de vista previa de Wikipedia y Wikimedia Commons.",
+          "license": "Los textos de Wikipedia están disponibles generalmente bajo CC BY-SA 4.0. Las imágenes y otros medios pueden tener licencias individuales; por ello, su fuente, autor y licencia se muestran junto al contenido correspondiente.",
+          "quality": "Wikipedia se mantiene de forma colaborativa. El contenido puede ser incompleto, estar desactualizado o ser incorrecto y no sustituye el asesoramiento profesional."
+        },
+        "openMeteo": {
+          "source": "Las previsiones meteorológicas, los valores meteorológicos históricos y los datos de calidad del aire se proporcionan mediante las API de Open-Meteo.",
+          "license": "Los datos proporcionados mediante la API de Open-Meteo están disponibles bajo la licencia Creative Commons Attribution 4.0 International (CC BY 4.0).",
+          "quality": "Las previsiones y los valores modelados pueden diferir de las condiciones reales. No se garantizan la disponibilidad, la integridad ni la exactitud."
+        },
+        "tripGo": {
+          "source": "MessageDrop utiliza la API de TripGo para rutas, paradas, salidas e información de transporte público.",
+          "providerTitle": "Operadores de transporte participantes",
+          "provider": "TripGo combina datos de distintos operadores de transporte y proveedores de movilidad. Por ello, los resultados pueden incluir información adicional sobre la fuente y el operador.",
+          "quality": "Los horarios, datos en tiempo real, incidencias y sugerencias de ruta pueden cambiar con poca antelación. Prevalece la información del operador de transporte correspondiente."
+        },
+        "viator": {
+          "source": "Cuando las experiencias están activadas, MessageDrop muestra excursiones, actividades e información de producto proporcionadas mediante la API para socios de Viator.",
+          "responsibilityTitle": "Proveedor y reserva",
+          "responsibility": "Las experiencias son ofrecidas por los operadores indicados. Las condiciones mostradas con la oferta se aplican a la disponibilidad, los servicios, los precios, la reserva y la cancelación.",
+          "quality": "Las ofertas, los precios, la disponibilidad y el contenido pueden cambiar en cualquier momento. Comprueba la información actual con el proveedor antes de reservar."
+        }
       },
       "externalContent": {
         "title": "Ajustes de contenido externo",

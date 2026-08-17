@@ -4,69 +4,285 @@
 </app-dialog-header>
 
 <div mat-dialog-content class="content">
-  <div class="tile-grid">
-    <section class="tile" aria-labelledby="osm-source-title">
-      <header class="tile-header">
-        <div class="tile-icon"><mat-icon>map</mat-icon></div>
-        <h2 id="osm-source-title">OpenStreetMap</h2>
-      </header>
-      <p class="attribution">© OpenStreetMap contributors</p>
-      <p>{{ 'common.legal.dataSources.openStreetMap' | transloco }}</p>
-      <div class="links">
-        <a mat-stroked-button href="https://www.openstreetmap.org/copyright"
-          target="_blank" rel="noopener noreferrer">
-          <mat-icon>copyright</mat-icon>
-          {{ 'common.legal.dataSources.copyrightAndLicense' | transloco }}
-        </a>
-        <a mat-stroked-button href="https://opendatacommons.org/licenses/odbl/1-0/"
-          target="_blank" rel="noopener noreferrer">
-          <mat-icon>description</mat-icon>
-          ODbL 1.0
-        </a>
-        <a mat-stroked-button [href]="geodataExportUrl"
-          target="_blank" rel="noopener noreferrer">
-          <mat-icon>database</mat-icon>
-          {{ 'common.legal.dataSources.downloadDataset' | transloco }}
-        </a>
+  <mat-tab-group class="source-tabs" mat-stretch-tabs="false" dynamicHeight animationDuration="180ms">
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <span class="tab-label"><mat-icon>map</mat-icon>{{ 'common.legal.dataSources.tabs.geodata' | transloco }}</span>
+      </ng-template>
+      <div class="tab-panel tile-grid">
+        <section class="tile" aria-labelledby="osm-source-title">
+          <header class="tile-header">
+            <div class="tile-icon"><mat-icon>map</mat-icon></div>
+            <h2 id="osm-source-title">OpenStreetMap</h2>
+          </header>
+          <p class="attribution">© OpenStreetMap contributors</p>
+          <p>{{ 'common.legal.dataSources.openStreetMap' | transloco }}</p>
+          <div class="links">
+            <a mat-stroked-button href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">
+              <mat-icon>copyright</mat-icon>
+              {{ 'common.legal.dataSources.copyrightAndLicense' | transloco }}
+            </a>
+            <a mat-stroked-button href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noopener noreferrer">
+              <mat-icon>description</mat-icon>
+              ODbL 1.0
+            </a>
+            <a mat-stroked-button [href]="geodataExportUrl" target="_blank" rel="noopener noreferrer">
+              <mat-icon>database</mat-icon>
+              {{ 'common.legal.dataSources.downloadDataset' | transloco }}
+            </a>
+          </div>
+        </section>
+
+        <section class="tile" aria-labelledby="geofabrik-source-title">
+          <header class="tile-header">
+            <div class="tile-icon"><mat-icon>download</mat-icon></div>
+            <h2 id="geofabrik-source-title">Geofabrik GmbH</h2>
+          </header>
+          <p>{{ 'common.legal.dataSources.geofabrik' | transloco }}</p>
+          <div class="links">
+            <a mat-stroked-button href="https://download.geofabrik.de/" target="_blank" rel="noopener noreferrer">
+              <mat-icon>open_in_new</mat-icon>
+              {{ 'common.legal.dataSources.openDownloadSource' | transloco }}
+            </a>
+          </div>
+        </section>
+
+        <section class="tile" aria-labelledby="processing-title">
+          <header class="tile-header">
+            <div class="tile-icon"><mat-icon>tune</mat-icon></div>
+            <h2 id="processing-title">{{ 'common.legal.dataSources.processingTitle' | transloco }}</h2>
+          </header>
+          <p>{{ 'common.legal.dataSources.processing' | transloco }}</p>
+        </section>
+
+        <section class="tile warning" aria-labelledby="quality-title">
+          <header class="tile-header">
+            <div class="tile-icon"><mat-icon>warning_amber</mat-icon></div>
+            <h2 id="quality-title">{{ 'common.legal.dataSources.qualityTitle' | transloco }}</h2>
+          </header>
+          <p>{{ 'common.legal.dataSources.quality' | transloco }}</p>
+        </section>
       </div>
-    </section>
+    </mat-tab>
 
-    <section class="tile" aria-labelledby="geofabrik-source-title">
-      <header class="tile-header">
-        <div class="tile-icon"><mat-icon>download</mat-icon></div>
-        <h2 id="geofabrik-source-title">Geofabrik GmbH</h2>
-      </header>
-      <p>{{ 'common.legal.dataSources.geofabrik' | transloco }}</p>
-      <div class="links">
-        <a mat-stroked-button href="https://download.geofabrik.de/"
-          target="_blank" rel="noopener noreferrer">
-          <mat-icon>open_in_new</mat-icon>
-          {{ 'common.legal.dataSources.openDownloadSource' | transloco }}
-        </a>
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <span class="tab-label"><mat-icon>search</mat-icon>{{ 'common.legal.dataSources.tabs.nominatim' | transloco }}</span>
+      </ng-template>
+      <div class="tab-panel tile-grid">
+        <section class="tile" aria-labelledby="nominatim-source-title">
+          <header class="tile-header">
+            <div class="tile-icon"><mat-icon>location_searching</mat-icon></div>
+            <h2 id="nominatim-source-title">Nominatim</h2>
+          </header>
+          <p>{{ 'common.legal.dataSources.nominatim.source' | transloco }}</p>
+          <div class="links">
+            <a mat-stroked-button href="https://nominatim.org/" target="_blank" rel="noopener noreferrer">
+              <mat-icon>open_in_new</mat-icon>
+              {{ 'common.legal.dataSources.openProvider' | transloco }}
+            </a>
+          </div>
+        </section>
+        <section class="tile" aria-labelledby="nominatim-license-title">
+          <header class="tile-header">
+            <div class="tile-icon"><mat-icon>copyright</mat-icon></div>
+            <h2 id="nominatim-license-title">{{ 'common.legal.dataSources.licenseTitle' | transloco }}</h2>
+          </header>
+          <p>{{ 'common.legal.dataSources.nominatim.license' | transloco }}</p>
+          <div class="links">
+            <a mat-stroked-button href="https://operations.osmfoundation.org/policies/nominatim/" target="_blank" rel="noopener noreferrer">
+              <mat-icon>policy</mat-icon>
+              {{ 'common.legal.dataSources.usagePolicy' | transloco }}
+            </a>
+            <a mat-stroked-button href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">
+              <mat-icon>copyright</mat-icon>
+              ODbL 1.0
+            </a>
+          </div>
+        </section>
+        <section class="tile warning" aria-labelledby="nominatim-quality-title">
+          <header class="tile-header">
+            <div class="tile-icon"><mat-icon>warning_amber</mat-icon></div>
+            <h2 id="nominatim-quality-title">{{ 'common.legal.dataSources.qualityTitle' | transloco }}</h2>
+          </header>
+          <p>{{ 'common.legal.dataSources.nominatim.quality' | transloco }}</p>
+        </section>
       </div>
-    </section>
+    </mat-tab>
 
-    <section class="tile" aria-labelledby="processing-title">
-      <header class="tile-header">
-        <div class="tile-icon"><mat-icon>tune</mat-icon></div>
-        <h2 id="processing-title">{{ 'common.legal.dataSources.processingTitle' | transloco }}</h2>
-      </header>
-      <p>{{ 'common.legal.dataSources.processing' | transloco }}</p>
-    </section>
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <span class="tab-label"><mat-icon>article</mat-icon>Wikipedia</span>
+      </ng-template>
+      <div class="tab-panel tile-grid">
+        <section class="tile" aria-labelledby="wikipedia-source-title">
+          <header class="tile-header">
+            <div class="tile-icon"><mat-icon>article</mat-icon></div>
+            <h2 id="wikipedia-source-title">Wikipedia</h2>
+          </header>
+          <p>{{ 'common.legal.dataSources.wikipedia.source' | transloco }}</p>
+          <div class="links">
+            <a mat-stroked-button href="https://www.wikipedia.org/" target="_blank" rel="noopener noreferrer">
+              <mat-icon>open_in_new</mat-icon>
+              {{ 'common.legal.dataSources.openProvider' | transloco }}
+            </a>
+          </div>
+        </section>
+        <section class="tile" aria-labelledby="wikipedia-license-title">
+          <header class="tile-header">
+            <div class="tile-icon"><mat-icon>copyright</mat-icon></div>
+            <h2 id="wikipedia-license-title">{{ 'common.legal.dataSources.licenseTitle' | transloco }}</h2>
+          </header>
+          <p>{{ 'common.legal.dataSources.wikipedia.license' | transloco }}</p>
+          <div class="links">
+            <a mat-stroked-button href="https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use" target="_blank" rel="noopener noreferrer">
+              <mat-icon>policy</mat-icon>
+              {{ 'common.legal.dataSources.termsOfUse' | transloco }}
+            </a>
+            <a mat-stroked-button href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">
+              <mat-icon>description</mat-icon>
+              CC BY-SA 4.0
+            </a>
+          </div>
+        </section>
+        <section class="tile warning" aria-labelledby="wikipedia-quality-title">
+          <header class="tile-header">
+            <div class="tile-icon"><mat-icon>warning_amber</mat-icon></div>
+            <h2 id="wikipedia-quality-title">{{ 'common.legal.dataSources.qualityTitle' | transloco }}</h2>
+          </header>
+          <p>{{ 'common.legal.dataSources.wikipedia.quality' | transloco }}</p>
+        </section>
+      </div>
+    </mat-tab>
 
-    <section class="tile warning" aria-labelledby="quality-title">
-      <header class="tile-header">
-        <div class="tile-icon"><mat-icon>warning_amber</mat-icon></div>
-        <h2 id="quality-title">{{ 'common.legal.dataSources.qualityTitle' | transloco }}</h2>
-      </header>
-      <p>{{ 'common.legal.dataSources.quality' | transloco }}</p>
-    </section>
-  </div>
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <span class="tab-label"><mat-icon>partly_cloudy_day</mat-icon>{{ 'common.legal.dataSources.tabs.weather' | transloco }}</span>
+      </ng-template>
+      <div class="tab-panel tile-grid">
+        <section class="tile" aria-labelledby="open-meteo-source-title">
+          <header class="tile-header">
+            <div class="tile-icon"><mat-icon>partly_cloudy_day</mat-icon></div>
+            <h2 id="open-meteo-source-title">Open-Meteo</h2>
+          </header>
+          <p class="attribution">Weather data by Open-Meteo.com</p>
+          <p>{{ 'common.legal.dataSources.openMeteo.source' | transloco }}</p>
+          <div class="links">
+            <a mat-stroked-button href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">
+              <mat-icon>open_in_new</mat-icon>
+              {{ 'common.legal.dataSources.openProvider' | transloco }}
+            </a>
+          </div>
+        </section>
+        <section class="tile" aria-labelledby="open-meteo-license-title">
+          <header class="tile-header">
+            <div class="tile-icon"><mat-icon>copyright</mat-icon></div>
+            <h2 id="open-meteo-license-title">{{ 'common.legal.dataSources.licenseTitle' | transloco }}</h2>
+          </header>
+          <p>{{ 'common.legal.dataSources.openMeteo.license' | transloco }}</p>
+          <div class="links">
+            <a mat-stroked-button href="https://open-meteo.com/en/license" target="_blank" rel="noopener noreferrer">
+              <mat-icon>description</mat-icon>
+              CC BY 4.0
+            </a>
+            <a mat-stroked-button href="https://open-meteo.com/en/terms" target="_blank" rel="noopener noreferrer">
+              <mat-icon>policy</mat-icon>
+              {{ 'common.legal.dataSources.termsOfUse' | transloco }}
+            </a>
+          </div>
+        </section>
+        <section class="tile warning" aria-labelledby="open-meteo-quality-title">
+          <header class="tile-header">
+            <div class="tile-icon"><mat-icon>warning_amber</mat-icon></div>
+            <h2 id="open-meteo-quality-title">{{ 'common.legal.dataSources.qualityTitle' | transloco }}</h2>
+          </header>
+          <p>{{ 'common.legal.dataSources.openMeteo.quality' | transloco }}</p>
+        </section>
+      </div>
+    </mat-tab>
+
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <span class="tab-label"><mat-icon>directions_transit</mat-icon>{{ 'common.legal.dataSources.tabs.mobility' | transloco }}</span>
+      </ng-template>
+      <div class="tab-panel tile-grid">
+        <section class="tile" aria-labelledby="tripgo-source-title">
+          <header class="tile-header">
+            <div class="tile-icon"><mat-icon>directions_transit</mat-icon></div>
+            <h2 id="tripgo-source-title">TripGo</h2>
+          </header>
+          <p>{{ 'common.legal.dataSources.tripGo.source' | transloco }}</p>
+          <div class="links">
+            <a mat-stroked-button href="https://developer.tripgo.com/" target="_blank" rel="noopener noreferrer">
+              <mat-icon>developer_mode</mat-icon>
+              {{ 'common.legal.dataSources.documentation' | transloco }}
+            </a>
+          </div>
+        </section>
+        <section class="tile" aria-labelledby="tripgo-provider-title">
+          <header class="tile-header">
+            <div class="tile-icon"><mat-icon>hub</mat-icon></div>
+            <h2 id="tripgo-provider-title">{{ 'common.legal.dataSources.tripGo.providerTitle' | transloco }}</h2>
+          </header>
+          <p>{{ 'common.legal.dataSources.tripGo.provider' | transloco }}</p>
+        </section>
+        <section class="tile warning" aria-labelledby="tripgo-quality-title">
+          <header class="tile-header">
+            <div class="tile-icon"><mat-icon>warning_amber</mat-icon></div>
+            <h2 id="tripgo-quality-title">{{ 'common.legal.dataSources.qualityTitle' | transloco }}</h2>
+          </header>
+          <p>{{ 'common.legal.dataSources.tripGo.quality' | transloco }}</p>
+        </section>
+      </div>
+    </mat-tab>
+
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <span class="tab-label"><mat-icon>local_activity</mat-icon>{{ 'common.legal.dataSources.tabs.experiences' | transloco }}</span>
+      </ng-template>
+      <div class="tab-panel tile-grid">
+        <section class="tile" aria-labelledby="viator-source-title">
+          <header class="tile-header">
+            <div class="tile-icon"><mat-icon>local_activity</mat-icon></div>
+            <h2 id="viator-source-title">Viator</h2>
+          </header>
+          <p>{{ 'common.legal.dataSources.viator.source' | transloco }}</p>
+          <div class="links">
+            <a mat-stroked-button href="https://www.viator.com/" target="_blank" rel="noopener noreferrer">
+              <mat-icon>open_in_new</mat-icon>
+              {{ 'common.legal.dataSources.openProvider' | transloco }}
+            </a>
+            <a mat-stroked-button href="https://partnerresources.viator.com/travel-commerce/technical-guide/" target="_blank" rel="noopener noreferrer">
+              <mat-icon>developer_mode</mat-icon>
+              {{ 'common.legal.dataSources.documentation' | transloco }}
+            </a>
+            <a mat-stroked-button href="https://www.viator.com/support/termsAndConditions" target="_blank" rel="noopener noreferrer">
+              <mat-icon>policy</mat-icon>
+              {{ 'common.legal.dataSources.termsOfUse' | transloco }}
+            </a>
+          </div>
+        </section>
+        <section class="tile" aria-labelledby="viator-responsibility-title">
+          <header class="tile-header">
+            <div class="tile-icon"><mat-icon>handshake</mat-icon></div>
+            <h2 id="viator-responsibility-title">{{ 'common.legal.dataSources.viator.responsibilityTitle' | transloco }}</h2>
+          </header>
+          <p>{{ 'common.legal.dataSources.viator.responsibility' | transloco }}</p>
+        </section>
+        <section class="tile warning" aria-labelledby="viator-quality-title">
+          <header class="tile-header">
+            <div class="tile-icon"><mat-icon>warning_amber</mat-icon></div>
+            <h2 id="viator-quality-title">{{ 'common.legal.dataSources.qualityTitle' | transloco }}</h2>
+          </header>
+          <p>{{ 'common.legal.dataSources.viator.quality' | transloco }}</p>
+        </section>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
 </div>
 
 <mat-dialog-actions align="end">
-  <button mat-icon-button type="button" (click)="close()"
-    [attr.aria-label]="'common.actions.close' | transloco">
+  <button mat-icon-button type="button" (click)="close()" [attr.aria-label]="'common.actions.close' | transloco">
     <mat-icon>close</mat-icon>
   </button>
 </mat-dialog-actions>

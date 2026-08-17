@@ -1571,6 +1571,18 @@
       },
       "dataSources": {
         "title": "Data sources and licenses",
+        "tabs": {
+          "geodata": "Geodata",
+          "nominatim": "Place search",
+          "weather": "Weather",
+          "mobility": "Mobility",
+          "experiences": "Experiences"
+        },
+        "openProvider": "Open provider",
+        "documentation": "Documentation",
+        "termsOfUse": "Terms of use",
+        "usagePolicy": "Usage policy",
+        "licenseTitle": "License and attribution",
         "openStreetMap": "Map and POI data comes from OpenStreetMap and is available under the Open Database License 1.0 (ODbL).",
         "copyrightAndLicense": "Copyright and license",
         "downloadDataset": "Download ODbL dataset",
@@ -1579,7 +1591,34 @@
         "processingTitle": "Processing by MessageDrop",
         "processing": "MessageDrop filters the extracts by enabled countries and POI categories, normalizes selected fields, and stores the required records in its own geodata database. Their origin as OpenStreetMap data and the ODbL license remain unaffected.",
         "qualityTitle": "Data quality",
-        "quality": "Community-maintained information may be missing, outdated, duplicated, or incorrect. Verify important details such as addresses, opening hours, accessibility, wheelchair access, and operating status on site or with the respective operator."
+        "quality": "Community-maintained information may be missing, outdated, duplicated, or incorrect. Verify important details such as addresses, opening hours, accessibility, wheelchair access, and operating status on site or with the respective operator.",
+        "nominatim": {
+          "source": "MessageDrop uses Nominatim to search for places and addresses and to assign addresses to coordinates.",
+          "license": "Search results are based on OpenStreetMap data. This data is subject to the Open Database License 1.0 (ODbL) and attribution to OpenStreetMap contributors.",
+          "quality": "Search results and addresses may be incomplete, ambiguous, outdated, or inaccurate."
+        },
+        "wikipedia": {
+          "source": "MessageDrop displays location-related article summaries and, where available, preview images from Wikipedia and Wikimedia Commons.",
+          "license": "Wikipedia text is generally available under CC BY-SA 4.0. Images and other media may have individual licenses; their source, creator, and license are therefore shown with the respective content.",
+          "quality": "Wikipedia is maintained collaboratively. Content may be incomplete, outdated, or incorrect and is not a substitute for professional advice."
+        },
+        "openMeteo": {
+          "source": "Weather forecasts, historical weather values, and air-quality data are provided through the Open-Meteo APIs.",
+          "license": "Data provided through the Open-Meteo API is available under the Creative Commons Attribution 4.0 International License (CC BY 4.0).",
+          "quality": "Forecasts and modelled values can differ from actual conditions. Availability, completeness, and accuracy are not guaranteed."
+        },
+        "tripGo": {
+          "source": "MessageDrop uses the TripGo API for routes, stops, departures, and public-transport information.",
+          "providerTitle": "Participating transport providers",
+          "provider": "TripGo combines data from different transport operators and mobility providers. Results may therefore include additional source and operator information.",
+          "quality": "Timetables, real-time data, disruptions, and route suggestions can change at short notice. Information from the respective transport operator takes precedence."
+        },
+        "viator": {
+          "source": "When experiences are enabled, MessageDrop displays tours, activities, and related product information supplied through the Viator Partner API.",
+          "responsibilityTitle": "Provider and booking",
+          "responsibility": "Experiences are supplied by the named operators. The terms shown with the offer apply to availability, services, prices, booking, and cancellation.",
+          "quality": "Offers, prices, availability, and content can change at any time. Check the current details with the provider before booking."
+        }
       },
       "externalContent": {
         "title": "External content settings",

@@ -1571,6 +1571,18 @@
       },
       "dataSources": {
         "title": "Datenquellen und Lizenzen",
+        "tabs": {
+          "geodata": "Geodaten",
+          "nominatim": "Ortssuche",
+          "weather": "Wetter",
+          "mobility": "Mobilität",
+          "experiences": "Erlebnisse"
+        },
+        "openProvider": "Anbieter öffnen",
+        "documentation": "Dokumentation",
+        "termsOfUse": "Nutzungsbedingungen",
+        "usagePolicy": "Nutzungsrichtlinie",
+        "licenseTitle": "Lizenz und Attribution",
         "openStreetMap": "Die Karten- und POI-Daten stammen von OpenStreetMap und stehen unter der Open Database License 1.0 (ODbL).",
         "copyrightAndLicense": "Urheberrecht und Lizenz",
         "downloadDataset": "ODbL-Datensatz herunterladen",
@@ -1579,7 +1591,34 @@
         "processingTitle": "Verarbeitung durch MessageDrop",
         "processing": "MessageDrop filtert die Auszüge nach aktivierten Ländern und POI-Kategorien, normalisiert ausgewählte Felder und speichert die benötigten Datensätze in einer eigenen Geodatenbank. Die Herkunft als OpenStreetMap-Daten und die ODbL-Lizenz bleiben davon unberührt.",
         "qualityTitle": "Datenqualität",
-        "quality": "Die gemeinschaftlich gepflegten Angaben können fehlen, veraltet, doppelt oder unrichtig sein. Prüfe wichtige Informationen wie Adresse, Öffnungszeiten, Erreichbarkeit, Barrierefreiheit und Betriebsstatus vor Ort oder beim jeweiligen Betreiber."
+        "quality": "Die gemeinschaftlich gepflegten Angaben können fehlen, veraltet, doppelt oder unrichtig sein. Prüfe wichtige Informationen wie Adresse, Öffnungszeiten, Erreichbarkeit, Barrierefreiheit und Betriebsstatus vor Ort oder beim jeweiligen Betreiber.",
+        "nominatim": {
+          "source": "MessageDrop verwendet Nominatim für die Suche nach Orten und Adressen sowie für die Zuordnung von Koordinaten zu Adressen.",
+          "license": "Die Suchergebnisse basieren auf OpenStreetMap-Daten. Für diese Daten gelten die Open Database License 1.0 (ODbL) und die Attribution an die OpenStreetMap-Mitwirkenden.",
+          "quality": "Suchergebnisse und Adressen können unvollständig, mehrdeutig, veraltet oder ungenau sein."
+        },
+        "wikipedia": {
+          "source": "MessageDrop zeigt standortbezogene Artikelzusammenfassungen und gegebenenfalls Vorschaubilder aus Wikipedia und Wikimedia Commons an.",
+          "license": "Wikipedia-Texte stehen grundsätzlich unter CC BY-SA 4.0. Für Bilder und andere Medien kann eine individuelle Lizenz gelten; Quelle, Urheber und Lizenz werden deshalb beim jeweiligen Inhalt angegeben.",
+          "quality": "Wikipedia wird gemeinschaftlich gepflegt. Inhalte können unvollständig, veraltet oder fehlerhaft sein und ersetzen keine fachliche Auskunft."
+        },
+        "openMeteo": {
+          "source": "Wettervorhersagen, historische Wetterwerte und Luftqualitätsdaten werden über die Programmierschnittstellen von Open-Meteo bereitgestellt.",
+          "license": "Die über die Open-Meteo-API bereitgestellten Daten stehen unter der Creative Commons Attribution 4.0 International License (CC BY 4.0).",
+          "quality": "Vorhersagen und Messmodelle können von den tatsächlichen Bedingungen abweichen. Verfügbarkeit, Vollständigkeit und Fehlerfreiheit sind nicht garantiert."
+        },
+        "tripGo": {
+          "source": "MessageDrop verwendet die TripGo-API für Routen, Haltestellen, Abfahrten und Informationen zum öffentlichen Verkehr.",
+          "providerTitle": "Beteiligte Verkehrsunternehmen",
+          "provider": "TripGo führt Daten verschiedener Verkehrsunternehmen und Mobilitätsanbieter zusammen. In den Ergebnissen können deshalb zusätzliche Quellen- und Betreiberangaben erscheinen.",
+          "quality": "Fahrpläne, Echtzeitdaten, Ausfälle und Routenvorschläge können sich kurzfristig ändern. Maßgeblich sind die Informationen des jeweiligen Verkehrsunternehmens."
+        },
+        "viator": {
+          "source": "Wenn Erlebnisse aktiviert sind, zeigt MessageDrop über die Viator Partner API bereitgestellte Ausflüge, Aktivitäten und zugehörige Produktinformationen an.",
+          "responsibilityTitle": "Anbieter und Buchung",
+          "responsibility": "Die Erlebnisse werden von den jeweils genannten Veranstaltern angeboten. Für Verfügbarkeit, Leistungen, Preise, Buchung und Stornierung gelten die beim Angebot ausgewiesenen Bedingungen.",
+          "quality": "Angebote, Preise, Verfügbarkeit und Inhalte können sich jederzeit ändern. Prüfe die aktuellen Angaben vor einer Buchung beim Anbieter."
+        }
       },
       "externalContent": {
         "title": "Einstellungen für externe Inhalte",
