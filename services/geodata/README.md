@@ -46,6 +46,14 @@ API and are public:
 
 The main backend streams the same resources below `/geodata/exports`, so the
 Geodata service itself can remain on an internal network.
+The service status at `GET /` advertises the export manifest, format,
+attribution and licence URI so the downloads remain discoverable independently
+of the MessageDrop frontend.
+
+The production service and export manifest are published at:
+
+- `https://service.geodata.messagedrop.de/`
+- `https://service.geodata.messagedrop.de/geodata/exports`
 
 Supported POI types are defined in `categories.js`. Nearby requests are bounded
 by `GEODATA_MAX_BBOX_AREA` and `GEODATA_MAX_RESULTS`. A request outside the

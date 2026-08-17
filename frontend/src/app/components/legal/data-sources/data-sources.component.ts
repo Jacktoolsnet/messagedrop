@@ -16,7 +16,7 @@ import { environment } from '../../../../environments/environment';
 })
 export class DataSourcesComponent {
   private readonly dialogRef = inject(MatDialogRef<DataSourcesComponent>);
-  readonly geodataExportUrl = `${environment.apiUrl}/geodata/exports`;
+  readonly geodataExportUrl = `${environment.geodataServiceUrl}/geodata/exports`;
 
   close(): void {
     this.dialogRef.close();
