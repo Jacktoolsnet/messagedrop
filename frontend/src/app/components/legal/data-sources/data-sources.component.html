@@ -1,0 +1,59 @@
+<app-dialog-header
+  icon="database"
+  [title]="'common.legal.dataSources.title' | transloco">
+</app-dialog-header>
+
+<div mat-dialog-content class="content">
+  <p>{{ 'common.legal.dataSources.intro' | transloco }}</p>
+
+  <section class="source-card" aria-labelledby="osm-source-title">
+    <div class="source-icon"><mat-icon>map</mat-icon></div>
+    <div>
+      <h2 id="osm-source-title">OpenStreetMap</h2>
+      <p class="attribution">© OpenStreetMap contributors</p>
+      <p>{{ 'common.legal.dataSources.openStreetMap' | transloco }}</p>
+      <div class="links">
+        <a mat-stroked-button href="https://www.openstreetmap.org/copyright"
+          target="_blank" rel="noopener noreferrer">
+          <mat-icon>copyright</mat-icon>
+          {{ 'common.legal.dataSources.copyrightAndLicense' | transloco }}
+        </a>
+        <a mat-stroked-button href="https://opendatacommons.org/licenses/odbl/1-0/"
+          target="_blank" rel="noopener noreferrer">
+          <mat-icon>description</mat-icon>
+          ODbL 1.0
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="source-card" aria-labelledby="geofabrik-source-title">
+    <div class="source-icon"><mat-icon>download</mat-icon></div>
+    <div>
+      <h2 id="geofabrik-source-title">Geofabrik GmbH</h2>
+      <p>{{ 'common.legal.dataSources.geofabrik' | transloco }}</p>
+      <a mat-stroked-button href="https://download.geofabrik.de/"
+        target="_blank" rel="noopener noreferrer">
+        <mat-icon>open_in_new</mat-icon>
+        {{ 'common.legal.dataSources.openDownloadSource' | transloco }}
+      </a>
+    </div>
+  </section>
+
+  <section class="notice">
+    <h2><mat-icon>tune</mat-icon>{{ 'common.legal.dataSources.processingTitle' | transloco }}</h2>
+    <p>{{ 'common.legal.dataSources.processing' | transloco }}</p>
+  </section>
+
+  <section class="notice warning">
+    <h2><mat-icon>warning_amber</mat-icon>{{ 'common.legal.dataSources.qualityTitle' | transloco }}</h2>
+    <p>{{ 'common.legal.dataSources.quality' | transloco }}</p>
+  </section>
+</div>
+
+<mat-dialog-actions align="end">
+  <button mat-icon-button type="button" (click)="close()"
+    [attr.aria-label]="'common.actions.close' | transloco">
+    <mat-icon>close</mat-icon>
+  </button>
+</mat-dialog-actions>

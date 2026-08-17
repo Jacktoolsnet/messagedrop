@@ -76,7 +76,6 @@ export class SearchSettingsMapPreviewComponent implements AfterViewInit, OnChang
     this.map = leaflet.map(this.mapId, {
       center: [this.center.latitude, this.center.longitude],
       zoom: this.zoom,
-      attributionControl: false,
       zoomControl: false,
       dragging: interactive,
       scrollWheelZoom: interactive,
@@ -91,11 +90,11 @@ export class SearchSettingsMapPreviewComponent implements AfterViewInit, OnChang
       this.zoomControl.addTo(this.map);
     }
 
-    leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    leaflet.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       minZoom: 3,
       noWrap: true,
-      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
     }).addTo(this.map);
 
     this.markerLayer = leaflet.layerGroup().addTo(this.map);

@@ -27,6 +27,7 @@ import { GeoStatisticComponent } from './components/geo-statistic/geo-statistic.
 import { ImagelistComponent } from './components/imagelist/imagelist.component';
 import { OverrideExifDataComponent } from './components/imagelist/override-exif-data/override-exif-data.component';
 import { ConsentGateComponent } from './components/legal/consent-gate/consent-gate.component';
+import { DataSourcesComponent } from './components/legal/data-sources/data-sources.component';
 import { DisclaimerComponent } from './components/legal/disclaimer/disclaimer.component';
 import { ExternalContentComponent } from './components/legal/external-content/external-content.component';
 import { LegalNoticeComponent } from './components/legal/legal-notice/legal-notice.component';
@@ -3147,6 +3148,20 @@ export class AppComponent implements OnInit {
 
   public showLicenses() {
     this.dialog.open(ThirdPartyLicensesComponent, {
+      data: {},
+      closeOnNavigation: true,
+      autoFocus: false,
+      maxHeight: '90vh',
+      width: '800px',
+      maxWidth: '90vw',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+    });
+  }
+
+  public showDataSources() {
+    this.dialog.open(DataSourcesComponent, {
       data: {},
       closeOnNavigation: true,
       autoFocus: false,

@@ -1,5 +1,5 @@
 HAFTUNGSHINWEIS (DISCLAIMER)
-Stand: 13. August 2026
+Stand: 17. August 2026
 
 ###
 Kurzfassung (nicht rechtsverbindlich)
@@ -28,6 +28,8 @@ Die optionale Vorlesefunktion hängt von Browser, Betriebssystem, Endgerät, ins
 Externe Inhalte, Dienste und verlinkte Webseiten liegen im Verantwortungsbereich der jeweiligen Drittanbieter.
 
 Routen-, Fahrplan- und Echtzeitinformationen sind unverbindlich. MessageDrop ist kein sicherheitskritisches Navigationssystem. Örtliche Beschilderung, Verkehrsregeln, behördliche Anordnungen und Informationen der Verkehrsunternehmen haben Vorrang. Nutzer müssen ihre Umgebung und den Straßenverkehr jederzeit aufmerksam beobachten.
+
+Karten- und POI-Daten aus OpenStreetMap können unvollständig, veraltet, doppelt oder unrichtig sein. Wichtige Angaben müssen vor Ort oder beim jeweiligen Betreiber überprüft werden.
 
 MessageDrop bietet keinen Zugang zu Notfalldiensten.
 
@@ -157,6 +159,18 @@ Kartenpositionen, Streckenlinien und Zwischenpunkte können ungenau sein. Angeze
 Nutzer müssen ihre Umgebung und die Verkehrssituation jederzeit selbst aufmerksam beobachten. Die Bedienung der App während der Fahrt oder beim Führen eines Fahrzeugs ist zu unterlassen, soweit sie ablenkt oder gesetzlich nicht zulässig ist. Bei Wanderungen und Fahrradtouren sind insbesondere Gelände, Wetter, persönliche Fähigkeiten, Ausrüstung und aktuelle Wegbedingungen eigenverantwortlich zu berücksichtigen.
 
 Die Routensimulation dient ausschließlich der Vorschau und ist keine präzise Wiedergabe der tatsächlichen Bewegung, Reisezeit oder Verkehrssituation. MessageDrop ist weder ein Notfall-, Rettungs- noch ein sicherheitskritisches Navigationssystem.
+
+###
+6.2 Karten- und POI-Daten
+###
+
+Die in MessageDrop angezeigten Karten- und POI-Daten stammen überwiegend aus dem gemeinschaftlich gepflegten OpenStreetMap-Datenbestand. MessageDrop filtert und kategorisiert ausgewählte Datensätze für die Darstellung in der App.
+
+Die Angaben können insbesondere fehlen, unvollständig, veraltet, doppelt, ungenau oder unrichtig sein. Dies gilt unter anderem für Namen, Kategorien, Positionen, Adressen, Öffnungszeiten, Telefonnummern, Webseiten, Barrierefreiheit, Zugänglichkeit, Ausstattung und den aktuellen Betriebsstatus eines Ortes.
+
+Eine Anzeige in MessageDrop stellt keine Empfehlung, Bestätigung der Existenz oder Garantie der Erreichbarkeit beziehungsweise Öffnung eines Ortes dar. Wichtige Informationen sind vor einer Anreise, Buchung oder sonstigen Entscheidung vor Ort oder beim jeweiligen Betreiber zu überprüfen.
+
+Bei sicherheitsrelevanten Angaben, gesperrten Bereichen, Zugangsregelungen und behördlichen Einrichtungen haben örtliche Hinweise, Absperrungen, Beschilderungen und behördliche Informationen stets Vorrang.
 
 ###
 7. Von Nutzern erstellte Inhalte

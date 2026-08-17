@@ -420,6 +420,10 @@
         "title": "Open-Source-Lizenzen",
         "desc": "Zeigt die verwendeten Open-Source-Lizenzen."
       },
+      "dataSources": {
+        "title": "Datenquellen und Lizenzen",
+        "desc": "Zeigt Herkunft, ODbL-Lizenz, Verarbeitung und Qualitätshinweise der Karten- und POI-Daten."
+      },
       "menuHelp": {
         "title": "Hilfe",
         "desc": "Öffnet diesen Hilfedialog für alle Menüs in der App-Ansicht."

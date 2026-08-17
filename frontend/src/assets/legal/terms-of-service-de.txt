@@ -1,5 +1,5 @@
 NUTZUNGSBEDINGUNGEN
-Stand: 13. August 2026
+Stand: 17. August 2026
 
 ###
 Kurzfassung (vereinfacht, nicht rechtsverbindlich)
@@ -343,6 +343,10 @@ Folgende externe Funktions- und Informationsdienste werden nicht über den „Ex
 - Flaticon / Freepik Company S.L.U. (Sticker-/Asset- und Lizenzanbieter)
 
 Diese Dienste werden genutzt, wenn Du die jeweilige Funktion aktiv verwendest (z. B. Wetterabfrage, Karten-/Ortsbezug, Übersetzung, Erlebnissuche oder Sticker-Nutzung) oder soweit dies zur Bereitstellung lizenzierter Inhalte erforderlich ist.
+
+Karten- und POI-Daten stammen überwiegend von OpenStreetMap. Die Daten stehen unter der Open Database License 1.0 (ODbL); es gelten die unter https://www.openstreetmap.org/copyright beschriebenen Lizenzbedingungen. Die für die POI-Suche verarbeiteten OpenStreetMap-Länderauszüge werden über den Download-Dienst der Geofabrik GmbH bezogen. Herkunft, Verarbeitung und Lizenz sind zusätzlich in der App unter „Datenquellen und Lizenzen“ beschrieben.
+
+Eine über die normale Nutzung der App hinausgehende Entnahme oder Weiterverwendung von OpenStreetMap-Daten richtet sich nach der ODbL. MessageDrop räumt keine weitergehenden Rechte an diesen Daten ein und schränkt die unmittelbar aus der ODbL folgenden Rechte nicht ein.
 
 Für die Übersetzungsfunktion kannst Du nach eigener Wahl statt des von uns bereitgestellten Zugangs auch einen eigenen DeepL-API-Key hinterlegen und verwenden. Dieser Key wird nach dem aktuellen technischen Stand lokal auf Deinem Endgerät gespeichert und für die jeweilige Übersetzungs- oder Prüf-Anfrage verwendet.
 

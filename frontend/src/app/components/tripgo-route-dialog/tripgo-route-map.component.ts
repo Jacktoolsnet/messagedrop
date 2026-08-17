@@ -444,11 +444,11 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     simulationPane.style.zIndex = '1200';
     simulationPane.style.pointerEvents = 'none';
 
-    leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    leaflet.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       minZoom: 3,
       noWrap: true,
-      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
     }).addTo(this.map);
 
     const bounds = leaflet.latLngBounds([]);

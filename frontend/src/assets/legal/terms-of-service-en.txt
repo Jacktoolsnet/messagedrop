@@ -1,5 +1,5 @@
 TERMS OF USE
-Version: August 13, 2026
+Version: August 17, 2026
 
 IMPORTANT NOTE ON LANGUAGE
 This English translation is provided for convenience only and is not legally binding. The legally binding version is exclusively the current complete German version of these Terms of Use.
@@ -346,6 +346,10 @@ The following external functional and information services are not activated via
 - Flaticon / Freepik Company S.L.U. (sticker/asset and license provider)
 
 These services are used when you actively use the respective function (e.g., weather query, map/location reference, translation, experience search, or sticker use) or where this is necessary to provide licensed content.
+
+Map and POI data mainly originates from OpenStreetMap. The data is available under the Open Database License 1.0 (ODbL), subject to the license terms described at https://www.openstreetmap.org/copyright. The OpenStreetMap country extracts processed for POI search are obtained through the Geofabrik GmbH download service. Origin, processing, and license are also described in the app under “Data sources and licenses.”
+
+Extraction or reuse of OpenStreetMap data beyond ordinary use of the app is governed by the ODbL. MessageDrop grants no additional rights in this data and does not restrict rights arising directly from the ODbL.
 
 For the translation function, you may choose to store and use your own DeepL API key instead of the access provided by us. According to the current technical design, this key is stored locally on your device and used for the respective translation or key-validation request.
 

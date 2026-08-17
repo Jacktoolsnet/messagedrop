@@ -420,6 +420,10 @@
         "title": "Open-source licenses",
         "desc": "Shows the open-source licenses used by the app."
       },
+      "dataSources": {
+        "title": "Data sources and licenses",
+        "desc": "Shows the origin, ODbL license, processing, and quality notices for map and POI data."
+      },
       "menuHelp": {
         "title": "Help",
         "desc": "Opens this help dialog for all menus in the app view."

@@ -140,6 +140,7 @@
       "disclaimer": "Disclaimer",
       "imprintLegalNotice": "Imprint (Legal notice)",
       "thirdPartyLicenses": "Open-source licenses",
+      "dataSources": "Data sources and licenses",
       "locateMe": "Locate me",
       "shareLocation": "Share location",
       "openLocationInMaps": "Open in maps app",
@@ -1567,6 +1568,18 @@
         "loading": "Loading licenses...",
         "loadFailed": "Could not load the license file.",
         "ariaLabel": "Open-source licenses"
+      },
+      "dataSources": {
+        "title": "Data sources and licenses",
+        "intro": "These notices explain the origin, license, and processing of the map and POI data displayed in MessageDrop.",
+        "openStreetMap": "Map and POI data comes from OpenStreetMap and is available under the Open Database License 1.0 (ODbL).",
+        "copyrightAndLicense": "Copyright and license",
+        "geofabrik": "The OpenStreetMap country extracts used for POI search are obtained server-side through the Geofabrik GmbH download service.",
+        "openDownloadSource": "Open download source",
+        "processingTitle": "Processing by MessageDrop",
+        "processing": "MessageDrop filters the extracts by enabled countries and POI categories, normalizes selected fields, and stores the required records in its own geodata database. Their origin as OpenStreetMap data and the ODbL license remain unaffected.",
+        "qualityTitle": "Data quality",
+        "quality": "Community-maintained information may be missing, outdated, duplicated, or incorrect. Verify important details such as addresses, opening hours, accessibility, wheelchair access, and operating status on site or with the respective operator."
       },
       "externalContent": {
         "title": "External content settings",

@@ -369,6 +369,10 @@
         <mat-icon>receipt_long</mat-icon>
         <span>{{ 'common.menu.thirdPartyLicenses' | transloco }}</span>
     </button>
+    <button mat-menu-item (click)="showDataSources()">
+        <mat-icon>database</mat-icon>
+        <span>{{ 'common.menu.dataSources' | transloco }}</span>
+    </button>
 </mat-menu>
 
 <mat-menu #messageMenu="matMenu">

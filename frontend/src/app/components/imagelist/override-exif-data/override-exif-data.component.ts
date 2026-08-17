@@ -124,7 +124,6 @@ export class OverrideExifDataComponent implements AfterViewInit, OnDestroy {
       zoom: 15,
       worldCopyJump: true,
       zoomControl: false,
-      attributionControl: false,
       dragging: false,
       scrollWheelZoom: false,
       doubleClickZoom: false,
@@ -135,11 +134,11 @@ export class OverrideExifDataComponent implements AfterViewInit, OnDestroy {
 
     map.setMaxBounds([[-90, -180], [90, 180]]);
 
-    leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    leaflet.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       minZoom: 3,
       noWrap: true,
-      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
     }).addTo(map);
 
     leaflet.marker(latLng, { icon, zIndexOffset: 20 }).addTo(map);

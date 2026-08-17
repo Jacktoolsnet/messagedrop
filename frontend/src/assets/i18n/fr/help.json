@@ -402,6 +402,10 @@
         "title": "Licences open source",
         "desc": "Affiche les licences open source utilisées dans l'app."
       },
+      "dataSources": {
+        "title": "Sources de données et licences",
+        "desc": "Affiche l’origine, la licence ODbL, le traitement et les informations de qualité des données cartographiques et des points d’intérêt."
+      },
       "menuHelp": {
         "title": "Aide",
         "desc": "Ouvre cette aide pour tous les menus visibles dans l'application."

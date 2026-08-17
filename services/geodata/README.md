@@ -5,6 +5,19 @@ extracts into PostgreSQL and serves them to MessageDrop. It no longer sends
 interactive map requests to a public query API. Only categories, subcategories,
 and countries enabled in the admin application are imported.
 
+## Data source and licence
+
+Geodata and POI records are © OpenStreetMap contributors and are available under
+the Open Data Commons Open Database License 1.0 (ODbL). Country extracts are
+obtained from the Geofabrik GmbH download service.
+
+- OpenStreetMap copyright and licence: https://www.openstreetmap.org/copyright
+- Geofabrik extracts: https://download.geofabrik.de/
+- Repository notice: [DATA-LICENSE.md](DATA-LICENSE.md)
+
+Keep `DATA-LICENSE.md` with database copies, backups, and exports created from
+this service.
+
 ## Local configuration
 
 Copy the required values from `.env.geodata.example` into the ignored root

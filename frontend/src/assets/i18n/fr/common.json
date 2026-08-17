@@ -139,6 +139,7 @@
       "disclaimer": "Avertissement",
       "imprintLegalNotice": "Mentions légales",
       "thirdPartyLicenses": "Licences open source",
+      "dataSources": "Sources de données et licences",
       "locateMe": "Me localiser",
       "shareLocation": "Partager le lieu",
       "openLocationInMaps": "Ouvrir dans l’app Plans",
@@ -1566,6 +1567,18 @@
         "loading": "Chargement des licences...",
         "loadFailed": "Impossible de charger le fichier de licences.",
         "ariaLabel": "Licences open source"
+      },
+      "dataSources": {
+        "title": "Sources de données et licences",
+        "intro": "Ces informations expliquent l’origine, la licence et le traitement des données cartographiques et des points d’intérêt affichés dans MessageDrop.",
+        "openStreetMap": "Les données cartographiques et de points d’intérêt proviennent d’OpenStreetMap et sont disponibles sous l’Open Database License 1.0 (ODbL).",
+        "copyrightAndLicense": "Droits d’auteur et licence",
+        "geofabrik": "Les extraits nationaux OpenStreetMap utilisés pour la recherche de points d’intérêt sont obtenus côté serveur via le service de téléchargement de Geofabrik GmbH.",
+        "openDownloadSource": "Ouvrir la source de téléchargement",
+        "processingTitle": "Traitement par MessageDrop",
+        "processing": "MessageDrop filtre les extraits selon les pays et catégories activés, normalise certains champs et stocke les enregistrements nécessaires dans sa propre base de géodonnées. Leur origine OpenStreetMap et la licence ODbL restent inchangées.",
+        "qualityTitle": "Qualité des données",
+        "quality": "Les informations maintenues par la communauté peuvent être manquantes, obsolètes, dupliquées ou incorrectes. Vérifiez les informations importantes, telles que l’adresse, les horaires, l’accessibilité et le statut d’exploitation, sur place ou auprès de l’exploitant concerné."
       },
       "externalContent": {
         "title": "Paramètres des contenus externes",

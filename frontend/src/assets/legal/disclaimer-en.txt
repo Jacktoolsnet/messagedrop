@@ -1,5 +1,5 @@
 LIABILITY NOTICE (DISCLAIMER)
-Version: August 13, 2026
+Version: August 17, 2026
 
 IMPORTANT NOTE ON LANGUAGE
 This English translation is provided for convenience only and is not legally binding. The legally binding version is exclusively the current complete German version of this Liability Notice (Disclaimer).
@@ -31,6 +31,8 @@ The optional read-aloud function depends on the browser, operating system, devic
 External content, services, and linked websites are the responsibility of the respective third-party providers.
 
 Route, timetable, and real-time information is non-binding. MessageDrop is not a safety-critical navigation system. Local signs, traffic rules, official directions, and information from transport operators take precedence. Users must remain attentive to their surroundings and traffic at all times.
+
+Map and POI data from OpenStreetMap may be incomplete, outdated, duplicated, or incorrect. Important information must be verified on site or with the respective operator.
 
 MessageDrop does not provide access to emergency services.
 
@@ -160,6 +162,18 @@ Map positions, route lines, and intermediate points may be inaccurate. Displayed
 Users must remain attentive to their surroundings and the traffic situation at all times. The app must not be operated while travelling or driving where doing so would be distracting or legally prohibited. When hiking or cycling, users are responsible for considering terrain, weather, personal abilities, equipment, and current route conditions.
 
 The route simulation is provided solely as a preview and is not a precise representation of actual movement, travel time, or traffic conditions. MessageDrop is not an emergency, rescue, or safety-critical navigation system.
+
+###
+6.2 Map and POI Data
+###
+
+Map and POI data displayed in MessageDrop mainly originates from the community-maintained OpenStreetMap database. MessageDrop filters and categorizes selected records for display in the app.
+
+Information may be missing, incomplete, outdated, duplicated, inaccurate, or incorrect. This applies in particular to names, categories, positions, addresses, opening hours, telephone numbers, websites, wheelchair access, general accessibility, facilities, and the current operating status of a place.
+
+Display in MessageDrop does not constitute a recommendation, confirmation that a place exists, or a guarantee that it is accessible or open. Important information must be verified on site or with the respective operator before travelling, booking, or making any other decision.
+
+For safety-related information, restricted areas, access rules, and public authorities, local notices, barriers, signs, and official information always take precedence.
 
 ###
 7. User-Created Content

@@ -456,6 +456,11 @@ const HELP_TOPICS = {
         descriptionKey: 'appMenu.items.licenses.desc'
       },
       {
+        icon: 'database',
+        titleKey: 'appMenu.items.dataSources.title',
+        descriptionKey: 'appMenu.items.dataSources.desc'
+      },
+      {
         icon: 'help',
         titleKey: 'appMenu.items.menuHelp.title',
         descriptionKey: 'appMenu.items.menuHelp.desc'

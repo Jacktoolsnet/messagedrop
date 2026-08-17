@@ -1,5 +1,5 @@
 DATENSCHUTZERKLÄRUNG
-Stand: 13. August 2026
+Stand: 17. August 2026
 
 ###
 Kurzfassung (nicht rechtsverbindlich)
@@ -281,6 +281,14 @@ Für die Übersetzungsfunktion kann der Nutzer nach eigener Wahl entweder den vo
 
 Für diese Funktionsdienste besteht kein separater Externe-Inhalte-Toggle. Sie werden nur genutzt, wenn der Nutzer die jeweilige Funktion aktiv verwendet.
 
+Die in der App dargestellten OpenStreetMap-Kartenkacheln werden nach aktuellem technischen Stand direkt vom Endgerät unter `https://tile.openstreetmap.org/` abgerufen. Dabei erhält der OpenStreetMap-Kachelserver die technisch erforderlichen Verbindungsdaten, insbesondere IP-Adresse, Zeitpunkt, Browserinformationen und die Kennungen der angeforderten Kartenkacheln. Aus den angeforderten Kacheln kann sich der dargestellte geografische Kartenbereich ergeben. Die OpenStreetMap Foundation verarbeitet diese Daten als eigenständig Verantwortliche nach Maßgabe ihrer eigenen Datenschutzerklärung.
+
+Ortssuchen über Nominatim werden nur bei Nutzung der entsprechenden Suchfunktion ausgeführt. Hierbei können insbesondere der Suchbegriff beziehungsweise die geografischen Suchparameter verarbeitet werden.
+
+Die in MessageDrop angezeigten POI-Daten werden dagegen aus einer von MessageDrop betriebenen Geodatenbank bereitgestellt. Die zugrunde liegenden OpenStreetMap-Länderauszüge werden serverseitig über den Download-Dienst der Geofabrik GmbH bezogen, gefiltert und regelmäßig aktualisiert. Beim bloßen Anzeigen oder Abrufen eines POIs entsteht daher kein zusätzlicher Abruf bei Geofabrik oder OpenStreetMap. Gegenüber MessageDrop werden dabei der angefragte Kartenausschnitt, ausgewählte POI-Kategorien sowie die üblichen technischen Verbindungs- und Protokolldaten verarbeitet.
+
+Geofabrik wird ausschließlich für den serverseitigen Bezug der OpenStreetMap-Datenauszüge eingesetzt. Dabei werden keine Suchanfragen, Standorte oder sonstigen personenbezogenen Nutzerdaten an Geofabrik übermittelt.
+
 Bei aktiver Nutzung der Routenplanung übermittelt MessageDrop die für die Anfrage erforderlichen Daten über den eigenen TripGo-Service an die TripGo API der SkedGo Pty Limited. Dazu gehören insbesondere Start- und Zielkoordinaten, gewünschte Verkehrsmittel, gewünschte Abfahrts- oder Ankunftszeit, Sprache sowie gegebenenfalls Haltestellen-, Linien- und Verbindungskennungen. Der auf dem Endgerät ermittelte Standort wird nur dann für eine Routenanfrage verwendet, wenn der Nutzer die entsprechende Funktion ausführt. Die Kommunikation mit SkedGo erfolgt über den MessageDrop-Server.
 
 SkedGo verarbeitet die technisch erforderlichen Verbindungs- und Anfragedaten nach Maßgabe seiner eigenen Datenschutzerklärung. Eine Verarbeitung außerhalb des Europäischen Wirtschaftsraums, insbesondere in Australien oder weiteren von SkedGo beziehungsweise beteiligten Verkehrsdatenanbietern genutzten Staaten, kann nicht ausgeschlossen werden.
@@ -295,6 +303,9 @@ Weiterführende Informationen zu den Anbietern sind über deren jeweilige Websit
 - Open-Meteo: https://open-meteo.com/
 - DeepL: https://www.deepl.com/
 - OpenStreetMap / Nominatim: https://www.openstreetmap.org/
+- OpenStreetMap Lizenzinformationen: https://www.openstreetmap.org/copyright
+- OpenStreetMap Foundation Datenschutzerklärung: https://osmfoundation.org/wiki/Privacy_Policy
+- Geofabrik Download-Dienst: https://download.geofabrik.de/
 - SkedGo / TripGo: https://developer.tripgo.com/
 - SkedGo Datenschutzerklärung: https://skedgo.com/privacy-policy/
 - SkedGo Nutzungsbedingungen: https://skedgo.com/home/terms-of-use/
