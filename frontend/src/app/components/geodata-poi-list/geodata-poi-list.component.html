@@ -9,9 +9,7 @@
     <div class="poi-results pin-dialog-results" role="list">
       @for (poi of data.pois; track poi.id) {
         <mat-card class="poi-tile" role="listitem">
-          <div class="tile-header"
-            [class.has-image]="metadataImage(poi)"
-            [style.--poi-header-bg-image]="headerBackground(poi)">
+          <div class="tile-header">
             <div class="identity-badge">
               <div class="avatar-shell">
                 <div class="pin-avatar" aria-hidden="true">
@@ -21,11 +19,6 @@
                       x="16" y="10">{{ categoryIcon(poi.category) }}</text>
                   </svg>
                 </div>
-                @if (metadataImage(poi); as image) {
-                  <img class="avatar-image" [src]="image"
-                    [alt]="poi.name || (('common.searchSettings.subcategoryItems.' + poi.subtype) | transloco)"
-                    (error)="imageFailed(poi)" />
-                }
               </div>
               <div class="identity-text">
                 <span class="name" [attr.title]="poi.name || ''">
@@ -84,9 +77,6 @@
                     @if (address(poi)) {
                       <div class="detail-row"><mat-icon>home_pin</mat-icon><span>{{ address(poi) }}</span></div>
                     }
-                    @if (poi.websiteMetadata?.siteName) {
-                      <div class="detail-row"><mat-icon>domain</mat-icon><span>{{ poi.websiteMetadata?.siteName }}</span></div>
-                    }
                     @if (poi.properties.stars) {
                       <div class="detail-row"><mat-icon>star</mat-icon><span>{{ poi.properties.stars }} {{ 'common.geodata.stars' | transloco }}</span></div>
                     }
@@ -111,7 +101,7 @@
                     }
                     @if (website(poi); as websiteUrl) {
                       <a class="detail-row" [href]="websiteUrl" target="_blank" rel="noopener noreferrer">
-                        <mat-icon>language</mat-icon><span>{{ poi.websiteMetadata?.title || websiteUrl }}</span>
+                        <mat-icon>language</mat-icon><span>{{ websiteUrl }}</span>
                       </a>
                     }
                   </div>

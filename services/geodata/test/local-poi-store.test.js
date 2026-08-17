@@ -43,7 +43,7 @@ test('returns the PostgreSQL database size as a JSON number', async () => {
   const database = { db: {
     get(_sql, _params, callback) {
       callback(null, {
-        datasetCount: 1, poiCount: 91371, websitePoiCount: 2400, websiteMetadataPoiCount: 1800,
+        datasetCount: 1, poiCount: 91371, websitePoiCount: 2400,
         importedAt: '2026-08-13T18:21:33Z', databaseBytes: '73400320'
       });
     }
@@ -51,7 +51,6 @@ test('returns the PostgreSQL database size as a JSON number', async () => {
   const status = await new LocalPoiStore({ database }).status();
   assert.equal(status.databaseBytes, 73400320);
   assert.equal(status.websitePoiCount, 2400);
-  assert.equal(status.websiteMetadataPoiCount, 1800);
 });
 
 test('caches database status and coalesces concurrent requests', async () => {
@@ -60,7 +59,7 @@ test('caches database status and coalesces concurrent requests', async () => {
     get(_sql, _params, callback) {
       calls += 1;
       setImmediate(() => callback(null, {
-        datasetCount: 4, poiCount: 100, websitePoiCount: 20, websiteMetadataPoiCount: 10,
+        datasetCount: 4, poiCount: 100, websitePoiCount: 20,
         importedAt: '2026-08-17T06:00:00Z', databaseBytes: '2791728742'
       }));
     }
@@ -76,16 +75,16 @@ test('caches database status and coalesces concurrent requests', async () => {
   assert.deepEqual(third, first);
 });
 
-test('adds stored website metadata to local POI results', async () => {
+test('returns the stored OSM POI payload without website enrichment', async () => {
   const payload = { id: 'osm:node:42', contact: { website: 'https://hotel.example' } };
   const database = { db: {
     get(_sql, _params, callback) {
       callback(null, { datasetId: 'germany', versionId: 'v1', sourceUrl: 'https://example.test/germany.pbf' });
     },
     all(_sql, _params, callback) {
-      callback(null, [{ payload, websiteMetadata: { title: 'Example Hotel' } }]);
+      callback(null, [{ payload }]);
     }
   } };
   const result = await new LocalPoiStore({ database }).getNearby(request());
-  assert.deepEqual(result.pois[0].websiteMetadata, { title: 'Example Hotel' });
+  assert.deepEqual(result.pois[0], payload);
 });

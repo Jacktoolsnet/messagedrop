@@ -1456,17 +1456,17 @@
   },
   "geodataPoiList": {
     "title": "Places and POIs",
-    "intro": "This view shows the available OpenStreetMap details for a place and supplementary metadata from its website. The displayed fields depend on the available source data.",
+    "intro": "This view shows the available OpenStreetMap details for a place. The displayed fields depend on the available OpenStreetMap data.",
     "items": {
       "flyTo": { "title": "Jump to map", "desc": "Centers the MessageDrop map on the selected place and zooms in." },
       "route": { "title": "Calculate route", "desc": "Opens route planning with this place as the destination. If no transport modes have been selected, route options open first." },
       "openMaps": { "title": "Open in maps app", "desc": "Opens the place coordinates in Google Maps in a new window or tab." },
       "openOsm": { "title": "Details on OpenStreetMap", "desc": "Opens the place’s specific source record on OpenStreetMap in a new window or tab." },
       "webSearch": { "title": "Start web search", "desc": "Starts a Google web search using the name and address. This action is available only for named places." },
-      "website": { "title": "Website and contact details", "desc": "Opens available website, telephone, or email links. When available, the description and image come from metadata in the website header." },
+      "website": { "title": "Website and contact details", "desc": "Opens available website, telephone, or email links from the OpenStreetMap data." },
       "close": { "title": "Close", "desc": "Closes the place list and returns to the map." },
       "help": { "title": "Help", "desc": "Opens this help view." },
-      "privacy": { "title": "Privacy and external services", "desc": "POI data comes from OpenStreetMap. A metadata image may be loaded directly from the place website. Opening a website, email, telephone link, OpenStreetMap, Google Maps, or web search is subject to the respective external provider’s terms and may transfer technical connection data." }
+      "privacy": { "title": "Privacy and external services", "desc": "POI data comes from OpenStreetMap. Opening a website, email, telephone link, OpenStreetMap, Google Maps, or web search is subject to the respective external provider’s terms and may transfer technical connection data." }
     }
   },
   "placeList": {

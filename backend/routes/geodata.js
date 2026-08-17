@@ -103,11 +103,4 @@ router.post('/nearby', [
   metric.count('geodata.nearby', { when: 'always', timezone: 'utc', amount: 1 })
 ], (req, res, next) => forward(req, res, next, { method: 'post', path: '/nearby', data: req.body }));
 
-router.post('/website-metadata', [
-  express.json({ type: 'application/json', limit: '4kb' }),
-  metric.count('geodata.websiteMetadata', { when: 'always', timezone: 'utc', amount: 1 })
-], (req, res, next) => forward(req, res, next, {
-  method: 'post', path: '/website-metadata', data: req.body
-}));
-
 module.exports = router;

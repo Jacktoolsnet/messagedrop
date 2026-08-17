@@ -114,12 +114,8 @@ function status(db, callback) {
       JOIN ${DATASET_TABLE} pd ON pd.activeVersionId = pv.versionId
       WHERE NULLIF(BTRIM(p.payload #>> '{contact,website}'), '') IS NOT NULL
     ), websiteCounts AS (
-      SELECT COUNT(*)::integer AS websitePoiCount,
-        COUNT(m.websiteUrl)::integer AS websiteMetadataPoiCount
-      FROM activeWebsites w
-      LEFT JOIN tableGeodataWebsiteReference r ON r.websiteUrl = w.websiteUrl
-      LEFT JOIN tableGeodataWebsiteMetadata m
-        ON m.websiteUrl = r.normalizedUrl AND m.metadata IS NOT NULL
+      SELECT COUNT(*)::integer AS websitePoiCount
+      FROM activeWebsites
     ), datasetCounts AS (
       SELECT COUNT(*)::integer AS datasetCount, COALESCE(SUM(v.poiCount), 0)::integer AS poiCount,
         MAX(v.activatedAt) AS importedAt
@@ -128,7 +124,7 @@ function status(db, callback) {
     )
     SELECT dc.datasetCount, dc.poiCount, dc.importedAt,
       pg_database_size(current_database())::bigint AS databaseBytes,
-      wc.websitePoiCount, wc.websiteMetadataPoiCount
+      wc.websitePoiCount
     FROM datasetCounts dc
     CROSS JOIN websiteCounts wc
   `, [], callback);
@@ -143,12 +139,8 @@ function nearby(db, versionId, bounds, selections, limit, callback) {
   }
   params.push(limit);
   db.all(`
-    SELECT p.payload, m.metadata AS websiteMetadata
+    SELECT p.payload
     FROM ${POI_TABLE} p
-    LEFT JOIN tableGeodataWebsiteReference r
-      ON r.websiteUrl = p.payload #>> '{contact,website}'
-    LEFT JOIN tableGeodataWebsiteMetadata m
-      ON m.websiteUrl = r.normalizedUrl AND m.metadata IS NOT NULL
     WHERE p.versionId = ?
       AND p.latitude BETWEEN ? AND ?
       AND p.longitude BETWEEN ? AND ?

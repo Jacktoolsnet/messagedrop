@@ -34,9 +34,7 @@ class LocalPoiStore {
       this.metrics.hits += 1;
       return {
         status: 200,
-        pois: rows.map(({ payload, websiteMetadata }) => websiteMetadata
-          ? { ...payload, websiteMetadata }
-          : payload),
+        pois: rows.map(({ payload }) => payload),
         count: rows.length,
         attribution: {
           provider: 'OpenStreetMap',
@@ -98,7 +96,6 @@ function emptyStatus() {
     datasetCount: 0,
     poiCount: 0,
     websitePoiCount: 0,
-    websiteMetadataPoiCount: 0,
     importedAt: null,
     databaseBytes: null
   };

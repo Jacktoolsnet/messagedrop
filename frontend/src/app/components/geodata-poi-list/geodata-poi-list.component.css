@@ -44,24 +44,6 @@
   background: color-mix(in srgb, var(--mat-card-filled-container-color) 88%, var(--mat-primary-color));
 }
 
-.tile-header.has-image {
-  min-height: 8.5rem;
-}
-
-.tile-header::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: var(--poi-header-bg-image, none);
-  background-position: center;
-  background-size: cover;
-  opacity: 0;
-}
-
-.tile-header.has-image::before {
-  opacity: 0.42;
-}
-
 .identity-badge {
   position: absolute;
   z-index: 1;
@@ -89,14 +71,6 @@
   overflow: hidden;
   border-radius: 0.9rem;
   background: var(--mat-card-filled-container-color);
-}
-
-.avatar-image {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
 }
 
 .pin-avatar {

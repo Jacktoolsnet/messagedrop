@@ -10,11 +10,8 @@ const helmet = require('helmet');
 const winston = require('winston');
 const Database = require('./db/database');
 const tableGeodataPoi = require('./db/tableGeodataPoi');
-const tableWebsiteMetadata = require('./db/tableWebsiteMetadata');
 const { LocalPoiStore } = require('./local-poi-store');
 const { ImportJobManager } = require('./import-job-manager');
-const { createWebsiteMetadataClient } = require('./website-metadata');
-const { WebsiteMetadataJobManager } = require('./website-metadata-job-manager');
 const loggerMw = require('./middleware/logger');
 const traceId = require('./middleware/trace-id');
 const headerMw = require('./middleware/header');
@@ -40,10 +37,7 @@ function cleanupJobHistory(database, retentionDays, logger) {
       resolve();
     }
   ));
-  return Promise.all([
-    cleanup(tableGeodataPoi, 'Geodata import job'),
-    cleanup(tableWebsiteMetadata, 'Geodata metadata job')
-  ]);
+  return cleanup(tableGeodataPoi, 'Geodata import job');
 }
 
 function createLogger() {
@@ -72,8 +66,7 @@ function createLogger() {
 function createApp({
   logger = createLogger(),
   localPoiStore,
-  importJobManager,
-  websiteMetadataJobManager
+  importJobManager
 } = {}) {
   const metrics = {};
   const app = express();
@@ -88,7 +81,7 @@ function createApp({
   app.use('/', root);
   app.use('/check', check);
   app.use('/geodata', createGeodataRouter({
-    localPoiStore, importJobManager, websiteMetadataJobManager, metrics
+    localPoiStore, importJobManager, metrics
   }));
   app.use(notFoundHandler);
   app.use(errorHandler);
@@ -103,19 +96,15 @@ async function start() {
   const logger = createLogger();
   const database = new Database();
   await database.init(logger);
-  const metadataClient = createWebsiteMetadataClient();
   const localPoiStore = new LocalPoiStore({ database, logger });
-  const websiteMetadataJobManager = new WebsiteMetadataJobManager({ database, client: metadataClient, logger });
-  const importJobManager = new ImportJobManager({ database, logger, websiteMetadataJobManager });
-  void websiteMetadataJobManager.recoverAndTrigger()
-    .catch((error) => logger.error('Could not recover website metadata jobs', { error: error.message }));
+  const importJobManager = new ImportJobManager({ database, logger });
   const jobRetentionDays = numberSetting('GEODATA_JOB_RETENTION_DAYS', 90);
   void cleanupJobHistory(database, jobRetentionDays, logger);
   const cleanupTimer = setInterval(() => {
     void cleanupJobHistory(database, jobRetentionDays, logger);
   }, 24 * 60 * 60 * 1000);
   cleanupTimer.unref();
-  const app = createApp({ logger, localPoiStore, importJobManager, websiteMetadataJobManager });
+  const app = createApp({ logger, localPoiStore, importJobManager });
   const server = app.listen(port, () => logger.info('Geodata service listening', { port }));
   server.on('error', (error) => logger.error('Geodata HTTP server error', { error: error.message }));
   const shutdown = (signal) => {

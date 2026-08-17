@@ -3,7 +3,7 @@ const { requireServiceJwt } = require('../utils/serviceJwt');
 const { validateNearbyRequest } = require('../validation');
 const { categoryNames, categoryCatalog } = require('../categories');
 
-function createGeodataRouter({ localPoiStore, importJobManager, websiteMetadataJobManager, metrics = {} }) {
+function createGeodataRouter({ localPoiStore, importJobManager, metrics = {} }) {
   const router = express.Router();
   router.use(requireServiceJwt);
 
@@ -53,24 +53,6 @@ function createGeodataRouter({ localPoiStore, importJobManager, websiteMetadataJ
     } catch (error) { return next(error); }
   });
 
-  router.get('/metadata-jobs', async (req, res, next) => {
-    if (!websiteMetadataJobManager) return res.status(503).json({ error: 'metadata_jobs_unavailable' });
-    try {
-      return res.status(200).json({ status: 200, jobs: await websiteMetadataJobManager.list(req.query.limit) });
-    } catch (error) { return next(error); }
-  });
-
-  router.post('/metadata-jobs', async (req, res, next) => {
-    if (!websiteMetadataJobManager) return res.status(503).json({ error: 'metadata_jobs_unavailable' });
-    try {
-      const reason = typeof req.body?.reason === 'string' && req.body.reason.trim()
-        ? req.body.reason.trim().slice(0, 100)
-        : 'api';
-      const job = await websiteMetadataJobManager.trigger(reason);
-      return res.status(job ? 202 : 200).json({ status: job ? 202 : 200, job });
-    } catch (error) { return next(error); }
-  });
-
   router.post('/nearby', async (req, res, next) => {
     metrics.nearby = (metrics.nearby || 0) + 1;
     const validated = validateNearbyRequest(req.body);
@@ -87,24 +69,6 @@ function createGeodataRouter({ localPoiStore, importJobManager, websiteMetadataJ
         source: { type: 'local-dataset', datasetId: null, versionId: null, timestamp: null, importedAt: null, url: null }
       });
     } catch (error) { return next(error); }
-  });
-
-  router.post('/website-metadata', async (req, res, next) => {
-    metrics.websiteMetadata = (metrics.websiteMetadata || 0) + 1;
-    if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)
-        || typeof req.body.url !== 'string' || !req.body.url.trim()) {
-      return res.status(400).json({ error: 'invalid_website_metadata_request' });
-    }
-    try {
-      const result = await websiteMetadataJobManager.getOrFetch(new URL(req.body.url).toString());
-      return res.status(200).json({
-        status: 200, metadata: result.metadata, cache: result.cache, outcome: result.outcome || 'metadata',
-        retryAt: result.retryAt || null, errorCode: result.errorCode || null, httpStatus: result.httpStatus || null
-      });
-    } catch (error) {
-      if (error?.code === 'ERR_INVALID_URL') return res.status(400).json({ error: 'invalid_website_url' });
-      return next(error);
-    }
   });
 
   router.get('/metrics', (_req, res) => res.status(200).json({

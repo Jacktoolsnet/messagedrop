@@ -56,20 +56,6 @@ export interface GeodataImportJob {
   completedAt: string | null;
 }
 
-export interface GeodataMetadataJob {
-  metadataJobId: string;
-  status: 'running' | 'succeeded' | 'failed';
-  stage?: 'discovering' | 'processing' | 'completed' | 'failed';
-  triggerReason: string;
-  totalUrls: number;
-  processedUrls: number;
-  succeededUrls: number;
-  failedUrls: number;
-  error: string | null;
-  createdAt: string;
-  completedAt: string | null;
-}
-
 export interface GeodataDatabaseInfo {
   status: number;
   health: {
@@ -79,11 +65,9 @@ export interface GeodataDatabaseInfo {
       datasetCount: number;
       poiCount: number;
       websitePoiCount?: number;
-      websiteMetadataPoiCount?: number;
       importedAt: string | null;
       databaseBytes: number | null;
     };
   };
   jobs: GeodataImportJob[];
-  metadataJobs?: GeodataMetadataJob[];
 }

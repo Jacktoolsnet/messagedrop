@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import {
@@ -51,7 +51,6 @@ export class GeodataPoiListComponent {
   readonly help = inject(HelpDialogService);
   private readonly transloco = inject(TranslocoService);
   private readonly dialogRef = inject(MatDialogRef<GeodataPoiListComponent, GeodataPoiListResult>);
-  private readonly failedImages = signal<ReadonlySet<string>>(new Set());
 
   categoryIcon(category: GeodataCategory): string {
     return GEODATA_CATEGORY_ICONS[category];
@@ -65,22 +64,8 @@ export class GeodataPoiListComponent {
     ].filter(Boolean).join(', ');
   }
 
-  metadataImage(poi: GeodataPoi): string | null {
-    if (this.failedImages().has(poi.id)) return null;
-    const value = poi.websiteMetadata?.image;
-    if (!value) return null;
-    try {
-      const url = new URL(value);
-      return url.protocol === 'https:' ? url.toString() : null;
-    } catch {
-      return null;
-    }
-  }
-
   description(poi: GeodataPoi): string | null {
-    return this.localizedOsmText(poi.properties.descriptions, poi.properties.description)
-      || poi.websiteMetadata?.description?.trim()
-      || null;
+    return this.localizedOsmText(poi.properties.descriptions, poi.properties.description);
   }
 
   inscription(poi: GeodataPoi): string | null {
@@ -138,7 +123,6 @@ export class GeodataPoiListComponent {
   hasAdditionalDetails(poi: GeodataPoi): boolean {
     return Boolean(
       this.address(poi)
-      || poi.websiteMetadata?.siteName
       || poi.properties.stars
       || poi.properties.rooms
       || poi.properties.beds
@@ -170,10 +154,6 @@ export class GeodataPoiListComponent {
     return 'accessibility-status status-unknown';
   }
 
-  imageFailed(poi: GeodataPoi): void {
-    this.failedImages.update((current) => new Set([...current, poi.id]));
-  }
-
   private localizedOsmText(
     translations: Partial<Record<'de' | 'en' | 'es' | 'fr', string>> | undefined,
     fallback: string | undefined
@@ -186,11 +166,6 @@ export class GeodataPoiListComponent {
       || translations?.es?.trim()
       || translations?.fr?.trim()
       || null;
-  }
-
-  headerBackground(poi: GeodataPoi): string {
-    const image = this.metadataImage(poi);
-    return image ? `url("${image.replaceAll('"', '%22')}")` : 'none';
   }
 
   showOnMap(poi: GeodataPoi): void {

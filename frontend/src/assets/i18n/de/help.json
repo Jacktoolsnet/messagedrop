@@ -1456,17 +1456,17 @@
   },
   "geodataPoiList": {
     "title": "Orte und POIs",
-    "intro": "Hier siehst du die verfügbaren OpenStreetMap-Daten eines Ortes sowie ergänzende Metadaten seiner Webseite. Welche Angaben erscheinen, hängt von den vorhandenen Quelldaten ab.",
+    "intro": "Hier siehst du die verfügbaren OpenStreetMap-Daten eines Ortes. Welche Angaben erscheinen, hängt von den vorhandenen OpenStreetMap-Daten ab.",
     "items": {
       "flyTo": { "title": "Auf Karte anspringen", "desc": "Zentriert die MessageDrop-Karte auf den ausgewählten Ort und zoomt näher heran." },
       "route": { "title": "Route berechnen", "desc": "Öffnet die Routenplanung mit diesem Ort als Ziel. Falls noch keine Verkehrsarten gewählt wurden, werden zuerst die Routenoptionen geöffnet." },
       "openMaps": { "title": "In Karten-App öffnen", "desc": "Öffnet die Koordinaten des Ortes in Google Maps in einem neuen Fenster oder Tab." },
       "openOsm": { "title": "Details bei OpenStreetMap", "desc": "Öffnet den konkreten Quelldatensatz des Ortes bei OpenStreetMap in einem neuen Fenster oder Tab." },
       "webSearch": { "title": "Websuche starten", "desc": "Startet eine Google-Websuche nach Name und Adresse. Die Aktion wird nur für benannte Orte angeboten." },
-      "website": { "title": "Webseite und Kontaktdaten", "desc": "Öffnet vorhandene Webseiten-, Telefon- oder E-Mail-Links. Beschreibung und Bild stammen, sofern vorhanden, aus den Metadaten im Kopfbereich der Webseite." },
+      "website": { "title": "Webseite und Kontaktdaten", "desc": "Öffnet vorhandene Webseiten-, Telefon- oder E-Mail-Links aus den OpenStreetMap-Daten." },
       "close": { "title": "Schließen", "desc": "Schließt die Ortsliste und kehrt zur Karte zurück." },
       "help": { "title": "Hilfe", "desc": "Öffnet diese Hilfeansicht." },
-      "privacy": { "title": "Datenschutz und externe Dienste", "desc": "POI-Daten stammen aus OpenStreetMap. Ein Metadatenbild kann direkt von der Webseite des Ortes geladen werden. Beim Öffnen von Webseite, E-Mail, Telefon, OpenStreetMap, Google Maps oder Websuche gelten die Bedingungen der jeweiligen externen Anbieter; dabei können technische Verbindungsdaten übertragen werden." }
+      "privacy": { "title": "Datenschutz und externe Dienste", "desc": "POI-Daten stammen aus OpenStreetMap. Beim Öffnen von Webseite, E-Mail, Telefon, OpenStreetMap, Google Maps oder Websuche gelten die Bedingungen der jeweiligen externen Anbieter; dabei können technische Verbindungsdaten übertragen werden." }
     }
   },
   "placeList": {

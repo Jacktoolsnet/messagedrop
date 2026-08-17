@@ -17,8 +17,6 @@ All application endpoints require a service JWT with audience
 - `GET /geodata/health`
 - `GET /geodata/categories`
 - `POST /geodata/nearby`
-- `POST /geodata/website-metadata`
-- `GET|POST /geodata/metadata-jobs`
 - `GET /geodata/import-catalog`
 - `GET|POST /geodata/import-jobs`
 - `GET /geodata/import-jobs/:jobId`
@@ -47,7 +45,7 @@ npm run db:reset -- --yes
 The configured PostgreSQL user needs permission to create and drop databases.
 No PostGIS extension is required.
 
-Import and metadata job records are retained for 90 days by default. Cleanup
+Import job records are retained for 90 days by default. Cleanup
 runs on startup and daily; queued and running jobs are preserved. Configure the
 retention with `GEODATA_JOB_RETENTION_DAYS`.
 
@@ -84,26 +82,6 @@ Before downloading an existing dataset again, the importer compares the remote
 ETag or Last-Modified value and the import configuration. An unchanged source
 and unchanged category selection completes as `up_to_date`. Use `--force` only
 when a deliberate rebuild is required.
-
-## Website header metadata
-
-After a successful import, a durable enrichment job processes the distinct
-public HTTPS websites referenced by active POIs. It reads only a bounded HTML
-`<head>` and stores publisher-provided title, description, canonical URL,
-language, favicon, Open Graph, Twitter Card, and JSON-LD values.
-
-Successful metadata is refreshed after 30 days by default. Permanent failures
-and reachable pages without useful header metadata are not retried
-automatically. Transient failures use increasing backoff and respect
-`Retry-After`. Interrupted jobs are recovered when the service starts. Limits,
-refresh interval, request delay, and retry behavior use the
-`GEODATA_WEBSITE_METADATA_*` settings.
-
-Four workers process different domains concurrently by default. A domain is
-handled by at most one worker at a time and keeps a one-second cooldown before
-its next request. Configure this with
-`GEODATA_WEBSITE_METADATA_CONCURRENCY` and
-`GEODATA_WEBSITE_METADATA_DOMAIN_DELAY_MS`.
 
 ## Admin integration
 

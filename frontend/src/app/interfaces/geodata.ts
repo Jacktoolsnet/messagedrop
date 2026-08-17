@@ -77,21 +77,6 @@ export interface GeodataPoi {
     wikidata?: string;
     wikipedia?: string;
   };
-  websiteMetadata?: {
-    url?: string;
-    canonicalUrl?: string;
-    language?: string;
-    title?: string;
-    description?: string;
-    image?: string;
-    favicon?: string;
-    siteName?: string;
-    type?: string;
-    fetchedAt?: string;
-    openGraph?: Record<string, unknown>;
-    twitterCard?: Record<string, unknown>;
-    structuredData?: unknown[];
-  };
   source: { provider: 'OpenStreetMap'; url: string };
 }
 

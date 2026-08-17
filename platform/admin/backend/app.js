@@ -106,7 +106,7 @@ const { normalizeErrorResponses, notFoundHandler, errorHandler } = require('./mi
 const { cleanupClosedDsaCases } = require('./utils/dsaCleanup');
 const { parseRetentionMs, DAY_MS } = require('./utils/logRetention');
 const { runCertificateHealthCheck } = require('./utils/certificateHealth');
-const { requestService, runScheduledImports } = require('./utils/geodataImport');
+const { runScheduledImports } = require('./utils/geodataImport');
 const robotsSitemap = require('./middleware/robots-sitemap');
 
 // ExpressJs
@@ -712,17 +712,6 @@ cron.schedule('*/5 * * * *', () => {
     logger.error('Scheduled Geodata import failed', { error: error?.message || error });
   });
 });
-
-// Check once a day for missing or stale website metadata. The Geodata service
-// only requests URLs whose persisted refresh timestamp is due.
-const geodataMetadataCron = process.env.GEODATA_METADATA_CRON || '0 4 * * *';
-const geodataMetadataTimezone = process.env.GEODATA_METADATA_TIMEZONE || 'Europe/Berlin';
-cron.schedule(geodataMetadataCron, () => {
-  void requestService('post', '/geodata/metadata-jobs', { reason: 'daily-cron' })
-    .catch((error) => logger.error('Scheduled Geodata metadata refresh failed', {
-      error: error?.message || error
-    }));
-}, { timezone: geodataMetadataTimezone });
 
 const infoRetentionMs = parseRetentionMs(LOG_RETENTION_INFO, 2 * DAY_MS);
 const errorRetentionMs = parseRetentionMs(LOG_RETENTION_ERROR, 2 * DAY_MS);

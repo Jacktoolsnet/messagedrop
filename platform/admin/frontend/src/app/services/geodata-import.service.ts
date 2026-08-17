@@ -6,7 +6,6 @@ import {
   GeodataDatabaseInfo,
   GeodataImportCatalog,
   GeodataImportJob,
-  GeodataMetadataJob,
   GeodataImportSettings,
   GeodataImportSettingsResponse
 } from '../interfaces/geodata-import.interface';
@@ -32,8 +31,8 @@ export class GeodataImportService {
     return this.http.get<GeodataDatabaseInfo>(`${this.baseUrl}/database-info`);
   }
 
-  getJobs(): Observable<{ status: number; jobs: GeodataImportJob[]; metadataJobs: GeodataMetadataJob[] }> {
-    return this.http.get<{ status: number; jobs: GeodataImportJob[]; metadataJobs: GeodataMetadataJob[] }>(`${this.baseUrl}/jobs`);
+  getJobs(): Observable<{ status: number; jobs: GeodataImportJob[] }> {
+    return this.http.get<{ status: number; jobs: GeodataImportJob[] }>(`${this.baseUrl}/jobs`);
   }
 
   startImport(force = false): Observable<{ status: number; jobs: unknown[] }> {

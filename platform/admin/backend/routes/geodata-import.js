@@ -55,24 +55,20 @@ router.get('/jobs', async (req, res, next) => {
   try {
     const dispatches = await callbackResult((cb) => dispatchTable.list(req.database.db, req.query.limit, cb));
     const limit = Math.max(1, Math.min(100, Number(req.query.limit) || 20));
-    const [service, metadata] = await Promise.all([
-      requestService('get', `/geodata/import-jobs?limit=${limit}`),
-      requestService('get', `/geodata/metadata-jobs?limit=${limit}`)
-    ]);
-    return res.json({ status: 200, dispatches, jobs: service.jobs || [], metadataJobs: metadata.jobs || [] });
+    const service = await requestService('get', `/geodata/import-jobs?limit=${limit}`);
+    return res.json({ status: 200, dispatches, jobs: service.jobs || [] });
   } catch (error) { return next(error); }
 });
 
 router.get('/database-info', async (_req, res, next) => {
   try {
-    // Aggregate POI/metadata counts can take longer than ordinary API calls on large datasets.
+    // Aggregate POI counts can take longer than ordinary API calls on large datasets.
     const databaseInfoTimeoutMs = Number(process.env.GEODATA_DATABASE_INFO_TIMEOUT_MS || 60000);
-    const [health, service, metadata] = await Promise.all([
+    const [health, service] = await Promise.all([
       requestService('get', '/geodata/health', undefined, { timeoutMs: databaseInfoTimeoutMs }),
-      requestService('get', '/geodata/import-jobs?limit=20'),
-      requestService('get', '/geodata/metadata-jobs?limit=20')
+      requestService('get', '/geodata/import-jobs?limit=20')
     ]);
-    return res.json({ status: 200, health, jobs: service.jobs || [], metadataJobs: metadata.jobs || [] });
+    return res.json({ status: 200, health, jobs: service.jobs || [] });
   } catch (error) { return next(error); }
 });
 

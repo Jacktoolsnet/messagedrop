@@ -1,5 +1,4 @@
 const tableGeodataPoi = require('./tableGeodataPoi');
-const tableWebsiteMetadata = require('./tableWebsiteMetadata');
 
 
 const DEFAULT_MAX_PENDING_REQUESTS = 1000;
@@ -36,7 +35,6 @@ const ROW_KEY_MAP = new Map(Object.entries({
   importedat: 'importedAt',
   poicount: 'poiCount',
   websitepoicount: 'websitePoiCount',
-  websitemetadatapoicount: 'websiteMetadataPoiCount',
   datasetcount: 'datasetCount',
   databasebytes: 'databaseBytes',
   versionid: 'versionId',
@@ -48,19 +46,6 @@ const ROW_KEY_MAP = new Map(Object.entries({
   activatedat: 'activatedAt',
   activeversionid: 'activeVersionId',
   websiteurl: 'websiteUrl',
-  websitemetadata: 'websiteMetadata',
-  metadatajobid: 'metadataJobId',
-  triggerreason: 'triggerReason',
-  totalurls: 'totalUrls',
-  processedurls: 'processedUrls',
-  succeededurls: 'succeededUrls',
-  failedurls: 'failedUrls',
-  attemptcount: 'attemptCount',
-  lastattemptat: 'lastAttemptAt',
-  nextattemptat: 'nextAttemptAt',
-  lasterror: 'lastError',
-  errorcode: 'errorCode',
-  httpstatus: 'httpStatus',
   stepnumber: 'stepNumber',
   stepcount: 'stepCount',
   stepprogress: 'stepProgress',
@@ -383,11 +368,6 @@ class Database {
         if (error) reject(error);
         else resolve();
       }));
-      await new Promise((resolve, reject) => tableWebsiteMetadata.init(this.db, (error) => {
-        if (error) reject(error);
-        else resolve();
-      }));
-
       this.initTriggers();
       this.initIndexes();
 
