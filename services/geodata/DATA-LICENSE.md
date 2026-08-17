@@ -16,3 +16,7 @@ This notice applies to database copies, backups, and exports created by the
 Geodata service. Reuse of OpenStreetMap-derived data is governed by the ODbL.
 MessageDrop does not grant additional rights in that data and does not restrict
 rights provided directly by the ODbL.
+
+Every activated dataset version has a matching machine-readable `JSONL.gz`
+export. Each immutable export directory contains its own `metadata.json` and
+`LICENSE.txt`; the public export manifest links the currently active versions.

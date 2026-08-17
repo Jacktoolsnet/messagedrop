@@ -19,6 +19,7 @@ const FALLBACK_DATASETS = Object.freeze({
   germany: Object.freeze({
     id: 'germany', label: 'Germany', continentCode: 'EU', continentLabel: 'Europe',
     countryCode: 'DE', countryLabel: 'Germany', regionCode: null, level: 'country',
+    countryCodes: Object.freeze(['DE']),
     supersedes: Object.freeze(['wolfenbuettel']),
     sourceUrl: 'https://download.geofabrik.de/europe/germany-latest.osm.pbf',
     sourceFile: 'germany-latest.osm.pbf',
@@ -27,6 +28,7 @@ const FALLBACK_DATASETS = Object.freeze({
   wolfenbuettel: Object.freeze({
     id: 'wolfenbuettel', label: 'Wolfenbüttel', continentCode: 'EU', continentLabel: 'Europe',
     countryCode: 'DE', countryLabel: 'Germany', regionCode: 'DE-NI', level: 'test', clipToBounds: true,
+    countryCodes: Object.freeze(['DE']),
     sourceUrl: 'https://download.geofabrik.de/europe/germany/niedersachsen-latest.osm.pbf',
     sourceFile: 'niedersachsen-latest.osm.pbf',
     bounds: Object.freeze({ south: 52.05, west: 10.40, north: 52.30, east: 10.75 })
@@ -106,6 +108,7 @@ function buildCatalog(index) {
       continentCode: continent.code,
       continentLabel: continent.label,
       countryCode: codes[0],
+      countryCodes: [...codes],
       countryLabel: String(country.name || codes[0]),
       regionCode: level === 'state' ? (array(item['iso3166-2'])[0] || item.id) : null,
       level,

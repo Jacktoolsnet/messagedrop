@@ -19,9 +19,12 @@ const { normalizeErrorResponses, notFoundHandler, errorHandler } = require('./mi
 const root = require('./routes/root');
 const check = require('./routes/check');
 const { createGeodataRouter } = require('./routes/geodata');
+const { createExportRouter } = require('./routes/exports');
+const { ExportStore } = require('./export-store');
+const { cleanupExportStorage } = require('./dataset-export');
 const { generateOrLoadKeypairs } = require('./utils/keyStore');
 const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder');
-const { ensureDownloadDirectory } = require('./storage-paths');
+const { ensureDownloadDirectory, ensureExportDirectory } = require('./storage-paths');
 
 function numberSetting(name, fallback) {
   const parsed = Number(process.env[name]);
@@ -66,7 +69,8 @@ function createLogger() {
 function createApp({
   logger = createLogger(),
   localPoiStore,
-  importJobManager
+  importJobManager,
+  exportStore
 } = {}) {
   const metrics = {};
   const app = express();
@@ -80,6 +84,7 @@ function createApp({
   app.use(normalizeErrorResponses);
   app.use('/', root);
   app.use('/check', check);
+  if (exportStore) app.use('/geodata/exports', createExportRouter({ exportStore }));
   app.use('/geodata', createGeodataRouter({
     localPoiStore, importJobManager, metrics
   }));
@@ -92,19 +97,22 @@ async function start() {
   const port = Number(process.env.GEODATA_PORT);
   if (!Number.isInteger(port) || port <= 0) throw new Error(`Invalid GEODATA_PORT: ${process.env.GEODATA_PORT ?? '<not set>'}`);
   await ensureDownloadDirectory();
+  await ensureExportDirectory();
   await generateOrLoadKeypairs();
   const logger = createLogger();
   const database = new Database();
   await database.init(logger);
   const localPoiStore = new LocalPoiStore({ database, logger });
   const importJobManager = new ImportJobManager({ database, logger });
+  const exportStore = new ExportStore({ database });
+  await cleanupExportStorage(database.db, logger);
   const jobRetentionDays = numberSetting('GEODATA_JOB_RETENTION_DAYS', 90);
   void cleanupJobHistory(database, jobRetentionDays, logger);
   const cleanupTimer = setInterval(() => {
     void cleanupJobHistory(database, jobRetentionDays, logger);
   }, 24 * 60 * 60 * 1000);
   cleanupTimer.unref();
-  const app = createApp({ logger, localPoiStore, importJobManager });
+  const app = createApp({ logger, localPoiStore, importJobManager, exportStore });
   const server = app.listen(port, () => logger.info('Geodata service listening', { port }));
   server.on('error', (error) => logger.error('Geodata HTTP server error', { error: error.message }));
   const shutdown = (signal) => {

@@ -7,10 +7,22 @@ function downloadDirectory() {
   return path.isAbsolute(configured) ? configured : path.resolve(__dirname, configured);
 }
 
+function exportDirectory() {
+  const configured = String(process.env.GEODATA_EXPORT_DIR || '').trim();
+  if (!configured) return path.join(__dirname, 'exports');
+  return path.isAbsolute(configured) ? configured : path.resolve(__dirname, configured);
+}
+
 async function ensureDownloadDirectory() {
   const directory = downloadDirectory();
   await fs.mkdir(directory, { recursive: true, mode: 0o700 });
   return directory;
 }
 
-module.exports = { downloadDirectory, ensureDownloadDirectory };
+async function ensureExportDirectory() {
+  const directory = exportDirectory();
+  await fs.mkdir(directory, { recursive: true, mode: 0o700 });
+  return directory;
+}
+
+module.exports = { downloadDirectory, ensureDownloadDirectory, exportDirectory, ensureExportDirectory };

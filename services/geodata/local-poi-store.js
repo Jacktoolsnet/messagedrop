@@ -40,7 +40,8 @@ class LocalPoiStore {
           provider: 'OpenStreetMap',
           text: '© OpenStreetMap contributors',
           url: 'https://www.openstreetmap.org/copyright',
-          license: 'ODbL 1.0'
+          license: 'ODbL 1.0',
+          licenseUrl: 'https://opendatacommons.org/licenses/odbl/1-0/'
         },
         source: {
           type: 'local-dataset',

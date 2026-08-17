@@ -160,6 +160,8 @@ platform/admin/backend/uploads/
 
 # generated sticker assets
 services/sticker/storage/
+services/geodata/downloads/
+services/geodata/exports/
 
 # Local/downloaded API documentation and captured upstream responses
 docs/external/

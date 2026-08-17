@@ -6,6 +6,7 @@ const table = require('./db/tableGeodataPoi');
 const { GeofabrikCatalog } = require('./geofabrik-catalog');
 const { categoryNames, subcategoryNames } = require('./categories');
 const { downloadDirectory } = require('./storage-paths');
+const { cleanupExportStorage } = require('./dataset-export');
 
 function callbackResult(register) {
   return new Promise((resolve, reject) => register((error, value) => error ? reject(error) : resolve(value)));
@@ -25,6 +26,7 @@ class ImportJobManager {
     try {
       await callbackResult((callback) => table.failInterruptedJobs(this.database.db, callback));
       await this.cleanupInterruptedFiles();
+      await cleanupExportStorage(this.database.db, this.logger);
       await this.launchNext();
     } catch (error) {
       this.logger.error('Could not recover Geodata import queue', { error: error.message });

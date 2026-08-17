@@ -64,7 +64,8 @@ function createGeodataRouter({ localPoiStore, importJobManager, metrics = {} }) 
         status: 200, pois: [], count: 0, cache: 'local', coverage: false,
         attribution: {
           provider: 'OpenStreetMap', text: '© OpenStreetMap contributors',
-          url: 'https://www.openstreetmap.org/copyright', license: 'ODbL 1.0'
+          url: 'https://www.openstreetmap.org/copyright', license: 'ODbL 1.0',
+          licenseUrl: 'https://opendatacommons.org/licenses/odbl/1-0/'
         },
         source: { type: 'local-dataset', datasetId: null, versionId: null, timestamp: null, importedAt: null, url: null }
       });

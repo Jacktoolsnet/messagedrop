@@ -1573,6 +1573,7 @@
         "intro": "Ces informations expliquent l’origine, la licence et le traitement des données cartographiques et des points d’intérêt affichés dans MessageDrop.",
         "openStreetMap": "Les données cartographiques et de points d’intérêt proviennent d’OpenStreetMap et sont disponibles sous l’Open Database License 1.0 (ODbL).",
         "copyrightAndLicense": "Droits d’auteur et licence",
+        "downloadDataset": "Télécharger les données ODbL",
         "geofabrik": "Les extraits nationaux OpenStreetMap utilisés pour la recherche de points d’intérêt sont obtenus côté serveur via le service de téléchargement de Geofabrik GmbH.",
         "openDownloadSource": "Ouvrir la source de téléchargement",
         "processingTitle": "Traitement par MessageDrop",

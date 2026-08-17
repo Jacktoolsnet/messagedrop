@@ -2,6 +2,7 @@ const DATASET_TABLE = 'tableGeodataDataset';
 const VERSION_TABLE = 'tableGeodataDatasetVersion';
 const POI_TABLE = 'tableGeodataPoiVersion';
 const JOB_TABLE = 'tableGeodataImportJob';
+const EXPORT_TABLE = 'tableGeodataDatasetExport';
 
 function init(db, callback) {
   runStatements(db, [
@@ -26,6 +27,7 @@ function init(db, callback) {
       sourceEtag TEXT,
       sourceContentLength BIGINT,
       importConfigHash TEXT,
+      importConfig JSONB NOT NULL DEFAULT '{}'::jsonb,
       categories JSONB NOT NULL DEFAULT '[]'::jsonb,
       createdAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
       activatedAt TIMESTAMPTZ,
@@ -42,12 +44,31 @@ function init(db, callback) {
       payload JSONB NOT NULL,
       PRIMARY KEY (versionId, osmType, osmId)
     )`,
+    `CREATE TABLE IF NOT EXISTS ${EXPORT_TABLE} (
+      versionId TEXT PRIMARY KEY REFERENCES ${VERSION_TABLE}(versionId) ON DELETE CASCADE,
+      datasetId TEXT NOT NULL REFERENCES ${DATASET_TABLE}(datasetId) ON DELETE CASCADE,
+      status TEXT NOT NULL CHECK (status IN ('building', 'ready', 'failed')),
+      format TEXT NOT NULL DEFAULT 'jsonl',
+      formatVersion INTEGER NOT NULL DEFAULT 1,
+      compression TEXT NOT NULL DEFAULT 'gzip',
+      mediaType TEXT NOT NULL DEFAULT 'application/x-ndjson',
+      relativePath TEXT,
+      recordCount BIGINT,
+      byteSize BIGINT,
+      sha256 TEXT,
+      metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+      error TEXT,
+      createdAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      generatedAt TIMESTAMPTZ
+    )`,
     `CREATE INDEX IF NOT EXISTS idx_geodata_version_dataset_status
       ON ${VERSION_TABLE} (datasetId, status, activatedAt DESC)`,
     `CREATE INDEX IF NOT EXISTS idx_geodata_poi_version_bounds
       ON ${POI_TABLE} (versionId, latitude, longitude)`,
     `CREATE INDEX IF NOT EXISTS idx_geodata_poi_version_category_subtype
       ON ${POI_TABLE} (versionId, category, subtype)`,
+    `CREATE INDEX IF NOT EXISTS idx_geodata_export_dataset_status
+      ON ${EXPORT_TABLE} (datasetId, status, generatedAt DESC)`,
     `CREATE TABLE IF NOT EXISTS ${JOB_TABLE} (
       jobId TEXT PRIMARY KEY,
       datasetId TEXT NOT NULL,
@@ -88,7 +109,8 @@ function init(db, callback) {
     `ALTER TABLE ${JOB_TABLE} ADD COLUMN IF NOT EXISTS sourceChanged BOOLEAN`,
     `ALTER TABLE ${VERSION_TABLE} ADD COLUMN IF NOT EXISTS sourceEtag TEXT`,
     `ALTER TABLE ${VERSION_TABLE} ADD COLUMN IF NOT EXISTS sourceContentLength BIGINT`,
-    `ALTER TABLE ${VERSION_TABLE} ADD COLUMN IF NOT EXISTS importConfigHash TEXT`
+    `ALTER TABLE ${VERSION_TABLE} ADD COLUMN IF NOT EXISTS importConfigHash TEXT`,
+    `ALTER TABLE ${VERSION_TABLE} ADD COLUMN IF NOT EXISTS importConfig JSONB NOT NULL DEFAULT '{}'::jsonb`
   ], callback);
 }
 
@@ -193,9 +215,11 @@ function updateJobProgress(db, jobId, stage, progress, details, callback) {
 function activeSource(db, datasetId, callback) {
   db.get(`
     SELECT v.versionId, v.sourceUrl, v.sourceTimestamp, v.sourceEtag,
-      v.sourceContentLength, v.importConfigHash, v.activatedAt
+      v.sourceContentLength, v.importConfigHash, v.activatedAt,
+      e.status AS exportStatus
     FROM ${DATASET_TABLE} d
     JOIN ${VERSION_TABLE} v ON v.versionId = d.activeVersionId AND v.status = 'active'
+    LEFT JOIN ${EXPORT_TABLE} e ON e.versionId = v.versionId
     WHERE d.datasetId = ?
   `, [datasetId], callback);
 }
@@ -266,7 +290,7 @@ function failInterruptedJobs(db, callback) {
   });
 }
 
-async function stageVersion(db, { versionId, dataset, categories }) {
+async function stageVersion(db, { versionId, dataset, categories, subcategories = {} }) {
   await db.transaction(async (transaction) => {
     await run(transaction, `
       INSERT INTO ${DATASET_TABLE}
@@ -278,14 +302,109 @@ async function stageVersion(db, { versionId, dataset, categories }) {
     await run(transaction, `
       INSERT INTO ${VERSION_TABLE}
         (versionId, datasetId, status, sourceUrl, sourceTimestamp, sourceEtag,
-          sourceContentLength, importConfigHash, categories, poiCount)
-      VALUES (?, ?, 'importing', ?, ?, ?, ?, ?, ?::jsonb, 0)
+          sourceContentLength, importConfigHash, importConfig, categories, poiCount)
+      VALUES (?, ?, 'importing', ?, ?, ?, ?, ?, ?::jsonb, ?::jsonb, 0)
     `, [versionId, dataset.id, dataset.sourceUrl, dataset.sourceTimestamp || null,
       dataset.sourceEtag || null,
       dataset.sourceContentLength == null ? null : finiteOrNull(dataset.sourceContentLength),
       dataset.importConfigHash || null,
+      JSON.stringify({
+        dataset: {
+          id: dataset.id, label: dataset.label || dataset.id,
+          continentCode: dataset.continentCode || null, continentLabel: dataset.continentLabel || null,
+          countryCode: dataset.countryCode || null, countryLabel: dataset.countryLabel || null,
+          countryCodes: dataset.countryCodes || (dataset.countryCode ? [dataset.countryCode] : []),
+          regionCode: dataset.regionCode || null, level: dataset.level || null,
+          bounds: dataset.bounds
+        },
+        categories,
+        subcategories
+      }),
       JSON.stringify(categories)]);
   });
+}
+
+function countPois(db, versionId, callback) {
+  db.get(`SELECT COUNT(*)::bigint AS count FROM ${POI_TABLE} WHERE versionId = ?`, [versionId], callback);
+}
+
+function exportPoiBatch(db, versionId, afterType, afterId, limit, callback) {
+  const safeLimit = Math.max(1, Math.min(10000, Number(limit) || 5000));
+  db.all(`
+    SELECT osmType, osmId, payload
+    FROM ${POI_TABLE}
+    WHERE versionId = ?
+      AND (?::text IS NULL OR (osmType, osmId) > (?::text, ?::bigint))
+    ORDER BY osmType, osmId
+    LIMIT ?
+  `, [versionId, afterType, afterType, afterId == null ? 0 : afterId, safeLimit], callback);
+}
+
+function beginExport(db, { versionId, datasetId }, callback) {
+  db.run(`
+    INSERT INTO ${EXPORT_TABLE} (versionId, datasetId, status)
+    VALUES (?, ?, 'building')
+    ON CONFLICT (versionId) DO UPDATE SET status = 'building', relativePath = NULL,
+      recordCount = NULL, byteSize = NULL, sha256 = NULL, metadata = '{}'::jsonb,
+      error = NULL, generatedAt = NULL
+  `, [versionId, datasetId], callback);
+}
+
+function updateVersionImportConfig(db, versionId, importConfig, callback) {
+  db.run(`UPDATE ${VERSION_TABLE} SET importConfig = ?::jsonb WHERE versionId = ?`,
+    [JSON.stringify(importConfig || {}), versionId], callback);
+}
+
+function completeExport(db, value, callback) {
+  db.run(`
+    UPDATE ${EXPORT_TABLE}
+    SET status = 'ready', relativePath = ?, recordCount = ?, byteSize = ?, sha256 = ?,
+      metadata = ?::jsonb, error = NULL, generatedAt = CURRENT_TIMESTAMP
+    WHERE versionId = ? AND status = 'building'
+  `, [value.relativePath, value.recordCount, value.byteSize, value.sha256,
+    JSON.stringify(value.metadata || {}), value.versionId], callback);
+}
+
+function failExport(db, versionId, error, callback) {
+  db.run(`UPDATE ${EXPORT_TABLE} SET status = 'failed', error = ? WHERE versionId = ?`,
+    [String(error || 'Export failed').slice(0, 4000), versionId], callback);
+}
+
+function getActiveExport(db, datasetId, callback) {
+  db.get(`
+    SELECT e.*, v.sourceUrl, v.sourceTimestamp, v.sourceEtag, v.importConfig,
+      v.activatedAt, v.poiCount, d.south, d.west, d.north, d.east
+    FROM ${DATASET_TABLE} d
+    JOIN ${VERSION_TABLE} v ON v.versionId = d.activeVersionId AND v.status = 'active'
+    JOIN ${EXPORT_TABLE} e ON e.versionId = v.versionId AND e.status = 'ready'
+    WHERE d.datasetId = ?
+  `, [datasetId], callback);
+}
+
+function getExport(db, datasetId, versionId, callback) {
+  db.get(`
+    SELECT e.*, v.sourceUrl, v.sourceTimestamp, v.sourceEtag, v.importConfig,
+      v.activatedAt, v.poiCount
+    FROM ${EXPORT_TABLE} e
+    JOIN ${VERSION_TABLE} v ON v.versionId = e.versionId
+    WHERE e.datasetId = ? AND e.versionId = ? AND e.status = 'ready'
+      AND v.status IN ('active', 'retired')
+  `, [datasetId, versionId], callback);
+}
+
+function listActiveExports(db, callback) {
+  db.all(`
+    SELECT e.*, v.sourceUrl, v.sourceTimestamp, v.sourceEtag, v.importConfig,
+      v.activatedAt, v.poiCount
+    FROM ${DATASET_TABLE} d
+    JOIN ${VERSION_TABLE} v ON v.versionId = d.activeVersionId AND v.status = 'active'
+    JOIN ${EXPORT_TABLE} e ON e.versionId = v.versionId AND e.status = 'ready'
+    ORDER BY e.datasetId
+  `, [], callback);
+}
+
+function listVersionIds(db, callback) {
+  db.all(`SELECT versionId FROM ${VERSION_TABLE}`, [], callback);
 }
 
 function insertPoiBatch(db, versionId, pois) {
@@ -303,6 +422,15 @@ function insertPoiBatch(db, versionId, pois) {
 
 async function activateVersion(db, { jobId, versionId, datasetId, poiCount }) {
   await db.transaction(async (transaction) => {
+    const readyExport = await get(transaction,
+      `SELECT versionId, recordCount, relativePath, sha256 FROM ${EXPORT_TABLE}
+        WHERE versionId = ? AND datasetId = ? AND status = 'ready'`,
+      [versionId, datasetId]);
+    if (!readyExport) throw new Error(`No ready ODbL export for version ${versionId}`);
+    if (Number(readyExport.recordCount) !== Number(poiCount)
+        || !readyExport.relativePath || !/^[a-f0-9]{64}$/u.test(String(readyExport.sha256 || ''))) {
+      throw new Error(`Invalid ODbL export metadata for version ${versionId}`);
+    }
     await run(transaction, `UPDATE ${VERSION_TABLE} SET status = 'retired'
       WHERE datasetId = ? AND status = 'active'`, [datasetId]);
     await run(transaction, `UPDATE ${VERSION_TABLE}
@@ -319,14 +447,6 @@ async function activateVersion(db, { jobId, versionId, datasetId, poiCount }) {
 
 function discardVersion(db, versionId, callback) {
   db.run(`DELETE FROM ${VERSION_TABLE} WHERE versionId = ? AND status = 'importing'`, [versionId], callback);
-}
-
-async function publishVersion(db, { jobId, versionId, dataset, categories, pois }) {
-  await stageVersion(db, { versionId, dataset, categories });
-  for (let index = 0; index < pois.length; index += 250) {
-    await insertPoiBatch(db, versionId, pois.slice(index, index + 250));
-  }
-  await activateVersion(db, { jobId, versionId, datasetId: dataset.id, poiCount: pois.length });
 }
 
 function cleanupRetiredVersions(db, datasetId, keepCount, callback) {
@@ -365,6 +485,13 @@ function run(db, sql, params) {
   }));
 }
 
+function get(db, sql, params) {
+  return new Promise((resolve, reject) => db.get(sql, params, (error, row) => {
+    if (error) reject(error);
+    else resolve(row);
+  }));
+}
+
 function finiteOrNull(value) {
   const number = Number(value);
   return Number.isFinite(number) && number >= 0 ? Math.round(number) : null;
@@ -391,9 +518,18 @@ module.exports = {
   failInterruptedJobs,
   stageVersion,
   insertPoiBatch,
+  countPois,
+  exportPoiBatch,
+  beginExport,
+  updateVersionImportConfig,
+  completeExport,
+  failExport,
+  getActiveExport,
+  getExport,
+  listActiveExports,
+  listVersionIds,
   activateVersion,
   discardVersion,
-  publishVersion,
   cleanupRetiredVersions,
   deleteDatasets
 };

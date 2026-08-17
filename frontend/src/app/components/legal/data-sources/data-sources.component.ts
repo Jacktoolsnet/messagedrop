@@ -4,6 +4,7 @@ import { MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/mater
 import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-data-sources',
@@ -15,6 +16,7 @@ import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.c
 })
 export class DataSourcesComponent {
   private readonly dialogRef = inject(MatDialogRef<DataSourcesComponent>);
+  readonly geodataExportUrl = `${environment.apiUrl}/geodata/exports`;
 
   close(): void {
     this.dialogRef.close();

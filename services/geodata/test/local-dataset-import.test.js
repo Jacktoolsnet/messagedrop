@@ -10,6 +10,7 @@ const {
   filterExpressions,
   geometryCenter,
   isImportCurrent,
+  isSourceCurrent,
   parseArguments,
   readPois,
   sourceInfoFromHeaders
@@ -85,9 +86,9 @@ test('reports a numbered import step and weighted overall progress', async () =>
 
   assert.equal(updates[0].stage, 'downloading');
   assert.equal(updates[0].details.stepNumber, 2);
-  assert.equal(updates[0].details.stepCount, 9);
+  assert.equal(updates[0].details.stepCount, 11);
   assert.equal(updates[0].details.stepProgress, 50);
-  assert.equal(updates[0].progress, 23);
+  assert.equal(updates[0].progress, 20);
   assert.equal(updates[1].details.stepNumber, 4);
   assert.equal(updates[1].details.stepProgress, null);
 });
@@ -101,11 +102,14 @@ test('detects unchanged sources only when source and import configuration match'
   }));
   const active = {
     sourceUrl: 'https://download.test/germany-latest.osm.pbf', sourceEtag: '"v2"',
-    sourceTimestamp: '2026-08-17T04:00:00.000Z', importConfigHash: configHash
+    sourceTimestamp: '2026-08-17T04:00:00.000Z', importConfigHash: configHash,
+    exportStatus: 'ready'
   };
   assert.equal(isImportCurrent(active, { etag: '"v2"' }, configHash, active.sourceUrl), true);
   assert.equal(isImportCurrent(active, { etag: '"v3"' }, configHash, active.sourceUrl), false);
   assert.equal(isImportCurrent(active, { etag: '"v2"' }, 'different', active.sourceUrl), false);
+  assert.equal(isImportCurrent({ ...active, exportStatus: null }, { etag: '"v2"' }, configHash, active.sourceUrl), false);
+  assert.equal(isSourceCurrent({ ...active, exportStatus: null }, { etag: '"v2"' }, configHash, active.sourceUrl), true);
 });
 
 test('reads ETag, timestamp and size from the final successful HTTP response', async (t) => {

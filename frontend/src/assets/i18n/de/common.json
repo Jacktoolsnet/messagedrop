@@ -1574,6 +1574,7 @@
         "intro": "Diese Hinweise erläutern Herkunft, Lizenz und Verarbeitung der in MessageDrop angezeigten Karten- und POI-Daten.",
         "openStreetMap": "Die Karten- und POI-Daten stammen von OpenStreetMap und stehen unter der Open Database License 1.0 (ODbL).",
         "copyrightAndLicense": "Urheberrecht und Lizenz",
+        "downloadDataset": "ODbL-Datensatz herunterladen",
         "geofabrik": "Die für die POI-Suche verwendeten OpenStreetMap-Länderauszüge werden serverseitig über den Download-Dienst der Geofabrik GmbH bezogen.",
         "openDownloadSource": "Bezugsquelle öffnen",
         "processingTitle": "Verarbeitung durch MessageDrop",

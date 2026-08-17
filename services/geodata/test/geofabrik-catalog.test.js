@@ -37,4 +37,5 @@ test('exposes a shared extract for every country code it contains without duplic
   assert.deepEqual(catalog.display.map((dataset) => dataset.countryCode), ['AA', 'BB', 'CC']);
   assert.equal(catalog.display.filter((dataset) => dataset.id === 'three-countries').length, 3);
   assert.equal(catalog.definitions['three-countries'].sourceUrl, 'https://download.test/three.pbf');
+  assert.deepEqual(catalog.definitions['three-countries'].countryCodes, ['AA', 'BB', 'CC']);
 });

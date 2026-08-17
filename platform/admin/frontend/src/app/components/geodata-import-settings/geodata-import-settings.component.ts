@@ -301,6 +301,8 @@ export class GeodataImportSettingsComponent {
       extracting: 'Extracting region',
       converting: 'Converting geodata',
       importing: 'Normalizing and storing POIs',
+      exporting: 'Generating ODbL data export',
+      validating: 'Validating ODbL data export',
       cleanup: 'Deleting temporary files',
       activating: 'Activating new data version',
       completed: 'Import completed',

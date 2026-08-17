@@ -12,6 +12,7 @@ const { CATEGORY_DEFINITIONS, categoryNames, subcategoryNames } = require('../ca
 const { normalizeElement } = require('../normalizer');
 const { FALLBACK_DATASETS } = require('../geofabrik-catalog');
 const { downloadDirectory } = require('../storage-paths');
+const { cleanupExportStorage, generateDatasetExport } = require('../dataset-export');
 
 const DATASETS = Object.freeze({
   ...FALLBACK_DATASETS
@@ -47,12 +48,35 @@ async function main() {
       tableGeodataPoi.activeSource(database.db, dataset.id, callback));
     const sourceInfo = await inspectRemoteSource(dataset, progress);
     const importConfigHash = createImportConfigHash(options.categories, options.subcategories);
-    const sourceChanged = options.force || !isImportCurrent(activeSource, sourceInfo, importConfigHash, dataset.sourceUrl);
+    const sourceCurrent = isSourceCurrent(activeSource, sourceInfo, importConfigHash, dataset.sourceUrl);
+    const sourceChanged = options.force || !sourceCurrent;
     await callbackResult((callback) => tableGeodataPoi.updateJobSource(
       database.db, jobId, sourceInfo, sourceChanged, callback
     ));
     await progress.update('checking_source', 100);
-    if (!sourceChanged) {
+    if (!options.force && sourceCurrent && activeSource.exportStatus !== 'ready') {
+      const countRow = await callbackResult((callback) =>
+        tableGeodataPoi.countPois(database.db, activeSource.versionId, callback));
+      const poiCount = Number(countRow?.count || 0);
+      if (!poiCount) throw new Error('The active dataset contains no supported POIs');
+      const importConfig = selectedImportConfig(options);
+      await progress.update('exporting', 0, { processedItems: 0 });
+      await generateDatasetExport({
+        database,
+        dataset: exportDataset(dataset, sourceInfo, importConfigHash, importConfig),
+        versionId: activeSource.versionId,
+        expectedCount: poiCount,
+        onGenerateProgress: (stepProgress, metrics) => progress.update('exporting', stepProgress, metrics),
+        onValidateProgress: (stepProgress, metrics) => progress.update('validating', stepProgress, metrics)
+      });
+      await progress.update('cleanup', 100);
+      await callbackResult((callback) => tableGeodataPoi.completeUnchangedJob(
+        database.db, jobId, activeSource.versionId, callback
+      ));
+      process.stdout.write(`Generated missing ODbL export for active version ${activeSource.versionId}.\n`);
+      return;
+    }
+    if (!sourceChanged && isImportCurrent(activeSource, sourceInfo, importConfigHash, dataset.sourceUrl)) {
       await callbackResult((callback) => tableGeodataPoi.completeUnchangedJob(
         database.db, jobId, activeSource.versionId, callback
       ));
@@ -68,12 +92,28 @@ async function main() {
         sourceContentLength: sourceInfo?.contentLength || null,
         importConfigHash
       },
-      categories: options.categories
+      categories: options.categories,
+      subcategories: options.subcategories || Object.fromEntries(options.categories.map((category) => [
+        category, subcategoryNames(category)
+      ]))
     });
     staged = true;
-    const poiCount = await prepareDataset(dataset, options, progress, async (batch) => {
+    await prepareDataset(dataset, options, progress, async (batch) => {
       await tableGeodataPoi.insertPoiBatch(database.db, versionId, batch);
     });
+    const countRow = await callbackResult((callback) => tableGeodataPoi.countPois(database.db, versionId, callback));
+    const poiCount = Number(countRow?.count || 0);
+    if (!poiCount) throw new Error('The imported dataset contains no supported POIs');
+    const importConfig = selectedImportConfig(options);
+    await progress.update('exporting', 0, { processedItems: 0 });
+    await generateDatasetExport({
+      database, dataset: exportDataset(dataset, sourceInfo, importConfigHash, importConfig),
+      versionId,
+      expectedCount: poiCount,
+      onGenerateProgress: (stepProgress, metrics) => progress.update('exporting', stepProgress, metrics),
+      onValidateProgress: (stepProgress, metrics) => progress.update('validating', stepProgress, metrics)
+    });
+    await progress.update('cleanup', 100);
     await progress.update('activating', null);
     await tableGeodataPoi.activateVersion(database.db, { jobId, versionId, datasetId: dataset.id, poiCount });
     if (dataset.supersedes?.length) {
@@ -87,12 +127,14 @@ async function main() {
         options.keepVersions,
         callback
       ));
+      await cleanupExportStorage(database.db);
     } catch (cleanupError) {
       process.stderr.write(`Version cleanup will be retried later: ${cleanupError.message}\n`);
     }
   } catch (error) {
     if (staged) {
       try { await callbackResult((callback) => tableGeodataPoi.discardVersion(database.db, versionId, callback)); } catch { /* best effort */ }
+      try { await cleanupExportStorage(database.db); } catch { /* best effort */ }
     }
     await callbackResult((callback) => tableGeodataPoi.failJob(database.db, jobId, error.message, callback));
     throw error;
@@ -166,9 +208,7 @@ async function prepareDataset(dataset, options, progress = createProgressTracker
   const poiCount = await readPois(geoJsonPath, options.categories, options.subcategories, persistBatch,
     (stepProgress, metrics) => progress.update('importing', stepProgress, metrics));
   if (!poiCount) throw new Error('The filtered dataset contains no supported POIs');
-  await progress.update('cleanup', null);
   await cleanupWorkingFiles(workingFiles);
-  await progress.update('cleanup', 100);
   return poiCount;
   } finally {
     await cleanupWorkingFiles(workingFiles);
@@ -229,12 +269,37 @@ function createImportConfigHash(categories, subcategories) {
 }
 
 function isImportCurrent(activeSource, remoteSource, importConfigHash, sourceUrl) {
+  return activeSource?.exportStatus === 'ready'
+    && isSourceCurrent(activeSource, remoteSource, importConfigHash, sourceUrl);
+}
+
+function isSourceCurrent(activeSource, remoteSource, importConfigHash, sourceUrl) {
   if (!activeSource || activeSource.sourceUrl !== sourceUrl || activeSource.importConfigHash !== importConfigHash) return false;
   if (activeSource.sourceEtag && remoteSource?.etag) return activeSource.sourceEtag === remoteSource.etag;
   if (activeSource.sourceTimestamp && remoteSource?.lastModified) {
     return new Date(activeSource.sourceTimestamp).getTime() === new Date(remoteSource.lastModified).getTime();
   }
   return false;
+}
+
+function selectedImportConfig(options) {
+  return {
+    categories: options.categories,
+    subcategories: options.subcategories || Object.fromEntries(options.categories.map((category) => [
+      category, subcategoryNames(category)
+    ]))
+  };
+}
+
+function exportDataset(dataset, sourceInfo, importConfigHash, importConfig) {
+  return {
+    ...dataset,
+    sourceTimestamp: sourceInfo?.lastModified || null,
+    sourceEtag: sourceInfo?.etag || null,
+    sourceContentLength: sourceInfo?.contentLength || null,
+    importConfigHash,
+    importConfig
+  };
 }
 
 async function readPois(
@@ -483,6 +548,8 @@ function createProgressTracker(dataset, updateProgress = async () => {}) {
     ...(dataset?.clipToBounds ? [{ stage: 'extracting', weight: 5 }] : []),
     { stage: 'converting', weight: 10 },
     { stage: 'importing', weight: 15 },
+    { stage: 'exporting', weight: 8 },
+    { stage: 'validating', weight: 3 },
     { stage: 'cleanup', weight: 2 },
     { stage: 'activating', weight: 3 }
   ];
@@ -595,6 +662,7 @@ module.exports = {
   createImportConfigHash,
   inspectRemoteSource,
   isImportCurrent,
+  isSourceCurrent,
   parseArguments,
   parseGeoJsonRecord,
   readPois,
