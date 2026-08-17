@@ -1454,7 +1454,7 @@
   "pinHint": {
     "title": "PIN-Hinweis"
   },
-  "overpassPoiList": {
+  "geodataPoiList": {
     "title": "Orte und POIs",
     "intro": "Hier siehst du die verfügbaren OpenStreetMap-Daten eines Ortes sowie ergänzende Metadaten seiner Webseite. Welche Angaben erscheinen, hängt von den vorhandenen Quelldaten ab.",
     "items": {

@@ -19,9 +19,9 @@
                 "<node_internals>/**"
             ],
             "env": {
-                "OVERPASS_BASE_URL": "http://localhost",
-                "OVERPASS_PORT": "3900",
-                "SERVICE_JWT_AUDIENCE_OVERPASS": "service.overpass",
+                "GEODATA_BASE_URL": "http://localhost",
+                "GEODATA_PORT": "3900",
+                "SERVICE_JWT_AUDIENCE_GEODATA": "service.geodata",
                 "SERVICE_JWT_ISSUER": "service.admin-backend",
                 "SERVICE_JWT_AUDIENCE": "service.admin-backend",
                 "SERVICE_JWT_TRUSTED_JWKS_PATH": "${workspaceFolder}/platform/admin/backend/config/service-jwks.json"
@@ -36,9 +36,9 @@
                 "<node_internals>/**"
             ],
             "env": {
-                "OVERPASS_BASE_URL": "http://localhost",
-                "OVERPASS_PORT": "3900",
-                "SERVICE_JWT_AUDIENCE_OVERPASS": "service.overpass",
+                "GEODATA_BASE_URL": "http://localhost",
+                "GEODATA_PORT": "3900",
+                "SERVICE_JWT_AUDIENCE_GEODATA": "service.geodata",
                 "SERVICE_JWT_ISSUER": "service.backend",
                 "SERVICE_JWT_AUDIENCE": "service.backend",
                 "SERVICE_JWT_TRUSTED_JWKS_PATH": "${workspaceFolder}/backend/config/service-jwks.json"
@@ -146,18 +146,18 @@
             "type": "node"
         },
         {
-            "name": "Overpass-Service",
-            "program": "${workspaceFolder}/services/overpass/app.js",
+            "name": "Geodata-Service",
+            "program": "${workspaceFolder}/services/geodata/app.js",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "skipFiles": [
                 "<node_internals>/**"
             ],
             "env": {
-                "OVERPASS_PORT": "3900",
-                "SERVICE_JWT_ISSUER": "service.overpass",
-                "SERVICE_JWT_AUDIENCE": "service.overpass",
-                "SERVICE_JWT_TRUSTED_JWKS_PATH": "${workspaceFolder}/services/overpass/config/service-jwks.json"
+                "GEODATA_PORT": "3900",
+                "SERVICE_JWT_ISSUER": "service.geodata",
+                "SERVICE_JWT_AUDIENCE": "service.geodata",
+                "SERVICE_JWT_TRUSTED_JWKS_PATH": "${workspaceFolder}/services/geodata/config/service-jwks.json"
             },
             "type": "node"
         },
@@ -414,10 +414,10 @@
             "cwd": "${workspaceFolder}"
         },
         {
-            "name": "DBeaver Overpass Service",
+            "name": "DBeaver Geodata Service",
             "type": "node-terminal",
             "request": "launch",
-            "command": "node tools/db/open-dbeaver.js OVERPASS",
+            "command": "node tools/db/open-dbeaver.js GEODATA",
             "cwd": "${workspaceFolder}"
         }
     ]

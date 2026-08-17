@@ -47,9 +47,9 @@ import { SystemMessageDialogComponent } from './components/system-messages/syste
 import { TripGoRouteDialogComponent } from './components/tripgo-route-dialog/tripgo-route-dialog.component';
 import { TripGoStopDialogComponent } from './components/tripgo-stop-dialog/tripgo-stop-dialog.component';
 import {
-  OverpassPoiListComponent,
-  OverpassPoiListResult
-} from './components/overpass-poi-list/overpass-poi-list.component';
+  GeodataPoiListComponent,
+  GeodataPoiListResult
+} from './components/geodata-poi-list/geodata-poi-list.component';
 import { DeleteUserComponent } from './components/user/delete-user/delete-user.component';
 import { UserProfileComponent } from './components/user/user-profile/user-profile.component';
 import { UserComponent } from './components/user/user.component';
@@ -81,8 +81,8 @@ import { Note } from './interfaces/note';
 import { NotificationAction } from './interfaces/notification-action';
 import { Place } from './interfaces/place';
 import { PlusCodeArea } from './interfaces/plus-code-area';
-import { applyOverpassAvailability, DEFAULT_SEARCH_SETTINGS, SearchSettings, normalizePoiSetting } from './interfaces/search-settings';
-import { OVERPASS_SUBCATEGORIES, OverpassCategory, OverpassPoi, OverpassSubcategory } from './interfaces/overpass';
+import { applyGeodataAvailability, DEFAULT_SEARCH_SETTINGS, SearchSettings, normalizePoiSetting } from './interfaces/search-settings';
+import { GEODATA_SUBCATEGORIES, GeodataCategory, GeodataPoi, GeodataSubcategory } from './interfaces/geodata';
 import {
   DEFAULT_ROUTE_OPTIONS,
   RouteOptions,
@@ -130,8 +130,8 @@ import { SharedContentService } from './services/shared-content.service';
 import { SystemNotificationService } from './services/system-notification.service';
 import { TripGoStopsMapStateService } from './services/tripgo-stops-map-state.service';
 import { WikipediaMapStateService } from './services/wikipedia-map-state.service';
-import { OverpassMapStateService } from './services/overpass-map-state.service';
-import { OverpassService } from './services/overpass.service';
+import { GeodataMapStateService } from './services/geodata-map-state.service';
+import { GeodataService } from './services/geodata.service';
 import { WikipediaService } from './services/wikipedia.service';
 import { TranslationHelperService } from './services/translation-helper.service';
 import { UsageProtectionService } from './services/usage-protection.service';
@@ -234,8 +234,8 @@ export class AppComponent implements OnInit {
   private readonly externalContentConsent = inject(ExternalContentConsentService);
   private readonly wikipediaMapState = inject(WikipediaMapStateService);
   private readonly tripGoStopsMapState = inject(TripGoStopsMapStateService);
-  private readonly overpassMapState = inject(OverpassMapStateService);
-  private readonly overpassService = inject(OverpassService);
+  private readonly geodataMapState = inject(GeodataMapStateService);
+  private readonly geodataService = inject(GeodataService);
   private readonly wikipediaService = inject(WikipediaService);
   private readonly experienceBookmarkService = inject(ExperienceBookmarkService);
   private readonly airQualityService = inject(AirQualityService);
@@ -389,7 +389,7 @@ export class AppComponent implements OnInit {
     });
 
     effect(() => {
-      this.overpassMapState.pois();
+      this.geodataMapState.pois();
       untracked(() => this.createMarkerLocations());
     });
 
@@ -404,7 +404,7 @@ export class AppComponent implements OnInit {
       untracked(() => {
         this.syncWikipediaMapState();
         this.syncTripGoStopsMapState();
-        this.syncOverpassMapState();
+        this.syncGeodataMapState();
       });
     });
 
@@ -1820,7 +1820,7 @@ export class AppComponent implements OnInit {
     // newer viewport or delay Wikipedia until another map interaction.
     this.syncWikipediaMapState(settings, zoom);
     this.syncTripGoStopsMapState(settings, zoom);
-    this.syncOverpassMapState(settings, zoom);
+    this.syncGeodataMapState(settings, zoom);
 
     // notes from local device
     if (this.userService.isReady()) {
@@ -1901,25 +1901,25 @@ export class AppComponent implements OnInit {
     this.tripGoStopsMapState.setEnabled(canSearchStops);
   }
 
-  private syncOverpassMapState(
+  private syncGeodataMapState(
     settings = this.normalizeSearchSettings(this.searchSettings),
     zoom = this.mapService.getMapZoom()
   ): void {
     if (!this.networkService.browserOnline() || !this.networkService.backendOnline() || this.maintenanceActive()) {
-      this.overpassMapState.setViewport(null);
+      this.geodataMapState.setViewport(null);
       return;
     }
-    const categories: Partial<Record<OverpassCategory, OverpassSubcategory[]>> = {};
-    (Object.keys(OVERPASS_SUBCATEGORIES) as OverpassCategory[]).forEach((category) => {
+    const categories: Partial<Record<GeodataCategory, GeodataSubcategory[]>> = {};
+    (Object.keys(GEODATA_SUBCATEGORIES) as GeodataCategory[]).forEach((category) => {
       const setting = settings[category];
       if (!setting.enabled || zoom < setting.minZoom) return;
-      const selected = OVERPASS_SUBCATEGORIES[category]
-        .filter((subcategory) => setting.subcategories[subcategory]) as OverpassSubcategory[];
+      const selected = GEODATA_SUBCATEGORIES[category]
+        .filter((subcategory) => setting.subcategories[subcategory]) as GeodataSubcategory[];
       if (selected.length) categories[category] = selected;
     });
     const bounds = this.mapService.getVisibleMapBoundingBoxes().filter((box) =>
       (box.latMax - box.latMin) * (box.lonMax - box.lonMin) <= 0.05);
-    this.overpassMapState.setViewport(Object.keys(categories).length && bounds.length
+    this.geodataMapState.setViewport(Object.keys(categories).length && bounds.length
       ? { bounds, zoom, categories }
       : null);
   }
@@ -1928,11 +1928,11 @@ export class AppComponent implements OnInit {
     const stored = await this.indexedDbService.getSetting<SearchSettings>('searchSettings');
     this.searchSettings = this.normalizeSearchSettings(stored ?? DEFAULT_SEARCH_SETTINGS);
     try {
-      const availability = await firstValueFrom(this.overpassService.getAvailability());
-      this.searchSettings = applyOverpassAvailability(this.searchSettings, availability);
+      const availability = await firstValueFrom(this.geodataService.getAvailability());
+      this.searchSettings = applyGeodataAvailability(this.searchSettings, availability);
       await this.indexedDbService.setSetting('searchSettings', this.searchSettings);
     } catch {
-      this.searchSettings = applyOverpassAvailability(this.searchSettings, {});
+      this.searchSettings = applyGeodataAvailability(this.searchSettings, {});
     }
   }
 
@@ -2028,8 +2028,8 @@ export class AppComponent implements OnInit {
           this.openPublicTransportStopDialog(event.publicTransportStop);
         }
         break;
-      case MarkerType.OVERPASS_POI:
-        this.openOverpassPoiList(event.overpassPois ?? (event.overpassPoi ? [event.overpassPoi] : []));
+      case MarkerType.GEODATA_POI:
+        this.openGeodataPoiList(event.geodataPois ?? (event.geodataPoi ? [event.geodataPoi] : []));
         break;
       case MarkerType.MULTI:
         if (
@@ -2038,7 +2038,7 @@ export class AppComponent implements OnInit {
           && !(event.experiences?.length)
           && !(event.secretDrops?.length)
           && !(event.wikipediaArticles?.length)
-          && !(event.overpassPois?.length)
+          && !(event.geodataPois?.length)
         ) {
           return;
         }
@@ -2051,7 +2051,7 @@ export class AppComponent implements OnInit {
           canOpenPrivateContent ? (event.myExperiences ?? []) : [],
           event.secretDrops ?? [],
           event.wikipediaArticles ?? [],
-          event.overpassPois ?? []
+          event.geodataPois ?? []
         );
         break;
     }
@@ -2677,11 +2677,11 @@ export class AppComponent implements OnInit {
     myExperiences: ExperienceResult[],
     secretDrops: SecretDrop[],
     wikipediaArticles: WikipediaArticle[],
-    overpassPois: OverpassPoi[]
+    geodataPois: GeodataPoi[]
   ) {
     const dialogRef = this.dialog.open(MultiMarkerComponent, {
       data: {
-        messages, notes, images, documents, experiences, myExperiences, secretDrops, wikipediaArticles, overpassPois
+        messages, notes, images, documents, experiences, myExperiences, secretDrops, wikipediaArticles, geodataPois
       },
       closeOnNavigation: true,
       hasBackdrop: true,
@@ -2729,17 +2729,17 @@ export class AppComponent implements OnInit {
           case 'wikipedia':
             this.openMarkerWikipediaListDialog(result.wikipediaArticles ?? []);
             break
-          case 'overpass':
-            this.openOverpassPoiList(result.overpassPois ?? []);
+          case 'geodata':
+            this.openGeodataPoiList(result.geodataPois ?? []);
             break
         }
       }
     });
   }
 
-  private openOverpassPoiList(pois: OverpassPoi[]): void {
+  private openGeodataPoiList(pois: GeodataPoi[]): void {
     if (!pois.length) return;
-    const dialogRef = this.dialog.open(OverpassPoiListComponent, {
+    const dialogRef = this.dialog.open(GeodataPoiListComponent, {
       data: { pois: [...pois].sort((left, right) => (left.name || '').localeCompare(right.name || '')) },
       width: 'min(620px, 95vw)',
       maxWidth: '95vw',
@@ -2747,7 +2747,7 @@ export class AppComponent implements OnInit {
       backdropClass: 'dialog-backdrop',
       autoFocus: false
     });
-    dialogRef.afterClosed().subscribe((result?: OverpassPoiListResult) => {
+    dialogRef.afterClosed().subscribe((result?: GeodataPoiListResult) => {
       if (!result) return;
       const destination: Location = {
         latitude: result.poi.latitude,
@@ -3998,11 +3998,11 @@ export class AppComponent implements OnInit {
     });
 
     // Apply the same Plus-Code grouping as Wikipedia and other map content.
-    // All Overpass POIs in a cell form one "public places" content group.
+    // All Geodata POIs in a cell form one "public places" content group.
     // Even at high zoom, separate OSM objects in the same small Plus-Code cell
     // share one marker so several indistinguishable pins are not stacked. The
     // neutral public-places icon identifies every grouped POI marker.
-    this.overpassMapState.pois().forEach((poi) => {
+    this.geodataMapState.pois().forEach((poi) => {
       const poiLocation: Location = {
         latitude: poi.latitude,
         longitude: poi.longitude,
@@ -4035,10 +4035,10 @@ export class AppComponent implements OnInit {
       }
       const existing = this.markerLocations.get(key);
       if (existing) {
-        existing.overpassPois ??= existing.overpassPoi ? [existing.overpassPoi] : [];
-        existing.overpassPois.push(poi);
-        existing.overpassGrouped = this.mapService.getMapZoom() <= 17 || existing.overpassPois.length > 1;
-        if (existing.type !== MarkerType.OVERPASS_POI) {
+        existing.geodataPois ??= existing.geodataPoi ? [existing.geodataPoi] : [];
+        existing.geodataPois.push(poi);
+        existing.geodataGrouped = this.mapService.getMapZoom() <= 17 || existing.geodataPois.length > 1;
+        if (existing.type !== MarkerType.GEODATA_POI) {
           existing.type = MarkerType.MULTI;
         }
       } else {
@@ -4048,10 +4048,10 @@ export class AppComponent implements OnInit {
           notes: [],
           images: [],
           documents: [],
-          overpassPoi: poi,
-          overpassPois: [poi],
-          overpassGrouped: this.mapService.getMapZoom() <= 17,
-          type: MarkerType.OVERPASS_POI
+          geodataPoi: poi,
+          geodataPois: [poi],
+          geodataGrouped: this.mapService.getMapZoom() <= 17,
+          type: MarkerType.GEODATA_POI
         });
       }
     });

@@ -172,8 +172,3 @@ tools/security/reports/
 
 # archives
 *.zip
-
-# Local Overpass samples and analysis reports
-services/overpass/samples/*.raw.json
-services/overpass/samples/*.analysis.json
-services/overpass/samples/*.request.json

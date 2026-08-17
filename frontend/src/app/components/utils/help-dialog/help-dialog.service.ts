@@ -2088,54 +2088,54 @@ const HELP_TOPICS = {
     introKey: 'common.intros.info',
     items: ITEMS.info
   },
-  overpassPoiList: {
-    titleKey: 'overpassPoiList.title',
-    introKey: 'overpassPoiList.intro',
+  geodataPoiList: {
+    titleKey: 'geodataPoiList.title',
+    introKey: 'geodataPoiList.intro',
     items: [
       {
         icon: 'place',
-        titleKey: 'overpassPoiList.items.flyTo.title',
-        descriptionKey: 'overpassPoiList.items.flyTo.desc'
+        titleKey: 'geodataPoiList.items.flyTo.title',
+        descriptionKey: 'geodataPoiList.items.flyTo.desc'
       },
       {
         icon: 'route',
-        titleKey: 'overpassPoiList.items.route.title',
-        descriptionKey: 'overpassPoiList.items.route.desc'
+        titleKey: 'geodataPoiList.items.route.title',
+        descriptionKey: 'geodataPoiList.items.route.desc'
       },
       {
         icon: 'map',
-        titleKey: 'overpassPoiList.items.openMaps.title',
-        descriptionKey: 'overpassPoiList.items.openMaps.desc'
+        titleKey: 'geodataPoiList.items.openMaps.title',
+        descriptionKey: 'geodataPoiList.items.openMaps.desc'
       },
       {
         icon: 'open_in_new',
-        titleKey: 'overpassPoiList.items.openOsm.title',
-        descriptionKey: 'overpassPoiList.items.openOsm.desc'
+        titleKey: 'geodataPoiList.items.openOsm.title',
+        descriptionKey: 'geodataPoiList.items.openOsm.desc'
       },
       {
         icon: 'travel_explore',
-        titleKey: 'overpassPoiList.items.webSearch.title',
-        descriptionKey: 'overpassPoiList.items.webSearch.desc'
+        titleKey: 'geodataPoiList.items.webSearch.title',
+        descriptionKey: 'geodataPoiList.items.webSearch.desc'
       },
       {
         icon: 'language',
-        titleKey: 'overpassPoiList.items.website.title',
-        descriptionKey: 'overpassPoiList.items.website.desc'
+        titleKey: 'geodataPoiList.items.website.title',
+        descriptionKey: 'geodataPoiList.items.website.desc'
       },
       {
         icon: 'close',
-        titleKey: 'overpassPoiList.items.close.title',
-        descriptionKey: 'overpassPoiList.items.close.desc'
+        titleKey: 'geodataPoiList.items.close.title',
+        descriptionKey: 'geodataPoiList.items.close.desc'
       },
       {
         icon: 'help',
-        titleKey: 'overpassPoiList.items.help.title',
-        descriptionKey: 'overpassPoiList.items.help.desc'
+        titleKey: 'geodataPoiList.items.help.title',
+        descriptionKey: 'geodataPoiList.items.help.desc'
       },
       {
         icon: 'privacy_tip',
-        titleKey: 'overpassPoiList.items.privacy.title',
-        descriptionKey: 'overpassPoiList.items.privacy.desc'
+        titleKey: 'geodataPoiList.items.privacy.title',
+        descriptionKey: 'geodataPoiList.items.privacy.desc'
       }
     ]
   },

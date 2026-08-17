@@ -1,0 +1,161 @@
+<app-dialog-header
+  icon="location_on"
+  [title]="'common.geodata.places' | transloco"
+  [subtitle]="'common.geodata.placeCount' | transloco : { count: data.pois.length }">
+</app-dialog-header>
+
+<mat-dialog-content class="poi-dialog-content">
+  <div class="poi-scroll">
+    <div class="poi-results pin-dialog-results" role="list">
+      @for (poi of data.pois; track poi.id) {
+        <mat-card class="poi-tile" role="listitem">
+          <div class="tile-header"
+            [class.has-image]="metadataImage(poi)"
+            [style.--poi-header-bg-image]="headerBackground(poi)">
+            <div class="identity-badge">
+              <div class="avatar-shell">
+                <div class="pin-avatar" aria-hidden="true">
+                  <svg class="dynamic-poi-marker" viewBox="0 0 32 40" width="32" height="40">
+                    <image href="assets/markers/empty-marker.svg" x="0" y="0" width="32" height="40" />
+                    <text class="material-symbols-outlined dynamic-poi-marker__icon"
+                      x="16" y="10">{{ categoryIcon(poi.category) }}</text>
+                  </svg>
+                </div>
+                @if (metadataImage(poi); as image) {
+                  <img class="avatar-image" [src]="image"
+                    [alt]="poi.name || (('common.searchSettings.subcategoryItems.' + poi.subtype) | transloco)"
+                    (error)="imageFailed(poi)" />
+                }
+              </div>
+              <div class="identity-text">
+                <span class="name" [attr.title]="poi.name || ''">
+                  {{ poi.name || (('common.searchSettings.subcategoryItems.' + poi.subtype) | transloco) }}
+                </span>
+                <span class="subtitle">
+                  <a class="identity-source" href="https://www.openstreetmap.org/copyright"
+                    target="_blank" rel="noopener noreferrer"
+                    [attr.aria-label]="'common.geodata.openOsm' | transloco">© OpenStreetMap contributors</a>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <mat-card-content class="poi-content">
+            @if (description(poi); as descriptionText) {
+              <p class="poi-description">{{ descriptionText }}</p>
+            }
+            @if (inscription(poi); as inscriptionText) {
+              <div class="poi-inscription">
+                <mat-icon aria-hidden="true">format_quote</mat-icon>
+                <div>
+                  <strong>{{ 'common.geodata.inscription' | transloco }}</strong>
+                  <span>{{ inscriptionText }}</span>
+                </div>
+              </div>
+            }
+            <div class="poi-subtiles">
+              @if (openingHoursRows(poi); as openingHours) {
+                @if (openingHours.length) {
+                  <section class="poi-subtile opening-hours" [attr.aria-label]="'common.geodata.openingHours' | transloco">
+                    <div class="detail-section-title">
+                      <mat-icon>schedule</mat-icon><span>{{ 'common.geodata.openingHours' | transloco }}</span>
+                    </div>
+                    @for (row of openingHours; track $index) {
+                      <div class="opening-hours-row">
+                        @if (row.days) { <span class="opening-days">{{ row.days }}</span> }
+                        @if (row.closed) {
+                          <span class="opening-closed"><mat-icon>event_busy</mat-icon>{{ 'common.geodata.closed' | transloco }}</span>
+                        } @else {
+                          <span class="opening-periods">
+                            @for (period of row.periods; track period) { <span class="time-chip">{{ period }}</span> }
+                          </span>
+                        }
+                      </div>
+                    }
+                  </section>
+                }
+              }
+              @if (hasAdditionalDetails(poi)) {
+                <section class="poi-subtile additional-details" [attr.aria-label]="'common.geodata.details' | transloco">
+                  <div class="detail-section-title">
+                    <mat-icon>info</mat-icon><span>{{ 'common.geodata.details' | transloco }}</span>
+                  </div>
+                  <div class="poi-details">
+                    @if (address(poi)) {
+                      <div class="detail-row"><mat-icon>home_pin</mat-icon><span>{{ address(poi) }}</span></div>
+                    }
+                    @if (poi.websiteMetadata?.siteName) {
+                      <div class="detail-row"><mat-icon>domain</mat-icon><span>{{ poi.websiteMetadata?.siteName }}</span></div>
+                    }
+                    @if (poi.properties.stars) {
+                      <div class="detail-row"><mat-icon>star</mat-icon><span>{{ poi.properties.stars }} {{ 'common.geodata.stars' | transloco }}</span></div>
+                    }
+                    @if (poi.properties.rooms) {
+                      <div class="detail-row"><mat-icon>meeting_room</mat-icon><span>{{ 'common.geodata.rooms' | transloco }}: {{ poi.properties.rooms }}</span></div>
+                    }
+                    @if (poi.properties.beds) {
+                      <div class="detail-row"><mat-icon>bed</mat-icon><span>{{ 'common.geodata.beds' | transloco }}: {{ poi.properties.beds }}</span></div>
+                    }
+                    @if (poi.properties.wheelchair) {
+                      <div class="accessibility-status" [class]="wheelchairStatusClass(poi.properties.wheelchair)"
+                        [attr.aria-label]="wheelchairLabelKey(poi.properties.wheelchair) | transloco"
+                        [matTooltip]="wheelchairLabelKey(poi.properties.wheelchair) | transloco">
+                        <mat-icon>accessible</mat-icon><mat-icon>{{ wheelchairIcon(poi.properties.wheelchair) }}</mat-icon>
+                      </div>
+                    }
+                    @if (poi.contact.phone) {
+                      <a class="detail-row" [href]="'tel:' + poi.contact.phone"><mat-icon>call</mat-icon><span>{{ poi.contact.phone }}</span></a>
+                    }
+                    @if (poi.contact.email) {
+                      <a class="detail-row" [href]="'mailto:' + poi.contact.email"><mat-icon>mail</mat-icon><span>{{ poi.contact.email }}</span></a>
+                    }
+                    @if (website(poi); as websiteUrl) {
+                      <a class="detail-row" [href]="websiteUrl" target="_blank" rel="noopener noreferrer">
+                        <mat-icon>language</mat-icon><span>{{ poi.websiteMetadata?.title || websiteUrl }}</span>
+                      </a>
+                    }
+                  </div>
+                </section>
+              }
+            </div>
+          </mat-card-content>
+
+          <mat-card-actions class="tile-actions">
+            <button mat-mini-fab color="primary" type="button" (click)="showOnMap(poi)"
+              [attr.aria-label]="'common.geodata.showOnMap' | transloco">
+              <mat-icon>place</mat-icon>
+            </button>
+            <button mat-mini-fab color="primary" type="button" (click)="calculateRoute(poi)"
+              [attr.aria-label]="'common.geodata.calculateRoute' | transloco">
+              <mat-icon>route</mat-icon>
+            </button>
+            <button mat-mini-fab color="primary" type="button" (click)="openInMaps(poi)"
+              [attr.aria-label]="'common.geodata.openInMaps' | transloco">
+              <mat-icon>map</mat-icon>
+            </button>
+            <a mat-mini-fab color="primary" [href]="poi.source.url" target="_blank" rel="noopener noreferrer"
+              [attr.aria-label]="'common.geodata.openOsmObject' | transloco">
+              <mat-icon>open_in_new</mat-icon>
+            </a>
+            @if (poi.name) {
+              <button mat-mini-fab color="primary" type="button" (click)="webSearch(poi)"
+                [attr.aria-label]="'common.geodata.webSearch' | transloco">
+                <mat-icon>travel_explore</mat-icon>
+              </button>
+            }
+          </mat-card-actions>
+        </mat-card>
+      }
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-dialog-close mat-icon-button class="action-close" [attr.aria-label]="'common.actions.abort' | transloco">
+    <mat-icon>close</mat-icon>
+  </button>
+  <button mat-icon-button type="button" (click)="help.open('geodataPoiList')"
+    [attr.aria-label]="'common.actions.help' | transloco">
+    <mat-icon>help</mat-icon>
+  </button>
+</mat-dialog-actions>

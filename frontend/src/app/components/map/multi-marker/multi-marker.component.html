@@ -62,9 +62,9 @@
     {{ 'common.map.multiMarker.showWikipedia' | transloco }}
   </button>
   }
-  @if (data.overpassPois.length) {
-    <button mat-stroked-button [mat-dialog-close]="{type: 'overpass', overpassPois: data.overpassPois}"
-      matBadge="{{data.overpassPois.length | shortNumber}}" matBadgePosition="after" matBadgeColor="accent"
+  @if (data.geodataPois.length) {
+    <button mat-stroked-button [mat-dialog-close]="{type: 'geodata', geodataPois: data.geodataPois}"
+      matBadge="{{data.geodataPois.length | shortNumber}}" matBadgePosition="after" matBadgeColor="accent"
       matBadgeOverlap="true">
       <mat-icon>place</mat-icon>
       {{ 'common.map.multiMarker.showPlaces' | transloco }}

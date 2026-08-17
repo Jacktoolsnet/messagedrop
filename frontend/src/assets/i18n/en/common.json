@@ -2246,7 +2246,7 @@
       "replyTitle": "Write reply",
       "emptyReplies": "No replies yet. Write the first reply."
     },
-    "overpass": {
+    "geodata": {
       "places": "Places in this area",
       "placeCount": "{{ count }} places",
       "stars": "stars",

@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
-import { OverpassCategory, OverpassPoi } from '../interfaces/overpass';
+import { GeodataCategory, GeodataPoi } from '../interfaces/geodata';
 
-import { MapService, overpassPoiGroupMarker } from './map.service';
+import { MapService, geodataPoiGroupMarker } from './map.service';
 
 describe('MapService', () => {
   let service: MapService;
@@ -15,20 +15,20 @@ describe('MapService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('keeps the category icon when grouped Overpass places share one category', () => {
-    const pois = [overpassPoi('first', 'tourism'), overpassPoi('second', 'tourism')];
+  it('keeps the category icon when grouped Geodata places share one category', () => {
+    const pois = [geodataPoi('first', 'tourism'), geodataPoi('second', 'tourism')];
 
-    expect(String(overpassPoiGroupMarker(pois, pois[0]).options.html)).toContain('photo_camera');
+    expect(String(geodataPoiGroupMarker(pois, pois[0]).options.html)).toContain('photo_camera');
   });
 
-  it('uses the neutral icon when grouped Overpass places contain several categories', () => {
-    const pois = [overpassPoi('first', 'tourism'), overpassPoi('second', 'religion')];
+  it('uses the neutral icon when grouped Geodata places contain several categories', () => {
+    const pois = [geodataPoi('first', 'tourism'), geodataPoi('second', 'religion')];
 
-    expect(String(overpassPoiGroupMarker(pois, pois[0]).options.html)).toContain('location_on');
+    expect(String(geodataPoiGroupMarker(pois, pois[0]).options.html)).toContain('location_on');
   });
 });
 
-function overpassPoi(id: string, category: OverpassCategory): OverpassPoi {
+function geodataPoi(id: string, category: GeodataCategory): GeodataPoi {
   return {
     id,
     osmType: 'node',
@@ -42,5 +42,5 @@ function overpassPoi(id: string, category: OverpassCategory): OverpassPoi {
     contact: {},
     properties: {},
     source: { provider: 'OpenStreetMap', url: 'https://www.openstreetmap.org' }
-  } as OverpassPoi;
+  } as GeodataPoi;
 }

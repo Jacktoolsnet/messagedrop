@@ -26,8 +26,8 @@ const tableModerationVoluntaryReview = require('./tableModerationVoluntaryReview
 const tablePublicProfile = require('./tablePublicProfile');
 const tablePublicContent = require('./tablePublicContent');
 const tableCertificateHealth = require('./tableCertificateHealth');
-const tableOverpassImportSettings = require('./tableOverpassImportSettings');
-const tableOverpassImportDispatch = require('./tableOverpassImportDispatch');
+const tableGeodataImportSettings = require('./tableGeodataImportSettings');
+const tableGeodataImportDispatch = require('./tableGeodataImportDispatch');
 
 
 const DEFAULT_MAX_PENDING_REQUESTS = 1000;
@@ -431,8 +431,14 @@ class Database {
       tablePublicProfile.init(this.db);
       tablePublicContent.init(this.db);
       tableCertificateHealth.init(this.db);
-      tableOverpassImportSettings.init(this.db);
-      tableOverpassImportDispatch.init(this.db);
+      tableGeodataImportSettings.init(this.db);
+      tableGeodataImportDispatch.init(this.db);
+      const geodataJobRetentionDays = Math.max(1, Number(process.env.GEODATA_JOB_RETENTION_DAYS) || 90);
+      tableGeodataImportDispatch.cleanupOlderThan(
+        this.db,
+        Date.now() - geodataJobRetentionDays * 24 * 60 * 60 * 1000,
+        (error) => { if (error) this.logger.error('Geodata dispatch cleanup failed', { error: error.message }); }
+      );
       this.initTriggers();
       this.initIndexes();
       this.db.get('SELECT 1;', (readyErr) => {

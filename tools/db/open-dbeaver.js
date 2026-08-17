@@ -12,7 +12,7 @@ const SERVICE_LABELS = {
   NOMINATIM: 'Nominatim Service',
   WIKIPEDIA: 'Wikipedia Service',
   TRIPGO: 'TripGo Service',
-  OVERPASS: 'Overpass Service'
+  GEODATA: 'Geodata Service'
 };
 
 function parseEnvFile(filePath) {

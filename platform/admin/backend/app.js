@@ -64,6 +64,7 @@ const headerMW = require('./middleware/header')
 const Database = require('./db/database');
 const database = new Database();
 const tableStatistic = require('./db/tableStatistic');
+const tableGeodataImportDispatch = require('./db/tableGeodataImportDispatch');
 const tableErrorLog = require('./db/tableErrorLog');
 const tableInfoLog = require('./db/tableInfoLog');
 const tableWarnLog = require('./db/tableWarnLog');
@@ -92,7 +93,7 @@ const frontendErrorLog = require('./routes/frontend-error-log');
 const powLog = require('./routes/pow-log');
 const moderation = require('./routes/moderation');
 const content = require('./routes/content');
-const overpassImport = require('./routes/overpass-import');
+const geodataImport = require('./routes/geodata-import');
 const cors = require('cors')
 const helmet = require('helmet');
 const cron = require('node-cron');
@@ -105,7 +106,7 @@ const { normalizeErrorResponses, notFoundHandler, errorHandler } = require('./mi
 const { cleanupClosedDsaCases } = require('./utils/dsaCleanup');
 const { parseRetentionMs, DAY_MS } = require('./utils/logRetention');
 const { runCertificateHealthCheck } = require('./utils/certificateHealth');
-const { requestService, runScheduledImports } = require('./utils/overpassImport');
+const { requestService, runScheduledImports } = require('./utils/geodataImport');
 const robotsSitemap = require('./middleware/robots-sitemap');
 
 // ExpressJs
@@ -604,8 +605,8 @@ app.use('/certificate-health', adminUserLimit, certificateHealth);
 // Import progress is polled while a potentially long-running download is active.
 // The global admin limiter still protects these authenticated routes; the much
 // tighter user limiter (30 requests / 5 minutes) would otherwise lock the whole
-// Overpass settings area after roughly 90 seconds of 3-second polling.
-app.use('/overpass-import', overpassImport);
+// Geodata settings area after roughly 90 seconds of 3-second polling.
+app.use('/geodata-import', geodataImport);
 
 
 // DSA
@@ -694,24 +695,34 @@ cron.schedule('5 0 * * *', () => {
   });
 });
 
+// Dispatch rows only record the hand-off; active jobs are retained by the Geodata service itself.
+cron.schedule('25 0 * * *', () => {
+  const retentionDays = Math.max(1, Number(process.env.GEODATA_JOB_RETENTION_DAYS) || 90);
+  tableGeodataImportDispatch.cleanupOlderThan(
+    database.db,
+    Date.now() - retentionDays * 24 * 60 * 60 * 1000,
+    (error) => { if (error) logger.error('Geodata dispatch cleanup failed', { error: error.message }); }
+  );
+});
+
 // Dynamic import schedules are stored in the admin database. This lightweight
 // poller makes changed schedules effective without restarting the process.
 cron.schedule('*/5 * * * *', () => {
   void runScheduledImports(database.db, logger).catch((error) => {
-    logger.error('Scheduled Overpass import failed', { error: error?.message || error });
+    logger.error('Scheduled Geodata import failed', { error: error?.message || error });
   });
 });
 
-// Check once a day for missing or stale website metadata. The Overpass service
+// Check once a day for missing or stale website metadata. The Geodata service
 // only requests URLs whose persisted refresh timestamp is due.
-const overpassMetadataCron = process.env.OVERPASS_METADATA_CRON || '0 4 * * *';
-const overpassMetadataTimezone = process.env.OVERPASS_METADATA_TIMEZONE || 'Europe/Berlin';
-cron.schedule(overpassMetadataCron, () => {
-  void requestService('post', '/overpass/metadata-jobs', { reason: 'daily-cron' })
-    .catch((error) => logger.error('Scheduled Overpass metadata refresh failed', {
+const geodataMetadataCron = process.env.GEODATA_METADATA_CRON || '0 4 * * *';
+const geodataMetadataTimezone = process.env.GEODATA_METADATA_TIMEZONE || 'Europe/Berlin';
+cron.schedule(geodataMetadataCron, () => {
+  void requestService('post', '/geodata/metadata-jobs', { reason: 'daily-cron' })
+    .catch((error) => logger.error('Scheduled Geodata metadata refresh failed', {
       error: error?.message || error
     }));
-}, { timezone: overpassMetadataTimezone });
+}, { timezone: geodataMetadataTimezone });
 
 const infoRetentionMs = parseRetentionMs(LOG_RETENTION_INFO, 2 * DAY_MS);
 const errorRetentionMs = parseRetentionMs(LOG_RETENTION_ERROR, 2 * DAY_MS);

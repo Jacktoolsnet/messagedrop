@@ -1,8 +1,8 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 import * as leaflet from 'leaflet';
 import { Location } from '../../../interfaces/location';
-import { OverpassCategory } from '../../../interfaces/overpass';
-import { overpassCategoryMarker } from '../../../services/map.service';
+import { GeodataCategory } from '../../../interfaces/geodata';
+import { geodataCategoryMarker } from '../../../services/map.service';
 
 interface MapMarker {
   latitude: number;
@@ -10,7 +10,7 @@ interface MapMarker {
   label?: string;
   id?: number;
   iconUrl?: string;
-  overpassCategory?: OverpassCategory;
+  geodataCategory?: GeodataCategory;
 }
 
 const DEFAULT_MARKER_ICON_URL = 'assets/markers/location-marker.svg';
@@ -144,8 +144,8 @@ export class SearchSettingsMapPreviewComponent implements AfterViewInit, OnChang
         return;
       }
       const latLng: leaflet.LatLngTuple = [marker.latitude, marker.longitude];
-      const icon = marker.overpassCategory
-        ? overpassCategoryMarker(marker.overpassCategory)
+      const icon = marker.geodataCategory
+        ? geodataCategoryMarker(marker.geodataCategory)
         : this.getMarkerIcon(marker.iconUrl);
       const leafletMarker = leaflet.marker(latLng, { icon });
       if (marker.label) {

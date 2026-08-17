@@ -6,7 +6,7 @@ import { MarkerLocation } from '../interfaces/marker-location';
 import { MapContextMenuEvent } from '../interfaces/map-context-menu-event';
 import { MarkerType } from '../interfaces/marker-type';
 import { TripGoStop } from '../interfaces/tripgo';
-import { OVERPASS_CATEGORY_ICONS, OverpassCategory, OverpassPoi } from '../interfaces/overpass';
+import { GEODATA_CATEGORY_ICONS, GeodataCategory, GeodataPoi } from '../interfaces/geodata';
 import { GeolocationService } from './geolocation.service';
 
 const messageMarker = leaflet.icon({
@@ -150,32 +150,32 @@ function publicTransportIcons(stop: TripGoStop): string[] {
   return icons.length ? icons : ['directions_transit'];
 }
 
-export function overpassPoiMarker(poi: OverpassPoi): leaflet.DivIcon {
-  return overpassCategoryMarker(poi.category);
+export function geodataPoiMarker(poi: GeodataPoi): leaflet.DivIcon {
+  return geodataCategoryMarker(poi.category);
 }
 
-export function overpassPoiGroupMarker(pois: OverpassPoi[], fallback: OverpassPoi): leaflet.DivIcon {
+export function geodataPoiGroupMarker(pois: GeodataPoi[], fallback: GeodataPoi): leaflet.DivIcon {
   const groupedPois = pois.length ? pois : [fallback];
   const categories = new Set(groupedPois.map((poi) => poi.category));
   return categories.size === 1
-    ? overpassPoiMarker(groupedPois[0])
-    : overpassPlacesMarker();
+    ? geodataPoiMarker(groupedPois[0])
+    : geodataPlacesMarker();
 }
 
-export function overpassPlacesMarker(): leaflet.DivIcon {
-  return overpassMarker('location_on');
+export function geodataPlacesMarker(): leaflet.DivIcon {
+  return geodataMarker('location_on');
 }
 
-export function overpassCategoryMarker(category: OverpassCategory): leaflet.DivIcon {
-  return overpassMarker(OVERPASS_CATEGORY_ICONS[category] || 'location_on');
+export function geodataCategoryMarker(category: GeodataCategory): leaflet.DivIcon {
+  return geodataMarker(GEODATA_CATEGORY_ICONS[category] || 'location_on');
 }
 
-function overpassMarker(icon: string): leaflet.DivIcon {
+function geodataMarker(icon: string): leaflet.DivIcon {
   return leaflet.divIcon({
-    className: 'overpass-poi-marker-host',
-    html: `<svg class="overpass-poi-marker" viewBox="0 0 32 40" width="32" height="40" aria-hidden="true">
+    className: 'geodata-poi-marker-host',
+    html: `<svg class="geodata-poi-marker" viewBox="0 0 32 40" width="32" height="40" aria-hidden="true">
       <image href="assets/markers/empty-marker.svg" x="0" y="0" width="32" height="40" />
-      <text class="material-symbols-outlined overpass-poi-marker__icon"
+      <text class="material-symbols-outlined geodata-poi-marker__icon"
         x="16" y="10">${icon}</text>
     </svg>`,
     iconSize: [32, 40],
@@ -616,16 +616,16 @@ export class MapService {
             alt: markerLocation.publicTransportStop.name
           })
           : null;
-      case MarkerType.OVERPASS_POI:
-        return markerLocation.overpassPoi
+      case MarkerType.GEODATA_POI:
+        return markerLocation.geodataPoi
           ? leaflet.marker(latLng, {
-            icon: overpassPoiGroupMarker(
-              markerLocation.overpassPois || [],
-              markerLocation.overpassPoi
+            icon: geodataPoiGroupMarker(
+              markerLocation.geodataPois || [],
+              markerLocation.geodataPoi
             ),
             zIndexOffset: 14,
-            title: markerLocation.overpassPoi.name || markerLocation.overpassPoi.subtype,
-            alt: markerLocation.overpassPoi.name || markerLocation.overpassPoi.subtype
+            title: markerLocation.geodataPoi.name || markerLocation.geodataPoi.subtype,
+            alt: markerLocation.geodataPoi.name || markerLocation.geodataPoi.subtype
           })
           : null;
       default:

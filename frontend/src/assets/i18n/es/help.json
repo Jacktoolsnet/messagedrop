@@ -1436,7 +1436,7 @@
   "pinHint": {
     "title": "Ayuda de PIN"
   },
-  "overpassPoiList": {
+  "geodataPoiList": {
     "title": "Lugares y POI",
     "intro": "Aquí se muestran los datos disponibles de OpenStreetMap sobre un lugar y los metadatos complementarios de su sitio web. Los campos visibles dependen de los datos de origen disponibles.",
     "items": {

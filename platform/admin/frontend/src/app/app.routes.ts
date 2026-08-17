@@ -28,7 +28,7 @@ import { ModerationQueueComponent } from './components/moderation/moderation-que
 import { PublicStatusComponent } from './components/public-status/public-status.component';
 import { PublicOverviewComponent } from './components/statistic/public-overview/public-overview.component';
 import { StatisticComponent } from './components/statistic/statistic.component';
-import { OverpassImportSettingsComponent } from './components/overpass-import-settings/overpass-import-settings.component';
+import { GeodataImportSettingsComponent } from './components/geodata-import-settings/geodata-import-settings.component';
 import { authGuard } from './guards/auth/auth-guard';
 import { CONTENT_MODULE_ROLES, DSA_MODULE_ROLES, MODERATION_MODULE_ROLES, ROOT_ADMIN_ROLES, USER_MODULE_ROLES } from './utils/admin-role-access';
 
@@ -57,7 +57,7 @@ export const routes: Routes = [
     },
     {
         path: 'dashboard/geodata',
-        component: OverpassImportSettingsComponent,
+        component: GeodataImportSettingsComponent,
         canActivate: [authGuard],
         data: { allowedRoles: ROOT_ADMIN_ROLES }
     },

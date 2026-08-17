@@ -1,4 +1,4 @@
-import { OVERPASS_SUBCATEGORIES, OverpassAvailability, OverpassCategory } from './overpass';
+import { GEODATA_SUBCATEGORIES, GeodataAvailability, GeodataCategory } from './geodata';
 
 export interface SearchSettingsEntry {
   enabled: boolean;
@@ -29,11 +29,11 @@ export interface SearchSettings {
 
 export type SearchSettingsKey = keyof SearchSettings;
 
-function poiDefaults(category: OverpassCategory, minZoom = 14): PoiSearchSettingsEntry {
+function poiDefaults(category: GeodataCategory, minZoom = 14): PoiSearchSettingsEntry {
   return {
     enabled: false,
     minZoom,
-    subcategories: Object.fromEntries(OVERPASS_SUBCATEGORIES[category].map((subcategory) => [subcategory, true]))
+    subcategories: Object.fromEntries(GEODATA_SUBCATEGORIES[category].map((subcategory) => [subcategory, true]))
   };
 }
 
@@ -56,7 +56,7 @@ export const DEFAULT_SEARCH_SETTINGS: SearchSettings = {
 };
 
 export function normalizePoiSetting(
-  category: OverpassCategory,
+  category: GeodataCategory,
   setting: Partial<PoiSearchSettingsEntry> | undefined
 ): PoiSearchSettingsEntry {
   const fallback = DEFAULT_SEARCH_SETTINGS[category] as PoiSearchSettingsEntry;
@@ -65,23 +65,23 @@ export function normalizePoiSetting(
     ...fallback,
     ...setting,
     minZoom: Math.min(19, Math.max(14, setting?.minZoom ?? fallback.minZoom)),
-    subcategories: Object.fromEntries(OVERPASS_SUBCATEGORIES[category]
+    subcategories: Object.fromEntries(GEODATA_SUBCATEGORIES[category]
       .map((subcategory) => [subcategory, stored[subcategory] ?? fallback.subcategories[subcategory]]))
   };
 }
 
-export function applyOverpassAvailability(
+export function applyGeodataAvailability(
   settings: SearchSettings,
-  availability: OverpassAvailability
+  availability: GeodataAvailability
 ): SearchSettings {
   const result = { ...settings };
-  for (const category of Object.keys(OVERPASS_SUBCATEGORIES) as OverpassCategory[]) {
+  for (const category of Object.keys(GEODATA_SUBCATEGORIES) as GeodataCategory[]) {
     const setting = settings[category];
     const allowed = new Set(availability[category] ?? []);
     result[category] = {
       ...setting,
       enabled: setting.enabled && allowed.size > 0,
-      subcategories: Object.fromEntries(OVERPASS_SUBCATEGORIES[category]
+      subcategories: Object.fromEntries(GEODATA_SUBCATEGORIES[category]
         .map((subcategory) => [subcategory, allowed.has(subcategory) && !!setting.subcategories[subcategory]]))
     };
   }

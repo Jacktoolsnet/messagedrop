@@ -1,0 +1,318 @@
+<mat-toolbar color="primary">
+  <button mat-icon-button routerLink="/dashboard" [attr.aria-label]="i18n.t('Back to dashboard')">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <span class="toolbar-title">{{ i18n.t('Geodata') }}</span>
+  <span class="spacer"></span>
+  <button mat-icon-button type="button" (click)="load()" [disabled]="loading() || saving()" [attr.aria-label]="i18n.t('Reload settings')">
+    <mat-icon>refresh</mat-icon>
+  </button>
+  <button mat-icon-button type="button" class="save-button" (click)="save()"
+    [disabled]="!hasChanges() || saving() || enabledCategories().size === 0 || enabledDatasets().size === 0" [attr.aria-label]="i18n.t('Save settings')">
+    <mat-icon>save</mat-icon>
+  </button>
+</mat-toolbar>
+
+@if (loading() || saving()) {
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
+<main class="page">
+  <mat-card class="hero-card">
+    <mat-card-header>
+      <div mat-card-avatar class="avatar avatar-map"><mat-icon>travel_explore</mat-icon></div>
+      <mat-card-title>{{ i18n.t('OpenStreetMap geodata') }}</mat-card-title>
+      <mat-card-subtitle>{{ i18n.t('Configure categories for all imported countries and regions') }}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <p>{{ i18n.t('This selection applies to every geodata set. Changes take effect with the next import or update.') }}</p>
+    </mat-card-content>
+  </mat-card>
+
+  @if (!loading() && categoryNames().length === 0) {
+    <mat-card class="empty-card">
+      <mat-card-content><mat-icon>cloud_off</mat-icon> {{ i18n.t('The Geodata catalog currently contains no categories.') }}</mat-card-content>
+    </mat-card>
+  } @else {
+    <mat-tab-group class="settings-tabs" animationDuration="180ms">
+      <mat-tab>
+        <ng-template mat-tab-label><mat-icon>category</mat-icon><span>{{ i18n.t('Categories') }}</span></ng-template>
+        <section class="tab-content settings-layout">
+          <mat-card class="section-card">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-category"><mat-icon>category</mat-icon></div>
+          <mat-card-title>{{ i18n.t('Categories') }}</mat-card-title>
+          <mat-card-subtitle>{{ i18n.t('{{enabled}} of {{total}} enabled', { enabled: enabledCategories().size, total: categoryNames().length }) }}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content class="selection-list">
+          @for (category of categoryNames(); track category) {
+            <div class="selection-row" [class.selected]="selectedCategory() === category" (click)="selectCategory(category)">
+              <button type="button" class="selection-copy" (click)="selectCategory(category)">
+                <mat-icon>{{ categoryIcon(category) }}</mat-icon>
+                <span>
+                  <strong>{{ label(category) }}</strong>
+                  <small>{{ catalog()?.categories?.[category]?.length ?? 0 }} {{ i18n.t('subcategories') }}</small>
+                </span>
+              </button>
+              <mat-slide-toggle [checked]="isCategoryEnabled(category)" (click)="$event.stopPropagation()"
+                (change)="toggleCategory(category, $event.checked)" [attr.aria-label]="i18n.t('Enable {{name}}', { name: label(category) })"></mat-slide-toggle>
+            </div>
+          }
+        </mat-card-content>
+          </mat-card>
+
+          <mat-card class="section-card">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-detail"><mat-icon>account_tree</mat-icon></div>
+          <mat-card-title>{{ selectedCategory() ? label(selectedCategory() ?? '') : i18n.t('Subcategories') }}</mat-card-title>
+          <mat-card-subtitle>{{ i18n.t('Enable or disable individual types') }}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          @if (selectedCategory(); as category) {
+            @if (!isCategoryEnabled(category)) {
+              <div class="category-hint"><mat-icon>info</mat-icon> {{ i18n.t('The main category is currently disabled.') }}</div>
+            }
+            <div class="bulk-actions">
+              <button mat-stroked-button type="button" (click)="enableAllSubcategories()" [disabled]="!isCategoryEnabled(category)">{{ i18n.t('Enable all') }}</button>
+              <button mat-stroked-button type="button" (click)="disableAllSubcategories()" [disabled]="!isCategoryEnabled(category)">{{ i18n.t('Disable all') }}</button>
+            </div>
+            <div class="subcategory-grid">
+              @for (subcategory of visibleSubcategories(); track subcategory) {
+                <label class="subcategory-row">
+                  <span>{{ label(subcategory) }}</span>
+                  <mat-slide-toggle [checked]="isSubcategoryEnabled(subcategory)"
+                    [disabled]="!isCategoryEnabled(category)" (change)="toggleSubcategory(subcategory, $event.checked)"
+                    [attr.aria-label]="i18n.t('Enable {{name}}', { name: label(subcategory) })"></mat-slide-toggle>
+                </label>
+              }
+            </div>
+          } @else {
+            <div class="empty-state"><mat-icon>touch_app</mat-icon> {{ i18n.t('Please select a category.') }}</div>
+          }
+        </mat-card-content>
+          </mat-card>
+        </section>
+      </mat-tab>
+
+      <mat-tab>
+        <ng-template mat-tab-label><mat-icon>public</mat-icon><span>{{ i18n.t('Regions') }}</span></ng-template>
+        <section class="tab-content settings-layout">
+          <mat-card class="section-card">
+            <mat-card-header>
+              <div mat-card-avatar class="avatar avatar-map"><mat-icon>public</mat-icon></div>
+              <mat-card-title>{{ i18n.t('Continents') }}</mat-card-title>
+              <mat-card-subtitle>{{ i18n.t('Select a continent') }}</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content class="selection-list">
+              @for (continent of continents(); track continent.code) {
+                <button type="button" class="selection-row region-selection-button"
+                  [class.selected]="selectedContinent() === continent.code" (click)="selectContinent(continent.code)">
+                  <mat-icon>public</mat-icon>
+                  <span><strong>{{ i18n.t(continent.label) }}</strong><small>{{ continent.code }}</small></span>
+                  <mat-icon class="radio-indicator">{{ selectedContinent() === continent.code ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
+                </button>
+              }
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="section-card">
+            <mat-card-header>
+              <div mat-card-avatar class="avatar avatar-category"><mat-icon>flag</mat-icon></div>
+              <mat-card-title>{{ i18n.t('Countries') }}</mat-card-title>
+              <mat-card-subtitle>{{ i18n.t('Select the countries to import completely.') }}</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content class="country-list">
+              <div class="selection-list country-selection-list">
+                @for (group of countryGroups(); track group.countryCode) {
+                  <div class="selection-row" [class.selected]="selectedCountry() === group.countryCode"
+                    (click)="selectCountry(group.countryCode)">
+                    <button type="button" class="selection-copy" (click)="selectCountry(group.countryCode)">
+                      <mat-icon>flag</mat-icon>
+                      <span><strong>{{ countryLabel(group.countryCode) }}</strong><small>{{ group.countryCode }}</small></span>
+                    </button>
+                    @if (countryDataset(group.datasets); as country) {
+                      <mat-slide-toggle [checked]="isDatasetEnabled(country.id)" (click)="$event.stopPropagation()"
+                        (change)="toggleCountry(group.datasets, $event.checked)"
+                        [attr.aria-label]="i18n.t('Enable {{name}}', { name: countryLabel(group.countryCode) })"></mat-slide-toggle>
+                    }
+                  </div>
+                } @empty {
+                  <div class="empty-state"><mat-icon>location_off</mat-icon>{{ i18n.t('No importable regions are currently available.') }}</div>
+                }
+              </div>
+              @if (enabledDatasets().size === 0) {
+                <div class="validation-hint"><mat-icon>warning</mat-icon>{{ i18n.t('Select at least one region.') }}</div>
+              }
+            </mat-card-content>
+          </mat-card>
+        </section>
+      </mat-tab>
+
+      <mat-tab>
+        <ng-template mat-tab-label><mat-icon>update</mat-icon><span>{{ i18n.t('Update settings') }}</span></ng-template>
+        <section class="tab-content">
+          <mat-card class="section-card wide-card">
+            <mat-card-header>
+              <div mat-card-avatar class="avatar avatar-detail"><mat-icon>schedule</mat-icon></div>
+              <mat-card-title>{{ i18n.t('Automatic updates') }}</mat-card-title>
+              <mat-card-subtitle>{{ i18n.t('Define when the selected regions should be refreshed.') }}</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content class="update-settings">
+              <label class="setting-toggle">
+                <span><strong>{{ i18n.t('Enable automatic imports') }}</strong><small>{{ i18n.t('The admin backend checks the schedule every five minutes.') }}</small></span>
+                <mat-slide-toggle [checked]="importsEnabled()" (change)="importsEnabled.set($event.checked)"></mat-slide-toggle>
+              </label>
+              <div class="schedule-grid" [class.disabled-section]="!importsEnabled()">
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ i18n.t('Frequency') }}</mat-label>
+                  <mat-select [value]="scheduleType()" [disabled]="!importsEnabled()" (selectionChange)="scheduleType.set($event.value)">
+                    <mat-option value="daily">{{ i18n.t('Daily') }}</mat-option>
+                    <mat-option value="weekly">{{ i18n.t('Weekly') }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+                @if (scheduleType() === 'weekly') {
+                  <mat-form-field appearance="outline">
+                    <mat-label>{{ i18n.t('Weekday') }}</mat-label>
+                    <mat-select [value]="weekday()" [disabled]="!importsEnabled()" (selectionChange)="weekday.set($event.value)">
+                      @for (day of weekdays; track day.value) { <mat-option [value]="day.value">{{ i18n.t(day.label) }}</mat-option> }
+                    </mat-select>
+                  </mat-form-field>
+                }
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ i18n.t('Hour') }}</mat-label>
+                  <input matInput type="number" min="0" max="23" [value]="hour()" [disabled]="!importsEnabled()" (input)="setHour($any($event.target).value)">
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ i18n.t('Minute') }}</mat-label>
+                  <input matInput type="number" min="0" max="59" [value]="minute()" [disabled]="!importsEnabled()" (input)="setMinute($any($event.target).value)">
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ i18n.t('Timezone') }}</mat-label>
+                  <mat-select [value]="timezone()" [disabled]="!importsEnabled()" (selectionChange)="timezone.set($event.value)">
+                    @for (zone of timezones; track zone) { <mat-option [value]="zone">{{ zone }}</mat-option> }
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="manual-actions">
+                <button mat-flat-button type="button" (click)="startImport()" [disabled]="hasChanges() || importing()">
+                  <mat-icon>play_arrow</mat-icon>{{ importing() ? i18n.t('Starting…') : i18n.t('Import now') }}
+                </button>
+                <button mat-stroked-button type="button" (click)="startImport(true)" [disabled]="hasChanges() || importing()">
+                  <mat-icon>sync</mat-icon>{{ i18n.t('Force import') }}
+                </button>
+                @if (hasChanges()) { <small>{{ i18n.t('Save your changes before starting a manual import.') }}</small> }
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </section>
+      </mat-tab>
+
+      <mat-tab>
+        <ng-template mat-tab-label><mat-icon>database</mat-icon><span>{{ i18n.t('Database information') }}</span></ng-template>
+        <section class="tab-content">
+          <mat-card class="section-card wide-card">
+            <mat-card-header>
+              <div mat-card-avatar class="avatar avatar-category"><mat-icon>storage</mat-icon></div>
+              <mat-card-title>{{ i18n.t('Local POI database') }}</mat-card-title>
+              <mat-card-subtitle>{{ i18n.t('Active data and recent import jobs') }}</mat-card-subtitle>
+              <span class="header-spacer"></span>
+              <button mat-icon-button type="button" (click)="loadDatabaseInfo()" [disabled]="loadingDatabaseInfo()"><mat-icon>refresh</mat-icon></button>
+            </mat-card-header>
+            <mat-card-content>
+              @if (loadingDatabaseInfo()) { <mat-progress-bar mode="indeterminate"></mat-progress-bar> }
+              @if (databaseInfo(); as info) {
+                <div class="database-stats">
+                  <article><span>{{ i18n.t('Mode') }}</span><strong>{{ info.health.mode || '—' }}</strong></article>
+                  <article><span>{{ i18n.t('Datasets') }}</span><strong>{{ info.health.local?.datasetCount ?? 0 }}</strong></article>
+                  <article><span>{{ i18n.t('POIs') }}</span><strong>{{ info.health.local?.poiCount ?? 0 }}</strong></article>
+                  <article><span>{{ i18n.t('POIs with website') }}</span><strong>{{ info.health.local?.websitePoiCount ?? 0 }}</strong></article>
+                  <article><span>{{ i18n.t('POIs with website metadata') }}</span><strong>{{ info.health.local?.websiteMetadataPoiCount ?? 0 }}</strong></article>
+                  <article><span>{{ i18n.t('Database size') }}</span><strong>{{ info.health.local?.databaseBytes ? (info.health.local!.databaseBytes! / 1048576 | number:'1.1-1') + ' MB' : '—' }}</strong></article>
+                  <article><span>{{ i18n.t('Last activation') }}</span><strong>{{ info.health.local?.importedAt ? (info.health.local.importedAt | date:'medium') : '—' }}</strong></article>
+                </div>
+                <h3>{{ i18n.t('Recent import jobs') }}</h3>
+                <div class="job-list">
+                  @for (job of info.jobs; track job.jobId) {
+                    <article class="job-row" [class.active-job]="job.status === 'running' || job.status === 'queued'">
+                      <mat-icon>{{ job.status === 'succeeded' ? 'check_circle' : job.status === 'failed' ? 'error' : 'sync' }}</mat-icon>
+                      <span class="job-content"><strong>{{ job.datasetId }}</strong>
+                        <small>{{ stepLabel(job) }}</small>
+                        @if (job.sourceTimestamp) {
+                          <small>{{ i18n.t('Source data') }}: {{ job.sourceTimestamp | date:'medium' }}</small>
+                        }
+                        @if (job.status === 'running') {
+                          <div class="progress-section">
+                            <div class="progress-caption">
+                              <span>{{ i18n.t('Current step') }}</span>
+                              <strong>{{ job.stepProgress == null ? i18n.t('Processing…') : job.stepProgress + ' %' }}</strong>
+                            </div>
+                            <mat-progress-bar [mode]="job.stepProgress == null ? 'indeterminate' : 'determinate'"
+                              [value]="job.stepProgress ?? 0"></mat-progress-bar>
+                            <div class="progress-caption overall-progress">
+                              <span>{{ i18n.t('Overall progress') }}</span><strong>{{ job.progress }} %</strong>
+                            </div>
+                            <mat-progress-bar mode="determinate" [value]="job.progress"></mat-progress-bar>
+                            <div class="progress-details">
+                              @if (processedDetails(job); as details) { <span><mat-icon>data_usage</mat-icon>{{ details }}</span> }
+                              @if (elapsed(job); as duration) { <span><mat-icon>schedule</mat-icon>{{ i18n.t('Elapsed') }}: {{ duration }}</span> }
+                              @if (remaining(job); as duration) { <span><mat-icon>hourglass_top</mat-icon>{{ i18n.t('Estimated remaining') }}: {{ duration }}</span> }
+                            </div>
+                          </div>
+                        } @else {
+                          <small>{{ job.progress }} %
+                            @if (elapsed(job); as duration) { · {{ i18n.t('Duration') }}: {{ duration }} }
+                          </small>
+                        }
+                        @if (job.error) { <small class="job-error">{{ job.error }}</small> }
+                      </span>
+                      <span class="job-status" [class]="'job-status status-' + job.status">{{ job.status }}</span>
+                    </article>
+                  } @empty {
+                    <div class="empty-state"><mat-icon>history</mat-icon>{{ i18n.t('No import jobs recorded yet.') }}</div>
+                  }
+                </div>
+                <h3>{{ i18n.t('Website metadata jobs') }}</h3>
+                <div class="job-list">
+                  @for (job of (info.metadataJobs ?? []); track job.metadataJobId) {
+                    <article class="job-row" [class.active-job]="job.status === 'running'">
+                      <mat-icon>{{ job.status === 'succeeded' ? 'check_circle' : job.status === 'failed' ? 'error' : 'sync' }}</mat-icon>
+                      <span class="job-content"><strong>{{ job.triggerReason }}</strong>
+                        @if (job.stage === 'discovering') {
+                          <small>{{ i18n.t('Discovering websites and preparing metadata job…') }}</small>
+                        } @else {
+                          <small>{{ job.processedUrls }} / {{ job.totalUrls }} · {{ job.succeededUrls }} {{ i18n.t('successful') }} · {{ job.failedUrls }} {{ i18n.t('failed') }}</small>
+                        }
+                        @if (job.status === 'running') {
+                          <div class="progress-section">
+                            <div class="progress-caption">
+                              <span>{{ i18n.t('Website metadata') }}</span>
+                              <strong>{{ metadataProgress(job) | number:'1.0-1' }} %</strong>
+                            </div>
+                            <mat-progress-bar [mode]="job.stage === 'discovering' ? 'indeterminate' : 'determinate'"
+                              [value]="metadataProgress(job)"></mat-progress-bar>
+                            <div class="progress-details">
+                              @if (metadataElapsed(job); as duration) { <span><mat-icon>schedule</mat-icon>{{ i18n.t('Elapsed') }}: {{ duration }}</span> }
+                              @if (metadataRemaining(job); as duration) { <span><mat-icon>hourglass_top</mat-icon>{{ i18n.t('Estimated remaining') }}: {{ duration }}</span> }
+                            </div>
+                          </div>
+                        } @else if (metadataElapsed(job); as duration) {
+                          <small>{{ i18n.t('Duration') }}: {{ duration }}</small>
+                        }
+                        @if (job.error) { <small class="job-error">{{ job.error }}</small> }
+                      </span>
+                      <span class="job-status" [class]="'job-status status-' + job.status">{{ job.status }}</span>
+                    </article>
+                  } @empty {
+                    <div class="empty-state"><mat-icon>language</mat-icon>{{ i18n.t('No website metadata jobs recorded yet.') }}</div>
+                  }
+                </div>
+              } @else if (!loadingDatabaseInfo()) {
+                <div class="empty-state"><mat-icon>cloud_off</mat-icon>{{ i18n.t('Database information is currently unavailable.') }}</div>
+              }
+            </mat-card-content>
+          </mat-card>
+        </section>
+      </mat-tab>
+    </mat-tab-group>
+  }
+</main>

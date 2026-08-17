@@ -15,15 +15,15 @@ import {
   PoiSearchSettingsEntry,
   SearchSettings,
   SearchSettingsKey,
-  applyOverpassAvailability,
+  applyGeodataAvailability,
   normalizePoiSetting
 } from '../../../interfaces/search-settings';
-import { OVERPASS_SUBCATEGORIES, OverpassAvailability, OverpassCategory } from '../../../interfaces/overpass';
+import { GEODATA_SUBCATEGORIES, GeodataAvailability, GeodataCategory } from '../../../interfaces/geodata';
 import { HelpDialogService } from '../help-dialog/help-dialog.service';
 import { SearchSettingsMapPreviewComponent } from './search-settings-map-preview.component';
 import { UserService } from '../../../services/user.service';
 import { LanguageService } from '../../../services/language.service';
-import { OverpassService } from '../../../services/overpass.service';
+import { GeodataService } from '../../../services/geodata.service';
 
 const REGION_PREVIEW_LOCATIONS: Record<string, Location> = {
   DE: { latitude: 51.1657, longitude: 10.4515, plusCode: '' },
@@ -70,7 +70,7 @@ interface SearchSettingsItem {
   key: SearchSettingsKey;
   icon: string;
   titleKey: string;
-  poiCategory?: OverpassCategory;
+  poiCategory?: GeodataCategory;
 }
 
 interface SearchSettingsDialogData {
@@ -104,11 +104,11 @@ export class SearchSettingsComponent {
   private readonly dialogData = inject<SearchSettingsDialogData>(MAT_DIALOG_DATA);
   private readonly userService = inject(UserService);
   private readonly languageService = inject(LanguageService);
-  private readonly overpassService = inject(OverpassService);
+  private readonly geodataService = inject(GeodataService);
   private readonly destroyRef = inject(DestroyRef);
   readonly help = inject(HelpDialogService);
-  readonly overpassAvailability = signal<OverpassAvailability>({});
-  readonly overpassAvailabilityLoaded = signal(false);
+  readonly geodataAvailability = signal<GeodataAvailability>({});
+  readonly geodataAvailabilityLoaded = signal(false);
 
   readonly previewLocation = this.resolvePreviewLocation();
   private readonly allItems: SearchSettingsItem[] = [
@@ -175,18 +175,18 @@ export class SearchSettingsComponent {
     if (this.dialogData.settings) {
       this.searchSettings = this.mergeSettings(this.dialogData.settings);
     }
-    this.overpassService.getAvailability()
+    this.geodataService.getAvailability()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (availability) => {
-          this.overpassAvailability.set(availability);
-          this.searchSettings = applyOverpassAvailability(this.searchSettings, availability);
-          this.overpassAvailabilityLoaded.set(true);
+          this.geodataAvailability.set(availability);
+          this.searchSettings = applyGeodataAvailability(this.searchSettings, availability);
+          this.geodataAvailabilityLoaded.set(true);
         },
         error: () => {
-          this.overpassAvailability.set({});
-          this.searchSettings = applyOverpassAvailability(this.searchSettings, {});
-          this.overpassAvailabilityLoaded.set(true);
+          this.geodataAvailability.set({});
+          this.searchSettings = applyGeodataAvailability(this.searchSettings, {});
+          this.geodataAvailabilityLoaded.set(true);
         }
       });
   }
@@ -213,7 +213,7 @@ export class SearchSettingsComponent {
     };
   }
 
-  updateSubcategory(category: OverpassCategory, subcategory: string, enabled: boolean): void {
+  updateSubcategory(category: GeodataCategory, subcategory: string, enabled: boolean): void {
     const setting = this.searchSettings[category] as PoiSearchSettingsEntry;
     this.searchSettings = {
       ...this.searchSettings,
@@ -224,11 +224,11 @@ export class SearchSettingsComponent {
     };
   }
 
-  getSubcategories(category: OverpassCategory): readonly string[] {
-    return this.overpassAvailability()[category] ?? [];
+  getSubcategories(category: GeodataCategory): readonly string[] {
+    return this.geodataAvailability()[category] ?? [];
   }
 
-  isSubcategoryEnabled(category: OverpassCategory, subcategory: string): boolean {
+  isSubcategoryEnabled(category: GeodataCategory, subcategory: string): boolean {
     return (this.searchSettings[category] as PoiSearchSettingsEntry).subcategories[subcategory] ?? false;
   }
 
@@ -236,7 +236,7 @@ export class SearchSettingsComponent {
     if (key === 'publicTransportStops') {
       return 16;
     }
-    if (key === 'wikipedia' || Object.hasOwn(OVERPASS_SUBCATEGORIES, key)) return 14;
+    if (key === 'wikipedia' || Object.hasOwn(GEODATA_SUBCATEGORIES, key)) return 14;
     return this.minZoom;
   }
 
@@ -248,13 +248,13 @@ export class SearchSettingsComponent {
     latitude: number;
     longitude: number;
     iconUrl: string;
-    overpassCategory?: OverpassCategory;
+    geodataCategory?: GeodataCategory;
   }[] {
     return [{
       latitude: this.previewLocation.latitude,
       longitude: this.previewLocation.longitude,
       iconUrl: this.getPreviewMarkerIcon(key),
-      overpassCategory: Object.hasOwn(OVERPASS_SUBCATEGORIES, key) ? key as OverpassCategory : undefined
+      geodataCategory: Object.hasOwn(GEODATA_SUBCATEGORIES, key) ? key as GeodataCategory : undefined
     }];
   }
 
@@ -290,7 +290,7 @@ export class SearchSettingsComponent {
   }
 
   private availableItems(items: SearchSettingsItem[]): SearchSettingsItem[] {
-    const availability = this.overpassAvailability();
+    const availability = this.geodataAvailability();
     return items.filter((item) => !item.poiCategory || (availability[item.poiCategory]?.length ?? 0) > 0);
   }
 

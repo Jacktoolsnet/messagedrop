@@ -1,12 +1,12 @@
-import { applyOverpassAvailability, DEFAULT_SEARCH_SETTINGS } from './search-settings';
+import { applyGeodataAvailability, DEFAULT_SEARCH_SETTINGS } from './search-settings';
 
-describe('applyOverpassAvailability', () => {
+describe('applyGeodataAvailability', () => {
   it('disables unavailable categories and subcategories', () => {
     const settings = structuredClone(DEFAULT_SEARCH_SETTINGS);
     settings.accommodation.enabled = true;
     settings.tourism.enabled = true;
 
-    const result = applyOverpassAvailability(settings, { accommodation: ['hotel'] });
+    const result = applyGeodataAvailability(settings, { accommodation: ['hotel'] });
 
     expect(result.accommodation.enabled).toBeTrue();
     expect(result.accommodation.subcategories['hotel']).toBeTrue();
