@@ -3,13 +3,23 @@ const table = require('./db/tableWebsiteMetadata');
 const { validateWebsiteUrl } = require('./website-metadata');
 
 class WebsiteMetadataJobManager {
-  constructor({ database, client, logger = console, refreshDays, retryHours, delayMs, maxUrls, store = table } = {}) {
+  constructor({
+    database, client, logger = console, refreshDays, retryHours,
+    concurrency, domainDelayMs, delayMs, maxUrls, store = table
+  } = {}) {
     this.database = database;
     this.client = client;
     this.logger = logger;
     this.refreshDays = positiveNumber(refreshDays ?? process.env.GEODATA_WEBSITE_METADATA_REFRESH_DAYS, 30);
     this.retryHours = positiveNumber(retryHours ?? process.env.GEODATA_WEBSITE_METADATA_RETRY_HOURS, 1);
-    this.delayMs = nonNegativeNumber(delayMs ?? process.env.GEODATA_WEBSITE_METADATA_DELAY_MS, 1000);
+    this.concurrency = positiveInteger(
+      concurrency ?? process.env.GEODATA_WEBSITE_METADATA_CONCURRENCY,
+      4
+    );
+    this.domainDelayMs = nonNegativeNumber(
+      domainDelayMs ?? delayMs ?? process.env.GEODATA_WEBSITE_METADATA_DOMAIN_DELAY_MS,
+      1000
+    );
     this.maxUrls = positiveNumber(maxUrls ?? process.env.GEODATA_WEBSITE_METADATA_JOB_MAX_URLS, 100000);
     this.running = null;
     this.inFlight = new Map();
@@ -82,21 +92,30 @@ class WebsiteMetadataJobManager {
     let processed = 0;
     let succeeded = 0;
     let failed = 0;
+    let progressWrite = Promise.resolve();
     try {
-      for (const row of due) {
-        try {
-          await this.fetchAndStore(row.websiteUrl);
-          succeeded += 1;
-        } catch (error) {
-          failed += 1;
-          this.logger.warn('Website metadata enrichment failed', { url: row.websiteUrl, error: error.message });
+      await runDomainAwareQueue(due, {
+        concurrency: this.concurrency,
+        domainDelayMs: this.domainDelayMs,
+        handler: async (row) => {
+          let retryAfterMs = 0;
+          try {
+            await this.fetchAndStore(row.websiteUrl);
+            succeeded += 1;
+          } catch (error) {
+            failed += 1;
+            retryAfterMs = nonNegativeNumber(error?.retryAfterMs, 0);
+            this.logger.warn('Website metadata enrichment failed', { url: row.websiteUrl, error: error.message });
+          }
+          processed += 1;
+          const progress = { processed, succeeded, failed };
+          progressWrite = progressWrite.then(() => callbackResult((callback) => this.store.updateJob(
+            this.database.db, jobId, progress, callback
+          )));
+          await progressWrite;
+          return { domainDelayMs: retryAfterMs };
         }
-        processed += 1;
-        await callbackResult((callback) => this.store.updateJob(
-          this.database.db, jobId, { processed, succeeded, failed }, callback
-        ));
-        if (processed < due.length && this.delayMs > 0) await delay(this.delayMs);
-      }
+      });
       await callbackResult((callback) => this.store.completeJob(this.database.db, jobId, callback));
       this.logger.info('Website metadata enrichment completed', { jobId, processed, succeeded, failed });
     } catch (error) {
@@ -179,13 +198,14 @@ function callbackResult(register) {
   return new Promise((resolve, reject) => register((error, value) => error ? reject(error) : resolve(value)));
 }
 
-function delay(milliseconds) {
-  return new Promise((resolve) => setTimeout(resolve, milliseconds));
-}
-
 function positiveNumber(value, fallback) {
   const parsed = Number(value);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function positiveInteger(value, fallback) {
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
 }
 
 function nonNegativeNumber(value, fallback) {
@@ -246,4 +266,75 @@ function positiveIntegerOrNull(value) {
   return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
 }
 
-module.exports = { WebsiteMetadataJobManager, classifyMetadataError, hasUsefulMetadata, retryDelayMs };
+function domainKey(value) {
+  const hostname = new URL(value).hostname.toLowerCase();
+  return hostname.startsWith('www.') ? hostname.slice(4) : hostname;
+}
+
+function runDomainAwareQueue(rows, { concurrency = 4, domainDelayMs = 1000, handler } = {}) {
+  const items = Array.isArray(rows) ? rows : [];
+  if (!items.length) return Promise.resolve();
+  if (typeof handler !== 'function') return Promise.reject(new TypeError('Metadata queue handler is required'));
+
+  const queues = new Map();
+  for (const row of items) {
+    const key = domainKey(row.websiteUrl);
+    const queue = queues.get(key) || { items: [], index: 0 };
+    queue.items.push(row);
+    queues.set(key, queue);
+  }
+
+  const workerLimit = positiveInteger(concurrency, 4);
+  const cooldown = nonNegativeNumber(domainDelayMs, 1000);
+  const ready = [...queues.keys()];
+  let readyIndex = 0;
+  let active = 0;
+  let completed = 0;
+  let settled = false;
+
+  return new Promise((resolve, reject) => {
+    const fail = (error) => {
+      if (settled) return;
+      settled = true;
+      reject(error);
+    };
+    const pump = () => {
+      if (settled) return;
+      while (active < workerLimit && readyIndex < ready.length) {
+        const key = ready[readyIndex++];
+        const queue = queues.get(key);
+        if (!queue || queue.index >= queue.items.length) continue;
+        const row = queue.items[queue.index++];
+        active += 1;
+        Promise.resolve(handler(row)).then((result) => {
+          active -= 1;
+          completed += 1;
+          if (queue.index < queue.items.length) {
+            const nextDelay = Math.max(cooldown, nonNegativeNumber(result?.domainDelayMs, 0));
+            if (nextDelay > 0) {
+              setTimeout(() => {
+                if (settled) return;
+                ready.push(key);
+                pump();
+              }, nextDelay);
+            } else {
+              ready.push(key);
+            }
+          }
+          if (completed >= items.length) {
+            settled = true;
+            resolve();
+            return;
+          }
+          pump();
+        }, fail);
+      }
+    };
+    pump();
+  });
+}
+
+module.exports = {
+  WebsiteMetadataJobManager, classifyMetadataError, domainKey, hasUsefulMetadata,
+  retryDelayMs, runDomainAwareQueue
+};

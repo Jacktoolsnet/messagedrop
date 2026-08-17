@@ -99,6 +99,12 @@ automatically. Transient failures use increasing backoff and respect
 refresh interval, request delay, and retry behavior use the
 `GEODATA_WEBSITE_METADATA_*` settings.
 
+Four workers process different domains concurrently by default. A domain is
+handled by at most one worker at a time and keeps a one-second cooldown before
+its next request. Configure this with
+`GEODATA_WEBSITE_METADATA_CONCURRENCY` and
+`GEODATA_WEBSITE_METADATA_DOMAIN_DELAY_MS`.
+
 ## Admin integration
 
 The admin backend stores global selection and scheduling data in

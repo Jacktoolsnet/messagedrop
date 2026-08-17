@@ -36,6 +36,7 @@ export class GeodataImportSettingsComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly service = inject(GeodataImportService);
   private readonly messages = inject(DisplayMessageService);
+  private readonly metadataSamples = new Map<string, Array<{ timestamp: number; processed: number }>>();
   readonly i18n = inject(TranslationHelperService);
 
   readonly loading = signal(true);
@@ -95,6 +96,7 @@ export class GeodataImportSettingsComponent {
       takeUntilDestroyed(this.destroyRef)
     ).subscribe((value) => {
       const metadataWasRunning = this.hasActiveMetadataJob();
+      this.recordMetadataSamples(value.metadataJobs ?? []);
       this.databaseInfo.update((current) => ({
         ...(current ?? { status: 200, health: { status: 200 } }),
         jobs: value.jobs,
@@ -109,7 +111,10 @@ export class GeodataImportSettingsComponent {
         ? this.service.getDatabaseInfo().pipe(catchError(() => EMPTY))
         : EMPTY),
       takeUntilDestroyed(this.destroyRef)
-    ).subscribe((value) => this.databaseInfo.set(value));
+    ).subscribe((value) => {
+      this.recordMetadataSamples(value.metadataJobs ?? []);
+      this.databaseInfo.set(value);
+    });
   }
 
   load(): void {
@@ -250,7 +255,10 @@ export class GeodataImportSettingsComponent {
     this.service.getDatabaseInfo()
       .pipe(finalize(() => this.loadingDatabaseInfo.set(false)), takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (value) => this.databaseInfo.set(value),
+        next: (value) => {
+          this.recordMetadataSamples(value.metadataJobs ?? []);
+          this.databaseInfo.set(value);
+        },
         error: () => this.showError(this.i18n.t('Could not load database information.'))
       });
   }
@@ -394,10 +402,31 @@ export class GeodataImportSettingsComponent {
 
   metadataRemaining(job: GeodataMetadataJob): string | null {
     if (job.status !== 'running' || job.processedUrls <= 0 || job.processedUrls >= job.totalUrls) return null;
-    const elapsed = Date.now() - new Date(job.createdAt).getTime();
-    if (!Number.isFinite(elapsed) || elapsed <= 0) return null;
-    const averageRequestDuration = elapsed / job.processedUrls;
-    return this.formatDuration(averageRequestDuration * (job.totalUrls - job.processedUrls));
+    const samples = this.metadataSamples.get(job.metadataJobId) ?? [];
+    if (samples.length < 2) return null;
+    const first = samples[0];
+    const last = samples[samples.length - 1];
+    const elapsed = last.timestamp - first.timestamp;
+    const processed = last.processed - first.processed;
+    if (elapsed <= 0 || processed <= 0) return null;
+    return this.formatDuration(elapsed / processed * (job.totalUrls - job.processedUrls));
+  }
+
+  private recordMetadataSamples(jobs: GeodataMetadataJob[]): void {
+    const now = Date.now();
+    const activeIds = new Set<string>();
+    for (const job of jobs) {
+      if (job.status !== 'running' || job.stage === 'discovering') continue;
+      activeIds.add(job.metadataJobId);
+      const samples = this.metadataSamples.get(job.metadataJobId) ?? [];
+      samples.push({ timestamp: now, processed: job.processedUrls });
+      // Five-second polling makes the last two minutes a useful rolling window
+      // while still reacting quickly when the achieved throughput changes.
+      this.metadataSamples.set(job.metadataJobId, samples.slice(-25));
+    }
+    for (const id of this.metadataSamples.keys()) {
+      if (!activeIds.has(id)) this.metadataSamples.delete(id);
+    }
   }
 
   private formatDuration(milliseconds: number): string {

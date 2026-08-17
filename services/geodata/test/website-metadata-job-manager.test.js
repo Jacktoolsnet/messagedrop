@@ -4,7 +4,8 @@ const {
   WebsiteMetadataJobManager,
   classifyMetadataError,
   hasUsefulMetadata,
-  retryDelayMs
+  retryDelayMs,
+  runDomainAwareQueue
 } = require('../website-metadata-job-manager');
 
 function memoryStore(websites) {
@@ -64,7 +65,7 @@ function memoryStore(websites) {
   };
 }
 
-test('recovers on startup, deduplicates normalized URLs and fetches them sequentially', async () => {
+test('recovers on startup and deduplicates normalized URLs', async () => {
   const store = memoryStore([
     'https://hotel.example', 'https://hotel.example/', 'https://second.example/'
   ]);
@@ -83,6 +84,55 @@ test('recovers on startup, deduplicates normalized URLs and fetches them sequent
   assert.equal(store.state.job.status, 'succeeded');
   assert.equal(store.state.job.processedUrls, 2);
   assert.equal(store.state.job.succeededUrls, 2);
+});
+
+test('processes different domains with bounded concurrency', async () => {
+  let active = 0;
+  let maximumActive = 0;
+  await runDomainAwareQueue([
+    { websiteUrl: 'https://one.example/' },
+    { websiteUrl: 'https://two.example/' },
+    { websiteUrl: 'https://three.example/' },
+    { websiteUrl: 'https://four.example/' },
+    { websiteUrl: 'https://five.example/' }
+  ], {
+    concurrency: 4,
+    domainDelayMs: 0,
+    async handler() {
+      active += 1;
+      maximumActive = Math.max(maximumActive, active);
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      active -= 1;
+    }
+  });
+  assert.equal(maximumActive, 4);
+});
+
+test('serializes the same domain and applies its cooldown without blocking other domains', async () => {
+  const starts = [];
+  let exampleActive = 0;
+  let maximumExampleActive = 0;
+  await runDomainAwareQueue([
+    { websiteUrl: 'https://example.test/first' },
+    { websiteUrl: 'https://www.example.test/second' },
+    { websiteUrl: 'https://other.test/' }
+  ], {
+    concurrency: 4,
+    domainDelayMs: 30,
+    async handler(row) {
+      starts.push({ url: row.websiteUrl, timestamp: Date.now() });
+      if (row.websiteUrl.includes('example.test')) {
+        exampleActive += 1;
+        maximumExampleActive = Math.max(maximumExampleActive, exampleActive);
+      }
+      await new Promise((resolve) => setTimeout(resolve, 5));
+      if (row.websiteUrl.includes('example.test')) exampleActive -= 1;
+    }
+  });
+  const exampleStarts = starts.filter((row) => row.url.includes('example.test'));
+  assert.equal(maximumExampleActive, 1);
+  assert.ok(exampleStarts[1].timestamp - exampleStarts[0].timestamp >= 25);
+  assert.ok(starts.findIndex((row) => row.url.includes('other.test')) < starts.findIndex((row) => row.url.includes('/second')));
 });
 
 test('resumes a startup metadata job without rediscovering already stored website references', async () => {
