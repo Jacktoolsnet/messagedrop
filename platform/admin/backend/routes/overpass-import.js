@@ -61,8 +61,10 @@ router.get('/jobs', async (req, res, next) => {
 
 router.get('/database-info', async (_req, res, next) => {
   try {
+    // Aggregate POI/metadata counts can take longer than ordinary API calls on large datasets.
+    const databaseInfoTimeoutMs = Number(process.env.OVERPASS_DATABASE_INFO_TIMEOUT_MS || 60000);
     const [health, service, metadata] = await Promise.all([
-      requestService('get', '/overpass/health'),
+      requestService('get', '/overpass/health', undefined, { timeoutMs: databaseInfoTimeoutMs }),
       requestService('get', '/overpass/import-jobs?limit=20'),
       requestService('get', '/overpass/metadata-jobs?limit=20')
     ]);

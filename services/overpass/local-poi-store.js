@@ -1,10 +1,13 @@
 const tableOverpassPoi = require('./db/tableOverpassPoi');
 
 class LocalPoiStore {
-  constructor({ database, logger = console } = {}) {
+  constructor({ database, logger = console, statusCacheMs = process.env.OVERPASS_STATUS_CACHE_MS || 60000 } = {}) {
     this.database = database;
     this.logger = logger;
     this.metrics = { hits: 0, misses: 0, errors: 0 };
+    this.statusCacheMs = Math.max(0, Number(statusCacheMs) || 0);
+    this.statusCache = null;
+    this.statusInFlight = null;
   }
 
   get enabled() {
@@ -59,12 +62,25 @@ class LocalPoiStore {
 
   async status() {
     if (!this.enabled) return emptyStatus();
+    if (this.statusCache && this.statusCache.expiresAt > Date.now()) return this.statusCache.value;
+    if (this.statusInFlight) return this.statusInFlight;
+
+    this.statusInFlight = this.loadStatus();
+    try { return await this.statusInFlight; }
+    finally { this.statusInFlight = null; }
+  }
+
+  async loadStatus() {
     try {
       const status = await callbackResult((callback) => tableOverpassPoi.status(this.database.db, callback));
-      return {
+      const value = {
         ...status,
         databaseBytes: status?.databaseBytes == null ? null : Number(status.databaseBytes)
       };
+      if (this.statusCacheMs > 0) {
+        this.statusCache = { value, expiresAt: Date.now() + this.statusCacheMs };
+      }
+      return value;
     } catch (error) {
       this.metrics.errors += 1;
       this.logger?.warn?.('Local Overpass POI status failed', { error: error.message });

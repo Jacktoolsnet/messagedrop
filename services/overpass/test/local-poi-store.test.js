@@ -54,6 +54,28 @@ test('returns the PostgreSQL database size as a JSON number', async () => {
   assert.equal(status.websiteMetadataPoiCount, 1800);
 });
 
+test('caches database status and coalesces concurrent requests', async () => {
+  let calls = 0;
+  const database = { db: {
+    get(_sql, _params, callback) {
+      calls += 1;
+      setImmediate(() => callback(null, {
+        datasetCount: 4, poiCount: 100, websitePoiCount: 20, websiteMetadataPoiCount: 10,
+        importedAt: '2026-08-17T06:00:00Z', databaseBytes: '2791728742'
+      }));
+    }
+  } };
+  const store = new LocalPoiStore({ database, statusCacheMs: 60000 });
+
+  const [first, second] = await Promise.all([store.status(), store.status()]);
+  const third = await store.status();
+
+  assert.equal(calls, 1);
+  assert.equal(first.databaseBytes, 2791728742);
+  assert.deepEqual(second, first);
+  assert.deepEqual(third, first);
+});
+
 test('adds stored website metadata to local POI results', async () => {
   const payload = { id: 'osm:node:42', contact: { website: 'https://hotel.example' } };
   const database = { db: {

@@ -17,12 +17,12 @@ function serviceBaseUrl() {
   return String(base).replace(/\/+$/, '');
 }
 
-async function requestService(method, path, data) {
+async function requestService(method, path, data, options = {}) {
   try {
     const token = await signServiceJwt({ audience: process.env.SERVICE_JWT_AUDIENCE_OVERPASS || 'service.overpass' });
     const response = await axios({
       method, url: `${serviceBaseUrl()}${path}`, data,
-      timeout: Number(process.env.OVERPASS_ADMIN_TIMEOUT_MS || 15000),
+      timeout: Number(options.timeoutMs ?? process.env.OVERPASS_ADMIN_TIMEOUT_MS ?? 15000),
       headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' }
     });
     return response.data;

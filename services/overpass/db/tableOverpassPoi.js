@@ -95,27 +95,30 @@ function coveringDataset(db, bounds, categories, callback) {
 
 function status(db, callback) {
   db.get(`
-    SELECT COUNT(*)::integer AS datasetCount, COALESCE(SUM(v.poiCount), 0)::integer AS poiCount,
-      MAX(v.activatedAt) AS importedAt,
+    WITH activeWebsites AS MATERIALIZED (
+      SELECT NULLIF(BTRIM(p.payload #>> '{contact,website}'), '') AS websiteUrl
+      FROM ${POI_TABLE} p
+      JOIN ${VERSION_TABLE} pv ON pv.versionId = p.versionId AND pv.status = 'active'
+      JOIN ${DATASET_TABLE} pd ON pd.activeVersionId = pv.versionId
+      WHERE NULLIF(BTRIM(p.payload #>> '{contact,website}'), '') IS NOT NULL
+    ), websiteCounts AS (
+      SELECT COUNT(*)::integer AS websitePoiCount,
+        COUNT(m.websiteUrl)::integer AS websiteMetadataPoiCount
+      FROM activeWebsites w
+      LEFT JOIN tableOverpassWebsiteReference r ON r.websiteUrl = w.websiteUrl
+      LEFT JOIN tableOverpassWebsiteMetadata m
+        ON m.websiteUrl = r.normalizedUrl AND m.metadata IS NOT NULL
+    ), datasetCounts AS (
+      SELECT COUNT(*)::integer AS datasetCount, COALESCE(SUM(v.poiCount), 0)::integer AS poiCount,
+        MAX(v.activatedAt) AS importedAt
+      FROM ${DATASET_TABLE} d
+      JOIN ${VERSION_TABLE} v ON v.versionId = d.activeVersionId AND v.status = 'active'
+    )
+    SELECT dc.datasetCount, dc.poiCount, dc.importedAt,
       pg_database_size(current_database())::bigint AS databaseBytes,
-      (SELECT COUNT(*)::integer
-        FROM ${POI_TABLE} p
-        JOIN ${VERSION_TABLE} pv ON pv.versionId = p.versionId AND pv.status = 'active'
-        JOIN ${DATASET_TABLE} pd ON pd.activeVersionId = pv.versionId
-        WHERE NULLIF(BTRIM(p.payload #>> '{contact,website}'), '') IS NOT NULL
-      ) AS websitePoiCount,
-      (SELECT COUNT(*)::integer
-        FROM ${POI_TABLE} p
-        JOIN ${VERSION_TABLE} pv ON pv.versionId = p.versionId AND pv.status = 'active'
-        JOIN ${DATASET_TABLE} pd ON pd.activeVersionId = pv.versionId
-        JOIN tableOverpassWebsiteReference r
-          ON r.websiteUrl = p.payload #>> '{contact,website}'
-        JOIN tableOverpassWebsiteMetadata m
-          ON m.websiteUrl = r.normalizedUrl AND m.metadata IS NOT NULL
-        WHERE NULLIF(BTRIM(p.payload #>> '{contact,website}'), '') IS NOT NULL
-      ) AS websiteMetadataPoiCount
-    FROM ${DATASET_TABLE} d
-    JOIN ${VERSION_TABLE} v ON v.versionId = d.activeVersionId AND v.status = 'active'
+      wc.websitePoiCount, wc.websiteMetadataPoiCount
+    FROM datasetCounts dc
+    CROSS JOIN websiteCounts wc
   `, [], callback);
 }
 
