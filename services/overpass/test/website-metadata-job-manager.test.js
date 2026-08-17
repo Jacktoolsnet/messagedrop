@@ -21,14 +21,17 @@ function memoryStore(websites) {
     },
     createJob(_db, value, callback) {
       state.job = { metadataJobId: value.jobId, status: 'running', totalUrls: value.total,
-        processedUrls: 0, succeededUrls: 0, failedUrls: 0 };
+        stage: 'discovering', processedUrls: 0, succeededUrls: 0, failedUrls: 0 };
       done(callback);
+    },
+    setJobTotal(_db, _id, total, callback) {
+      state.job.totalUrls = total; state.job.stage = 'processing'; done(callback);
     },
     updateJob(_db, _id, value, callback) { Object.assign(state.job, {
       processedUrls: value.processed, succeededUrls: value.succeeded, failedUrls: value.failed
     }); done(callback); },
-    completeJob(_db, _id, callback) { state.job.status = 'succeeded'; done(callback); },
-    failJob(_db, _id, error, callback) { state.job.status = 'failed'; state.job.error = error; done(callback); },
+    completeJob(_db, _id, callback) { state.job.status = 'succeeded'; state.job.stage = 'completed'; done(callback); },
+    failJob(_db, _id, error, callback) { state.job.status = 'failed'; state.job.stage = 'failed'; state.job.error = error; done(callback); },
     markFetching(_db, url, callback) {
       const row = state.metadata.get(url);
       row.status = 'fetching'; row.attemptCount = Number(row.attemptCount || 0) + 1; done(callback);

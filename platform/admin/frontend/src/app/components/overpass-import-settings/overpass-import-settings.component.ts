@@ -95,11 +95,11 @@ export class OverpassImportSettingsComponent {
       takeUntilDestroyed(this.destroyRef)
     ).subscribe((value) => {
       const metadataWasRunning = this.hasActiveMetadataJob();
-      this.databaseInfo.update((current) => current ? {
-        ...current,
+      this.databaseInfo.update((current) => ({
+        ...(current ?? { status: 200, health: { status: 200 } }),
         jobs: value.jobs,
         metadataJobs: value.metadataJobs
-      } : current);
+      }));
       if (metadataWasRunning && !this.hasActiveMetadataJob()) this.loadDatabaseInfo();
     });
     // The POI metadata total is an aggregate over the active datasets and therefore

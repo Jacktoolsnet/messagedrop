@@ -59,6 +59,7 @@ export interface OverpassImportJob {
 export interface OverpassMetadataJob {
   metadataJobId: string;
   status: 'running' | 'succeeded' | 'failed';
+  stage?: 'discovering' | 'processing' | 'completed' | 'failed';
   triggerReason: string;
   totalUrls: number;
   processedUrls: number;

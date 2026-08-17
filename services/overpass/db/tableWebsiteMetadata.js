@@ -31,6 +31,7 @@ function init(db, callback) {
     CREATE TABLE IF NOT EXISTS ${JOB_TABLE} (
       metadataJobId TEXT PRIMARY KEY,
       status TEXT NOT NULL CHECK (status IN ('running', 'succeeded', 'failed')),
+      stage TEXT NOT NULL DEFAULT 'discovering',
       triggerReason TEXT NOT NULL,
       totalUrls INTEGER NOT NULL DEFAULT 0,
       processedUrls INTEGER NOT NULL DEFAULT 0,
@@ -47,6 +48,7 @@ function init(db, callback) {
     ALTER TABLE ${METADATA_TABLE} ADD COLUMN IF NOT EXISTS outcome TEXT;
     ALTER TABLE ${METADATA_TABLE} ADD COLUMN IF NOT EXISTS errorCode TEXT;
     ALTER TABLE ${METADATA_TABLE} ADD COLUMN IF NOT EXISTS httpStatus INTEGER;
+    ALTER TABLE ${JOB_TABLE} ADD COLUMN IF NOT EXISTS stage TEXT NOT NULL DEFAULT 'discovering';
   `, callback);
 }
 
@@ -58,7 +60,7 @@ function recover(db, callback) {
         lastError = 'Service restarted during metadata fetch', updatedAt = CURRENT_TIMESTAMP
       WHERE status = 'fetching';
     UPDATE ${JOB_TABLE}
-      SET status = 'failed', error = 'Service restarted during metadata job', completedAt = CURRENT_TIMESTAMP
+      SET status = 'failed', stage = 'failed', error = 'Service restarted during metadata job', completedAt = CURRENT_TIMESTAMP
       WHERE status = 'running';
   `, callback);
 }
@@ -135,8 +137,13 @@ function markPermanentFailed(db, websiteUrl, { error, errorCode, httpStatus }, c
 }
 
 function createJob(db, { jobId, reason, total }, callback) {
-  db.run(`INSERT INTO ${JOB_TABLE} (metadataJobId, status, triggerReason, totalUrls)
-    VALUES (?, 'running', ?, ?)`, [jobId, reason, total], callback);
+  db.run(`INSERT INTO ${JOB_TABLE} (metadataJobId, status, stage, triggerReason, totalUrls)
+    VALUES (?, 'running', 'discovering', ?, ?)`, [jobId, reason, total], callback);
+}
+
+function setJobTotal(db, jobId, total, callback) {
+  db.run(`UPDATE ${JOB_TABLE} SET totalUrls = ?, stage = 'processing'
+    WHERE metadataJobId = ? AND status = 'running'`, [total, jobId], callback);
 }
 
 function updateJob(db, jobId, { processed, succeeded, failed }, callback) {
@@ -145,12 +152,12 @@ function updateJob(db, jobId, { processed, succeeded, failed }, callback) {
 }
 
 function completeJob(db, jobId, callback) {
-  db.run(`UPDATE ${JOB_TABLE} SET status = 'succeeded', completedAt = CURRENT_TIMESTAMP
+  db.run(`UPDATE ${JOB_TABLE} SET status = 'succeeded', stage = 'completed', completedAt = CURRENT_TIMESTAMP
     WHERE metadataJobId = ? AND status = 'running'`, [jobId], callback);
 }
 
 function failJob(db, jobId, error, callback) {
-  db.run(`UPDATE ${JOB_TABLE} SET status = 'failed', error = ?, completedAt = CURRENT_TIMESTAMP
+  db.run(`UPDATE ${JOB_TABLE} SET status = 'failed', stage = 'failed', error = ?, completedAt = CURRENT_TIMESTAMP
     WHERE metadataJobId = ? AND status = 'running'`, [String(error || 'Metadata job failed').slice(0, 2000), jobId], callback);
 }
 
@@ -166,5 +173,5 @@ function listJobs(db, limit, callback) {
 module.exports = {
   METADATA_TABLE, REFERENCE_TABLE, JOB_TABLE, init, recover, discoverWebsites, listDue, get, ensure, ensureReference,
   markFetching, markSucceeded, markNoMetadata, markRetryableFailed, markPermanentFailed,
-  createJob, updateJob, completeJob, failJob, runningJob, listJobs
+  createJob, setJobTotal, updateJob, completeJob, failJob, runningJob, listJobs
 };

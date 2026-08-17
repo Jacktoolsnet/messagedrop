@@ -27,18 +27,38 @@ class WebsiteMetadataJobManager {
     }
     const active = await callbackResult((callback) => this.store.runningJob(this.database.db, callback));
     if (active) return active;
-    await this.discover();
-    const due = await callbackResult((callback) => this.store.listDue(
-      this.database.db, this.refreshDays, this.maxUrls, callback
-    ));
-    if (!due.length) return null;
     const jobId = randomUUID();
     await callbackResult((callback) => this.store.createJob(this.database.db, {
-      jobId, reason: String(reason).slice(0, 100), total: due.length
+      jobId, reason: String(reason).slice(0, 100), total: 0
     }, callback));
-    this.running = this.run(jobId, due).finally(() => { this.running = null; });
+    const job = await callbackResult((callback) => this.store.runningJob(this.database.db, callback));
+    this.running = this.prepareAndRun(jobId).finally(() => { this.running = null; });
     void this.running;
-    return callbackResult((callback) => this.store.runningJob(this.database.db, callback));
+    return job;
+  }
+
+  async prepareAndRun(jobId) {
+    try {
+      await this.discover();
+      const due = await callbackResult((callback) => this.store.listDue(
+        this.database.db, this.refreshDays, this.maxUrls, callback
+      ));
+      await callbackResult((callback) => this.store.setJobTotal(this.database.db, jobId, due.length, callback));
+      if (!due.length) {
+        await callbackResult((callback) => this.store.completeJob(this.database.db, jobId, callback));
+        return;
+      }
+      await this.run(jobId, due);
+    } catch (error) {
+      try {
+        await callbackResult((callback) => this.store.failJob(this.database.db, jobId, error.message, callback));
+      } catch (databaseError) {
+        this.logger.error('Could not persist website metadata preparation failure', {
+          jobId, error: databaseError.message
+        });
+      }
+      this.logger.error('Website metadata preparation failed', { jobId, error: error.message });
+    }
   }
 
   async discover() {

@@ -277,14 +277,19 @@
                     <article class="job-row" [class.active-job]="job.status === 'running'">
                       <mat-icon>{{ job.status === 'succeeded' ? 'check_circle' : job.status === 'failed' ? 'error' : 'sync' }}</mat-icon>
                       <span class="job-content"><strong>{{ job.triggerReason }}</strong>
-                        <small>{{ job.processedUrls }} / {{ job.totalUrls }} · {{ job.succeededUrls }} {{ i18n.t('successful') }} · {{ job.failedUrls }} {{ i18n.t('failed') }}</small>
+                        @if (job.stage === 'discovering') {
+                          <small>{{ i18n.t('Discovering websites and preparing metadata job…') }}</small>
+                        } @else {
+                          <small>{{ job.processedUrls }} / {{ job.totalUrls }} · {{ job.succeededUrls }} {{ i18n.t('successful') }} · {{ job.failedUrls }} {{ i18n.t('failed') }}</small>
+                        }
                         @if (job.status === 'running') {
                           <div class="progress-section">
                             <div class="progress-caption">
                               <span>{{ i18n.t('Website metadata') }}</span>
                               <strong>{{ metadataProgress(job) | number:'1.0-1' }} %</strong>
                             </div>
-                            <mat-progress-bar mode="determinate" [value]="metadataProgress(job)"></mat-progress-bar>
+                            <mat-progress-bar [mode]="job.stage === 'discovering' ? 'indeterminate' : 'determinate'"
+                              [value]="metadataProgress(job)"></mat-progress-bar>
                             <div class="progress-details">
                               @if (metadataElapsed(job); as duration) { <span><mat-icon>schedule</mat-icon>{{ i18n.t('Elapsed') }}: {{ duration }}</span> }
                               @if (metadataRemaining(job); as duration) { <span><mat-icon>hourglass_top</mat-icon>{{ i18n.t('Estimated remaining') }}: {{ duration }}</span> }
