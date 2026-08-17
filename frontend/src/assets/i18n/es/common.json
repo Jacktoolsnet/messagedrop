@@ -1570,7 +1570,6 @@
       },
       "dataSources": {
         "title": "Fuentes de datos y licencias",
-        "intro": "Estos avisos explican el origen, la licencia y el tratamiento de los datos cartográficos y de puntos de interés mostrados en MessageDrop.",
         "openStreetMap": "Los datos cartográficos y de puntos de interés proceden de OpenStreetMap y están disponibles bajo la Open Database License 1.0 (ODbL).",
         "copyrightAndLicense": "Derechos de autor y licencia",
         "downloadDataset": "Descargar datos ODbL",

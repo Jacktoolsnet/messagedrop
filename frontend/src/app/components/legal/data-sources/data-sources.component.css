@@ -1,32 +1,63 @@
 :host {
   color: var(--mat-app-text-color);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: 90vh;
 }
 
 .content {
-  display: grid;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
   gap: 1rem;
+  padding-bottom: 1.5rem;
+  scroll-padding-bottom: 1.5rem;
   line-height: 1.5;
 }
 
-.content > p,
-.source-card p,
-.notice p {
+mat-dialog-actions {
+  flex: 0 0 auto;
   margin: 0;
 }
 
-.source-card {
+.content > p,
+.tile p {
+  margin: 0;
+}
+
+.tile-grid {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: .9rem;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.tile {
+  min-width: 0;
   padding: 1rem;
   border: 1px solid var(--mat-sys-outline-variant);
   border-radius: 16px;
-  background: var(--mat-sys-surface-container-low);
+  background: var(--mat-card-filled-container-color);
+  color: var(--mat-card-subtitle-text-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+  display: flex;
+  flex-direction: column;
+  gap: .65rem;
 }
 
-.source-icon {
+.tile-header {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+
+.tile-icon {
   width: 44px;
   height: 44px;
+  flex: 0 0 44px;
   display: grid;
   place-items: center;
   border-radius: 50%;
@@ -35,12 +66,11 @@
 }
 
 h2 {
-  margin: 0 0 .4rem;
+  margin: 0;
   font-size: 1.05rem;
 }
 
 .attribution {
-  margin-bottom: .4rem !important;
   font-weight: 600;
 }
 
@@ -48,37 +78,24 @@ h2 {
   display: flex;
   flex-wrap: wrap;
   gap: .55rem;
-  margin-top: .75rem;
+  margin-top: auto;
+  padding-top: .35rem;
 }
 
-.source-card > div > a {
-  margin-top: .75rem;
+.tile.warning .tile-icon {
+  background: var(--mat-sys-tertiary);
+  color: var(--mat-sys-on-tertiary);
 }
 
-.notice {
-  padding: 1rem;
-  border-radius: 14px;
-  background: var(--mat-sys-surface-container);
-}
-
-.notice.warning {
-  background: var(--mat-sys-tertiary-container);
-  color: var(--mat-sys-on-tertiary-container);
-}
-
-.notice h2 {
-  display: flex;
-  align-items: center;
-  gap: .5rem;
+@media (min-width: 720px) {
+  .tile-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 520px) {
-  .source-card {
-    grid-template-columns: 1fr;
-  }
-
   .links a,
-  .source-card > div > a {
+  .links {
     width: 100%;
   }
 }

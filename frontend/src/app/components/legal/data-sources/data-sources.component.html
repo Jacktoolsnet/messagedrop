@@ -4,12 +4,12 @@
 </app-dialog-header>
 
 <div mat-dialog-content class="content">
-  <p>{{ 'common.legal.dataSources.intro' | transloco }}</p>
-
-  <section class="source-card" aria-labelledby="osm-source-title">
-    <div class="source-icon"><mat-icon>map</mat-icon></div>
-    <div>
-      <h2 id="osm-source-title">OpenStreetMap</h2>
+  <div class="tile-grid">
+    <section class="tile" aria-labelledby="osm-source-title">
+      <header class="tile-header">
+        <div class="tile-icon"><mat-icon>map</mat-icon></div>
+        <h2 id="osm-source-title">OpenStreetMap</h2>
+      </header>
       <p class="attribution">© OpenStreetMap contributors</p>
       <p>{{ 'common.legal.dataSources.openStreetMap' | transloco }}</p>
       <div class="links">
@@ -29,31 +29,39 @@
           {{ 'common.legal.dataSources.downloadDataset' | transloco }}
         </a>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="source-card" aria-labelledby="geofabrik-source-title">
-    <div class="source-icon"><mat-icon>download</mat-icon></div>
-    <div>
-      <h2 id="geofabrik-source-title">Geofabrik GmbH</h2>
+    <section class="tile" aria-labelledby="geofabrik-source-title">
+      <header class="tile-header">
+        <div class="tile-icon"><mat-icon>download</mat-icon></div>
+        <h2 id="geofabrik-source-title">Geofabrik GmbH</h2>
+      </header>
       <p>{{ 'common.legal.dataSources.geofabrik' | transloco }}</p>
-      <a mat-stroked-button href="https://download.geofabrik.de/"
-        target="_blank" rel="noopener noreferrer">
-        <mat-icon>open_in_new</mat-icon>
-        {{ 'common.legal.dataSources.openDownloadSource' | transloco }}
-      </a>
-    </div>
-  </section>
+      <div class="links">
+        <a mat-stroked-button href="https://download.geofabrik.de/"
+          target="_blank" rel="noopener noreferrer">
+          <mat-icon>open_in_new</mat-icon>
+          {{ 'common.legal.dataSources.openDownloadSource' | transloco }}
+        </a>
+      </div>
+    </section>
 
-  <section class="notice">
-    <h2><mat-icon>tune</mat-icon>{{ 'common.legal.dataSources.processingTitle' | transloco }}</h2>
-    <p>{{ 'common.legal.dataSources.processing' | transloco }}</p>
-  </section>
+    <section class="tile" aria-labelledby="processing-title">
+      <header class="tile-header">
+        <div class="tile-icon"><mat-icon>tune</mat-icon></div>
+        <h2 id="processing-title">{{ 'common.legal.dataSources.processingTitle' | transloco }}</h2>
+      </header>
+      <p>{{ 'common.legal.dataSources.processing' | transloco }}</p>
+    </section>
 
-  <section class="notice warning">
-    <h2><mat-icon>warning_amber</mat-icon>{{ 'common.legal.dataSources.qualityTitle' | transloco }}</h2>
-    <p>{{ 'common.legal.dataSources.quality' | transloco }}</p>
-  </section>
+    <section class="tile warning" aria-labelledby="quality-title">
+      <header class="tile-header">
+        <div class="tile-icon"><mat-icon>warning_amber</mat-icon></div>
+        <h2 id="quality-title">{{ 'common.legal.dataSources.qualityTitle' | transloco }}</h2>
+      </header>
+      <p>{{ 'common.legal.dataSources.quality' | transloco }}</p>
+    </section>
+  </div>
 </div>
 
 <mat-dialog-actions align="end">

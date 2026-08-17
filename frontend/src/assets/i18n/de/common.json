@@ -1571,7 +1571,6 @@
       },
       "dataSources": {
         "title": "Datenquellen und Lizenzen",
-        "intro": "Diese Hinweise erläutern Herkunft, Lizenz und Verarbeitung der in MessageDrop angezeigten Karten- und POI-Daten.",
         "openStreetMap": "Die Karten- und POI-Daten stammen von OpenStreetMap und stehen unter der Open Database License 1.0 (ODbL).",
         "copyrightAndLicense": "Urheberrecht und Lizenz",
         "downloadDataset": "ODbL-Datensatz herunterladen",
