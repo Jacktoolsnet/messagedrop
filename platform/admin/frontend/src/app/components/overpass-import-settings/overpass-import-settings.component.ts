@@ -102,6 +102,14 @@ export class OverpassImportSettingsComponent {
       } : current);
       if (metadataWasRunning && !this.hasActiveMetadataJob()) this.loadDatabaseInfo();
     });
+    // The POI metadata total is an aggregate over the active datasets and therefore
+    // deliberately refreshed less often than the lightweight job progress.
+    timer(60000, 60000).pipe(
+      switchMap(() => this.hasActiveMetadataJob() && !this.loadingDatabaseInfo()
+        ? this.service.getDatabaseInfo().pipe(catchError(() => EMPTY))
+        : EMPTY),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe((value) => this.databaseInfo.set(value));
   }
 
   load(): void {
