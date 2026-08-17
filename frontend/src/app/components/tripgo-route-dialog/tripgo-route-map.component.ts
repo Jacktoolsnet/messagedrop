@@ -1659,22 +1659,27 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
         longitude: poi.longitude,
         plusCode: this.geolocation.getPlusCode(poi.latitude, poi.longitude)
       };
+      // Use the physical distance at every zoom level. At the simulation's
+      // common zoom level 17, differently generated grouping keys (for
+      // example Wikipedia and Overpass) must not produce overlapping pins.
+      const nearbyGroupKey = [...groups.entries()].find(([, group]) =>
+        this.geolocation.areLocationsNear(
+          group.location,
+          sourceLocation,
+          MAP_CONTENT_GROUP_RADIUS_METERS
+        ))?.[0];
+      if (nearbyGroupKey) {
+        add(MarkerType.OVERPASS_POI, poi, sourceLocation, nearbyGroupKey);
+        return;
+      }
       if (zoom > 17) {
-        // Separate OSM objects can share practically the same coordinates.
-        // A Plus-Code boundary can run directly between two practically
-        // adjacent objects. Prefer any existing nearby content group in that
-        // case so Wikipedia, messages, notes and other pins cannot cover it.
-        const nearbyGroupKey = [...groups.entries()].find(([, group]) =>
-          this.geolocation.areLocationsNear(
-            group.location,
-            sourceLocation,
-            MAP_CONTENT_GROUP_RADIUS_METERS
-          ))?.[0];
+        // No nearby content exists, so the precise Plus Code can safely be
+        // retained for this individual high-zoom marker.
         add(
           MarkerType.OVERPASS_POI,
           poi,
           sourceLocation,
-          nearbyGroupKey || `overpass-location:${sourceLocation.plusCode}`
+          `overpass-location:${sourceLocation.plusCode}`
         );
         return;
       }
