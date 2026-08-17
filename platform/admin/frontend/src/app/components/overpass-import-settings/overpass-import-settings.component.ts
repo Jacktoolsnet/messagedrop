@@ -17,6 +17,7 @@ import {
   OverpassDatabaseInfo,
   OverpassImportCatalog,
   OverpassImportJob,
+  OverpassMetadataJob,
   OverpassImportSettings
 } from '../../interfaces/overpass-import.interface';
 import { DisplayMessageService } from '../../services/display-message.service';
@@ -90,11 +91,17 @@ export class OverpassImportSettingsComponent {
   constructor() {
     this.load();
     timer(5000, 5000).pipe(
-      switchMap(() => this.hasActiveImport()
-        ? this.service.getJobs().pipe(catchError(() => EMPTY))
-        : EMPTY),
+      switchMap(() => this.service.getJobs().pipe(catchError(() => EMPTY))),
       takeUntilDestroyed(this.destroyRef)
-    ).subscribe((value) => this.databaseInfo.update((current) => current ? { ...current, jobs: value.jobs } : current));
+    ).subscribe((value) => {
+      const metadataWasRunning = this.hasActiveMetadataJob();
+      this.databaseInfo.update((current) => current ? {
+        ...current,
+        jobs: value.jobs,
+        metadataJobs: value.metadataJobs
+      } : current);
+      if (metadataWasRunning && !this.hasActiveMetadataJob()) this.loadDatabaseInfo();
+    });
   }
 
   load(): void {
@@ -244,6 +251,10 @@ export class OverpassImportSettingsComponent {
     return this.databaseInfo()?.jobs.some((job) => job.status === 'queued' || job.status === 'running') ?? false;
   }
 
+  private hasActiveMetadataJob(): boolean {
+    return this.databaseInfo()?.metadataJobs?.some((job) => job.status === 'running') ?? false;
+  }
+
   startImport(): void {
     if (this.importing() || this.hasChanges()) return;
     this.importing.set(true);
@@ -356,6 +367,27 @@ export class OverpassImportSettingsComponent {
     const elapsed = Date.now() - new Date(job.startedAt).getTime();
     if (!Number.isFinite(elapsed) || elapsed <= 0) return null;
     return this.formatDuration(elapsed / job.progress * (100 - job.progress));
+  }
+
+  metadataProgress(job: OverpassMetadataJob): number {
+    if (!job.totalUrls) return job.status === 'succeeded' ? 100 : 0;
+    return Math.max(0, Math.min(100, job.processedUrls / job.totalUrls * 100));
+  }
+
+  metadataElapsed(job: OverpassMetadataJob): string | null {
+    const start = new Date(job.createdAt).getTime();
+    const end = job.completedAt ? new Date(job.completedAt).getTime() : Date.now();
+    return Number.isFinite(start) && Number.isFinite(end)
+      ? this.formatDuration(Math.max(0, end - start))
+      : null;
+  }
+
+  metadataRemaining(job: OverpassMetadataJob): string | null {
+    if (job.status !== 'running' || job.processedUrls <= 0 || job.processedUrls >= job.totalUrls) return null;
+    const elapsed = Date.now() - new Date(job.createdAt).getTime();
+    if (!Number.isFinite(elapsed) || elapsed <= 0) return null;
+    const averageRequestDuration = elapsed / job.processedUrls;
+    return this.formatDuration(averageRequestDuration * (job.totalUrls - job.processedUrls));
   }
 
   private formatDuration(milliseconds: number): string {

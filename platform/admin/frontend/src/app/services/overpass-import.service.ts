@@ -6,6 +6,7 @@ import {
   OverpassDatabaseInfo,
   OverpassImportCatalog,
   OverpassImportJob,
+  OverpassMetadataJob,
   OverpassImportSettings,
   OverpassImportSettingsResponse
 } from '../interfaces/overpass-import.interface';
@@ -31,8 +32,8 @@ export class OverpassImportService {
     return this.http.get<OverpassDatabaseInfo>(`${this.baseUrl}/database-info`);
   }
 
-  getJobs(): Observable<{ status: number; jobs: OverpassImportJob[] }> {
-    return this.http.get<{ status: number; jobs: OverpassImportJob[] }>(`${this.baseUrl}/jobs`);
+  getJobs(): Observable<{ status: number; jobs: OverpassImportJob[]; metadataJobs: OverpassMetadataJob[] }> {
+    return this.http.get<{ status: number; jobs: OverpassImportJob[]; metadataJobs: OverpassMetadataJob[] }>(`${this.baseUrl}/jobs`);
   }
 
   startImport(): Observable<{ status: number; jobs: unknown[] }> {

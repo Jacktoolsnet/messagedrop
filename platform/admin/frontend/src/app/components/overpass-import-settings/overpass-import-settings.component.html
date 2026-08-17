@@ -272,10 +272,25 @@
                 <h3>{{ i18n.t('Website metadata jobs') }}</h3>
                 <div class="job-list">
                   @for (job of (info.metadataJobs ?? []); track job.metadataJobId) {
-                    <article class="job-row">
+                    <article class="job-row" [class.active-job]="job.status === 'running'">
                       <mat-icon>{{ job.status === 'succeeded' ? 'check_circle' : job.status === 'failed' ? 'error' : 'sync' }}</mat-icon>
-                      <span><strong>{{ job.triggerReason }}</strong>
+                      <span class="job-content"><strong>{{ job.triggerReason }}</strong>
                         <small>{{ job.processedUrls }} / {{ job.totalUrls }} · {{ job.succeededUrls }} {{ i18n.t('successful') }} · {{ job.failedUrls }} {{ i18n.t('failed') }}</small>
+                        @if (job.status === 'running') {
+                          <div class="progress-section">
+                            <div class="progress-caption">
+                              <span>{{ i18n.t('Website metadata') }}</span>
+                              <strong>{{ metadataProgress(job) | number:'1.0-1' }} %</strong>
+                            </div>
+                            <mat-progress-bar mode="determinate" [value]="metadataProgress(job)"></mat-progress-bar>
+                            <div class="progress-details">
+                              @if (metadataElapsed(job); as duration) { <span><mat-icon>schedule</mat-icon>{{ i18n.t('Elapsed') }}: {{ duration }}</span> }
+                              @if (metadataRemaining(job); as duration) { <span><mat-icon>hourglass_top</mat-icon>{{ i18n.t('Estimated remaining') }}: {{ duration }}</span> }
+                            </div>
+                          </div>
+                        } @else if (metadataElapsed(job); as duration) {
+                          <small>{{ i18n.t('Duration') }}: {{ duration }}</small>
+                        }
                         @if (job.error) { <small class="job-error">{{ job.error }}</small> }
                       </span>
                       <span class="job-status" [class]="'job-status status-' + job.status">{{ job.status }}</span>

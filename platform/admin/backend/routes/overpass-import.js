@@ -54,8 +54,12 @@ router.post('/jobs', async (req, res, next) => {
 router.get('/jobs', async (req, res, next) => {
   try {
     const dispatches = await callbackResult((cb) => dispatchTable.list(req.database.db, req.query.limit, cb));
-    const service = await requestService('get', `/overpass/import-jobs?limit=${Math.max(1, Math.min(100, Number(req.query.limit) || 20))}`);
-    return res.json({ status: 200, dispatches, jobs: service.jobs || [] });
+    const limit = Math.max(1, Math.min(100, Number(req.query.limit) || 20));
+    const [service, metadata] = await Promise.all([
+      requestService('get', `/overpass/import-jobs?limit=${limit}`),
+      requestService('get', `/overpass/metadata-jobs?limit=${limit}`)
+    ]);
+    return res.json({ status: 200, dispatches, jobs: service.jobs || [], metadataJobs: metadata.jobs || [] });
   } catch (error) { return next(error); }
 });
 

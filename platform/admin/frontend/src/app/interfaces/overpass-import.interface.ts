@@ -53,6 +53,19 @@ export interface OverpassImportJob {
   completedAt: string | null;
 }
 
+export interface OverpassMetadataJob {
+  metadataJobId: string;
+  status: 'running' | 'succeeded' | 'failed';
+  triggerReason: string;
+  totalUrls: number;
+  processedUrls: number;
+  succeededUrls: number;
+  failedUrls: number;
+  error: string | null;
+  createdAt: string;
+  completedAt: string | null;
+}
+
 export interface OverpassDatabaseInfo {
   status: number;
   health: {
@@ -68,16 +81,5 @@ export interface OverpassDatabaseInfo {
     };
   };
   jobs: OverpassImportJob[];
-  metadataJobs?: Array<{
-    metadataJobId: string;
-    status: 'running' | 'succeeded' | 'failed';
-    triggerReason: string;
-    totalUrls: number;
-    processedUrls: number;
-    succeededUrls: number;
-    failedUrls: number;
-    error: string | null;
-    createdAt: string;
-    completedAt: string | null;
-  }>;
+  metadataJobs?: OverpassMetadataJob[];
 }
