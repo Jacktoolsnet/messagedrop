@@ -23,7 +23,7 @@ import { DEFAULT_SEARCH_SETTINGS, SearchSettings } from '../../interfaces/search
 import { TripGoLocation, TripGoRouteOption, TripGoRouteSegment, TripGoStop, TripGoTurnInstruction } from '../../interfaces/tripgo';
 import { WikipediaArticle } from '../../interfaces/wikipedia';
 import { GeolocationService } from '../../services/geolocation.service';
-import { overpassPlacesMarker, overpassPoiMarker, publicTransportStopMarker } from '../../services/map.service';
+import { overpassPoiGroupMarker, publicTransportStopMarker } from '../../services/map.service';
 import { TripGoRouteContent, TripGoRouteContentService } from '../../services/tripgo-route-content.service';
 import { WikipediaService } from '../../services/wikipedia.service';
 import { DisplayMessage } from '../utils/display-message/display-message.component';
@@ -69,11 +69,12 @@ const routeContentIcons: Partial<Record<MarkerType, leaflet.Icon>> = {
   [MarkerType.EXPERIENCE_DESTINATION]: leaflet.icon({ iconUrl: 'assets/markers/experience-marker.svg', iconSize: [32, 40], iconAnchor: [16, 40] }),
   [MarkerType.MY_EXPERIENCE]: leaflet.icon({ iconUrl: 'assets/markers/my-experience-marker.svg', iconSize: [32, 40], iconAnchor: [16, 40] }),
   [MarkerType.SECRET_DROP]: leaflet.icon({ iconUrl: 'assets/markers/secretdrop-marker.svg', iconSize: [32, 40], iconAnchor: [16, 40] }),
+  [MarkerType.WIKIPEDIA]: wikipediaMarker,
   [MarkerType.MULTI]: leaflet.icon({ iconUrl: 'assets/markers/multi-marker.svg', iconSize: [32, 40], iconAnchor: [16, 40] })
 };
 const WIKIPEDIA_ROUTE_RADIUS_METERS = 200;
 const MAX_WIKIPEDIA_SIMULATION_SEARCHES = 80;
-const OVERPASS_POI_GROUP_RADIUS_METERS = 10;
+const MAP_CONTENT_GROUP_RADIUS_METERS = 15;
 const EMPTY_ROUTE_CONTENT: TripGoRouteContent = {
   messages: [], notes: [], images: [], documents: [], experiences: [], myExperiences: [], secretDrops: [], overpassPois: []
 };
@@ -1429,12 +1430,9 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
   }
 
   private renderPreparedWikipediaMarkers(): void {
-    if (!this.map || !this.wikipediaPrepared || !this.searchSettings.wikipedia.enabled
-      || this.map.getZoom() < this.searchSettings.wikipedia.minZoom) {
-      this.clearWikipediaMarkers();
-      return;
-    }
-    this.drawWikipediaMarkers(this.preparedWikipediaArticles);
+    // Prepared Wikipedia articles are rendered together with the remaining
+    // route content so nearby Wikipedia and Overpass entries can share a pin.
+    this.clearWikipediaMarkers();
   }
 
   private resetWikipediaPreparation(): void {
@@ -1549,10 +1547,19 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
       this.clearRouteContentMarkers();
       return;
     }
-    this.drawRouteContentMarkers(this.preparedRouteContent, Math.round(this.map.getZoom()));
+    const zoom = Math.round(this.map.getZoom());
+    const wikipediaArticles = this.searchSettings.wikipedia.enabled
+      && zoom >= this.searchSettings.wikipedia.minZoom
+      ? this.preparedWikipediaArticles
+      : [];
+    this.drawRouteContentMarkers(this.preparedRouteContent, zoom, wikipediaArticles);
   }
 
-  private drawRouteContentMarkers(content: TripGoRouteContent, zoom: number): void {
+  private drawRouteContentMarkers(
+    content: TripGoRouteContent,
+    zoom: number,
+    wikipediaArticles: WikipediaArticle[] = []
+  ): void {
     this.clearRouteContentMarkers();
     if (!this.map) return;
     const groups = new Map<string, MarkerLocation>();
@@ -1570,7 +1577,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
         group = {
           location: { ...location, plusCode: location.plusCode || `route:${key}` },
           messages: [], notes: [], images: [], documents: [], experiences: [], myExperiences: [], secretDrops: [],
-          overpassPois: [], overpassGrouped,
+          wikipediaArticles: [], overpassPois: [], overpassGrouped,
           type
         };
         groups.set(key, group);
@@ -1585,6 +1592,9 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
         case MarkerType.EXPERIENCE_DESTINATION: group.experiences?.push(item as NonNullable<typeof group.experiences>[number]); break;
         case MarkerType.MY_EXPERIENCE: group.myExperiences?.push(item as NonNullable<typeof group.myExperiences>[number]); break;
         case MarkerType.SECRET_DROP: group.secretDrops?.push(item as NonNullable<typeof group.secretDrops>[number]); break;
+        case MarkerType.WIKIPEDIA:
+          group.wikipediaArticles?.push(item as NonNullable<typeof group.wikipediaArticles>[number]);
+          break;
         case MarkerType.OVERPASS_POI:
           group.overpassPoi ??= item as NonNullable<typeof group.overpassPoi>;
           group.overpassPois?.push(item as NonNullable<typeof group.overpassPois>[number]);
@@ -1622,6 +1632,25 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
           plusCode: item.plusCode || item.discoveryPlusCode || item.location?.plusCode || ''
         }));
     }
+    wikipediaArticles.forEach((article) => {
+      const location: Location = {
+        latitude: article.latitude,
+        longitude: article.longitude,
+        plusCode: this.geolocation.getPlusCode(article.latitude, article.longitude)
+      };
+      const nearbyGroupKey = [...groups.entries()].find(([, group]) =>
+        this.geolocation.areLocationsNear(
+          group.location,
+          location,
+          MAP_CONTENT_GROUP_RADIUS_METERS
+        ))?.[0];
+      add(
+        MarkerType.WIKIPEDIA,
+        article,
+        location,
+        nearbyGroupKey || `wikipedia-location:${location.plusCode}`
+      );
+    });
     content.overpassPois.forEach((poi) => {
       if (!this.routeContentVisible(poi.category, zoom)
         || !this.searchSettings[poi.category].subcategories[poi.subtype]) return;
@@ -1633,14 +1662,13 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
       if (zoom > 17) {
         // Separate OSM objects can share practically the same coordinates.
         // A Plus-Code boundary can run directly between two practically
-        // adjacent objects. Prefer an existing nearby POI group in that case
-        // so their pins cannot cover each other during the simulation.
+        // adjacent objects. Prefer any existing nearby content group in that
+        // case so Wikipedia, messages, notes and other pins cannot cover it.
         const nearbyGroupKey = [...groups.entries()].find(([, group]) =>
-          (group.overpassPois?.length ?? 0) > 0
-          && this.geolocation.areLocationsNear(
+          this.geolocation.areLocationsNear(
             group.location,
             sourceLocation,
-            OVERPASS_POI_GROUP_RADIUS_METERS
+            MAP_CONTENT_GROUP_RADIUS_METERS
           ))?.[0];
         add(
           MarkerType.OVERPASS_POI,
@@ -1661,7 +1689,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
 
     groups.forEach((group) => {
       const icon = group.type === MarkerType.OVERPASS_POI && group.overpassPoi
-        ? (group.overpassGrouped ? overpassPlacesMarker() : overpassPoiMarker(group.overpassPoi))
+        ? overpassPoiGroupMarker(group.overpassPois || [], group.overpassPoi)
         : routeContentIcons[group.type] ?? routeContentIcons[MarkerType.MULTI];
       if (!icon) return;
       const marker = leaflet.marker([group.location.latitude, group.location.longitude], {

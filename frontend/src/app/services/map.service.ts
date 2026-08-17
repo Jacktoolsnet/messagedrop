@@ -154,6 +154,14 @@ export function overpassPoiMarker(poi: OverpassPoi): leaflet.DivIcon {
   return overpassCategoryMarker(poi.category);
 }
 
+export function overpassPoiGroupMarker(pois: OverpassPoi[], fallback: OverpassPoi): leaflet.DivIcon {
+  const groupedPois = pois.length ? pois : [fallback];
+  const categories = new Set(groupedPois.map((poi) => poi.category));
+  return categories.size === 1
+    ? overpassPoiMarker(groupedPois[0])
+    : overpassPlacesMarker();
+}
+
 export function overpassPlacesMarker(): leaflet.DivIcon {
   return overpassMarker('location_on');
 }
@@ -611,9 +619,10 @@ export class MapService {
       case MarkerType.OVERPASS_POI:
         return markerLocation.overpassPoi
           ? leaflet.marker(latLng, {
-            icon: markerLocation.overpassGrouped
-              ? overpassPlacesMarker()
-              : overpassPoiMarker(markerLocation.overpassPoi),
+            icon: overpassPoiGroupMarker(
+              markerLocation.overpassPois || [],
+              markerLocation.overpassPoi
+            ),
             zIndexOffset: 14,
             title: markerLocation.overpassPoi.name || markerLocation.overpassPoi.subtype,
             alt: markerLocation.overpassPoi.name || markerLocation.overpassPoi.subtype

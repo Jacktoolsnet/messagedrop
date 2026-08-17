@@ -156,7 +156,7 @@ interface RememberedExifLocationChoice {
 const PRODUCTION_APP_URL = 'https://app.messagedrop.de/';
 const SHARED_LOCATION_DEFAULT_ZOOM = 18;
 const SHARED_LOCATION_MESSAGE_RADIUS_METERS = 30;
-const OVERPASS_POI_GROUP_RADIUS_METERS = 10;
+const MAP_CONTENT_GROUP_RADIUS_METERS = 15;
 const Q_STAGE_WARNING_SESSION_KEY = 'messagedrop.qStageWarningSeen';
 
 @Component({
@@ -3946,15 +3946,26 @@ export class AppComponent implements OnInit {
           plusCode: groupedPlusCode
         };
       }
-      if (this.markerLocations.has(center.plusCode)) {
-        const existing = this.markerLocations.get(center.plusCode)!;
+      let key = center.plusCode;
+      if (this.mapService.getMapZoom() > 17 && !this.markerLocations.has(key)) {
+        const nearbyContentGroup = [...this.markerLocations.entries()].find(([, marker]) =>
+          marker.type !== MarkerType.PUBLIC_TRANSPORT_STOP
+          && this.geolocationService.areLocationsNear(
+            marker.location,
+            articleLocation,
+            MAP_CONTENT_GROUP_RADIUS_METERS
+          ));
+        key = nearbyContentGroup?.[0] || key;
+      }
+      if (this.markerLocations.has(key)) {
+        const existing = this.markerLocations.get(key)!;
         existing.wikipediaArticles ??= [];
         existing.wikipediaArticles.push(article);
         if (existing.type !== MarkerType.WIKIPEDIA) {
           existing.type = MarkerType.MULTI;
         }
       } else {
-        this.markerLocations.set(center.plusCode, {
+        this.markerLocations.set(key, {
           location: center,
           messages: [],
           notes: [],
@@ -4013,14 +4024,14 @@ export class AppComponent implements OnInit {
       }
       let key = center.plusCode;
       if (this.mapService.getMapZoom() > 17 && !this.markerLocations.has(key)) {
-        const nearbyOverpassGroup = [...this.markerLocations.entries()].find(([, marker]) =>
-          (marker.overpassPois?.length ?? 0) > 0
+        const nearbyContentGroup = [...this.markerLocations.entries()].find(([, marker]) =>
+          marker.type !== MarkerType.PUBLIC_TRANSPORT_STOP
           && this.geolocationService.areLocationsNear(
             marker.location,
             poiLocation,
-            OVERPASS_POI_GROUP_RADIUS_METERS
+            MAP_CONTENT_GROUP_RADIUS_METERS
           ));
-        key = nearbyOverpassGroup?.[0] || key;
+        key = nearbyContentGroup?.[0] || key;
       }
       const existing = this.markerLocations.get(key);
       if (existing) {
