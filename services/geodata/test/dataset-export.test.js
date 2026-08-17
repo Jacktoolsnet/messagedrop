@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
-const { generateDatasetExport, validateJsonlGzip } = require('../dataset-export');
+const { generateDatasetExport, serializePoi, validateJsonlGzip } = require('../dataset-export');
 
 function poi(id, category = 'accommodation', subtype = 'hotel') {
   return {
@@ -80,4 +80,13 @@ test('rejects an export when the database count does not match', async (t) => {
     database: { db }, versionId: 'version-2', expectedCount: 2,
     dataset: { id: 'germany', sourceUrl: 'https://download.test/germany.osm.pbf', bounds: {} }
   }), /Exported 1 POIs/u);
+});
+
+test('serializes Unicode line separators without breaking JSONL records', () => {
+  const value = poi(3);
+  value.properties.description = 'first\u2028second\u2029third\nlast';
+  const serialized = serializePoi(value);
+  assert.ok(!serialized.includes('\u2028'));
+  assert.ok(!serialized.includes('\u2029'));
+  assert.equal(JSON.parse(serialized).properties.description, value.properties.description);
 });

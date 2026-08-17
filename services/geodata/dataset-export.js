@@ -81,11 +81,16 @@ async function writeJsonlGzip(db, versionId, outputPath, expectedCount, onProgre
       ));
       if (!rows.length) break;
       for (const row of rows) {
-        const payload = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload;
+        let payload;
+        try {
+          payload = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload;
+        } catch (error) {
+          throw new Error(`Invalid stored POI JSON for ${row.osmType}:${row.osmId}: ${error.message}`);
+        }
         if (row.osmType !== payload?.osmType || Number(row.osmId) !== Number(payload?.osmId)) {
           throw new Error(`POI index and payload disagree for ${row.osmType}:${row.osmId}`);
         }
-        yield `${JSON.stringify(payload)}\n`;
+        yield `${serializePoi(payload)}\n`;
         recordCount += 1;
       }
       const last = rows.at(-1);
@@ -107,7 +112,9 @@ async function validateJsonlGzip(inputPath, expectedCount, onProgress) {
   let recordCount = 0;
   for await (const line of lines) {
     if (!line) continue;
-    const value = JSON.parse(line);
+    let value;
+    try { value = JSON.parse(line); }
+    catch (error) { throw new Error(`Invalid JSONL export record ${recordCount + 1}: ${error.message}`); }
     validatePoi(value, recordCount + 1);
     recordCount += 1;
     if (recordCount % 5000 === 0) {
@@ -119,6 +126,17 @@ async function validateJsonlGzip(inputPath, expectedCount, onProgress) {
   }
   await onProgress?.(100, { processedItems: recordCount });
   return { recordCount };
+}
+
+function serializePoi(value) {
+  // JSON.stringify already escapes JSON control characters. Escaping the two
+  // Unicode line separators as well guarantees one physical line per POI for
+  // every JSONL consumer, including tools that treat them as line endings.
+  const serialized = JSON.stringify(value)
+    .replaceAll('\u2028', '\\u2028')
+    .replaceAll('\u2029', '\\u2029');
+  if (!serialized) throw new Error('Could not serialize POI for export');
+  return serialized;
 }
 
 function validatePoi(value, lineNumber) {
@@ -249,6 +267,7 @@ module.exports = {
   gzipLevel,
   licenseNotice,
   safeSegment,
+  serializePoi,
   sha256File,
   validateJsonlGzip,
   validatePoi,
