@@ -3,6 +3,9 @@
   <div class="tic-tac-toe__player-mark" [class.tic-tac-toe__player-mark--o]="mark === 'O'">
     <span>{{ getPlayerMarkText(mark) }}</span>
     <strong>{{ mark }}</strong>
+    @if (variant() === 'vanishing') {
+    <span class="tic-tac-toe__variant">· {{ getVariantText() }}</span>
+    }
   </div>
   }
   <div class="tic-tac-toe__grid" role="grid" [attr.aria-label]="statusText()">

@@ -55,6 +55,11 @@
   transform: translateY(0.06rem);
 }
 
+.tic-tac-toe__player-mark .tic-tac-toe__variant {
+  color: var(--mat-card-subtitle-text-color);
+  font-size: 0.72rem;
+}
+
 .tic-tac-toe__player-mark--o strong {
   color: var(--mat-sys-tertiary, var(--mat-sys-secondary, var(--mat-app-text-color)));
 }

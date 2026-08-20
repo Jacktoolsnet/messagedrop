@@ -1,11 +1,17 @@
-<app-dialog-header icon="grid_3x3" [title]="'common.contact.chatroom.games.rulesTitle' | transloco"></app-dialog-header>
+<app-dialog-header icon="grid_3x3"
+  [title]="(data.variant === 'vanishing' ? 'common.contact.chatroom.games.vanishingRulesTitle' : 'common.contact.chatroom.games.rulesTitle') | transloco"></app-dialog-header>
 
 <mat-dialog-content class="rules-content">
   <ol class="rules-list">
     <li>{{ 'common.contact.chatroom.games.ruleFirstMove' | transloco }}</li>
     <li>{{ 'common.contact.chatroom.games.ruleAlternate' | transloco }}</li>
     <li>{{ 'common.contact.chatroom.games.ruleWin' | transloco }}</li>
+    @if (data.variant === 'vanishing') {
+    <li>{{ 'common.contact.chatroom.games.ruleVanishing' | transloco }}</li>
+    <li>{{ 'common.contact.chatroom.games.ruleVanishingNoDraw' | transloco }}</li>
+    } @else {
     <li>{{ 'common.contact.chatroom.games.ruleDraw' | transloco }}</li>
+    }
     <li>{{ 'common.contact.chatroom.games.ruleFinished' | transloco }}</li>
   </ol>
 </mat-dialog-content>

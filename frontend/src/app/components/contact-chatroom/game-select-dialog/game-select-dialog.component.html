@@ -7,7 +7,10 @@
         <span class="game-avatar-box__avatar" aria-hidden="true">
           <mat-icon>grid_3x3</mat-icon>
         </span>
-        <span class="game-avatar-box__title">{{ 'common.contact.chatroom.games.ticTacToe' | transloco }}</span>
+        <span class="game-avatar-box__text">
+          <span class="game-avatar-box__title">{{ 'common.contact.chatroom.games.ticTacToe' | transloco }}</span>
+          <span class="game-avatar-box__variant">{{ 'common.contact.chatroom.games.standardVariant' | transloco }}</span>
+        </span>
       </div>
 
       <div class="game-stats">
@@ -38,7 +41,53 @@
           [attr.aria-label]="'common.contact.chatroom.games.playAria' | transloco">
           <mat-icon>play_arrow</mat-icon>
         </button>
-        <button mat-mini-fab type="button" (click)="openRules()"
+        <button mat-mini-fab type="button" (click)="openRules('standard')"
+          [attr.aria-label]="'common.contact.chatroom.games.rulesAria' | transloco">
+          <mat-icon>help</mat-icon>
+        </button>
+      </div>
+    </article>
+
+    <article class="game-tile">
+      <div class="game-avatar-box">
+        <span class="game-avatar-box__avatar" aria-hidden="true">
+          <mat-icon>change_circle</mat-icon>
+        </span>
+        <span class="game-avatar-box__text">
+          <span class="game-avatar-box__title">{{ 'common.contact.chatroom.games.ticTacToe' | transloco }}</span>
+          <span class="game-avatar-box__variant">{{ 'common.contact.chatroom.games.vanishingVariant' | transloco }}</span>
+        </span>
+      </div>
+
+      <div class="game-stats">
+        <div class="game-stat game-stat--played">
+          <mat-icon aria-hidden="true">sports_score</mat-icon>
+          <span class="game-stat__value">{{ data.vanishingTicTacToeStats.played }}</span>
+          <span class="game-stat__label">{{ 'common.contact.chatroom.games.statsPlayed' | transloco }}</span>
+        </div>
+        <div class="game-stat game-stat--won">
+          <mat-icon aria-hidden="true">emoji_events</mat-icon>
+          <span class="game-stat__value">{{ data.vanishingTicTacToeStats.won }}</span>
+          <span class="game-stat__label">{{ 'common.contact.chatroom.games.statsWon' | transloco }}</span>
+        </div>
+        <div class="game-stat game-stat--lost">
+          <mat-icon aria-hidden="true">trending_down</mat-icon>
+          <span class="game-stat__value">{{ data.vanishingTicTacToeStats.lost }}</span>
+          <span class="game-stat__label">{{ 'common.contact.chatroom.games.statsLost' | transloco }}</span>
+        </div>
+        <div class="game-stat game-stat--drawn">
+          <mat-icon aria-hidden="true">handshake</mat-icon>
+          <span class="game-stat__value">{{ data.vanishingTicTacToeStats.drawn }}</span>
+          <span class="game-stat__label">{{ 'common.contact.chatroom.games.statsDrawn' | transloco }}</span>
+        </div>
+      </div>
+
+      <div class="game-tile__actions">
+        <button mat-mini-fab color="primary" type="button" (click)="select('ticTacToeVanishing')"
+          [attr.aria-label]="'common.contact.chatroom.games.playVanishingAria' | transloco">
+          <mat-icon>play_arrow</mat-icon>
+        </button>
+        <button mat-mini-fab type="button" (click)="openRules('vanishing')"
           [attr.aria-label]="'common.contact.chatroom.games.rulesAria' | transloco">
           <mat-icon>help</mat-icon>
         </button>

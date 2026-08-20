@@ -10,7 +10,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
 import { Contact } from '../../interfaces/contact';
-import { TicTacToeGame, TicTacToeMark, TicTacToeStats } from '../../interfaces/chat-game';
+import { TicTacToeGame, TicTacToeMark, TicTacToeStats, TicTacToeVariant } from '../../interfaces/chat-game';
 import { ContactMessage } from '../../interfaces/contact-message';
 import { Location } from '../../interfaces/location';
 import { Mode } from '../../interfaces/mode';
@@ -478,8 +478,11 @@ export class ContactChatroomComponent implements AfterViewInit {
       return;
     }
     const dialogRef = this.matDialog.open(GameSelectDialogComponent, {
-      data: { ticTacToeStats: this.getTicTacToeStats() },
-      width: 'min(430px, 94vw)',
+      data: {
+        ticTacToeStats: this.getTicTacToeStats('standard'),
+        vanishingTicTacToeStats: this.getTicTacToeStats('vanishing')
+      },
+      width: 'min(760px, 94vw)',
       maxWidth: '94vw',
       maxHeight: '85vh',
       hasBackdrop: true,
@@ -490,13 +493,16 @@ export class ContactChatroomComponent implements AfterViewInit {
 
     dialogRef.afterClosed().subscribe((gameType?: ChatGameType) => {
       if (gameType === 'ticTacToe') {
-        this.openNewTicTacToeDialog(contact);
+        this.openNewTicTacToeDialog(contact, 'standard');
+      } else if (gameType === 'ticTacToeVanishing') {
+        this.openNewTicTacToeDialog(contact, 'vanishing');
       }
     });
   }
 
-  private openNewTicTacToeDialog(contact: Contact): void {
+  private openNewTicTacToeDialog(contact: Contact, variant: TicTacToeVariant): void {
     const dialogRef = this.matDialog.open(NewTicTacToeDialogComponent, {
+      data: { variant },
       width: 'min(390px, 94vw)',
       maxWidth: '94vw',
       maxHeight: '90vh',
@@ -510,7 +516,7 @@ export class ContactChatroomComponent implements AfterViewInit {
       if (!Number.isInteger(firstCell)) {
         return;
       }
-      const game = createTicTacToeGame(contact.userId, contact.contactUserId, firstCell!);
+      const game = createTicTacToeGame(contact.userId, contact.contactUserId, firstCell!, variant);
       const payload = this.createEmptyMessage();
       payload.game = game;
       void this.sendAsNewMessage(contact, payload, undefined, 'game_started');
@@ -580,12 +586,13 @@ export class ContactChatroomComponent implements AfterViewInit {
     });
   }
 
-  private getTicTacToeStats(): TicTacToeStats {
+  private getTicTacToeStats(variant: TicTacToeVariant): TicTacToeStats {
     const currentUserId = this.userService.getUser().id;
     const latestGames = new Map<string, TicTacToeGame>();
     for (const message of this.visibleMessages()) {
       const game = message.payload?.game;
-      if (game?.type === 'ticTacToe' && !latestGames.has(game.gameId)) {
+      const gameVariant = game?.variant ?? 'standard';
+      if (game?.type === 'ticTacToe' && gameVariant === variant && !latestGames.has(game.gameId)) {
         latestGames.set(game.gameId, game);
       }
     }

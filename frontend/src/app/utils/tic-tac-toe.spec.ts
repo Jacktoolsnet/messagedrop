@@ -26,4 +26,19 @@ describe('tic-tac-toe', () => {
     expect(draw?.status).toBe('draw');
     expect(draw?.nextPlayerUserId).toBeNull();
   });
+
+  it('removes a player\'s oldest stone when placing a fourth stone in the vanishing variant', () => {
+    let game = createTicTacToeGame('sender', 'recipient', 0, 'vanishing');
+    game = applyTicTacToeMove(game, 'recipient', 4)!;
+    game = applyTicTacToeMove(game, 'sender', 2)!;
+    game = applyTicTacToeMove(game, 'recipient', 1)!;
+    game = applyTicTacToeMove(game, 'sender', 7)!;
+    game = applyTicTacToeMove(game, 'recipient', 6)!;
+    game = applyTicTacToeMove(game, 'sender', 8)!;
+
+    expect(game.board[0]).toBeNull();
+    expect(game.board[8]).toBe('X');
+    expect(game.board.filter((cell) => cell === 'X').length).toBe(3);
+    expect(game.status).toBe('active');
+  });
 });

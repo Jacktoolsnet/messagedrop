@@ -1,4 +1,10 @@
-import { TicTacToeCell, TicTacToeGame, TicTacToeMark } from '../interfaces/chat-game';
+import {
+  TicTacToeCell,
+  TicTacToeGame,
+  TicTacToeMark,
+  TicTacToeMove,
+  TicTacToeVariant
+} from '../interfaces/chat-game';
 
 const WINNING_LINES: readonly (readonly [number, number, number])[] = [
   [0, 1, 2], [3, 4, 5], [6, 7, 8],
@@ -27,7 +33,8 @@ export function getTicTacToeWinner(board: readonly TicTacToeCell[]): TicTacToeMa
 export function createTicTacToeGame(
   playerXUserId: string,
   playerOUserId: string,
-  firstCell: number
+  firstCell: number,
+  variant: TicTacToeVariant = 'standard'
 ): TicTacToeGame {
   const board = Array<TicTacToeCell>(9).fill(null);
   if (!Number.isInteger(firstCell) || firstCell < 0 || firstCell >= board.length) {
@@ -44,7 +51,9 @@ export function createTicTacToeGame(
     nextPlayerUserId: playerOUserId,
     status: 'active',
     winnerUserId: null,
-    moveNumber: 1
+    moveNumber: 1,
+    variant,
+    moves: variant === 'vanishing' ? [{ mark: 'X', cellIndex: firstCell }] : undefined
   };
 }
 
@@ -75,8 +84,19 @@ export function applyTicTacToeMove(
   }
 
   board[cellIndex] = mark;
+  let moves = game.variant === 'vanishing' ? normalizeMoves(game, board, cellIndex) : undefined;
+  if (game.variant === 'vanishing' && moves) {
+    const ownMoves = moves.filter((move) => move.mark === mark);
+    if (ownMoves.length >= 3) {
+      const oldestMove = ownMoves[0];
+      board[oldestMove.cellIndex] = null;
+      moves = moves.filter((move) => move !== oldestMove);
+    }
+    board[cellIndex] = mark;
+    moves.push({ mark, cellIndex });
+  }
   const winner = getTicTacToeWinner(board);
-  const moveNumber = board.filter(Boolean).length;
+  const moveNumber = game.moveNumber + 1;
   if (winner) {
     return {
       ...game,
@@ -84,17 +104,19 @@ export function applyTicTacToeMove(
       moveNumber,
       status: 'won',
       winnerUserId: winner === 'X' ? game.playerXUserId : game.playerOUserId,
-      nextPlayerUserId: null
+      nextPlayerUserId: null,
+      moves
     };
   }
-  if (board.every(Boolean)) {
+  if (game.variant !== 'vanishing' && board.every(Boolean)) {
     return {
       ...game,
       board,
       moveNumber,
       status: 'draw',
       winnerUserId: null,
-      nextPlayerUserId: null
+      nextPlayerUserId: null,
+      moves
     };
   }
 
@@ -102,6 +124,36 @@ export function applyTicTacToeMove(
     ...game,
     board,
     moveNumber,
+    moves,
     nextPlayerUserId: mark === 'X' ? game.playerOUserId : game.playerXUserId
   };
+}
+
+function normalizeMoves(
+  game: TicTacToeGame,
+  boardWithNewMove: readonly TicTacToeCell[],
+  newCellIndex: number
+): TicTacToeMove[] {
+  const boardBeforeMove = normalizeTicTacToeBoard(boardWithNewMove);
+  boardBeforeMove[newCellIndex] = null;
+  const usedCells = new Set<number>();
+  const moves = (game.moves ?? []).filter((move) => {
+    const valid = Number.isInteger(move.cellIndex)
+      && move.cellIndex >= 0
+      && move.cellIndex < boardBeforeMove.length
+      && boardBeforeMove[move.cellIndex] === move.mark
+      && !usedCells.has(move.cellIndex);
+    if (valid) {
+      usedCells.add(move.cellIndex);
+    }
+    return valid;
+  });
+
+  for (let index = 0; index < boardBeforeMove.length; index += 1) {
+    const mark = boardBeforeMove[index];
+    if (mark && !usedCells.has(index)) {
+      moves.push({ mark, cellIndex: index });
+    }
+  }
+  return moves;
 }

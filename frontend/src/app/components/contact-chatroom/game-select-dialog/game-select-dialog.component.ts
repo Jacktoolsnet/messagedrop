@@ -3,14 +3,15 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDial
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { TicTacToeStats } from '../../../interfaces/chat-game';
+import { TicTacToeStats, TicTacToeVariant } from '../../../interfaces/chat-game';
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
 import { GameRulesDialogComponent } from '../game-rules-dialog/game-rules-dialog.component';
 
-export type ChatGameType = 'ticTacToe';
+export type ChatGameType = 'ticTacToe' | 'ticTacToeVanishing';
 
 interface GameSelectDialogData {
   ticTacToeStats: TicTacToeStats;
+  vanishingTicTacToeStats: TicTacToeStats;
 }
 
 @Component({
@@ -34,8 +35,9 @@ export class GameSelectDialogComponent {
     this.dialogRef.close();
   }
 
-  openRules(): void {
+  openRules(variant: TicTacToeVariant): void {
     this.dialog.open(GameRulesDialogComponent, {
+      data: { variant },
       width: 'min(440px, 94vw)',
       maxWidth: '94vw',
       maxHeight: '85vh',

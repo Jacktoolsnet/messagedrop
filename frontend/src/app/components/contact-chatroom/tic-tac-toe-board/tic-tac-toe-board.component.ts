@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
-import { TicTacToeCell, TicTacToeMark } from '../../../interfaces/chat-game';
+import { TicTacToeCell, TicTacToeMark, TicTacToeVariant } from '../../../interfaces/chat-game';
 import { GameFeedbackService } from '../../../services/game-feedback.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { normalizeTicTacToeBoard } from '../../../utils/tic-tac-toe';
@@ -18,6 +18,7 @@ export class TicTacToeBoardComponent {
   readonly board = input<readonly TicTacToeCell[]>([]);
   readonly disabled = input(false);
   readonly playerMark = input<TicTacToeMark | null>(null);
+  readonly variant = input<TicTacToeVariant>('standard');
   readonly statusText = input('');
   readonly move = output<number>();
   readonly cells = computed(() => normalizeTicTacToeBoard(this.board()));
@@ -45,5 +46,9 @@ export class TicTacToeBoardComponent {
 
   getPlayerMarkText(mark: TicTacToeMark): string {
     return this.translation.t('common.contact.chatroom.games.yourMark', { mark });
+  }
+
+  getVariantText(): string {
+    return this.translation.t('common.contact.chatroom.games.vanishingVariant');
   }
 }

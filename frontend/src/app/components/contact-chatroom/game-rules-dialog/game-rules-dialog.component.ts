@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
+import { TicTacToeVariant } from '../../../interfaces/chat-game';
 
 @Component({
   selector: 'app-game-rules-dialog',
@@ -15,6 +16,7 @@ import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.c
 })
 export class GameRulesDialogComponent {
   private readonly dialogRef = inject(MatDialogRef<GameRulesDialogComponent>);
+  readonly data = inject<{ variant: TicTacToeVariant }>(MAT_DIALOG_DATA);
 
   close(): void {
     this.dialogRef.close();
