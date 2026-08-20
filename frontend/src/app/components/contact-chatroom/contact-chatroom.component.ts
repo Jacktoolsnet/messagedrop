@@ -45,6 +45,10 @@ import { DeleteContactMessageComponent } from './delete-contact-message/delete-c
 import { DisplayMessageService } from '../../services/display-message.service';
 import { ProtectedStickerImageComponent } from '../utils/protected-sticker-image/protected-sticker-image.component';
 import { hasSufficientMessageVisibility, MESSAGE_READ_VISIBILITY_THRESHOLDS } from './message-read-visibility';
+import {
+  ContactMessageRevisionHistoryComponent,
+  ContactMessageRevisionHistoryEntry
+} from './revision-history/contact-message-revision-history.component';
 
 interface ChatroomMessage {
   id: string;
@@ -129,6 +133,15 @@ export class ContactChatroomComponent implements AfterViewInit {
   });
   readonly composeMessage = output<Contact>();
   readonly messages = signal<ChatroomMessage[]>([]);
+  readonly visibleMessages = computed(() => {
+    const allMessages = this.messages();
+    const replacedMessageIds = new Set(
+      allMessages
+        .map((message) => message.payload?.revisionOfMessageId?.trim())
+        .filter((messageId): messageId is string => !!messageId)
+    );
+    return allMessages.filter((message) => !replacedMessageIds.has(message.messageId));
+  });
   readonly loading = signal<boolean>(false);
   readonly loaded = signal<boolean>(false);
   readonly hasSavedExperiences = computed(() => this.experienceBookmarkService.bookmarksSignal().length > 0);
@@ -194,7 +207,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   ];
   readonly audioLimitReached = computed(() => {
     let count = 0;
-    for (const msg of this.messages()) {
+    for (const msg of this.visibleMessages()) {
       if (msg.direction === 'user' && msg.payload?.audio) {
         count += 1;
         if (count >= this.maxAudioMessages) {
@@ -570,10 +583,10 @@ export class ContactChatroomComponent implements AfterViewInit {
         experience,
         experienceSearchTerm: experienceSearchTerm ?? null
       };
-    void this.sendAsNewMessage(contact, payload);
+    void this.sendAsNewMessage(contact, payload, message.messageId);
   }
 
-  openAudioRecorder(initialAudio?: ShortMessage['audio'] | null): void {
+  openAudioRecorder(initialAudio?: ShortMessage['audio'] | null, revisionOfMessageId?: string): void {
     const contact = this.contact();
     if (!contact) {
       return;
@@ -600,7 +613,7 @@ export class ContactChatroomComponent implements AfterViewInit {
       }
       const payload = this.createEmptyMessage();
       payload.audio = result.audio;
-      void this.sendAsNewMessage(contact, payload);
+      void this.sendAsNewMessage(contact, payload, revisionOfMessageId);
     });
   }
 
@@ -1016,7 +1029,7 @@ export class ContactChatroomComponent implements AfterViewInit {
       return;
     }
     if (message.payload?.audio) {
-      this.openAudioRecorder(message.payload.audio);
+      this.openAudioRecorder(message.payload.audio, message.messageId);
       return;
     }
     if (message.payload?.experience) {
@@ -1044,7 +1057,7 @@ export class ContactChatroomComponent implements AfterViewInit {
       if (!result?.shortMessage) {
         return;
       }
-      void this.sendAsNewMessage(contact, result.shortMessage);
+      void this.sendAsNewMessage(contact, result.shortMessage, message.messageId);
     });
   }
 
@@ -1291,7 +1304,7 @@ export class ContactChatroomComponent implements AfterViewInit {
     }
     const rows = this.messageRows?.toArray() ?? [];
     if (!rows.length) {
-      if (this.messages().length === 0) {
+      if (this.visibleMessages().length === 0) {
         this.scrolledToFirstUnread = true;
         this.readTrackingEnabled = true;
       }
@@ -1300,7 +1313,7 @@ export class ContactChatroomComponent implements AfterViewInit {
     // Messages are sorted newest first; find the oldest unread (last in the list)
     let target: ElementRef<HTMLElement> | undefined;
     for (let i = rows.length - 1; i >= 0; i -= 1) {
-      const message = this.messages()[i];
+      const message = this.visibleMessages()[i];
       if (message && this.isUnread(message)) {
         target = rows[i];
         break;
@@ -1382,7 +1395,9 @@ export class ContactChatroomComponent implements AfterViewInit {
           }
           const message = this.messages().find((m) => m.messageId === messageId);
           if (message && this.isUnread(message)) {
-            this.markAsRead(messageId, contact);
+            this.getRevisionHistory(message)
+              .filter((revision) => this.isUnread(revision))
+              .forEach((revision) => this.markAsRead(revision.messageId, contact));
           }
         });
       }, { root: container, threshold: [...MESSAGE_READ_VISIBILITY_THRESHOLDS] });
@@ -1390,7 +1405,7 @@ export class ContactChatroomComponent implements AfterViewInit {
 
     const rows = this.messageRows?.toArray() ?? [];
     rows.forEach((row, index) => {
-      const message = this.messages()[index];
+      const message = this.visibleMessages()[index];
       if (message && this.isUnread(message)) {
         this.visibilityObserver!.observe(row.nativeElement);
       } else {
@@ -1464,7 +1479,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   isNewDay(index: number): boolean {
-    const list = this.messages();
+    const list = this.visibleMessages();
     if (!list.length || index < 0 || index >= list.length) {
       return false;
     }
@@ -1499,6 +1514,48 @@ export class ContactChatroomComponent implements AfterViewInit {
     const m = (d.getMonth() + 1).toString().padStart(2, '0');
     const day = d.getDate().toString().padStart(2, '0');
     return `${y}-${m}-${day}`;
+  }
+
+  getRevisionHistory(message: ChatroomMessage): ChatroomMessage[] {
+    const messagesById = new Map(this.messages().map((entry) => [entry.messageId, entry]));
+    const history: ChatroomMessage[] = [];
+    const visited = new Set<string>();
+    let current: ChatroomMessage | undefined = message;
+
+    while (current && !visited.has(current.messageId)) {
+      history.push(current);
+      visited.add(current.messageId);
+      const previousMessageId: string | undefined = current.payload?.revisionOfMessageId?.trim();
+      current = previousMessageId ? messagesById.get(previousMessageId) : undefined;
+    }
+
+    return history;
+  }
+
+  hasRevisionHistory(message: ChatroomMessage): boolean {
+    return this.getRevisionHistory(message).length > 1;
+  }
+
+  openRevisionHistory(message: ChatroomMessage): void {
+    const revisions: ContactMessageRevisionHistoryEntry[] = this.getRevisionHistory(message).map((revision) => ({
+      messageId: revision.messageId,
+      createdAt: revision.createdAt,
+      payload: revision.payload,
+      displayText: revision.direction === 'contactUser'
+        ? (revision.payload?.translatedMessage || revision.payload?.message || '')
+        : (revision.payload?.message || '')
+    }));
+
+    this.matDialog.open(ContactMessageRevisionHistoryComponent, {
+      data: { revisions },
+      width: 'min(560px, 95vw)',
+      maxWidth: '95vw',
+      maxHeight: '85vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
   }
 
   private markAsRead(messageId: string, contact: Contact): void {
@@ -1565,18 +1622,25 @@ export class ContactChatroomComponent implements AfterViewInit {
     return new Blob([bytes], { type: mimeType });
   }
 
-  private async sendAsNewMessage(contact: Contact, payload: ShortMessage): Promise<void> {
+  private async sendAsNewMessage(
+    contact: Contact,
+    payload: ShortMessage,
+    revisionOfMessageId?: string
+  ): Promise<void> {
     if (contact.status === 'removed_by_contact') {
       this.snackBar.open(this.translation.t('common.contact.chatroom.contactRemovedSendBlocked'), '', { duration: 4000 });
       return;
     }
 
+    const versionedPayload: ShortMessage = revisionOfMessageId
+      ? { ...payload, revisionOfMessageId }
+      : payload;
     let encryptedMessageForUser = '';
     let encryptedMessageForContact = '';
     let signature = '';
     try {
       ({ encryptedMessageForUser, encryptedMessageForContact, signature } =
-        await this.contactMessageService.encryptMessageForContact(contact, payload));
+        await this.contactMessageService.encryptMessageForContact(contact, versionedPayload));
     } catch {
       this.snackBar.open(this.translation.t('common.contact.chatroom.sendFailed'), '', { duration: 3000 });
       return;
@@ -1591,7 +1655,7 @@ export class ContactChatroomComponent implements AfterViewInit {
       return;
     }
 
-    const tempId = this.addOptimisticMessage(payload);
+    const tempId = this.addOptimisticMessage(versionedPayload);
 
     this.contactMessageService.send({
       contactId: contact.id,
@@ -1606,7 +1670,7 @@ export class ContactChatroomComponent implements AfterViewInit {
         if (tempId) {
           this.finalizeOptimisticMessage(tempId, res.messageId, res.sharedMessageId, res.createdAt);
         }
-        void this.persistPayloadBatch(contact.id, [{ messageId: res.sharedMessageId, payload }]);
+        void this.persistPayloadBatch(contact.id, [{ messageId: res.sharedMessageId, payload: versionedPayload }]);
         this.socketioService.sendContactMessage({
           id: res.mirrorMessageId ?? res.messageId,
           messageId: res.sharedMessageId,

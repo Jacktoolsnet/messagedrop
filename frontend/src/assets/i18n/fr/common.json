@@ -534,6 +534,13 @@
         "storeTranslationFailed": "Le message traduit n'a pas pu être enregistré.",
         "openInMaps": "Ouvrir dans Google Maps",
         "showOnMap": "Afficher sur la carte",
+        "revisionHistory": {
+          "title": "Historique des modifications",
+          "openAria": "Afficher l’historique des modifications",
+          "current": "Version actuelle",
+          "previous": "Version précédente",
+          "voiceMessage": "Message vocal"
+        },
         "deleteMessage": {
           "title": "Supprimer le message",
           "confirm": "Ce message sera supprimé définitivement. Êtes-vous sûr ?"

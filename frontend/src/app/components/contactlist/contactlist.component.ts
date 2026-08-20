@@ -605,15 +605,14 @@ export class ContactlistComponent {
 
   private async loadLatestMessagePreview(contact: Contact, requestKey: string): Promise<void> {
     try {
-      const response = await firstValueFrom(this.contactMessageService.list(contact.id, { limit: 2 }));
+      const response = await firstValueFrom(this.contactMessageService.list(contact.id, { limit: 10 }));
       if (this.previewRequestKeys.get(contact.id) !== requestKey) {
         return;
       }
 
       const latestMessages = (response.rows ?? [])
         .slice()
-        .sort((left, right) => right.createdAt.localeCompare(left.createdAt))
-        .slice(0, 2);
+        .sort((left, right) => right.createdAt.localeCompare(left.createdAt));
 
       if (latestMessages.length === 0) {
         this.setLatestMessagePreviews(contact.id, []);
@@ -629,7 +628,7 @@ export class ContactlistComponent {
         previews.push(this.buildLatestMessagePreview(latestMessage, payload));
       }
 
-      this.setLatestMessagePreviews(contact.id, previews);
+      this.setLatestMessagePreviews(contact.id, this.collapseRevisionPreviews(previews).slice(0, 2));
     } catch {
       if (this.previewRequestKeys.get(contact.id) === requestKey) {
         this.setLatestMessagePreviews(contact.id, []);
@@ -643,7 +642,10 @@ export class ContactlistComponent {
     const nextPreview = this.buildLatestMessagePreview(message, payload);
     this.latestMessagePreviews.update((current) => {
       const existing = current[contact.id] ?? [];
-      const merged = [...existing.filter((entry) => entry.messageId !== nextPreview.messageId), nextPreview]
+      const replacedMessageId = nextPreview.payload?.revisionOfMessageId?.trim();
+      const merged = [...existing.filter((entry) =>
+        entry.messageId !== nextPreview.messageId && entry.messageId !== replacedMessageId
+      ), nextPreview]
         .sort((left, right) => right.createdAt.localeCompare(left.createdAt))
         .slice(0, 2);
       return { ...current, [contact.id]: merged };
@@ -672,6 +674,15 @@ export class ContactlistComponent {
       kind: this.resolvePreviewKind(message, payload),
       hasText: this.hasPreviewText(payload)
     };
+  }
+
+  private collapseRevisionPreviews(previews: ContactMessagePreview[]): ContactMessagePreview[] {
+    const replacedMessageIds = new Set(
+      previews
+        .map((preview) => preview.payload?.revisionOfMessageId?.trim())
+        .filter((messageId): messageId is string => !!messageId)
+    );
+    return previews.filter((preview) => !replacedMessageIds.has(preview.messageId));
   }
 
   private resolvePreviewKind(message: ContactMessage, payload: ShortMessage | null): ContactMessagePreview['kind'] {

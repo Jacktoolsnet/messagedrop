@@ -1,0 +1,41 @@
+.revision-history-content {
+  width: min(32rem, 90vw);
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.revision-list {
+  display: grid;
+  gap: 1rem;
+  padding-block: 0.5rem;
+}
+
+.revision-card {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.9rem;
+  border: 1px solid var(--mat-card-outlined-outline-color);
+  border-radius: 0.75rem;
+  background: var(--mat-card-filled-container-color);
+}
+
+.revision-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  font-weight: 600;
+}
+
+.revision-card__header time {
+  color: var(--mat-card-subtitle-text-color);
+  font-size: 0.75rem;
+  font-weight: 400;
+  text-align: end;
+}
+
+.revision-placeholder {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}

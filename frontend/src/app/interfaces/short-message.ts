@@ -4,6 +4,7 @@ import { ExperienceResult } from "./viator";
 
 export interface ShortMessage {
     message: string,
+    revisionOfMessageId?: string | null,
     translatedMessage?: string,
     verified?: boolean,
     style: string,

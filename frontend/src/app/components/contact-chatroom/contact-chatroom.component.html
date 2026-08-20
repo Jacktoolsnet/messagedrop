@@ -70,7 +70,7 @@
         </div>
       </div>
       }
-      @for (msg of messages(); track msg.id; let last = $last; let idx = $index) {
+      @for (msg of visibleMessages(); track msg.id; let last = $last; let idx = $index) {
       @if (isNewDay(idx)) {
       <div class="day-separator">
         <span class="day-separator__line"></span>
@@ -216,6 +216,13 @@
                 <mat-icon>edit</mat-icon>
               </button>
               }
+              @if (hasRevisionHistory(msg)) {
+              <button mat-mini-fab color="primary"
+                [attr.aria-label]="'common.contact.chatroom.revisionHistory.openAria' | transloco"
+                (click)="openRevisionHistory(msg)">
+                <mat-icon>history</mat-icon>
+              </button>
+              }
               <button mat-mini-fab color="warn" [attr.aria-label]="'common.contact.chatroom.deleteAria' | transloco"
                 (click)="deleteMessage(msg)">
                 <mat-icon>delete</mat-icon>
@@ -354,6 +361,13 @@
                 <mat-icon>translate</mat-icon>
               </button>
               }
+              }
+              @if (hasRevisionHistory(msg)) {
+              <button mat-mini-fab color="primary"
+                [attr.aria-label]="'common.contact.chatroom.revisionHistory.openAria' | transloco"
+                (click)="openRevisionHistory(msg)">
+                <mat-icon>history</mat-icon>
+              </button>
               }
               <button mat-mini-fab color="warn" [attr.aria-label]="'common.contact.chatroom.deleteAria' | transloco"
                 (click)="deleteMessage(msg)">

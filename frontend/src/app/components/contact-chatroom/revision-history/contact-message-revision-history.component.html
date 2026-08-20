@@ -1,0 +1,53 @@
+<app-dialog-header icon="history" [title]="'common.contact.chatroom.revisionHistory.title' | transloco">
+</app-dialog-header>
+
+<mat-dialog-content class="revision-history-content">
+  <div class="revision-list">
+    @for (revision of data.revisions; track revision.messageId; let first = $first) {
+    <section class="revision-card">
+      <header class="revision-card__header">
+        <span>{{ first
+          ? ('common.contact.chatroom.revisionHistory.current' | transloco)
+          : ('common.contact.chatroom.revisionHistory.previous' | transloco) }}</span>
+        <time [attr.datetime]="revision.createdAt">{{ revision.createdAt | date:'medium' }}</time>
+      </header>
+
+      @if (revision.payload; as payload) {
+        @if (payload.multimedia.type !== 'undefined') {
+        <app-showmultimedia [multimedia]="payload.multimedia"></app-showmultimedia>
+        }
+        @if (payload.location) {
+        <app-location-preview [location]="payload.location"></app-location-preview>
+        }
+        @if (revision.displayText.trim()) {
+        <app-showmessage [message]="revision.displayText" [style]="payload.style"></app-showmessage>
+        }
+        @if (payload.experience) {
+        <div class="revision-placeholder">
+          <mat-icon>local_activity</mat-icon>
+          <span>{{ payload.experience.title || payload.experience.productCode }}</span>
+        </div>
+        }
+        @if (payload.audio) {
+        <div class="revision-placeholder">
+          <mat-icon>mic</mat-icon>
+          <span>{{ 'common.contact.chatroom.revisionHistory.voiceMessage' | transloco }}</span>
+        </div>
+        }
+      } @else {
+      <div class="revision-placeholder">
+        <mat-icon>warning</mat-icon>
+        <span>{{ 'common.contact.chatroom.messageUnreadable' | transloco }}</span>
+      </div>
+      }
+    </section>
+    }
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="start">
+  <button mat-icon-button type="button" (click)="close()"
+    [attr.aria-label]="'common.actions.close' | transloco">
+    <mat-icon>close</mat-icon>
+  </button>
+</mat-dialog-actions>

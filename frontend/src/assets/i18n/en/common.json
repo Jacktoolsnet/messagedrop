@@ -535,6 +535,13 @@
         "storeTranslationFailed": "Translated message could not be stored.",
         "openInMaps": "Open in Google Maps",
         "showOnMap": "Show on map",
+        "revisionHistory": {
+          "title": "Change history",
+          "openAria": "Show change history",
+          "current": "Current version",
+          "previous": "Previous version",
+          "voiceMessage": "Voice message"
+        },
         "deleteMessage": {
           "title": "Delete message",
           "confirm": "This message will be permanently deleted. Are you sure?"
