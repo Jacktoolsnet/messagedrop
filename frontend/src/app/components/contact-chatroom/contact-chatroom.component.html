@@ -205,8 +205,7 @@
               [disabled]="!canPlayTicTacToe(msg)" [statusText]="getTicTacToeStatusText(game)" [showStatus]="false"
               (move)="playTicTacToeMove(msg, $event)"></app-tic-tac-toe-board>
             } @else {
-            <app-connect-four-board [board]="game.board" [lastMoveIndex]="game.lastMoveIndex"
-              [disabled]="!canPlayConnectFour(msg)"
+            <app-connect-four-board [board]="game.board" [disabled]="!canPlayConnectFour(msg)"
               [statusText]="getConnectFourStatusText(game)" [showStatus]="false"
               (move)="playConnectFourMove(msg, $event)"></app-connect-four-board>
             }
@@ -485,8 +484,7 @@
               [disabled]="!canPlayTicTacToe(msg)" [statusText]="getTicTacToeStatusText(game)" [showStatus]="false"
               (move)="playTicTacToeMove(msg, $event)"></app-tic-tac-toe-board>
             } @else {
-            <app-connect-four-board [board]="game.board" [lastMoveIndex]="game.lastMoveIndex"
-              [disabled]="!canPlayConnectFour(msg)"
+            <app-connect-four-board [board]="game.board" [disabled]="!canPlayConnectFour(msg)"
               [statusText]="getConnectFourStatusText(game)" [showStatus]="false"
               (move)="playConnectFourMove(msg, $event)"></app-connect-four-board>
             }

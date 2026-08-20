@@ -21,7 +21,6 @@ export class ConnectFourBoardComponent {
 
   readonly board = input<readonly ConnectFourCell[]>([]);
   readonly disabled = input(false);
-  readonly lastMoveIndex = input<number | null>(null);
   readonly statusText = input('');
   readonly showStatus = input(true);
   readonly move = output<number>();

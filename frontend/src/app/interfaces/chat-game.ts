@@ -38,7 +38,6 @@ export interface ConnectFourGame {
   status: TicTacToeStatus;
   winnerUserId: string | null;
   moveNumber: number;
-  lastMoveIndex: number;
 }
 
 export type ChatGame = TicTacToeGame | ConnectFourGame;

@@ -4,7 +4,6 @@
     <span class="connect-four__cell" role="gridcell"
       [class.connect-four__cell--red]="cell === 'R'"
       [class.connect-four__cell--yellow]="cell === 'Y'"
-      [class.connect-four__cell--last]="lastMoveIndex() === $index"
       [class.connect-four__cell--target]="hoveredDropIndex() === $index">
       <span class="connect-four__stone">{{ cell || '' }}</span>
     </span>

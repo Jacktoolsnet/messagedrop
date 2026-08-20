@@ -72,8 +72,7 @@ export function createConnectFourGame(
     nextPlayerUserId: playerYellowUserId,
     status: 'active',
     winnerUserId: null,
-    moveNumber: 1,
-    lastMoveIndex: dropIndex
+    moveNumber: 1
   };
 }
 
@@ -98,18 +97,16 @@ export function applyConnectFourMove(
       moveNumber,
       status: 'won',
       winnerUserId: winner === 'R' ? game.playerRedUserId : game.playerYellowUserId,
-      nextPlayerUserId: null,
-      lastMoveIndex: dropIndex
+      nextPlayerUserId: null
     };
   }
   if (board.every(Boolean)) {
-    return { ...game, board, moveNumber, status: 'draw', winnerUserId: null, nextPlayerUserId: null, lastMoveIndex: dropIndex };
+    return { ...game, board, moveNumber, status: 'draw', winnerUserId: null, nextPlayerUserId: null };
   }
   return {
     ...game,
     board,
     moveNumber,
-    lastMoveIndex: dropIndex,
     nextPlayerUserId: mark === 'R' ? game.playerYellowUserId : game.playerRedUserId
   };
 }
