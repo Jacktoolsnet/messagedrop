@@ -75,6 +75,16 @@ function createTripGoClient({
       }));
     },
 
+    async routeInfo({ region, operator, routeId, locale = 'en' }) {
+      return unwrap(await http.post('/info/routeInfo.json', {
+        regions: [region],
+        operatorID: operator,
+        routeID: routeId
+      }, {
+        headers: { 'Accept-Language': locale }
+      }));
+    },
+
     async routes(query) {
       const params = new URLSearchParams();
       params.set('from', coordinate(query.from));

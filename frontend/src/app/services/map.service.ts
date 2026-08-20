@@ -151,13 +151,13 @@ function publicTransportIcons(stop: TripGoStop): string[] {
 }
 
 export function geodataPoiMarker(poi: GeodataPoi): leaflet.DivIcon {
-  return geodataCategoryMarker(poi.category);
+  return geodataMarker(geodataPoiIcon(poi));
 }
 
 export function geodataPoiGroupMarker(pois: GeodataPoi[], fallback: GeodataPoi): leaflet.DivIcon {
   const groupedPois = pois.length ? pois : [fallback];
-  const categories = new Set(groupedPois.map((poi) => poi.category));
-  return categories.size === 1
+  const icons = new Set(groupedPois.map(geodataPoiIcon));
+  return icons.size === 1
     ? geodataPoiMarker(groupedPois[0])
     : geodataPlacesMarker();
 }
@@ -168,6 +168,12 @@ export function geodataPlacesMarker(): leaflet.DivIcon {
 
 export function geodataCategoryMarker(category: GeodataCategory): leaflet.DivIcon {
   return geodataMarker(GEODATA_CATEGORY_ICONS[category] || 'location_on');
+}
+
+function geodataPoiIcon(poi: GeodataPoi): string {
+  return poi.subtype === 'toilets'
+    ? 'wc'
+    : GEODATA_CATEGORY_ICONS[poi.category] || 'location_on';
 }
 
 function geodataMarker(icon: string): leaflet.DivIcon {

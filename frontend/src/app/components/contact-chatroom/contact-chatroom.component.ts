@@ -47,6 +47,7 @@ import { ContactChatroomPlaceSelectDialogComponent } from './place-select-dialog
 import { DeleteContactMessageComponent } from './delete-contact-message/delete-contact-message.component';
 import { DisplayMessageService } from '../../services/display-message.service';
 import { ProtectedStickerImageComponent } from '../utils/protected-sticker-image/protected-sticker-image.component';
+import { hasSufficientMessageVisibility, MESSAGE_READ_VISIBILITY_THRESHOLDS } from './message-read-visibility';
 
 interface ChatroomMessage {
   id: string;
@@ -146,6 +147,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   private scrolledToFirstUnread = false;
   private readTrackingEnabled = false;
   private visibilityObserver?: IntersectionObserver;
+  private readonly readRequestsInFlight = new Set<string>();
   private currentContactId?: string;
   private lastLiveMessageId?: string;
   private lastResetToken?: number;
@@ -212,6 +214,9 @@ export class ContactChatroomComponent implements AfterViewInit {
   constructor() {
     void this.experienceBookmarkService.ensureLoaded().catch(() => undefined);
     this.destroyRef.onDestroy(() => {
+      this.visibilityObserver?.disconnect();
+      this.visibilityObserver = undefined;
+      this.readRequestsInFlight.clear();
       this.audioUrlCache.forEach((url) => URL.revokeObjectURL(url));
       this.audioUrlCache.clear();
       this.audioDurationCache.clear();
@@ -1401,8 +1406,7 @@ export class ContactChatroomComponent implements AfterViewInit {
     if (target?.nativeElement && this.messageScroll?.nativeElement) {
       // Place the unread message fully in view (top aligned)
       const container = this.messageScroll.nativeElement;
-      const top = target.nativeElement.offsetTop - container.offsetTop;
-      container.scrollTop = Math.max(0, top);
+      this.scrollElementToTop(container, target.nativeElement);
       this.scrolledToFirstUnread = true;
       this.readTrackingEnabled = true;
       this.observeUnread();
@@ -1445,8 +1449,7 @@ export class ContactChatroomComponent implements AfterViewInit {
       return false;
     }
 
-    const top = target.nativeElement.offsetTop - container.offsetTop;
-    container.scrollTop = Math.max(0, top - 12);
+    this.scrollElementToTop(container, target.nativeElement, 12);
     target.nativeElement.focus?.({ preventScroll: true });
     return true;
   }
@@ -1466,7 +1469,7 @@ export class ContactChatroomComponent implements AfterViewInit {
           return;
         }
         entries.forEach((entry) => {
-          if (!entry.isIntersecting) {
+          if (!hasSufficientMessageVisibility(entry, container.clientHeight)) {
             return;
           }
           const target = entry.target as HTMLElement;
@@ -1477,10 +1480,9 @@ export class ContactChatroomComponent implements AfterViewInit {
           const message = this.messages().find((m) => m.messageId === messageId);
           if (message && this.isUnread(message)) {
             this.markAsRead(messageId, contact);
-            this.visibilityObserver?.unobserve(target);
           }
         });
-      }, { root: container, threshold: 0.6 });
+      }, { root: container, threshold: [...MESSAGE_READ_VISIBILITY_THRESHOLDS] });
     }
 
     const rows = this.messageRows?.toArray() ?? [];
@@ -1492,6 +1494,12 @@ export class ContactChatroomComponent implements AfterViewInit {
         this.visibilityObserver?.unobserve(row.nativeElement);
       }
     });
+  }
+
+  private scrollElementToTop(container: HTMLElement, target: HTMLElement, margin = 0): void {
+    const containerTop = container.getBoundingClientRect().top;
+    const targetTop = target.getBoundingClientRect().top;
+    container.scrollTop = Math.max(0, container.scrollTop + targetTop - containerTop - margin);
   }
 
   private buildMessageKey(id: string, signature: string, cipher: string): string {
@@ -1591,6 +1599,10 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   private markAsRead(messageId: string, contact: Contact): void {
+    if (this.readRequestsInFlight.has(messageId)) {
+      return;
+    }
+    this.readRequestsInFlight.add(messageId);
     this.contactMessageService.markReadBothCopies({
       messageId,
       contactId: contact.id,
@@ -1598,6 +1610,13 @@ export class ContactChatroomComponent implements AfterViewInit {
       contactUserId: contact.contactUserId
     }).subscribe({
       next: () => {
+        this.readRequestsInFlight.delete(messageId);
+        const row = this.messageRows?.find((candidate) =>
+          candidate.nativeElement.dataset['messageId'] === messageId
+        );
+        if (row) {
+          this.visibilityObserver?.unobserve(row.nativeElement);
+        }
         this.messages.update((msgs) =>
           msgs.map((msg) =>
             msg.messageId === messageId ? { ...msg, status: 'read', readAt: msg.readAt ?? new Date().toISOString() } : msg
@@ -1610,6 +1629,9 @@ export class ContactChatroomComponent implements AfterViewInit {
           contactUserId: contact.contactUserId,
           messageId
         });
+      },
+      error: () => {
+        this.readRequestsInFlight.delete(messageId);
       }
     });
   }

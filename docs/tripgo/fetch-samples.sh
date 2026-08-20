@@ -68,12 +68,17 @@ fetch_diagnostic_route() {
   local mode="${7:-pt_pub}"
   local operator="${8:-}"
   local timeout_ms="${9:-${TRIPGO_API_TIMEOUT_MS:-15000}}"
+  local depart_after="${TRIPGO_SAMPLE_DEPART_AFTER:-}"
   local modes_json
+  local time_json="null"
 
   modes_json="$(node -e '
     const modes = process.argv[1].split(",").map((mode) => mode.trim()).filter(Boolean);
     process.stdout.write(JSON.stringify(modes));
   ' "${mode}")"
+  if [[ -n "${depart_after}" ]]; then
+    time_json="{ \"type\": \"departAfter\", \"value\": ${depart_after} }"
+  fi
 
   printf 'Fetching TripGo sample %s ...\n' "${name}"
 
@@ -87,11 +92,13 @@ fetch_diagnostic_route() {
     TRIPGO_SAMPLE_LOCALE="${locale}" \
     TRIPGO_SAMPLE_MODES="${mode}" \
     TRIPGO_SAMPLE_OPERATOR="${operator}" \
+    TRIPGO_SAMPLE_DEPART_AFTER="${depart_after}" \
     TRIPGO_API_TIMEOUT_MS="${timeout_ms}" \
     node "${script_dir}/../../services/tripgo/scripts/fetch-raw-route-sample.js" \
       "${output_dir}/route-${name}-raw.json" \
       "${output_dir}/services-${name}-raw.json" \
-      "${output_dir}/latest-${name}-raw.json"; then
+      "${output_dir}/latest-${name}-raw.json" \
+      "${output_dir}/geometry-${name}.json"; then
     printf 'Raw sample %s failed; continuing with the other diagnostics.\n' "${name}" >&2
   fi
 
@@ -102,13 +109,40 @@ fetch_diagnostic_route() {
       \"from\": { \"latitude\": ${from_lat}, \"longitude\": ${from_lng} },
       \"to\": { \"latitude\": ${to_lat}, \"longitude\": ${to_lng} },
       \"locale\": \"${locale}\",
-      \"modes\": ${modes_json}
+      \"modes\": ${modes_json},
+      \"time\": ${time_json}
     }" \
     "${api_url}/tripgo/routes" \
     --output "${output_dir}/route-${name}.json"; then
     printf 'Normalized sample %s failed; continuing with its raw response.\n' "${name}" >&2
   fi
 }
+
+# Focused geometry diagnostic from Im Kirchfeld 27 in Wolfenbüttel to the
+# Braunschweiger Residenzschloss. The journey normally contains bus and rail
+# sections, making it suitable for comparing routing.json segment shapes with
+# the detailed shapes returned by service.json for both transport types.
+if [[ "${TRIPGO_FETCH_WOLFENBUETTEL_GEOMETRY:-1}" == "1" ]]; then
+  TRIPGO_SAMPLE_PREFER_DIVERSE_MODES=1 \
+  TRIPGO_SAMPLE_DEPART_AFTER="$(date -d 'tomorrow 08:00' +%s)" \
+  fetch_diagnostic_route "kirchfeld-braunschweig-schloss-transit" \
+    "${TRIPGO_KIRCHFELD_LAT:-52.14323}" \
+    "${TRIPGO_KIRCHFELD_LNG:-10.54569}" \
+    "${TRIPGO_BRAUNSCHWEIG_SCHLOSS_LAT:-52.2634}" \
+    "${TRIPGO_BRAUNSCHWEIG_SCHLOSS_LNG:-10.5274}" \
+    "de" "pt_pub" "" "60000"
+
+  # The door-to-door sample currently favours buses. This station-to-station
+  # request makes sure the same routeInfo geometry check also covers RB45.
+  TRIPGO_SAMPLE_PREFER_DIVERSE_MODES=1 \
+  TRIPGO_SAMPLE_DEPART_AFTER="$(date -d 'tomorrow 08:00' +%s)" \
+  fetch_diagnostic_route "wolfenbuettel-braunschweig-train" \
+    "${TRIPGO_WOLFENBUETTEL_STATION_LAT:-52.1590}" \
+    "${TRIPGO_WOLFENBUETTEL_STATION_LNG:-10.53198}" \
+    "${TRIPGO_BRAUNSCHWEIG_HBF_LAT:-52.25253}" \
+    "${TRIPGO_BRAUNSCHWEIG_HBF_LNG:-10.53862}" \
+    "de" "pt_pub" "" "60000"
+fi
 
 # Optional diagnostic: a central Oslo journey from Oslo S to the
 # Vigeland sculpture park. The separate requests make it possible to tell
@@ -135,7 +169,7 @@ fi
 # Current default diagnostic: allow TripGo's dedicated car-ferry mode for the
 # previously failing Hamburg-to-Copenhagen route. Both coordinates remain in
 # the respective city centre. The direct request gets a generous timeout.
-if [[ "${TRIPGO_FETCH_LONG_ROUTES:-1}" == "1" ]]; then
+if [[ "${TRIPGO_FETCH_LONG_ROUTES:-0}" == "1" ]]; then
   fetch_diagnostic_route "hamburg-copenhagen-car-ferry" \
     "53.5505" "9.9925" "55.6761" "12.5683" "en" \
     "me_car,pt_pub_carferry" "" "120000"
