@@ -614,8 +614,8 @@
         "desc": "This action first opens a small menu. There you can pick one of your saved experiences or search for new ones and attach the experience card to your message."
       },
       "location": {
-        "title": "Send location message",
-        "desc": "The location icon first opens a small menu. There you can send one of your saved places or search for a new place. The location message then includes buttons to show it on the app map or open it in Google Maps."
+        "title": "Attach a place to a message",
+        "desc": "While composing a message, use Add place to select a saved place or search for a new one. This lets you send a place together with text and media. The place card then includes buttons for the app map and Google Maps."
       },
       "audio": {
         "title": "Record voice message",

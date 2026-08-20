@@ -614,8 +614,8 @@
         "desc": "Mit dieser Funktion öffnest du zuerst ein kleines Menü. Dort kannst du ein gespeichertes Erlebnis auswählen oder nach neuen Erlebnissen suchen und die Erlebnis-Karte an deine Nachricht anhängen."
       },
       "location": {
-        "title": "Ortsnachricht senden",
-        "desc": "Mit dem Orti-Symbol öffnest du zuerst ein kleines Menü. Dort kannst du einen Ort aus deinen gespeicherten Orten senden oder nach einem neuen Ort suchen. Die Ortsnachricht bietet anschließend Buttons für App-Karte und Google Maps."
+        "title": "Ort an eine Nachricht anhängen",
+        "desc": "Beim Verfassen einer Nachricht kannst du über „Ort hinzufügen“ einen gespeicherten Ort auswählen oder nach einem neuen Ort suchen. So lassen sich Ort, Text und Medien gemeinsam senden. Die Ortskarte bietet anschließend Buttons für App-Karte und Google Maps."
       },
       "audio": {
         "title": "Sprachnachricht aufnehmen",

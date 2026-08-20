@@ -596,8 +596,8 @@
         "desc": "Con esta función se abre primero un pequeño menú. Allí puedes elegir una experiencia guardada o buscar experiencias nuevas y adjuntar la tarjeta de experiencia a tu mensaje."
       },
       "location": {
-        "title": "Enviar mensaje de ubicación",
-        "desc": "El icono de ubicación abre primero un pequeño menú. Allí puedes enviar uno de tus lugares guardados o buscar un lugar nuevo. El mensaje de ubicación incluye después botones para verlo en el mapa de la app o abrirlo en Google Maps."
+        "title": "Adjuntar un lugar a un mensaje",
+        "desc": "Al redactar un mensaje, usa Añadir lugar para elegir un lugar guardado o buscar uno nuevo. Así puedes enviar el lugar junto con texto y contenido multimedia. La tarjeta del lugar incluye botones para el mapa de la aplicación y Google Maps."
       },
       "audio": {
         "title": "Grabar mensaje de voz",

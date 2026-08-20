@@ -542,6 +542,9 @@
       },
       "message": {
         "addText": "Add a text",
+        "addLocation": "Add place",
+        "editLocation": "Change place",
+        "removeLocation": "Remove place",
         "dropNewAria": "Drop a new message",
         "applyAria": "Drop your message",
         "policy": "This information is stored on our server and is visible to everyone."

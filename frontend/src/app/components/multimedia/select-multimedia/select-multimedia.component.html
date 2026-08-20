@@ -1,4 +1,6 @@
 <div class="button_container">
+    <ng-content select="[beforeMultimediaActions]"></ng-content>
+
     <button (click)="openStickerDialog()" mat-flat-button class="button_default" color="primary"
         [attr.aria-label]="'common.multimedia.addSticker' | transloco">
         <span>{{ 'common.multimedia.addSticker' | transloco }}</span>

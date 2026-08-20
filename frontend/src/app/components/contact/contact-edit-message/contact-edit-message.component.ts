@@ -7,8 +7,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatMenuModule } from '@angular/material/menu';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Contact } from '../../../interfaces/contact';
+import { Location } from '../../../interfaces/location';
 import { Mode } from '../../../interfaces/mode';
 import { Multimedia } from '../../../interfaces/multimedia';
 import { MultimediaType } from '../../../interfaces/multimedia-type';
@@ -24,6 +26,11 @@ import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 import { GifSearchComponent } from '../../utils/gif-search/gif-search.component';
 import { TextComponent } from '../../utils/text/text.component';
 import { DisplayMessageService } from '../../../services/display-message.service';
+import { MapService } from '../../../services/map.service';
+import { PlaceService } from '../../../services/place.service';
+import { ContactChatroomPlaceSelectDialogComponent } from '../../contact-chatroom/place-select-dialog/contact-chatroom-place-select-dialog.component';
+import { LocationPickerDialogComponent } from '../../utils/location-picker-dialog/location-picker-dialog.component';
+import { LocationPreviewComponent } from '../../utils/location-preview/location-preview.component';
 
 interface TextDialogResult {
   text: string;
@@ -41,7 +48,9 @@ interface TextDialogResult {
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
+    MatMenuModule,
     ShowmultimediaComponent,
+    LocationPreviewComponent,
     TranslocoPipe
   ],
   templateUrl: './contact-edit-message.component.html',
@@ -58,6 +67,8 @@ export class ContactEditMessageComponent implements OnInit {
   private readonly style = inject(StyleService);
   private readonly sharedContentService = inject(SharedContentService);
   private readonly translation = inject(TranslationHelperService);
+  private readonly mapService = inject(MapService);
+  private readonly placeService = inject(PlaceService);
   readonly data = inject<{ mode: Mode; contact: Contact; shortMessage: ShortMessage }>(MAT_DIALOG_DATA);
 
   safeHtml: string | undefined = undefined;
@@ -167,6 +178,55 @@ export class ContactEditMessageComponent implements OnInit {
 
   public removeText(): void {
     this.data.shortMessage.message = '';
+  }
+
+  hasSavedPlaces(): boolean {
+    return this.placeService.sortedPlacesSignal().length > 0;
+  }
+
+  openSavedPlacePicker(): void {
+    const dialogRef = this.matDialog.open(ContactChatroomPlaceSelectDialogComponent, {
+      width: 'min(420px, 92vw)',
+      maxWidth: '92vw',
+      maxHeight: '80vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe((location?: Location) => {
+      if (location) {
+        this.data.shortMessage.location = { ...location };
+      }
+    });
+  }
+
+  openLocationSearch(): void {
+    const initialLocation = this.data.shortMessage.location
+      ? { ...this.data.shortMessage.location }
+      : this.mapService.getMapLocation();
+    const dialogRef = this.matDialog.open(LocationPickerDialogComponent, {
+      data: { location: initialLocation, markerType: 'message' },
+      maxWidth: '95vw',
+      maxHeight: '95vh',
+      width: '95vw',
+      height: '95vh',
+      autoFocus: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false
+    });
+
+    dialogRef.afterClosed().subscribe((location?: Location) => {
+      if (location) {
+        this.data.shortMessage.location = { ...location };
+      }
+    });
+  }
+
+  removeLocation(): void {
+    this.data.shortMessage.location = null;
   }
 
   private updateSafeHtml(): void {

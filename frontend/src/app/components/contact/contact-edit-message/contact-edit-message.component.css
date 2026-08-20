@@ -91,12 +91,25 @@ h2 {
 
 /* === BUTTON-POSITIONIERUNG === */
 .button_remove_multimedia,
-.button_remove_text {
+.button_remove_text,
+.button_remove_location {
     position: absolute;
     top: 0;
     right: 0;
     transform: translate(50%, -50%);
     z-index: 100;
+}
+
+.button_edit_location {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translate(-50%, -50%);
+    z-index: 100;
+}
+
+.location-container app-location-preview {
+    width: 100%;
 }
 
 .button_random {
@@ -117,4 +130,8 @@ h2 {
     margin: 1rem;
     width: 95%;
     border-radius: 0.5rem;
+}
+
+.button_default[beforeMultimediaActions] {
+    margin: 0.5rem auto;
 }

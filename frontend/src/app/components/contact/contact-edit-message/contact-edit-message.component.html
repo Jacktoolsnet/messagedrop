@@ -1,7 +1,24 @@
 <mat-dialog-content>
     <div class="content">
-        @if (data.shortMessage.multimedia.type === 'undefined') {
+        @if (data.shortMessage.location; as location) {
+        <div class="oembed_container location-container">
+            <button mat-mini-fab color="primary" class="button_remove_location" (click)="removeLocation()"
+                [attr.aria-label]="'common.contact.message.removeLocation' | transloco">
+                <mat-icon>delete</mat-icon>
+            </button>
+            <button mat-mini-fab color="primary" class="button_edit_location" [matMenuTriggerFor]="locationMenu"
+                [attr.aria-label]="'common.contact.message.editLocation' | transloco">
+                <mat-icon>edit_location_alt</mat-icon>
+            </button>
+            <app-location-preview [location]="location"></app-location-preview>
+        </div>
+        } @else if (data.shortMessage.multimedia.type === 'undefined') {
         <app-select-multimedia class="oembed_container" (newMultimedia)="applyNewMultimedia($event)">
+            <button beforeMultimediaActions mat-flat-button class="button_default" color="primary"
+                [matMenuTriggerFor]="locationMenu"
+                [attr.aria-label]="'common.contact.message.addLocation' | transloco">
+                <span>{{ 'common.contact.message.addLocation' | transloco }}</span>
+            </button>
         </app-select-multimedia>
         } @else {
         <div class="oembed_container">
@@ -12,6 +29,23 @@
             </app-showmultimedia>
         </div>
         }
+
+        <mat-menu #locationMenu="matMenu" panelClass="accent-menu">
+            <button mat-menu-item type="button" (click)="openSavedPlacePicker()" [disabled]="!hasSavedPlaces()">
+                <mat-icon>place</mat-icon>
+                <span>{{ 'common.contact.chatroom.locationSourceMyPlaces' | transloco }}</span>
+            </button>
+            <button mat-menu-item type="button" (click)="openLocationSearch()">
+                <mat-icon>search</mat-icon>
+                <span>{{ 'common.menu.searchPlace' | transloco }}</span>
+            </button>
+            @if (!hasSavedPlaces()) {
+            <button mat-menu-item type="button" disabled>
+                <mat-icon>info</mat-icon>
+                <span>{{ 'common.contact.chatroom.noSavedPlaces' | transloco }}</span>
+            </button>
+            }
+        </mat-menu>
 
         @if (data.shortMessage.message === '') {
         <div class="oembed_container">
@@ -44,7 +78,7 @@
         <mat-icon>help</mat-icon>
     </button>
 
-    @if (data.shortMessage.message !== '' || data.shortMessage.multimedia.type !== 'undefined') {
+    @if (data.shortMessage.message !== '' || data.shortMessage.multimedia.type !== 'undefined' || data.shortMessage.location) {
     <button class="button_drop" color="primary" [attr.aria-label]="'common.contact.message.applyAria' | transloco"
         (click)="onApplyClick()" mat-icon-button><mat-icon>send</mat-icon></button>
     }

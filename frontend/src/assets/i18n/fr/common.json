@@ -541,6 +541,9 @@
       },
       "message": {
         "addText": "Ajouter du texte",
+        "addLocation": "Ajouter un lieu",
+        "editLocation": "Modifier le lieu",
+        "removeLocation": "Supprimer le lieu",
         "dropNewAria": "Publier un nouveau message",
         "applyAria": "Publier votre message",
         "policy": "Ces informations sont stockées sur notre serveur et sont visibles par tous."

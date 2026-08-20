@@ -552,12 +552,12 @@ export class ContactChatroomComponent implements AfterViewInit {
     this.openExperienceSearch(message);
   }
 
-  openLocationSearch(message?: ChatroomMessage): void {
+  openLocationSearch(message: ChatroomMessage): void {
     const contact = this.contact();
     if (!contact) {
       return;
     }
-    const initialLocation = message?.payload?.location
+    const initialLocation = message.payload?.location
       ? { ...message.payload.location }
       : this.mapService.getMapLocation();
     const dialogRef = this.matDialog.open(LocationPickerDialogComponent, {
@@ -576,15 +576,11 @@ export class ContactChatroomComponent implements AfterViewInit {
       if (!location) {
         return;
       }
-      if (message) {
-        this.sendEditedLocationMessage(contact, message, location);
-        return;
-      }
-      this.sendLocationMessage(contact, location);
+      this.sendEditedLocationMessage(contact, message, location);
     });
   }
 
-  openSavedPlacePicker(message?: ChatroomMessage): void {
+  openSavedPlacePicker(message: ChatroomMessage): void {
     const contact = this.contact();
     if (!contact) {
       return;
@@ -603,11 +599,7 @@ export class ContactChatroomComponent implements AfterViewInit {
       if (!location) {
         return;
       }
-      if (message) {
-        this.sendEditedLocationMessage(contact, message, location);
-        return;
-      }
-      this.sendLocationMessage(contact, location);
+      this.sendEditedLocationMessage(contact, message, location);
     });
   }
 
@@ -633,12 +625,6 @@ export class ContactChatroomComponent implements AfterViewInit {
       return;
     }
     this.openLocationSearch(message);
-  }
-
-  private sendLocationMessage(contact: Contact, location: Location): void {
-    const payload = this.createEmptyMessage();
-    payload.location = { ...location };
-    void this.sendAsNewMessage(contact, payload);
   }
 
   private sendExperienceMessage(contact: Contact, experience: ExperienceResult, experienceSearchTerm?: string | null): void {
@@ -1126,10 +1112,6 @@ export class ContactChatroomComponent implements AfterViewInit {
     }
     if (message.payload?.experience) {
       this.openExperienceSearch(message);
-      return;
-    }
-    if (message.payload?.location) {
-      this.openLocationSearch(message);
       return;
     }
     const initialPayload: ShortMessage = message.payload
