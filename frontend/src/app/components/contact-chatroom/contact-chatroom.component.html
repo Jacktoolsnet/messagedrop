@@ -105,7 +105,26 @@
               <span>{{ 'common.contact.chatroom.messageUnreadable' | transloco }}</span>
             </div>
             } @else {
-            @if (msg.payload.multimedia.type !== 'undefined') {
+            @if (hasMultimediaAndText(msg.payload)) {
+            <mat-tab-group class="chat-content-tabs" dynamicHeight animationDuration="160ms">
+              <mat-tab [aria-label]="'common.contact.chatroom.multimediaTabAria' | transloco">
+                <ng-template mat-tab-label>
+                  <mat-icon aria-hidden="true">perm_media</mat-icon>
+                </ng-template>
+                <div class="chat-content-tab__panel">
+                  <app-showmultimedia [multimedia]="msg.payload.multimedia"></app-showmultimedia>
+                </div>
+              </mat-tab>
+              <mat-tab [aria-label]="'common.contact.chatroom.textTabAria' | transloco">
+                <ng-template mat-tab-label>
+                  <mat-icon aria-hidden="true">subject</mat-icon>
+                </ng-template>
+                <div class="chat-content-tab__panel">
+                  <app-showmessage [message]="msg.payload.message" [style]="msg.payload.style"></app-showmessage>
+                </div>
+              </mat-tab>
+            </mat-tab-group>
+            } @else if (msg.payload.multimedia.type !== 'undefined') {
             <app-showmultimedia [multimedia]="msg.payload.multimedia"></app-showmultimedia>
             }
             @if (msg.payload.verified === false) {
@@ -119,7 +138,7 @@
               <app-location-preview [location]="msg.payload.location"></app-location-preview>
             </div>
             }
-            @if (msg.payload.message.trim() !== '') {
+            @if (msg.payload.message.trim() !== '' && !hasMultimediaAndText(msg.payload)) {
             <app-showmessage [message]="msg.payload!.message" [style]="msg.payload!.style"></app-showmessage>
             }
             @if (msg.payload.experience) {
@@ -256,7 +275,26 @@
               <span>{{ 'common.contact.chatroom.messageUnreadable' | transloco }}</span>
             </div>
             } @else {
-            @if (msg.payload.multimedia.type !== 'undefined') {
+            @if (hasMultimediaAndText(msg.payload)) {
+            <mat-tab-group class="chat-content-tabs" dynamicHeight animationDuration="160ms">
+              <mat-tab [aria-label]="'common.contact.chatroom.multimediaTabAria' | transloco">
+                <ng-template mat-tab-label>
+                  <mat-icon aria-hidden="true">perm_media</mat-icon>
+                </ng-template>
+                <div class="chat-content-tab__panel">
+                  <app-showmultimedia [multimedia]="msg.payload.multimedia"></app-showmultimedia>
+                </div>
+              </mat-tab>
+              <mat-tab [aria-label]="'common.contact.chatroom.textTabAria' | transloco">
+                <ng-template mat-tab-label>
+                  <mat-icon aria-hidden="true">subject</mat-icon>
+                </ng-template>
+                <div class="chat-content-tab__panel">
+                  <app-showmessage [message]="getDisplayedMessage(msg)" [style]="msg.payload.style"></app-showmessage>
+                </div>
+              </mat-tab>
+            </mat-tab-group>
+            } @else if (msg.payload.multimedia.type !== 'undefined') {
             <app-showmultimedia [multimedia]="msg.payload.multimedia"></app-showmultimedia>
             }
             @if (msg.payload.verified === false) {
@@ -270,7 +308,7 @@
               <app-location-preview [location]="msg.payload.location"></app-location-preview>
             </div>
             }
-            @if (msg.payload.message.trim() !== '') {
+            @if (msg.payload.message.trim() !== '' && !hasMultimediaAndText(msg.payload)) {
             <app-showmessage [message]="getDisplayedMessage(msg)" [style]="msg.payload!.style"></app-showmessage>
             }
             @if (msg.payload.experience) {

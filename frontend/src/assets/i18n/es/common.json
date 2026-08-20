@@ -534,6 +534,8 @@
         "storeTranslationFailed": "No se pudo guardar el mensaje traducido.",
         "openInMaps": "Abrir en Google Maps",
         "showOnMap": "Mostrar en el mapa",
+        "multimediaTabAria": "Contenido multimedia",
+        "textTabAria": "Texto",
         "revisionHistory": {
           "title": "Historial de cambios",
           "openAria": "Mostrar historial de cambios",

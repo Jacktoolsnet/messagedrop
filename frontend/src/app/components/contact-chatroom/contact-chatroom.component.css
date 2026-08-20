@@ -312,6 +312,16 @@
   margin-bottom: 1.5rem;
 }
 
+.chat-content-tabs {
+  width: min(32rem, calc(100vw - 8rem));
+  min-width: min(18rem, calc(100vw - 8rem));
+  text-align: left;
+}
+
+.chat-content-tab__panel {
+  padding-top: 0.75rem;
+}
+
 .chat-audio {
   display: grid;
   gap: 0.35rem;

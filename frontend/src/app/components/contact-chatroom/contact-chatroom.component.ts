@@ -6,6 +6,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatTabsModule } from '@angular/material/tabs';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
 import { Contact } from '../../interfaces/contact';
@@ -84,6 +85,7 @@ interface ContactChatroomDialogData {
     MatCardModule,
     MatButtonModule,
     MatMenuModule,
+    MatTabsModule,
     MatDialogActions,
     MatDialogTitle,
     MatIcon,
@@ -625,6 +627,10 @@ export class ContactChatroomComponent implements AfterViewInit {
       || !!message.experience
       || !!message.audio
     );
+  }
+
+  hasMultimediaAndText(message: ShortMessage): boolean {
+    return message.multimedia?.type !== 'undefined' && message.message.trim() !== '';
   }
 
   isUnread(message: { direction: 'user' | 'contactUser'; readAt?: string | null }): boolean {

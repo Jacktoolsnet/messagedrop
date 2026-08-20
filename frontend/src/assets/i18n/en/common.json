@@ -535,6 +535,8 @@
         "storeTranslationFailed": "Translated message could not be stored.",
         "openInMaps": "Open in Google Maps",
         "showOnMap": "Show on map",
+        "multimediaTabAria": "Multimedia content",
+        "textTabAria": "Text",
         "revisionHistory": {
           "title": "Change history",
           "openAria": "Show change history",

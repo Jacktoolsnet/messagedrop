@@ -535,6 +535,8 @@
         "storeTranslationFailed": "Übersetzte Nachricht konnte nicht gespeichert werden.",
         "openInMaps": "In Google Maps öffnen",
         "showOnMap": "Auf der Karte anzeigen",
+        "multimediaTabAria": "Multimedia-Inhalt",
+        "textTabAria": "Text",
         "revisionHistory": {
           "title": "Änderungshistorie",
           "openAria": "Änderungshistorie anzeigen",
