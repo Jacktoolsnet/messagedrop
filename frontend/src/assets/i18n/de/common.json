@@ -539,7 +539,6 @@
           "title": "Änderungshistorie",
           "openAria": "Änderungshistorie anzeigen",
           "current": "Aktueller Stand",
-          "previous": "Früherer Stand",
           "voiceMessage": "Sprachnachricht"
         },
         "deleteMessage": {

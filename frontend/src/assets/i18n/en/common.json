@@ -539,7 +539,6 @@
           "title": "Change history",
           "openAria": "Show change history",
           "current": "Current version",
-          "previous": "Previous version",
           "voiceMessage": "Voice message"
         },
         "deleteMessage": {

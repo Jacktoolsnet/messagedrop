@@ -6,9 +6,9 @@
     @for (revision of data.revisions; track revision.messageId; let first = $first) {
     <section class="revision-card">
       <header class="revision-card__header">
-        <span>{{ first
-          ? ('common.contact.chatroom.revisionHistory.current' | transloco)
-          : ('common.contact.chatroom.revisionHistory.previous' | transloco) }}</span>
+        @if (first) {
+        <span>{{ 'common.contact.chatroom.revisionHistory.current' | transloco }}</span>
+        }
         <time [attr.datetime]="revision.createdAt">{{ revision.createdAt | date:'medium' }}</time>
       </header>
 
@@ -45,8 +45,8 @@
   </div>
 </mat-dialog-content>
 
-<mat-dialog-actions align="start">
-  <button mat-icon-button type="button" (click)="close()"
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-icon-button type="button" class="action-close" (click)="close()"
     [attr.aria-label]="'common.actions.close' | transloco">
     <mat-icon>close</mat-icon>
   </button>

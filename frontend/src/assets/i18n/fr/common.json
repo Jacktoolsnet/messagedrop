@@ -538,7 +538,6 @@
           "title": "Historique des modifications",
           "openAria": "Afficher l’historique des modifications",
           "current": "Version actuelle",
-          "previous": "Version précédente",
           "voiceMessage": "Message vocal"
         },
         "deleteMessage": {

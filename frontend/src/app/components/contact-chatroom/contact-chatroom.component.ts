@@ -1037,13 +1037,13 @@ export class ContactChatroomComponent implements AfterViewInit {
       return;
     }
     const initialPayload: ShortMessage = message.payload
-      ? { ...message.payload }
+      ? structuredClone(message.payload)
       : this.createEmptyMessage();
 
     const dialogRef = this.matDialog.open(ContactEditMessageComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: { mode: Mode.EDIT_SHORT_MESSAGE, contact, shortMessage: { ...initialPayload } },
+      data: { mode: Mode.EDIT_SHORT_MESSAGE, contact, shortMessage: initialPayload },
       minWidth: '20vw',
       maxWidth: '90vw',
       maxHeight: '90vh',
