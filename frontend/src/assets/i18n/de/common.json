@@ -536,6 +536,7 @@
         "openInMaps": "In Google Maps öffnen",
         "showOnMap": "Auf der Karte anzeigen",
         "multimediaTabAria": "Multimedia-Inhalt",
+        "locationTabAria": "Ort",
         "textTabAria": "Text",
         "revisionHistory": {
           "title": "Änderungshistorie",

@@ -629,8 +629,20 @@ export class ContactChatroomComponent implements AfterViewInit {
     );
   }
 
-  hasMultimediaAndText(message: ShortMessage): boolean {
-    return message.multimedia?.type !== 'undefined' && message.message.trim() !== '';
+  hasTabbedMultimediaContent(message: ShortMessage): boolean {
+    const hasMultimediaContent = message.multimedia?.type !== 'undefined' || !!message.location;
+    return hasMultimediaContent && message.message.trim() !== '';
+  }
+
+  getMultimediaTabIcon(message: ShortMessage): string {
+    return message.multimedia?.type !== 'undefined' ? 'perm_media' : 'place';
+  }
+
+  getMultimediaTabLabel(message: ShortMessage): string {
+    const key = message.multimedia?.type !== 'undefined'
+      ? 'common.contact.chatroom.multimediaTabAria'
+      : 'common.contact.chatroom.locationTabAria';
+    return this.translation.t(key);
   }
 
   isUnread(message: { direction: 'user' | 'contactUser'; readAt?: string | null }): boolean {

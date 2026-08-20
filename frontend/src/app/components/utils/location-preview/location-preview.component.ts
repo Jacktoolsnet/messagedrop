@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnChanges, OnDestroy, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnChanges, OnDestroy, SimpleChanges, ChangeDetectionStrategy, inject } from '@angular/core';
 import * as leaflet from 'leaflet';
 import { Location } from '../../../interfaces/location';
 
@@ -32,9 +32,13 @@ export class LocationPreviewComponent implements AfterViewInit, OnChanges, OnDes
   readonly mapId = `location-preview-map-${Math.random().toString(36).slice(2)}`;
   private map?: leaflet.Map;
   private marker?: leaflet.Marker;
+  private resizeObserver?: ResizeObserver;
+  private resizeFrameId?: number;
+  private readonly elementRef = inject(ElementRef<HTMLElement>);
 
   ngAfterViewInit(): void {
     this.initMap();
+    this.observeSizeChanges();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -44,6 +48,10 @@ export class LocationPreviewComponent implements AfterViewInit, OnChanges, OnDes
   }
 
   ngOnDestroy(): void {
+    this.resizeObserver?.disconnect();
+    if (this.resizeFrameId !== undefined) {
+      cancelAnimationFrame(this.resizeFrameId);
+    }
     this.map?.remove();
   }
 
@@ -78,7 +86,7 @@ export class LocationPreviewComponent implements AfterViewInit, OnChanges, OnDes
       icon: markerIcons[this.markerType]
     }).addTo(this.map);
 
-    setTimeout(() => this.map?.invalidateSize(), 0);
+    this.scheduleMapResize();
   }
 
   private updateMap(location: Location): void {
@@ -92,5 +100,20 @@ export class LocationPreviewComponent implements AfterViewInit, OnChanges, OnDes
       return;
     }
     this.marker = leaflet.marker(latLng, { icon: markerIcons[this.markerType] }).addTo(this.map);
+  }
+
+  private observeSizeChanges(): void {
+    this.resizeObserver = new ResizeObserver(() => this.scheduleMapResize());
+    this.resizeObserver.observe(this.elementRef.nativeElement);
+  }
+
+  private scheduleMapResize(): void {
+    if (this.resizeFrameId !== undefined) {
+      cancelAnimationFrame(this.resizeFrameId);
+    }
+    this.resizeFrameId = requestAnimationFrame(() => {
+      this.resizeFrameId = undefined;
+      this.map?.invalidateSize();
+    });
   }
 }

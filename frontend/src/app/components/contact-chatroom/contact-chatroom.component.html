@@ -105,14 +105,19 @@
               <span>{{ 'common.contact.chatroom.messageUnreadable' | transloco }}</span>
             </div>
             } @else {
-            @if (hasMultimediaAndText(msg.payload)) {
+            @if (hasTabbedMultimediaContent(msg.payload)) {
             <mat-tab-group class="chat-content-tabs" dynamicHeight animationDuration="160ms">
-              <mat-tab [aria-label]="'common.contact.chatroom.multimediaTabAria' | transloco">
+              <mat-tab [aria-label]="getMultimediaTabLabel(msg.payload)">
                 <ng-template mat-tab-label>
-                  <mat-icon aria-hidden="true">perm_media</mat-icon>
+                  <mat-icon aria-hidden="true">{{ getMultimediaTabIcon(msg.payload) }}</mat-icon>
                 </ng-template>
                 <div class="chat-content-tab__panel">
+                  @if (msg.payload.multimedia.type !== 'undefined') {
                   <app-showmultimedia [multimedia]="msg.payload.multimedia"></app-showmultimedia>
+                  }
+                  @if (msg.payload.location) {
+                  <app-location-preview [location]="msg.payload.location"></app-location-preview>
+                  }
                 </div>
               </mat-tab>
               <mat-tab [aria-label]="'common.contact.chatroom.textTabAria' | transloco">
@@ -133,12 +138,12 @@
               <span>{{ 'common.contact.chatroom.messageUnverified' | transloco }}</span>
             </div>
             }
-            @if (msg.payload.location) {
+            @if (msg.payload.location && !hasTabbedMultimediaContent(msg.payload)) {
             <div class="chat-location">
               <app-location-preview [location]="msg.payload.location"></app-location-preview>
             </div>
             }
-            @if (msg.payload.message.trim() !== '' && !hasMultimediaAndText(msg.payload)) {
+            @if (msg.payload.message.trim() !== '' && !hasTabbedMultimediaContent(msg.payload)) {
             <app-showmessage [message]="msg.payload!.message" [style]="msg.payload!.style"></app-showmessage>
             }
             @if (msg.payload.experience) {
@@ -275,14 +280,19 @@
               <span>{{ 'common.contact.chatroom.messageUnreadable' | transloco }}</span>
             </div>
             } @else {
-            @if (hasMultimediaAndText(msg.payload)) {
+            @if (hasTabbedMultimediaContent(msg.payload)) {
             <mat-tab-group class="chat-content-tabs" dynamicHeight animationDuration="160ms">
-              <mat-tab [aria-label]="'common.contact.chatroom.multimediaTabAria' | transloco">
+              <mat-tab [aria-label]="getMultimediaTabLabel(msg.payload)">
                 <ng-template mat-tab-label>
-                  <mat-icon aria-hidden="true">perm_media</mat-icon>
+                  <mat-icon aria-hidden="true">{{ getMultimediaTabIcon(msg.payload) }}</mat-icon>
                 </ng-template>
                 <div class="chat-content-tab__panel">
+                  @if (msg.payload.multimedia.type !== 'undefined') {
                   <app-showmultimedia [multimedia]="msg.payload.multimedia"></app-showmultimedia>
+                  }
+                  @if (msg.payload.location) {
+                  <app-location-preview [location]="msg.payload.location"></app-location-preview>
+                  }
                 </div>
               </mat-tab>
               <mat-tab [aria-label]="'common.contact.chatroom.textTabAria' | transloco">
@@ -303,12 +313,12 @@
               <span>{{ 'common.contact.chatroom.messageUnverified' | transloco }}</span>
             </div>
             }
-            @if (msg.payload.location) {
+            @if (msg.payload.location && !hasTabbedMultimediaContent(msg.payload)) {
             <div class="chat-location">
               <app-location-preview [location]="msg.payload.location"></app-location-preview>
             </div>
             }
-            @if (msg.payload.message.trim() !== '' && !hasMultimediaAndText(msg.payload)) {
+            @if (msg.payload.message.trim() !== '' && !hasTabbedMultimediaContent(msg.payload)) {
             <app-showmessage [message]="getDisplayedMessage(msg)" [style]="msg.payload!.style"></app-showmessage>
             }
             @if (msg.payload.experience) {
