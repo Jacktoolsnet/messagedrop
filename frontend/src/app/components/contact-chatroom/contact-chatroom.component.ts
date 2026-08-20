@@ -45,6 +45,7 @@ import { ExperienceSearchDetailDialogComponent } from '../utils/experience-searc
 import { DisplayMessage } from '../utils/display-message/display-message.component';
 import { ContactChatroomExperienceSelectDialogComponent } from './experience-select-dialog/contact-chatroom-experience-select-dialog.component';
 import { ChatGameType, GameSelectDialogComponent } from './game-select-dialog/game-select-dialog.component';
+import { GameRulesDialogComponent } from './game-rules-dialog/game-rules-dialog.component';
 import { NewTicTacToeDialogComponent } from './new-tic-tac-toe-dialog/new-tic-tac-toe-dialog.component';
 import { TicTacToeBoardComponent } from './tic-tac-toe-board/tic-tac-toe-board.component';
 import { DeleteContactMessageComponent } from './delete-contact-message/delete-contact-message.component';
@@ -540,6 +541,34 @@ export class ContactChatroomComponent implements AfterViewInit {
       : currentUserId === game.playerOUserId
         ? 'O'
         : null;
+  }
+
+  getTicTacToeGameIcon(game: TicTacToeGame): string {
+    return game.variant === 'vanishing' ? 'change_circle' : 'grid_3x3';
+  }
+
+  getTicTacToeVariantLabel(game: TicTacToeGame): string {
+    const key = game.variant === 'vanishing'
+      ? 'common.contact.chatroom.games.vanishingVariant'
+      : 'common.contact.chatroom.games.standardVariant';
+    return this.translation.t(key);
+  }
+
+  isCurrentUserTicTacToeTurn(game: TicTacToeGame): boolean {
+    return game.nextPlayerUserId === this.userService.getUser().id;
+  }
+
+  openTicTacToeRules(game: TicTacToeGame): void {
+    this.matDialog.open(GameRulesDialogComponent, {
+      data: { variant: game.variant ?? 'standard' },
+      width: 'min(440px, 94vw)',
+      maxWidth: '94vw',
+      maxHeight: '85vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
   }
 
   async playTicTacToeMove(message: ChatroomMessage, cellIndex: number): Promise<void> {

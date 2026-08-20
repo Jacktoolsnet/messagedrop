@@ -606,7 +606,7 @@
 }
 
 .avatar-me mat-icon,
-avatar-them mat-icon {
+.avatar-them mat-icon {
   flex: 0 0 2.5rem;
   width: 2.5rem;
   height: 2.5rem;

@@ -105,6 +105,68 @@ h2[mat-dialog-title].dialog-title {
   backdrop-filter: blur(6px);
 }
 
+/* Shared game identity/turn badges in the contact chat. Kept global so the
+   chat component stays within its deliberately small component-style budget. */
+app-contact-chatroom .game-message-avatar {
+  cursor: default;
+}
+
+app-contact-chatroom .game-message-avatar__text,
+app-contact-chatroom .game-turn-box__text {
+  display: grid;
+  min-width: 0;
+  text-align: left;
+}
+
+app-contact-chatroom .game-message-avatar__variant,
+app-contact-chatroom .game-turn-box__status {
+  overflow: hidden;
+  color: var(--mat-card-subtitle-text-color);
+  font-size: 0.72rem;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+app-contact-chatroom .game-turn-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: fit-content;
+  max-width: min(90%, 22rem);
+  min-height: 3rem;
+  margin: 0 auto 1.25rem;
+  padding: 0.25rem 0.75rem;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  color: var(--mat-card-subtitle-text-color);
+  background: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+}
+
+app-contact-chatroom .game-turn-box__avatar,
+app-contact-chatroom .game-turn-box__avatar-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 2.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.65rem;
+  object-fit: cover;
+}
+
+app-contact-chatroom .game-turn-box__avatar-icon {
+  font-size: 2rem;
+}
+
+app-contact-chatroom .game-turn-box__name {
+  overflow: hidden;
+  font-size: 1rem;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* The map should remain clearly visible while Wikipedia pins are prepared and
    Leaflet is already moving to the first route point. */
 .route-wikipedia-preparation-backdrop {
