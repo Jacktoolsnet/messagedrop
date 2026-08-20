@@ -81,7 +81,8 @@
       <div class="message" #messageRow [attr.data-message-id]="msg.messageId" [class.message--unread]="isUnread(msg)"
         tabindex="-1">
         @if (msg.direction === 'user') {
-        <div class="bubble-row me">
+        <div class="bubble-row me"
+          [style.justify-self]="msg.payload?.game?.type === 'ticTacToe' ? 'center' : null">
           <button type="button" class="avatar-me" (click)="openUserProfile()" (keyup.enter)="openUserProfile()"
             (keyup.space)="openUserProfile()" [attr.aria-label]="'common.user.profile.title' | transloco">
             @if (profile().avatarStickerId) {
@@ -260,7 +261,8 @@
           </div>
         </div>
         } @else {
-        <div class="bubble-row them">
+        <div class="bubble-row them"
+          [style.justify-self]="msg.payload?.game?.type === 'ticTacToe' ? 'center' : null">
           <button type="button" class="avatar-them" (click)="openContactSettings(activeContact)"
             (keyup.enter)="openContactSettings(activeContact)" (keyup.space)="openContactSettings(activeContact)"
             [attr.aria-label]="'common.contact.profile.title' | transloco">
