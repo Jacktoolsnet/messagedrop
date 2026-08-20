@@ -25,11 +25,29 @@ export interface TicTacToeGame {
   moves?: TicTacToeMove[];
 }
 
-export type ChatGame = TicTacToeGame;
+export type ConnectFourCell = 'R' | 'Y' | null;
 
-export interface TicTacToeStats {
+export interface ConnectFourGame {
+  type: 'connectFour';
+  version: 1;
+  gameId: string;
+  board: ConnectFourCell[];
+  playerRedUserId: string;
+  playerYellowUserId: string;
+  nextPlayerUserId: string | null;
+  status: TicTacToeStatus;
+  winnerUserId: string | null;
+  moveNumber: number;
+  lastMoveIndex: number;
+}
+
+export type ChatGame = TicTacToeGame | ConnectFourGame;
+
+export interface GameStats {
   played: number;
   won: number;
   lost: number;
   drawn: number;
 }
+
+export type TicTacToeStats = GameStats;

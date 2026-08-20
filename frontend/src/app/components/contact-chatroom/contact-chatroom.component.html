@@ -82,13 +82,13 @@
         tabindex="-1">
         @if (msg.direction === 'user') {
         <div class="bubble-row me"
-          [style.justify-self]="msg.payload?.game?.type === 'ticTacToe' ? 'center' : null">
+          [style.justify-self]="msg.payload?.game ? 'center' : null">
           @if (msg.payload?.game; as game) {
           <div class="avatar-me game-message-avatar">
-            <mat-icon aria-hidden="true">{{ getTicTacToeGameIcon(game) }}</mat-icon>
+            <mat-icon aria-hidden="true">{{ getChatGameIcon(game) }}</mat-icon>
             <span class="game-message-avatar__text">
-              <span class="name">{{ 'common.contact.chatroom.games.ticTacToe' | transloco }}</span>
-              <span class="game-message-avatar__variant">{{ getTicTacToeVariantLabel(game) }}</span>
+              <span class="name">{{ getChatGameTitle(game) }}</span>
+              <span class="game-message-avatar__variant">{{ getChatGameVariantLabel(game) }}</span>
             </span>
           </div>
           } @else {
@@ -199,13 +199,20 @@
             </div>
             }
             @if (msg.payload.game; as game) {
+            @if (game.type === 'ticTacToe') {
             <app-tic-tac-toe-board [board]="game.board"
               [variant]="game.variant ?? 'standard'"
               [disabled]="!canPlayTicTacToe(msg)" [statusText]="getTicTacToeStatusText(game)" [showStatus]="false"
               (move)="playTicTacToeMove(msg, $event)"></app-tic-tac-toe-board>
+            } @else {
+            <app-connect-four-board [board]="game.board" [lastMoveIndex]="game.lastMoveIndex"
+              [disabled]="!canPlayConnectFour(msg)"
+              [statusText]="getConnectFourStatusText(game)" [showStatus]="false"
+              (move)="playConnectFourMove(msg, $event)"></app-connect-four-board>
+            }
             @if (game.status === 'active') {
             <div class="game-turn-box" role="status" aria-live="polite">
-              @if (isCurrentUserTicTacToeTurn(game)) {
+              @if (isCurrentUserGameTurn(game)) {
                 @if (profile().avatarStickerId) {
                 <app-protected-sticker-image class="game-turn-box__avatar" [stickerId]="profile().avatarStickerId"
                   [alt]="profile().name"></app-protected-sticker-image>
@@ -225,17 +232,17 @@
                 }
               }
               <span class="game-turn-box__text">
-                <span class="game-turn-box__name">{{ isCurrentUserTicTacToeTurn(game)
+                <span class="game-turn-box__name">{{ isCurrentUserGameTurn(game)
                   ? ('common.contact.chatroom.games.yourTurnName' | transloco)
                   : (activeContact.name || ('common.contact.chatroom.contactLabel' | transloco)) }}</span>
-                <span class="game-turn-box__status">{{ isCurrentUserTicTacToeTurn(game)
-                  ? ('common.contact.chatroom.games.youPlayMark' | transloco:{ mark: getTicTacToePlayerMark(game) })
+                <span class="game-turn-box__status">{{ isCurrentUserGameTurn(game)
+                  ? ('common.contact.chatroom.games.youPlayMark' | transloco:{ mark: getCurrentUserGamePieceLabel(game) })
                   : ('common.contact.chatroom.games.isTurn' | transloco) }}</span>
               </span>
             </div>
             } @else if (game.status === 'won') {
             <div class="game-turn-box" role="status" aria-live="polite">
-              @if (isCurrentUserTicTacToeWinner(game)) {
+              @if (isCurrentUserGameWinner(game)) {
                 @if (profile().avatarStickerId) {
                 <app-protected-sticker-image class="game-turn-box__avatar" [stickerId]="profile().avatarStickerId"
                   [alt]="profile().name"></app-protected-sticker-image>
@@ -255,11 +262,11 @@
                 }
               }
               <span class="game-turn-box__text">
-                <span class="game-turn-box__name">{{ isCurrentUserTicTacToeWinner(game)
+                <span class="game-turn-box__name">{{ isCurrentUserGameWinner(game)
                   ? ('common.contact.chatroom.games.iWon' | transloco)
                   : (activeContact.name || ('common.contact.chatroom.contactLabel' | transloco)) }}</span>
-                <span class="game-turn-box__status">{{ isCurrentUserTicTacToeWinner(game)
-                  ? ('common.contact.chatroom.games.youPlayedMark' | transloco:{ mark: getTicTacToePlayerMark(game) })
+                <span class="game-turn-box__status">{{ isCurrentUserGameWinner(game)
+                  ? ('common.contact.chatroom.games.youPlayedMark' | transloco:{ mark: getCurrentUserGamePieceLabel(game) })
                   : ('common.contact.chatroom.games.hasWon' | transloco) }}</span>
               </span>
             </div>
@@ -336,7 +343,7 @@
               @if (msg.payload?.game) {
               <button mat-mini-fab color="primary"
                 [attr.aria-label]="'common.contact.chatroom.games.rulesAria' | transloco"
-                (click)="openTicTacToeRules(msg.payload.game)">
+                (click)="openGameRules(msg.payload.game)">
                 <mat-icon>help</mat-icon>
               </button>
               <button mat-mini-fab color="primary"
@@ -354,13 +361,13 @@
         </div>
         } @else {
         <div class="bubble-row them"
-          [style.justify-self]="msg.payload?.game?.type === 'ticTacToe' ? 'center' : null">
+          [style.justify-self]="msg.payload?.game ? 'center' : null">
           @if (msg.payload?.game; as game) {
           <div class="avatar-them game-message-avatar">
-            <mat-icon aria-hidden="true">{{ getTicTacToeGameIcon(game) }}</mat-icon>
+            <mat-icon aria-hidden="true">{{ getChatGameIcon(game) }}</mat-icon>
             <span class="game-message-avatar__text">
-              <span class="name">{{ 'common.contact.chatroom.games.ticTacToe' | transloco }}</span>
-              <span class="game-message-avatar__variant">{{ getTicTacToeVariantLabel(game) }}</span>
+              <span class="name">{{ getChatGameTitle(game) }}</span>
+              <span class="game-message-avatar__variant">{{ getChatGameVariantLabel(game) }}</span>
             </span>
           </div>
           } @else {
@@ -472,13 +479,20 @@
             </div>
             }
             @if (msg.payload.game; as game) {
+            @if (game.type === 'ticTacToe') {
             <app-tic-tac-toe-board [board]="game.board"
               [variant]="game.variant ?? 'standard'"
               [disabled]="!canPlayTicTacToe(msg)" [statusText]="getTicTacToeStatusText(game)" [showStatus]="false"
               (move)="playTicTacToeMove(msg, $event)"></app-tic-tac-toe-board>
+            } @else {
+            <app-connect-four-board [board]="game.board" [lastMoveIndex]="game.lastMoveIndex"
+              [disabled]="!canPlayConnectFour(msg)"
+              [statusText]="getConnectFourStatusText(game)" [showStatus]="false"
+              (move)="playConnectFourMove(msg, $event)"></app-connect-four-board>
+            }
             @if (game.status === 'active') {
             <div class="game-turn-box" role="status" aria-live="polite">
-              @if (isCurrentUserTicTacToeTurn(game)) {
+              @if (isCurrentUserGameTurn(game)) {
                 @if (profile().avatarStickerId) {
                 <app-protected-sticker-image class="game-turn-box__avatar" [stickerId]="profile().avatarStickerId"
                   [alt]="profile().name"></app-protected-sticker-image>
@@ -498,17 +512,17 @@
                 }
               }
               <span class="game-turn-box__text">
-                <span class="game-turn-box__name">{{ isCurrentUserTicTacToeTurn(game)
+                <span class="game-turn-box__name">{{ isCurrentUserGameTurn(game)
                   ? ('common.contact.chatroom.games.yourTurnName' | transloco)
                   : (activeContact.name || ('common.contact.chatroom.contactLabel' | transloco)) }}</span>
-                <span class="game-turn-box__status">{{ isCurrentUserTicTacToeTurn(game)
-                  ? ('common.contact.chatroom.games.youPlayMark' | transloco:{ mark: getTicTacToePlayerMark(game) })
+                <span class="game-turn-box__status">{{ isCurrentUserGameTurn(game)
+                  ? ('common.contact.chatroom.games.youPlayMark' | transloco:{ mark: getCurrentUserGamePieceLabel(game) })
                   : ('common.contact.chatroom.games.isTurn' | transloco) }}</span>
               </span>
             </div>
             } @else if (game.status === 'won') {
             <div class="game-turn-box" role="status" aria-live="polite">
-              @if (isCurrentUserTicTacToeWinner(game)) {
+              @if (isCurrentUserGameWinner(game)) {
                 @if (profile().avatarStickerId) {
                 <app-protected-sticker-image class="game-turn-box__avatar" [stickerId]="profile().avatarStickerId"
                   [alt]="profile().name"></app-protected-sticker-image>
@@ -528,11 +542,11 @@
                 }
               }
               <span class="game-turn-box__text">
-                <span class="game-turn-box__name">{{ isCurrentUserTicTacToeWinner(game)
+                <span class="game-turn-box__name">{{ isCurrentUserGameWinner(game)
                   ? ('common.contact.chatroom.games.iWon' | transloco)
                   : (activeContact.name || ('common.contact.chatroom.contactLabel' | transloco)) }}</span>
-                <span class="game-turn-box__status">{{ isCurrentUserTicTacToeWinner(game)
-                  ? ('common.contact.chatroom.games.youPlayedMark' | transloco:{ mark: getTicTacToePlayerMark(game) })
+                <span class="game-turn-box__status">{{ isCurrentUserGameWinner(game)
+                  ? ('common.contact.chatroom.games.youPlayedMark' | transloco:{ mark: getCurrentUserGamePieceLabel(game) })
                   : ('common.contact.chatroom.games.hasWon' | transloco) }}</span>
               </span>
             </div>
@@ -604,7 +618,7 @@
               @if (msg.payload?.game) {
               <button mat-mini-fab color="primary"
                 [attr.aria-label]="'common.contact.chatroom.games.rulesAria' | transloco"
-                (click)="openTicTacToeRules(msg.payload.game)">
+                (click)="openGameRules(msg.payload.game)">
                 <mat-icon>help</mat-icon>
               </button>
               <button mat-mini-fab color="primary"

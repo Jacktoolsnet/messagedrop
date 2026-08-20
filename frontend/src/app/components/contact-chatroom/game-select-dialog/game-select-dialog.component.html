@@ -93,6 +93,52 @@
         </button>
       </div>
     </article>
+
+    <article class="game-tile">
+      <div class="game-avatar-box">
+        <span class="game-avatar-box__avatar" aria-hidden="true">
+          <mat-icon>view_column</mat-icon>
+        </span>
+        <span class="game-avatar-box__text">
+          <span class="game-avatar-box__title">{{ 'common.contact.chatroom.games.connectFour' | transloco }}</span>
+          <span class="game-avatar-box__variant">{{ 'common.contact.chatroom.games.standardVariant' | transloco }}</span>
+        </span>
+      </div>
+
+      <div class="game-stats">
+        <div class="game-stat game-stat--played">
+          <mat-icon aria-hidden="true">sports_score</mat-icon>
+          <span class="game-stat__value">{{ data.connectFourStats.played }}</span>
+          <span class="game-stat__label">{{ 'common.contact.chatroom.games.statsPlayed' | transloco }}</span>
+        </div>
+        <div class="game-stat game-stat--won">
+          <mat-icon aria-hidden="true">emoji_events</mat-icon>
+          <span class="game-stat__value">{{ data.connectFourStats.won }}</span>
+          <span class="game-stat__label">{{ 'common.contact.chatroom.games.statsWon' | transloco }}</span>
+        </div>
+        <div class="game-stat game-stat--lost">
+          <mat-icon aria-hidden="true">trending_down</mat-icon>
+          <span class="game-stat__value">{{ data.connectFourStats.lost }}</span>
+          <span class="game-stat__label">{{ 'common.contact.chatroom.games.statsLost' | transloco }}</span>
+        </div>
+        <div class="game-stat game-stat--drawn">
+          <mat-icon aria-hidden="true">handshake</mat-icon>
+          <span class="game-stat__value">{{ data.connectFourStats.drawn }}</span>
+          <span class="game-stat__label">{{ 'common.contact.chatroom.games.statsDrawn' | transloco }}</span>
+        </div>
+      </div>
+
+      <div class="game-tile__actions">
+        <button mat-mini-fab color="primary" type="button" (click)="select('connectFour')"
+          [attr.aria-label]="'common.contact.chatroom.games.playConnectFourAria' | transloco">
+          <mat-icon>play_arrow</mat-icon>
+        </button>
+        <button mat-mini-fab type="button" (click)="openConnectFourRules()"
+          [attr.aria-label]="'common.contact.chatroom.games.rulesAria' | transloco">
+          <mat-icon>help</mat-icon>
+        </button>
+      </div>
+    </article>
   </div>
 </mat-dialog-content>
 

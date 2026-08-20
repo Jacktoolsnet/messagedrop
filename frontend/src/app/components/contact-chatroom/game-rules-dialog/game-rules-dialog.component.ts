@@ -6,6 +6,11 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
 import { TicTacToeVariant } from '../../../interfaces/chat-game';
 
+export interface GameRulesDialogData {
+  gameType: 'ticTacToe' | 'connectFour';
+  variant?: TicTacToeVariant;
+}
+
 @Component({
   selector: 'app-game-rules-dialog',
   standalone: true,
@@ -16,7 +21,7 @@ import { TicTacToeVariant } from '../../../interfaces/chat-game';
 })
 export class GameRulesDialogComponent {
   private readonly dialogRef = inject(MatDialogRef<GameRulesDialogComponent>);
-  readonly data = inject<{ variant: TicTacToeVariant }>(MAT_DIALOG_DATA);
+  readonly data = inject<GameRulesDialogData>(MAT_DIALOG_DATA);
 
   close(): void {
     this.dialogRef.close();

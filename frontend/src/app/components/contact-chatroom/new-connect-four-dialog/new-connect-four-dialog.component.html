@@ -1,0 +1,18 @@
+<app-dialog-header icon="view_column" [title]="'common.contact.chatroom.games.newConnectFourTitle' | transloco"></app-dialog-header>
+
+<mat-dialog-content class="new-game-content">
+  <app-connect-four-board [board]="board()" [disabled]="false"
+    [statusText]="'common.contact.chatroom.games.chooseFirstConnectFourMove' | transloco"
+    (move)="selectColumn($event)"></app-connect-four-board>
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-icon-button class="action-close" type="button" (click)="close()"
+    [attr.aria-label]="'common.actions.close' | transloco">
+    <mat-icon>close</mat-icon>
+  </button>
+  <button mat-icon-button color="primary" type="button" (click)="send()" [disabled]="selectedColumn() === null"
+    [attr.aria-label]="'common.contact.chatroom.games.sendGameAria' | transloco">
+    <mat-icon>send</mat-icon>
+  </button>
+</mat-dialog-actions>

@@ -3,15 +3,16 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDial
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { TicTacToeStats, TicTacToeVariant } from '../../../interfaces/chat-game';
+import { GameStats, TicTacToeStats, TicTacToeVariant } from '../../../interfaces/chat-game';
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
 import { GameRulesDialogComponent } from '../game-rules-dialog/game-rules-dialog.component';
 
-export type ChatGameType = 'ticTacToe' | 'ticTacToeVanishing';
+export type ChatGameType = 'ticTacToe' | 'ticTacToeVanishing' | 'connectFour';
 
 interface GameSelectDialogData {
   ticTacToeStats: TicTacToeStats;
   vanishingTicTacToeStats: TicTacToeStats;
+  connectFourStats: GameStats;
 }
 
 @Component({
@@ -37,7 +38,20 @@ export class GameSelectDialogComponent {
 
   openRules(variant: TicTacToeVariant): void {
     this.dialog.open(GameRulesDialogComponent, {
-      data: { variant },
+      data: { gameType: 'ticTacToe', variant },
+      width: 'min(440px, 94vw)',
+      maxWidth: '94vw',
+      maxHeight: '85vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+  }
+
+  openConnectFourRules(): void {
+    this.dialog.open(GameRulesDialogComponent, {
+      data: { gameType: 'connectFour' },
       width: 'min(440px, 94vw)',
       maxWidth: '94vw',
       maxHeight: '85vh',

@@ -700,7 +700,7 @@ export class ContactlistComponent {
     if (payload.location) {
       return 'location';
     }
-    if (payload.game?.type === 'ticTacToe') {
+    if (payload.game) {
       return 'game';
     }
     if (payload.translatedMessage?.trim() || payload.message?.trim()) {
@@ -721,7 +721,7 @@ export class ContactlistComponent {
 
   getPreviewIcon(preview: ContactMessagePreview): string {
     if (preview.kind === 'game') {
-      return 'grid_3x3';
+      return preview.payload?.game?.type === 'connectFour' ? 'view_column' : 'grid_3x3';
     }
     if (preview.kind === 'location') {
       return 'location_on';
@@ -773,19 +773,25 @@ export class ContactlistComponent {
       return this.normalizePreviewText(plainText);
     }
 
-    if (payload.game?.type === 'ticTacToe') {
+    if (payload.game) {
       const currentUserId = this.userService.getUser().id;
+      const prefixKey = payload.game.type === 'connectFour'
+        ? 'common.contact.chatroom.games.connectFourPreviewPrefix'
+        : 'common.contact.chatroom.games.ticTacToePreviewPrefix';
+      const prefix = this.translation.t(prefixKey);
       if (payload.game.status === 'draw') {
-        return this.translation.t('common.contact.chatroom.games.previewDraw');
+        return `${prefix}: ${this.translation.t('common.contact.chatroom.games.previewDrawState')}`;
       }
       if (payload.game.status === 'won') {
-        return payload.game.winnerUserId === currentUserId
-          ? this.translation.t('common.contact.chatroom.games.previewWon')
-          : this.translation.t('common.contact.chatroom.games.previewLost');
+        const stateKey = payload.game.winnerUserId === currentUserId
+          ? 'common.contact.chatroom.games.previewWonState'
+          : 'common.contact.chatroom.games.previewLostState';
+        return `${prefix}: ${this.translation.t(stateKey)}`;
       }
-      return payload.game.nextPlayerUserId === currentUserId
-        ? this.translation.t('common.contact.chatroom.games.previewYourTurn')
-        : this.translation.t('common.contact.chatroom.games.previewWaiting');
+      const stateKey = payload.game.nextPlayerUserId === currentUserId
+        ? 'common.contact.chatroom.games.previewYourTurnState'
+        : 'common.contact.chatroom.games.previewWaitingState';
+      return `${prefix}: ${this.translation.t(stateKey)}`;
     }
 
     if (payload.audio) {

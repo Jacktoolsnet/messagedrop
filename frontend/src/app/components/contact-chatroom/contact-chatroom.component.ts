@@ -10,7 +10,15 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
 import { Contact } from '../../interfaces/contact';
-import { TicTacToeGame, TicTacToeMark, TicTacToeStats, TicTacToeVariant } from '../../interfaces/chat-game';
+import {
+  ChatGame,
+  ConnectFourGame,
+  GameStats,
+  TicTacToeGame,
+  TicTacToeMark,
+  TicTacToeStats,
+  TicTacToeVariant
+} from '../../interfaces/chat-game';
 import { ContactMessage } from '../../interfaces/contact-message';
 import { Location } from '../../interfaces/location';
 import { Mode } from '../../interfaces/mode';
@@ -48,6 +56,8 @@ import { ChatGameType, GameSelectDialogComponent } from './game-select-dialog/ga
 import { GameRulesDialogComponent } from './game-rules-dialog/game-rules-dialog.component';
 import { NewTicTacToeDialogComponent } from './new-tic-tac-toe-dialog/new-tic-tac-toe-dialog.component';
 import { TicTacToeBoardComponent } from './tic-tac-toe-board/tic-tac-toe-board.component';
+import { NewConnectFourDialogComponent } from './new-connect-four-dialog/new-connect-four-dialog.component';
+import { ConnectFourBoardComponent } from './connect-four-board/connect-four-board.component';
 import { DeleteContactMessageComponent } from './delete-contact-message/delete-contact-message.component';
 import { DisplayMessageService } from '../../services/display-message.service';
 import { ProtectedStickerImageComponent } from '../utils/protected-sticker-image/protected-sticker-image.component';
@@ -57,6 +67,7 @@ import {
   ContactMessageRevisionHistoryEntry
 } from './revision-history/contact-message-revision-history.component';
 import { applyTicTacToeMove, createTicTacToeGame } from '../../utils/tic-tac-toe';
+import { applyConnectFourMove, createConnectFourGame } from '../../utils/connect-four';
 
 interface ChatroomMessage {
   id: string;
@@ -100,6 +111,7 @@ interface ContactChatroomDialogData {
     ShowmessageComponent,
     LocationPreviewComponent,
     TicTacToeBoardComponent,
+    ConnectFourBoardComponent,
     TranslocoPipe
   ],
   templateUrl: './contact-chatroom.component.html',
@@ -483,7 +495,8 @@ export class ContactChatroomComponent implements AfterViewInit {
     const dialogRef = this.matDialog.open(GameSelectDialogComponent, {
       data: {
         ticTacToeStats: this.getTicTacToeStats('standard'),
-        vanishingTicTacToeStats: this.getTicTacToeStats('vanishing')
+        vanishingTicTacToeStats: this.getTicTacToeStats('vanishing'),
+        connectFourStats: this.getConnectFourStats()
       },
       width: 'min(760px, 94vw)',
       maxWidth: '94vw',
@@ -499,7 +512,27 @@ export class ContactChatroomComponent implements AfterViewInit {
         this.openNewTicTacToeDialog(contact, 'standard');
       } else if (gameType === 'ticTacToeVanishing') {
         this.openNewTicTacToeDialog(contact, 'vanishing');
+      } else if (gameType === 'connectFour') {
+        this.openNewConnectFourDialog(contact);
       }
+    });
+  }
+
+  private openNewConnectFourDialog(contact: Contact): void {
+    const dialogRef = this.matDialog.open(NewConnectFourDialogComponent, {
+      width: 'min(470px, 96vw)',
+      maxWidth: '96vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+    dialogRef.afterClosed().subscribe((firstColumn?: number) => {
+      if (!Number.isInteger(firstColumn)) return;
+      const payload = this.createEmptyMessage();
+      payload.game = createConnectFourGame(contact.userId, contact.contactUserId, firstColumn!);
+      void this.sendAsNewMessage(contact, payload, undefined, 'game_started');
     });
   }
 
@@ -543,28 +576,45 @@ export class ContactChatroomComponent implements AfterViewInit {
         : null;
   }
 
-  getTicTacToeGameIcon(game: TicTacToeGame): string {
-    return game.variant === 'vanishing' ? 'change_circle' : 'grid_3x3';
+  getChatGameIcon(game: ChatGame): string {
+    return game.type === 'connectFour' ? 'view_column' : game.variant === 'vanishing' ? 'change_circle' : 'grid_3x3';
   }
 
-  getTicTacToeVariantLabel(game: TicTacToeGame): string {
-    const key = game.variant === 'vanishing'
+  getChatGameTitle(game: ChatGame): string {
+    return this.translation.t(game.type === 'connectFour'
+      ? 'common.contact.chatroom.games.connectFour'
+      : 'common.contact.chatroom.games.ticTacToe');
+  }
+
+  getChatGameVariantLabel(game: ChatGame): string {
+    const key = game.type === 'ticTacToe' && game.variant === 'vanishing'
       ? 'common.contact.chatroom.games.vanishingVariant'
       : 'common.contact.chatroom.games.standardVariant';
     return this.translation.t(key);
   }
 
-  isCurrentUserTicTacToeTurn(game: TicTacToeGame): boolean {
+  isCurrentUserGameTurn(game: ChatGame): boolean {
     return game.nextPlayerUserId === this.userService.getUser().id;
   }
 
-  isCurrentUserTicTacToeWinner(game: TicTacToeGame): boolean {
+  isCurrentUserGameWinner(game: ChatGame): boolean {
     return game.winnerUserId === this.userService.getUser().id;
   }
 
-  openTicTacToeRules(game: TicTacToeGame): void {
+  getCurrentUserGamePieceLabel(game: ChatGame): string {
+    if (game.type === 'ticTacToe') return this.getTicTacToePlayerMark(game) ?? '';
+    const isRed = game.playerRedUserId === this.userService.getUser().id;
+    return this.translation.t(isRed
+      ? 'common.contact.chatroom.games.redPiece'
+      : 'common.contact.chatroom.games.yellowPiece');
+  }
+
+  openGameRules(game: ChatGame): void {
     this.matDialog.open(GameRulesDialogComponent, {
-      data: { variant: game.variant ?? 'standard' },
+      data: {
+        gameType: game.type,
+        variant: game.type === 'ticTacToe' ? game.variant ?? 'standard' : undefined
+      },
       width: 'min(440px, 94vw)',
       maxWidth: '94vw',
       maxHeight: '85vh',
@@ -573,6 +623,28 @@ export class ContactChatroomComponent implements AfterViewInit {
       disableClose: false,
       autoFocus: false
     });
+  }
+
+  canPlayConnectFour(message: ChatroomMessage): boolean {
+    const game = message.payload?.game;
+    return !!game
+      && game.type === 'connectFour'
+      && !this.gameMovesInFlight().has(game.gameId)
+      && game.status === 'active'
+      && game.nextPlayerUserId === this.userService.getUser().id;
+  }
+
+  async playConnectFourMove(message: ChatroomMessage, column: number): Promise<void> {
+    const contact = this.contact();
+    const game = message.payload?.game;
+    if (!contact || !game || game.type !== 'connectFour' || !this.canPlayConnectFour(message)) return;
+    const nextGame = applyConnectFourMove(game, this.userService.getUser().id, column);
+    if (!nextGame) return;
+    this.setGameMoveInFlight(game.gameId, true);
+    const payload = this.createEmptyMessage();
+    payload.game = nextGame;
+    await this.sendAsNewMessage(contact, payload, message.messageId, 'game_move');
+    this.setGameMoveInFlight(game.gameId, false);
   }
 
   async playTicTacToeMove(message: ChatroomMessage, cellIndex: number): Promise<void> {
@@ -609,6 +681,20 @@ export class ContactChatroomComponent implements AfterViewInit {
       : this.translation.t('common.contact.chatroom.games.statusContactTurn', { name: contactName });
   }
 
+  getConnectFourStatusText(game: ConnectFourGame): string {
+    const currentUserId = this.userService.getUser().id;
+    const contactName = this.contact()?.name || this.translation.t('common.contact.chatroom.contactLabel');
+    if (game.status === 'draw') return this.translation.t('common.contact.chatroom.games.statusDraw');
+    if (game.status === 'won') {
+      return game.winnerUserId === currentUserId
+        ? this.translation.t('common.contact.chatroom.games.statusWonYou')
+        : this.translation.t('common.contact.chatroom.games.statusWonContact', { name: contactName });
+    }
+    return game.nextPlayerUserId === currentUserId
+      ? this.translation.t('common.contact.chatroom.games.statusYourTurn')
+      : this.translation.t('common.contact.chatroom.games.statusContactTurn', { name: contactName });
+  }
+
   private setGameMoveInFlight(gameId: string, inFlight: boolean): void {
     this.gameMovesInFlight.update((current) => {
       const next = new Set(current);
@@ -626,8 +712,9 @@ export class ContactChatroomComponent implements AfterViewInit {
     const latestGames = new Map<string, TicTacToeGame>();
     for (const message of this.visibleMessages()) {
       const game = message.payload?.game;
-      const gameVariant = game?.variant ?? 'standard';
-      if (game?.type === 'ticTacToe' && gameVariant === variant && !latestGames.has(game.gameId)) {
+      if (game?.type !== 'ticTacToe') continue;
+      const gameVariant = game.variant ?? 'standard';
+      if (gameVariant === variant && !latestGames.has(game.gameId)) {
         latestGames.set(game.gameId, game);
       }
     }
@@ -641,6 +728,22 @@ export class ContactChatroomComponent implements AfterViewInit {
       } else if (game.status === 'won') {
         stats.lost += 1;
       }
+    }
+    return stats;
+  }
+
+  private getConnectFourStats(): GameStats {
+    const currentUserId = this.userService.getUser().id;
+    const latestGames = new Map<string, ConnectFourGame>();
+    for (const message of this.visibleMessages()) {
+      const game = message.payload?.game;
+      if (game?.type === 'connectFour' && !latestGames.has(game.gameId)) latestGames.set(game.gameId, game);
+    }
+    const stats: GameStats = { played: latestGames.size, won: 0, lost: 0, drawn: 0 };
+    for (const game of latestGames.values()) {
+      if (game.status === 'draw') stats.drawn += 1;
+      else if (game.status === 'won' && game.winnerUserId === currentUserId) stats.won += 1;
+      else if (game.status === 'won') stats.lost += 1;
     }
     return stats;
   }

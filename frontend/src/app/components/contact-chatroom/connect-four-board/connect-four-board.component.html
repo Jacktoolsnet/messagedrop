@@ -1,0 +1,28 @@
+<div class="connect-four">
+  <div class="connect-four__grid" role="grid" [attr.aria-label]="statusText()">
+    @for (cell of cells(); track $index) {
+    <span class="connect-four__cell" role="gridcell"
+      [class.connect-four__cell--red]="cell === 'R'"
+      [class.connect-four__cell--yellow]="cell === 'Y'"
+      [class.connect-four__cell--last]="lastMoveIndex() === $index"
+      [class.connect-four__cell--target]="hoveredDropIndex() === $index">
+      <span class="connect-four__stone">{{ cell || '' }}</span>
+    </span>
+    }
+    <div class="connect-four__controls">
+      @for (column of columns; track column) {
+      <button type="button" class="connect-four__column"
+        [disabled]="disabled() || isColumnFull(column)"
+        [attr.aria-label]="getColumnAriaLabel(column)"
+        (pointerenter)="previewColumn(column, $event)"
+        (pointerleave)="clearPreview(column)"
+        (focus)="hoveredColumn.set(column)"
+        (blur)="clearPreview(column)"
+        (click)="selectColumn(column)"></button>
+      }
+    </div>
+  </div>
+  @if (statusText() && showStatus()) {
+  <div class="connect-four__status" aria-live="polite">{{ statusText() }}</div>
+  }
+</div>
