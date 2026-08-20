@@ -200,7 +200,12 @@ export class CryptoService {
     return bytes;
   }
 
-  private async derivePinKey(pin: string, salt: Uint8Array<ArrayBuffer>, iterations: number): Promise<CryptoKey> {
+  private async derivePinKey(
+    pin: string,
+    salt: Uint8Array<ArrayBuffer>,
+    iterations: number,
+    extractable = false
+  ): Promise<CryptoKey> {
     const encoder = new TextEncoder();
     const keyMaterial = await crypto.subtle.importKey(
       'raw',
@@ -218,7 +223,7 @@ export class CryptoService {
       },
       keyMaterial,
       { name: 'AES-GCM', length: 256 },
-      false,
+      extractable,
       ['encrypt', 'decrypt']
     );
   }
@@ -226,10 +231,11 @@ export class CryptoService {
   async encryptWithPin(
     pin: string,
     payload: string,
-    iterations = 250000
+    iterations = 250000,
+    extractable = false
   ): Promise<{ envelope: PinEncryptedPayload; key: CryptoKey; salt: Uint8Array<ArrayBuffer>; iterations: number }> {
     const salt = this.createRandomBytes(16);
-    const key = await this.derivePinKey(pin, salt, iterations);
+    const key = await this.derivePinKey(pin, salt, iterations, extractable);
     const envelope = await this.encryptWithKey(key, payload, salt, iterations);
     return { envelope, key, salt, iterations };
   }
@@ -268,14 +274,15 @@ export class CryptoService {
 
   async decryptWithPin(
     pin: string,
-    envelope: PinEncryptedPayload
+    envelope: PinEncryptedPayload,
+    extractable = false
   ): Promise<{ plaintext: string; key: CryptoKey; salt: Uint8Array<ArrayBuffer>; iterations: number } | null> {
     if (!envelope?.kdf || !envelope?.cipher || envelope.payloadEncoding !== 'base64') {
       return null;
     }
     const salt = this.base64ToBytes(envelope.kdf.salt);
     const iterations = envelope.kdf.iterations;
-    const key = await this.derivePinKey(pin, salt, iterations);
+    const key = await this.derivePinKey(pin, salt, iterations, extractable);
     const decrypted = await this.decryptWithKey(key, envelope);
     return decrypted ? { ...decrypted, key } : null;
   }

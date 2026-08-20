@@ -2028,7 +2028,21 @@ export class UserService {
     this.blocked = true;
 
     try {
-      const encrypted = await this.cryptoService.encryptWithPin(pin, JSON.stringify(this.user), this.pinIterations);
+      let keepRememberedLogin = false;
+      try {
+        const remembered = await this.indexedDbService.getRememberedLogin();
+        keepRememberedLogin = !!remembered
+          && remembered.userId === this.user.id
+          && remembered.expiresAt > Date.now();
+      } catch {
+        // A missing device preference must not prevent changing the PIN.
+      }
+      const encrypted = await this.cryptoService.encryptWithPin(
+        pin,
+        JSON.stringify(this.user),
+        this.pinIterations,
+        keepRememberedLogin
+      );
       await this.indexedDbService.reencryptEncryptedStores(encrypted.key);
 
       const cryptedUser: CryptedUser = {
@@ -2389,7 +2403,7 @@ export class UserService {
         this.blocked = false;
         return;
       }
-      const decrypted = await this.cryptoService.decryptWithPin(pin, cryptedUser.cryptedUser);
+      const decrypted = await this.cryptoService.decryptWithPin(pin, cryptedUser.cryptedUser, rememberDevice);
       if (!decrypted) {
         this.showPinIncorrectDialog();
         return;

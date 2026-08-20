@@ -38,6 +38,11 @@ export interface RememberedLoginRecord {
   expiresAt: number;
 }
 
+interface StoredRememberedLoginRecord extends Omit<RememberedLoginRecord, 'key'> {
+  key?: CryptoKey;
+  keyData?: string;
+}
+
 /**
  * Service for managing data in IndexedDB for the MessageDrop application.
  * Provides CRUD operations for settings, users, profiles, contact profiles, places, and notes.
@@ -434,15 +439,40 @@ export class IndexedDbService {
   }
 
   async setRememberedLogin(userId: string, key: CryptoKey, expiresAt: number): Promise<void> {
-    const db = await this.openDB();
-    const record: RememberedLoginRecord = {
+    const exportedKey = key.extractable
+      ? await crypto.subtle.exportKey('raw', key)
+      : null;
+    const storedKey = exportedKey
+      ? await crypto.subtle.importKey('raw', exportedKey, { name: 'AES-GCM' }, false, ['encrypt', 'decrypt'])
+      : key;
+    const record: StoredRememberedLoginRecord = {
       version: 1,
       userId,
-      key,
+      key: storedKey,
       createdAt: Date.now(),
       expiresAt
     };
 
+    try {
+      await this.putRememberedLoginRecord(record);
+      return;
+    } catch (error) {
+      if (!exportedKey) {
+        throw error;
+      }
+    }
+
+    await this.putRememberedLoginRecord({
+      version: 1,
+      userId,
+      keyData: this.bytesToBase64(new Uint8Array(exportedKey)),
+      createdAt: record.createdAt,
+      expiresAt
+    });
+  }
+
+  private async putRememberedLoginRecord(record: StoredRememberedLoginRecord): Promise<void> {
+    const db = await this.openDB();
     return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(this.rememberedLoginStore, 'readwrite');
       tx.objectStore(this.rememberedLoginStore).put(record, 'current');
@@ -457,9 +487,22 @@ export class IndexedDbService {
     return new Promise<RememberedLoginRecord | undefined>((resolve) => {
       const tx = db.transaction(this.rememberedLoginStore, 'readonly');
       const request = tx.objectStore(this.rememberedLoginStore).get('current');
-      request.onsuccess = () => {
-        const record = request.result as Partial<RememberedLoginRecord> | undefined;
-        const key = record?.key as CryptoKey | undefined;
+      request.onsuccess = async () => {
+        const record = request.result as Partial<StoredRememberedLoginRecord> | undefined;
+        let key = record?.key as CryptoKey | undefined;
+        if (!key && typeof record?.keyData === 'string') {
+          try {
+            key = await crypto.subtle.importKey(
+              'raw',
+              this.base64ToBytes(record.keyData),
+              { name: 'AES-GCM' },
+              false,
+              ['encrypt', 'decrypt']
+            );
+          } catch {
+            key = undefined;
+          }
+        }
         if (record?.version !== 1 || typeof record.userId !== 'string'
           || !key || typeof key !== 'object'
           || key.extractable || key.type !== 'secret'
@@ -468,7 +511,13 @@ export class IndexedDbService {
           resolve(undefined);
           return;
         }
-        resolve(record as RememberedLoginRecord);
+        resolve({
+          version: 1,
+          userId: record.userId,
+          key,
+          createdAt: Number(record.createdAt) || 0,
+          expiresAt: Number(record.expiresAt)
+        });
       };
       request.onerror = () => resolve(undefined);
     });
