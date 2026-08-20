@@ -10,7 +10,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
 import { Contact } from '../../interfaces/contact';
-import { TicTacToeGame, TicTacToeStats } from '../../interfaces/chat-game';
+import { TicTacToeGame, TicTacToeMark, TicTacToeStats } from '../../interfaces/chat-game';
 import { ContactMessage } from '../../interfaces/contact-message';
 import { Location } from '../../interfaces/location';
 import { Mode } from '../../interfaces/mode';
@@ -523,6 +523,15 @@ export class ContactChatroomComponent implements AfterViewInit {
       return false;
     }
     return game.status === 'active' && game.nextPlayerUserId === this.userService.getUser().id;
+  }
+
+  getTicTacToePlayerMark(game: TicTacToeGame): TicTacToeMark | null {
+    const currentUserId = this.userService.getUser().id;
+    return currentUserId === game.playerXUserId
+      ? 'X'
+      : currentUserId === game.playerOUserId
+        ? 'O'
+        : null;
   }
 
   async playTicTacToeMove(message: ChatroomMessage, cellIndex: number): Promise<void> {

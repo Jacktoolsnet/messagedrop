@@ -190,6 +190,7 @@
             }
             @if (msg.payload.game?.type === 'ticTacToe') {
             <app-tic-tac-toe-board [board]="msg.payload.game.board"
+              [playerMark]="getTicTacToePlayerMark(msg.payload.game)"
               [disabled]="!canPlayTicTacToe(msg)" [statusText]="getTicTacToeStatusText(msg.payload.game)"
               (move)="playTicTacToeMove(msg, $event)"></app-tic-tac-toe-board>
             }
@@ -378,6 +379,7 @@
             }
             @if (msg.payload.game?.type === 'ticTacToe') {
             <app-tic-tac-toe-board [board]="msg.payload.game.board"
+              [playerMark]="getTicTacToePlayerMark(msg.payload.game)"
               [disabled]="!canPlayTicTacToe(msg)" [statusText]="getTicTacToeStatusText(msg.payload.game)"
               (move)="playTicTacToeMove(msg, $event)"></app-tic-tac-toe-board>
             }

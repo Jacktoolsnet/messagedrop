@@ -558,6 +558,7 @@
           "statsDrawn": "Empates",
           "cellEmptyAria": "Jugar en la casilla {{ cell }}",
           "cellOccupiedAria": "La casilla {{ cell }} contiene {{ mark }}",
+          "yourMark": "Juegas con",
           "statusYourTurn": "Es tu turno.",
           "statusContactTurn": "Es el turno de @{{ name }}.",
           "statusWonYou": "¡Has ganado!",

@@ -558,6 +558,7 @@
           "statsDrawn": "Égalités",
           "cellEmptyAria": "Jouer la case {{ cell }}",
           "cellOccupiedAria": "La case {{ cell }} contient {{ mark }}",
+          "yourMark": "Tu joues avec",
           "statusYourTurn": "C'est ton tour.",
           "statusContactTurn": "C'est au tour de @{{ name }}.",
           "statusWonYou": "Tu as gagné !",

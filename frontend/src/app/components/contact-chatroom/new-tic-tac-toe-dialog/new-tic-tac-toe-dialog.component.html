@@ -1,7 +1,7 @@
 <app-dialog-header icon="grid_3x3" [title]="'common.contact.chatroom.games.newTicTacToeTitle' | transloco"></app-dialog-header>
 
 <mat-dialog-content class="new-game-content">
-  <app-tic-tac-toe-board [board]="board()" [disabled]="false"
+  <app-tic-tac-toe-board [board]="board()" [disabled]="false" [playerMark]="'X'"
     [statusText]="'common.contact.chatroom.games.chooseFirstMove' | transloco"
     (move)="selectCell($event)"></app-tic-tac-toe-board>
 </mat-dialog-content>

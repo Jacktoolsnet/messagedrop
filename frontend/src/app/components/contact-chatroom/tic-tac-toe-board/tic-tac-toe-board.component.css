@@ -31,6 +31,34 @@
   gap: 0.75rem;
 }
 
+.tic-tac-toe__player-mark {
+  justify-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.3rem 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--tic-tac-toe-primary) 55%, transparent);
+  border-radius: 999px;
+  background: var(--mat-sys-primary-container, var(--tic-tac-toe-cell-color));
+  color: var(--mat-sys-on-primary-container, var(--mat-app-text-color));
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.tic-tac-toe__player-mark strong {
+  font-size: 1.15rem;
+  line-height: 1;
+  color: var(--tic-tac-toe-primary);
+}
+
+.tic-tac-toe__player-mark span {
+  transform: translateY(0.06rem);
+}
+
+.tic-tac-toe__player-mark--o strong {
+  color: var(--mat-sys-tertiary, var(--mat-sys-secondary, var(--mat-app-text-color)));
+}
+
 .tic-tac-toe__grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

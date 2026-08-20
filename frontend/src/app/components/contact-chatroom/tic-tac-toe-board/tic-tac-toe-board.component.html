@@ -1,4 +1,10 @@
 <div class="tic-tac-toe">
+  @if (playerMark(); as mark) {
+  <div class="tic-tac-toe__player-mark" [class.tic-tac-toe__player-mark--o]="mark === 'O'">
+    <span>{{ getPlayerMarkText(mark) }}</span>
+    <strong>{{ mark }}</strong>
+  </div>
+  }
   <div class="tic-tac-toe__grid" role="grid" [attr.aria-label]="statusText()">
     @for (cell of cells(); track $index) {
     <button type="button" class="tic-tac-toe__cell" role="gridcell"
