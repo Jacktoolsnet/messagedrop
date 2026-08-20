@@ -321,7 +321,7 @@ export class AppComponent implements OnInit {
         // Get user id if avaliable
         this.userService.initUserId();
       } else {
-        this.logout();
+        this.logout(false);
       }
     });
 
@@ -657,9 +657,9 @@ export class AppComponent implements OnInit {
     }
   }
 
-  public logout() {
+  public logout(forgetRememberedLogin = true) {
     this.dialog.closeAll();
-    this.userService.logout(true);
+    this.userService.logout(forgetRememberedLogin);
     this.placeService.logout();
     this.contactService.logout();
     this.noteService.logout();
