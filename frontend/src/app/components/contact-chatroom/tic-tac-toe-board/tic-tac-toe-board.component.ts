@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
 import { TicTacToeCell } from '../../../interfaces/chat-game';
+import { GameFeedbackService } from '../../../services/game-feedback.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { normalizeTicTacToeBoard } from '../../../utils/tic-tac-toe';
 
@@ -12,6 +13,7 @@ import { normalizeTicTacToeBoard } from '../../../utils/tic-tac-toe';
 })
 export class TicTacToeBoardComponent {
   private readonly translation = inject(TranslationHelperService);
+  private readonly feedback = inject(GameFeedbackService);
 
   readonly board = input<readonly TicTacToeCell[]>([]);
   readonly disabled = input(false);
@@ -23,7 +25,15 @@ export class TicTacToeBoardComponent {
     if (this.disabled() || this.cells()[index] !== null) {
       return;
     }
+    this.feedback.notifySelection();
     this.move.emit(index);
+  }
+
+  previewCell(index: number, event: PointerEvent): void {
+    if (event.pointerType !== 'mouse' || this.disabled() || this.cells()[index] !== null) {
+      return;
+    }
+    this.feedback.notifyHover();
   }
 
   getCellAriaLabel(index: number, cell: TicTacToeCell): string {

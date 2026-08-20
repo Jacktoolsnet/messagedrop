@@ -568,7 +568,9 @@
           "previewWaiting": "Tic-Tac-Toe: Waiting for the next move",
           "previewWon": "Tic-Tac-Toe: Won",
           "previewLost": "Tic-Tac-Toe: Lost",
-          "previewDraw": "Tic-Tac-Toe: Draw"
+          "previewDraw": "Tic-Tac-Toe: Draw",
+          "muteAria": "Mute game sounds",
+          "unmuteAria": "Turn on game sounds"
         },
         "revisionHistory": {
           "title": "Change history",

@@ -22,6 +22,7 @@ import { ContactService } from '../../services/contact.service';
 import { AppService } from '../../services/app.service';
 import { ExperienceBookmarkService } from '../../services/experience-bookmark.service';
 import { ExternalContentConsentService } from '../../services/external-content-consent.service';
+import { GameFeedbackService } from '../../services/game-feedback.service';
 import { SpeechService } from '../../services/speech.service';
 import { LanguageService } from '../../services/language.service';
 import { MapService } from '../../services/map.service';
@@ -114,6 +115,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   private readonly externalContentConsent = inject(ExternalContentConsentService);
   private readonly mapService = inject(MapService);
   readonly help = inject(HelpDialogService);
+  readonly gameFeedback = inject(GameFeedbackService);
   private readonly contactMessageService = inject(ContactMessageService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly matDialog = inject(MatDialog);

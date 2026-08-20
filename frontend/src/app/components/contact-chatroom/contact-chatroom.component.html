@@ -253,6 +253,13 @@
                 <mat-icon>history</mat-icon>
               </button>
               }
+              @if (msg.payload?.game) {
+              <button mat-mini-fab color="primary"
+                [attr.aria-label]="(gameFeedback.audioMuted() ? 'common.contact.chatroom.games.unmuteAria' : 'common.contact.chatroom.games.muteAria') | transloco"
+                (click)="gameFeedback.toggleAudioMuted()">
+                <mat-icon>{{ gameFeedback.audioMuted() ? 'volume_off' : 'volume_up' }}</mat-icon>
+              </button>
+              }
               <button mat-mini-fab color="warn" [attr.aria-label]="'common.contact.chatroom.deleteAria' | transloco"
                 (click)="deleteMessage(msg)">
                 <mat-icon>delete</mat-icon>
@@ -427,6 +434,13 @@
                 [attr.aria-label]="'common.contact.chatroom.revisionHistory.openAria' | transloco"
                 (click)="openRevisionHistory(msg)">
                 <mat-icon>history</mat-icon>
+              </button>
+              }
+              @if (msg.payload?.game) {
+              <button mat-mini-fab color="primary"
+                [attr.aria-label]="(gameFeedback.audioMuted() ? 'common.contact.chatroom.games.unmuteAria' : 'common.contact.chatroom.games.muteAria') | transloco"
+                (click)="gameFeedback.toggleAudioMuted()">
+                <mat-icon>{{ gameFeedback.audioMuted() ? 'volume_off' : 'volume_up' }}</mat-icon>
               </button>
               }
               <button mat-mini-fab color="warn" [attr.aria-label]="'common.contact.chatroom.deleteAria' | transloco"

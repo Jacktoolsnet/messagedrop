@@ -568,7 +568,9 @@
           "previewWaiting": "Tic-Tac-Toe: Warten auf den nächsten Zug",
           "previewWon": "Tic-Tac-Toe: Gewonnen",
           "previewLost": "Tic-Tac-Toe: Verloren",
-          "previewDraw": "Tic-Tac-Toe: Unentschieden"
+          "previewDraw": "Tic-Tac-Toe: Unentschieden",
+          "muteAria": "Spielklänge stummschalten",
+          "unmuteAria": "Spielklänge einschalten"
         },
         "revisionHistory": {
           "title": "Änderungshistorie",

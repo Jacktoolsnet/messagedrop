@@ -567,7 +567,9 @@
           "previewWaiting": "Tres en raya: esperando el siguiente movimiento",
           "previewWon": "Tres en raya: victoria",
           "previewLost": "Tres en raya: derrota",
-          "previewDraw": "Tres en raya: empate"
+          "previewDraw": "Tres en raya: empate",
+          "muteAria": "Silenciar los sonidos del juego",
+          "unmuteAria": "Activar los sonidos del juego"
         },
         "revisionHistory": {
           "title": "Historial de cambios",

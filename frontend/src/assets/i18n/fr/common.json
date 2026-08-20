@@ -567,7 +567,9 @@
           "previewWaiting": "Morpion : en attente du prochain coup",
           "previewWon": "Morpion : gagné",
           "previewLost": "Morpion : perdu",
-          "previewDraw": "Morpion : égalité"
+          "previewDraw": "Morpion : égalité",
+          "muteAria": "Couper les sons du jeu",
+          "unmuteAria": "Activer les sons du jeu"
         },
         "revisionHistory": {
           "title": "Historique des modifications",

@@ -4,6 +4,7 @@
     <button type="button" class="tic-tac-toe__cell" role="gridcell"
       [class.tic-tac-toe__cell--x]="cell === 'X'" [class.tic-tac-toe__cell--o]="cell === 'O'"
       [disabled]="disabled() || cell !== null" [attr.aria-label]="getCellAriaLabel($index, cell)"
+      (pointerenter)="previewCell($index, $event)"
       (click)="selectCell($index)">
       {{ cell || '' }}
     </button>
