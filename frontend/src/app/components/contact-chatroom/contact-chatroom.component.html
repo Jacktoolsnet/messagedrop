@@ -114,6 +114,11 @@
               <span>{{ 'common.contact.chatroom.messageUnverified' | transloco }}</span>
             </div>
             }
+            @if (msg.payload.location) {
+            <div class="chat-location">
+              <app-location-preview [location]="msg.payload.location"></app-location-preview>
+            </div>
+            }
             @if (msg.payload.message.trim() !== '') {
             <app-showmessage [message]="msg.payload!.message" [style]="msg.payload!.style"></app-showmessage>
             }
@@ -156,11 +161,6 @@
               }
               }
               <span class="chat-audio__duration">{{ getAudioTimer(msg) }}</span>
-            </div>
-            }
-            @if (msg.payload.location) {
-            <div class="chat-location">
-              <app-location-preview [location]="msg.payload.location"></app-location-preview>
             </div>
             }
             }
@@ -207,7 +207,7 @@
               </button>
               } @else if (msg.payload?.location) {
               <button mat-mini-fab color="primary" [attr.aria-label]="'common.contact.chatroom.editAria' | transloco"
-                [matMenuTriggerFor]="locationEditMenu" (click)="prepareLocationEdit(msg)">
+                (click)="editMessage(msg)">
                 <mat-icon>edit</mat-icon>
               </button>
               } @else if (msg.payload) {
@@ -258,6 +258,11 @@
               <span>{{ 'common.contact.chatroom.messageUnverified' | transloco }}</span>
             </div>
             }
+            @if (msg.payload.location) {
+            <div class="chat-location">
+              <app-location-preview [location]="msg.payload.location"></app-location-preview>
+            </div>
+            }
             @if (msg.payload.message.trim() !== '') {
             <app-showmessage [message]="getDisplayedMessage(msg)" [style]="msg.payload!.style"></app-showmessage>
             }
@@ -300,11 +305,6 @@
               }
               }
               <span class="chat-audio__duration">{{ getAudioTimer(msg) }}</span>
-            </div>
-            }
-            @if (msg.payload.location) {
-            <div class="chat-location">
-              <app-location-preview [location]="msg.payload.location"></app-location-preview>
             </div>
             }
             }
@@ -423,22 +423,6 @@
     <button mat-menu-item type="button" disabled>
       <mat-icon>info</mat-icon>
       <span>{{ 'common.contact.chatroom.noSavedExperiences' | transloco }}</span>
-    </button>
-    }
-  </mat-menu>
-  <mat-menu #locationEditMenu="matMenu" panelClass="accent-menu" (closed)="clearLocationEditTarget()">
-    <button mat-menu-item type="button" (click)="editSelectedLocationFromSavedPlaces()" [disabled]="!hasSavedPlaces()">
-      <mat-icon>place</mat-icon>
-      <span>{{ 'common.contact.chatroom.locationSourceMyPlaces' | transloco }}</span>
-    </button>
-    <button mat-menu-item type="button" (click)="editSelectedLocationSearch()">
-      <mat-icon>search</mat-icon>
-      <span>{{ 'common.menu.searchPlace' | transloco }}</span>
-    </button>
-    @if (!hasSavedPlaces()) {
-    <button mat-menu-item type="button" disabled>
-      <mat-icon>info</mat-icon>
-      <span>{{ 'common.contact.chatroom.noSavedPlaces' | transloco }}</span>
     </button>
     }
   </mat-menu>

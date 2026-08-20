@@ -20,7 +20,6 @@ import { ContactService } from '../../services/contact.service';
 import { AppService } from '../../services/app.service';
 import { ExperienceBookmarkService } from '../../services/experience-bookmark.service';
 import { ExternalContentConsentService } from '../../services/external-content-consent.service';
-import { PlaceService } from '../../services/place.service';
 import { SpeechService } from '../../services/speech.service';
 import { LanguageService } from '../../services/language.service';
 import { MapService } from '../../services/map.service';
@@ -37,13 +36,11 @@ import { UserProfileComponent } from '../user/user-profile/user-profile.componen
 import { EmoticonPickerComponent } from '../utils/emoticon-picker/emoticon-picker.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { AudioRecorderComponent } from '../utils/audio-recorder/audio-recorder.component';
-import { LocationPickerDialogComponent } from '../utils/location-picker-dialog/location-picker-dialog.component';
 import { LocationPreviewComponent } from '../utils/location-preview/location-preview.component';
 import { ExperienceSearchComponent } from '../utils/experience-search/experience-search.component';
 import { ExperienceSearchDetailDialogComponent } from '../utils/experience-search/detail-dialog/experience-search-detail-dialog.component';
 import { DisplayMessage } from '../utils/display-message/display-message.component';
 import { ContactChatroomExperienceSelectDialogComponent } from './experience-select-dialog/contact-chatroom-experience-select-dialog.component';
-import { ContactChatroomPlaceSelectDialogComponent } from './place-select-dialog/contact-chatroom-place-select-dialog.component';
 import { DeleteContactMessageComponent } from './delete-contact-message/delete-contact-message.component';
 import { DisplayMessageService } from '../../services/display-message.service';
 import { ProtectedStickerImageComponent } from '../utils/protected-sticker-image/protected-sticker-image.component';
@@ -103,7 +100,6 @@ export class ContactChatroomComponent implements AfterViewInit {
   private readonly contactService = inject(ContactService);
   private readonly experienceBookmarkService = inject(ExperienceBookmarkService);
   private readonly externalContentConsent = inject(ExternalContentConsentService);
-  private readonly placeService = inject(PlaceService);
   private readonly mapService = inject(MapService);
   readonly help = inject(HelpDialogService);
   private readonly contactMessageService = inject(ContactMessageService);
@@ -136,14 +132,12 @@ export class ContactChatroomComponent implements AfterViewInit {
   readonly loading = signal<boolean>(false);
   readonly loaded = signal<boolean>(false);
   readonly hasSavedExperiences = computed(() => this.experienceBookmarkService.bookmarksSignal().length > 0);
-  readonly hasSavedPlaces = computed(() => this.placeService.sortedPlacesSignal().length > 0);
   readonly translationTargetLabel = computed(() =>
     this.translation.t(`common.languageNames.${this.languageService.effectiveLanguage()}`)
   );
   private readonly messageKeys = new Set<string>();
   private readonly payloadSyncInFlightContacts = new Set<string>();
   private readonly experienceEditTarget = signal<ChatroomMessage | null>(null);
-  private readonly locationEditTarget = signal<ChatroomMessage | null>(null);
   private scrolledToFirstUnread = false;
   private readTrackingEnabled = false;
   private visibilityObserver?: IntersectionObserver;
@@ -552,95 +546,10 @@ export class ContactChatroomComponent implements AfterViewInit {
     this.openExperienceSearch(message);
   }
 
-  openLocationSearch(message: ChatroomMessage): void {
-    const contact = this.contact();
-    if (!contact) {
-      return;
-    }
-    const initialLocation = message.payload?.location
-      ? { ...message.payload.location }
-      : this.mapService.getMapLocation();
-    const dialogRef = this.matDialog.open(LocationPickerDialogComponent, {
-      data: { location: initialLocation, markerType: 'message' },
-      maxWidth: '95vw',
-      maxHeight: '95vh',
-      width: '95vw',
-      height: '95vh',
-      autoFocus: false,
-      hasBackdrop: true,
-      backdropClass: 'dialog-backdrop',
-      disableClose: false
-    });
-
-    dialogRef.afterClosed().subscribe((location?: Location) => {
-      if (!location) {
-        return;
-      }
-      this.sendEditedLocationMessage(contact, message, location);
-    });
-  }
-
-  openSavedPlacePicker(message: ChatroomMessage): void {
-    const contact = this.contact();
-    if (!contact) {
-      return;
-    }
-    const dialogRef = this.matDialog.open(ContactChatroomPlaceSelectDialogComponent, {
-      width: 'min(420px, 92vw)',
-      maxWidth: '92vw',
-      maxHeight: '80vh',
-      hasBackdrop: true,
-      backdropClass: 'dialog-backdrop',
-      disableClose: false,
-      autoFocus: false
-    });
-
-    dialogRef.afterClosed().subscribe((location?: Location) => {
-      if (!location) {
-        return;
-      }
-      this.sendEditedLocationMessage(contact, message, location);
-    });
-  }
-
-  prepareLocationEdit(message: ChatroomMessage): void {
-    this.locationEditTarget.set(message);
-  }
-
-  clearLocationEditTarget(): void {
-    this.locationEditTarget.set(null);
-  }
-
-  editSelectedLocationFromSavedPlaces(): void {
-    const message = this.locationEditTarget();
-    if (!message) {
-      return;
-    }
-    this.openSavedPlacePicker(message);
-  }
-
-  editSelectedLocationSearch(): void {
-    const message = this.locationEditTarget();
-    if (!message) {
-      return;
-    }
-    this.openLocationSearch(message);
-  }
-
   private sendExperienceMessage(contact: Contact, experience: ExperienceResult, experienceSearchTerm?: string | null): void {
     const payload = this.createEmptyMessage();
     payload.experience = experience;
     payload.experienceSearchTerm = experienceSearchTerm ?? null;
-    void this.sendAsNewMessage(contact, payload);
-  }
-
-  private sendEditedLocationMessage(contact: Contact, message: ChatroomMessage, location: Location): void {
-    const payload: ShortMessage = message.payload
-      ? { ...message.payload, location: { ...location } }
-      : {
-        ...this.createEmptyMessage(),
-        location: { ...location }
-      };
     void this.sendAsNewMessage(contact, payload);
   }
 

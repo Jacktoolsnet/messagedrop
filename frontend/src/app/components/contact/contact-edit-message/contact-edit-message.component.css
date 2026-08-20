@@ -112,6 +112,10 @@ h2 {
     width: 100%;
 }
 
+.location-container {
+    min-width: min(22rem, calc(90vw - 3rem));
+}
+
 .button_random {
     position: absolute;
     bottom: 0;
