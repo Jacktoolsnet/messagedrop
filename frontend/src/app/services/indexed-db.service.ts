@@ -30,6 +30,14 @@ interface EncryptedStoreEnvelope {
   payload: string;
 }
 
+export interface RememberedLoginRecord {
+  version: 1;
+  userId: string;
+  key: CryptoKey;
+  createdAt: number;
+  expiresAt: number;
+}
+
 /**
  * Service for managing data in IndexedDB for the MessageDrop application.
  * Provides CRUD operations for settings, users, profiles, contact profiles, places, and notes.
@@ -40,7 +48,7 @@ interface EncryptedStoreEnvelope {
 export class IndexedDbService {
   private readonly backupState = inject(BackupStateService);
   private dbName = 'MessageDrop';
-  private dbVersion = 10;
+  private dbVersion = 11;
   private settingStore = 'setting';
   private userStore = 'user';
   private profileStore = 'profile';
@@ -58,6 +66,7 @@ export class IndexedDbService {
   private contactMessagePayloadStore = 'contactMessagePayload';
   private publicMessageStore = 'publicMessage';
   private secretDropStore = 'secretDrop';
+  private rememberedLoginStore = 'rememberedLogin';
   private atRestEncryptionKey: CryptoKey | null = null;
   private readonly encryptedStores = new Set<string>([
     this.profileStore,
@@ -387,6 +396,9 @@ export class IndexedDbService {
         if (!db.objectStoreNames.contains(this.contactMessagePayloadStore)) {
           db.createObjectStore(this.contactMessagePayloadStore);
         }
+        if (!db.objectStoreNames.contains(this.rememberedLoginStore)) {
+          db.createObjectStore(this.rememberedLoginStore);
+        }
       };
 
       request.onsuccess = () => resolve(request.result);
@@ -421,11 +433,60 @@ export class IndexedDbService {
     });
   }
 
+  async setRememberedLogin(userId: string, key: CryptoKey, expiresAt: number): Promise<void> {
+    const db = await this.openDB();
+    const record: RememberedLoginRecord = {
+      version: 1,
+      userId,
+      key,
+      createdAt: Date.now(),
+      expiresAt
+    };
+
+    return new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(this.rememberedLoginStore, 'readwrite');
+      const request = tx.objectStore(this.rememberedLoginStore).put(record, 'current');
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  async getRememberedLogin(): Promise<RememberedLoginRecord | undefined> {
+    const db = await this.openDB();
+    return new Promise<RememberedLoginRecord | undefined>((resolve) => {
+      const tx = db.transaction(this.rememberedLoginStore, 'readonly');
+      const request = tx.objectStore(this.rememberedLoginStore).get('current');
+      request.onsuccess = () => {
+        const record = request.result as Partial<RememberedLoginRecord> | undefined;
+        if (record?.version !== 1 || typeof record.userId !== 'string'
+          || typeof CryptoKey === 'undefined' || !(record.key instanceof CryptoKey)
+          || record.key.extractable || record.key.type !== 'secret'
+          || record.key.algorithm.name !== 'AES-GCM' || !record.key.usages.includes('decrypt')
+          || !Number.isFinite(record.expiresAt)) {
+          resolve(undefined);
+          return;
+        }
+        resolve(record as RememberedLoginRecord);
+      };
+      request.onerror = () => resolve(undefined);
+    });
+  }
+
+  async deleteRememberedLogin(): Promise<void> {
+    const db = await this.openDB();
+    return new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(this.rememberedLoginStore, 'readwrite');
+      const request = tx.objectStore(this.rememberedLoginStore).delete('current');
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  }
+
   async exportAllData(skipStores: string[] = []): Promise<IndexedDbBackup> {
     const db = await this.openDB();
     const storeNames = Array.from(db.objectStoreNames);
     const stores: Record<string, IndexedDbBackupEntry[]> = {};
-    const skipped = new Set(skipStores);
+    const skipped = new Set([...skipStores, this.rememberedLoginStore]);
 
     await Promise.all(storeNames.map((storeName) => {
       if (skipped.has(storeName)) {
@@ -460,7 +521,7 @@ export class IndexedDbService {
       dbName: this.dbName,
       dbVersion: this.dbVersion,
       stores,
-      skippedStores: skipStores.length ? skipStores : undefined
+      skippedStores: skipped.size ? Array.from(skipped) : undefined
     };
   }
 

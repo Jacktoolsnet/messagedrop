@@ -659,7 +659,7 @@ export class AppComponent implements OnInit {
 
   public logout() {
     this.dialog.closeAll();
-    this.userService.logout();
+    this.userService.logout(true);
     this.placeService.logout();
     this.contactService.logout();
     this.noteService.logout();
@@ -3309,7 +3309,7 @@ export class AppComponent implements OnInit {
           .subscribe({
             next: (simpleStatusResponse) => {
               if (simpleStatusResponse.status === 200) {
-                this.userService.logout();
+                this.userService.logout(true);
                 this.indexedDbService.clearAllData();
                 this.updateDataForLocation();
                 this.snackBarRef = this.snackBar.open(this.translation.t('common.user.deleteSuccess'), undefined, {

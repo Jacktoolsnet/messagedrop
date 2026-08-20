@@ -5,7 +5,7 @@ import { SwPush } from '@angular/service-worker';
 import { jwtDecode, JwtPayload } from 'jwt-decode';
 import { catchError, firstValueFrom, Observable, take, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { CheckPinComponent } from '../components/pin/check-pin/check-pin.component';
+import { CheckPinComponent, CheckPinDialogResult } from '../components/pin/check-pin/check-pin.component';
 import { CreatePinComponent } from '../components/pin/create-pin/create-pin.component';
 import { DeleteUserComponent } from '../components/user/delete-user/delete-user.component';
 import { DisplayMessage } from '../components/utils/display-message/display-message.component';
@@ -163,6 +163,9 @@ export class UserService {
   private pinKey: CryptoKey | null = null;
   private pinSalt: Uint8Array<ArrayBuffer> | null = null;
   private pinIterations = 250000;
+  private readonly rememberedLoginDurationMs = 30 * 24 * 60 * 60 * 1000;
+  private rememberedLoginRestorePromise?: Promise<boolean>;
+  private suppressRememberedLoginRestore = false;
   private connectInProgress = false;
   private pushPermissionInfoDialog?: Promise<void>;
 
@@ -200,7 +203,7 @@ export class UserService {
     return throwError(() => error);
   }
 
-  public logout() {
+  public logout(forgetRememberedLogin = false) {
     this.displayMessage.closeAll();
     this.clearJwtRenewal();
     this.user = {
@@ -232,7 +235,18 @@ export class UserService {
     this.indexedDbService.setAtRestEncryptionKey(null);
     this.pinSalt = null;
     this.backupState.clearDirty();
-    this.initUserId();
+    this.rememberedLoginRestorePromise = undefined;
+    if (forgetRememberedLogin) {
+      this.suppressRememberedLoginRestore = true;
+      void this.indexedDbService.deleteRememberedLogin()
+        .catch((error) => console.warn('Remembered login could not be removed', error))
+        .finally(() => {
+          this.suppressRememberedLoginRestore = false;
+          void this.initUserId(false);
+        });
+    } else {
+      void this.initUserId(false);
+    }
     this._userSet.update(trigger => trigger + 1);
   }
 
@@ -264,11 +278,107 @@ export class UserService {
     this.clearAccountBlockedState();
   }
 
-  async initUserId() {
+  async initUserId(attemptRememberedLogin = true) {
     const user = await this.indexedDbService.getUser();
     if (user) {
       this.user.id = user.id;
+      if (attemptRememberedLogin && !this.ready && !this.suppressRememberedLoginRestore) {
+        const restored = await this.tryRestoreRememberedLogin(user);
+        if (restored) {
+          return;
+        }
+      }
       this.loadProfile();
+    }
+  }
+
+  private tryRestoreRememberedLogin(cryptedUser: CryptedUser): Promise<boolean> {
+    if (!this.rememberedLoginRestorePromise) {
+      this.rememberedLoginRestorePromise = this.restoreRememberedLogin(cryptedUser);
+    }
+    return this.rememberedLoginRestorePromise;
+  }
+
+  private async restoreRememberedLogin(cryptedUser: CryptedUser): Promise<boolean> {
+    this.blocked = true;
+    try {
+      const remembered = await this.indexedDbService.getRememberedLogin();
+      if (!remembered) {
+        return false;
+      }
+      if (remembered.userId !== cryptedUser.id || remembered.expiresAt <= Date.now()) {
+        await this.indexedDbService.deleteRememberedLogin();
+        return false;
+      }
+
+      const decrypted = await this.cryptoService.decryptWithKey(remembered.key, cryptedUser.cryptedUser);
+      if (!decrypted) {
+        await this.indexedDbService.deleteRememberedLogin();
+        return false;
+      }
+
+      let user: User;
+      try {
+        user = JSON.parse(decrypted.plaintext) as User;
+      } catch {
+        await this.indexedDbService.deleteRememberedLogin();
+        return false;
+      }
+      if (!user?.id || user.id !== remembered.userId || !user.signingKeyPair?.privateKey) {
+        await this.indexedDbService.deleteRememberedLogin();
+        return false;
+      }
+
+      this.pinKey = remembered.key;
+      this.indexedDbService.setAtRestEncryptionKey(remembered.key);
+      this.pinSalt = decrypted.salt;
+      this.pinIterations = decrypted.iterations;
+      this.setLocalUser(user);
+      void this.attemptBackendLogin(user, {
+        showAlways: false,
+        showError: false,
+        blockUi: false
+      });
+      return true;
+    } catch (error) {
+      console.warn('Remembered login could not be restored', error);
+      return false;
+    } finally {
+      if (!this.ready) {
+        this.blocked = false;
+      }
+    }
+  }
+
+  private async updateRememberedLoginPreference(userId: string, key: CryptoKey, rememberDevice: boolean): Promise<void> {
+    try {
+      if (!rememberDevice) {
+        await this.indexedDbService.deleteRememberedLogin();
+        return;
+      }
+      await this.indexedDbService.setRememberedLogin(
+        userId,
+        key,
+        Date.now() + this.rememberedLoginDurationMs
+      );
+    } catch (error) {
+      console.warn('Remembered login preference could not be stored', error);
+    }
+  }
+
+  private async refreshRememberedLoginKey(userId: string, key: CryptoKey): Promise<void> {
+    try {
+      const remembered = await this.indexedDbService.getRememberedLogin();
+      if (!remembered) {
+        return;
+      }
+      if (remembered.userId !== userId || remembered.expiresAt <= Date.now()) {
+        await this.indexedDbService.deleteRememberedLogin();
+        return;
+      }
+      await this.indexedDbService.setRememberedLogin(userId, key, remembered.expiresAt);
+    } catch (error) {
+      console.warn('Remembered login key could not be updated', error);
     }
   }
 
@@ -1929,6 +2039,7 @@ export class UserService {
       this.pinKey = encrypted.key;
       this.pinSalt = encrypted.salt;
       this.pinIterations = encrypted.iterations;
+      await this.refreshRememberedLoginKey(this.user.id, encrypted.key);
 
       const infoDialog = this.displayMessage.open(DisplayMessage, {
         panelClass: '',
@@ -2240,12 +2351,12 @@ export class UserService {
     const dialogRef = this.checkPinDialog.open(CheckPinComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: {},
+      data: { allowRememberDevice: true },
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
       disableClose: false,
     });
-    dialogRef.afterClosed().subscribe(async (data: string | undefined) => {
+    dialogRef.afterClosed().subscribe(async (data: string | CheckPinDialogResult | undefined) => {
       const requireJwt = options?.requireJwt ?? false;
       const attemptBackend = options?.attemptBackend ?? true;
       let callbackCalled = false;
@@ -2258,13 +2369,18 @@ export class UserService {
       if (!data) {
         return;
       }
+      const pin = typeof data === 'string' ? data : data.pin;
+      const rememberDevice = typeof data === 'string' ? false : data.rememberDevice;
+      if (!pin) {
+        return;
+      }
       this.blocked = true;
       const cryptedUser = await this.indexedDbService.getUser();
       if (!cryptedUser) {
         this.blocked = false;
         return;
       }
-      const decrypted = await this.cryptoService.decryptWithPin(data, cryptedUser.cryptedUser);
+      const decrypted = await this.cryptoService.decryptWithPin(pin, cryptedUser.cryptedUser);
       if (!decrypted) {
         this.showPinIncorrectDialog();
         return;
@@ -2275,6 +2391,7 @@ export class UserService {
       this.indexedDbService.setAtRestEncryptionKey(this.pinKey);
       this.pinSalt = decrypted.salt;
       this.pinIterations = decrypted.iterations;
+      await this.updateRememberedLoginPreference(user.id, decrypted.key, rememberDevice);
       this.setLocalUser(user);
       if (!requireJwt) {
         runCallback();

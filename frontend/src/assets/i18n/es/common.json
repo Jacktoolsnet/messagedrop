@@ -829,6 +829,8 @@
       "title": "PIN",
       "enterTitle": "Introducir PIN",
       "enterHint": "Introduce tu PIN actual.",
+      "rememberDevice": "Mantener la sesión en este dispositivo",
+      "rememberDeviceHint": "Úsalo solo en dispositivos personales. El PIN no se guarda. La sesión se mantiene durante 30 días.",
       "createTitle": "Crear PIN",
       "createHint": "Define ahora tu nuevo PIN.",
       "confirmTitle": "Confirmar PIN",

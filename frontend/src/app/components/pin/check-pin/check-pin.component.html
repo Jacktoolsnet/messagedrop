@@ -1,6 +1,13 @@
 <h3 mat-dialog-title class="dialog-title">{{ 'common.pin.title' | transloco }}</h3>
 <p class="dialog-hint">{{ enterHintI18nKey | transloco }}</p>
 
+@if (allowRememberDevice) {
+<mat-checkbox class="remember-device" [(ngModel)]="rememberDevice">
+    {{ 'common.pin.rememberDevice' | transloco }}
+</mat-checkbox>
+<p class="remember-device-hint">{{ 'common.pin.rememberDeviceHint' | transloco }}</p>
+}
+
 <div class="pin-display">
     @for (digit of pinDisplay; track $index) {
     <div [ngClass]="{ 'pin-dot': true, 'active': $index === currentPinIndex, 'pulse': pinPulseStates[$index] }">

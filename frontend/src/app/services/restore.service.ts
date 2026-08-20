@@ -167,7 +167,7 @@ export class RestoreService {
       this.placeService.logout();
       this.contactService.logout();
       this.noteService.logout();
-      this.userService.logout();
+      this.userService.logout(true);
       this.snackBar.open(this.i18n.t('common.restore.completed'), undefined, {
         duration: 3500,
         horizontalPosition: 'center',

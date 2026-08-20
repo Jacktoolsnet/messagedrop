@@ -829,6 +829,8 @@
       "title": "PIN",
       "enterTitle": "Saisir le code PIN",
       "enterHint": "Veuillez saisir votre PIN actuel.",
+      "rememberDevice": "Rester connecté sur cet appareil",
+      "rememberDeviceHint": "À utiliser uniquement sur un appareil personnel. Le code PIN n’est pas enregistré. La connexion reste valide pendant 30 jours.",
       "createTitle": "Créer un code PIN",
       "createHint": "Définissez maintenant votre nouveau PIN.",
       "confirmTitle": "Confirmer le code PIN",

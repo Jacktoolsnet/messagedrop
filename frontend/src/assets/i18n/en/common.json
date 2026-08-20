@@ -830,6 +830,8 @@
       "title": "PIN",
       "enterTitle": "Enter PIN",
       "enterHint": "Please enter your current PIN.",
+      "rememberDevice": "Stay signed in on this device",
+      "rememberDeviceHint": "Only use this on personal devices. The PIN is not stored. Sign-in remains valid for 30 days.",
       "createTitle": "Create PIN",
       "createHint": "Set your new PIN now.",
       "confirmTitle": "Confirm PIN",

@@ -830,6 +830,8 @@
       "title": "PIN",
       "enterTitle": "PIN eingeben",
       "enterHint": "Bitte gib deine aktuelle PIN ein.",
+      "rememberDevice": "Auf diesem Gerät angemeldet bleiben",
+      "rememberDeviceHint": "Nur auf persönlichen Geräten verwenden. Die PIN wird nicht gespeichert. Die Anmeldung gilt 30 Tage.",
       "createTitle": "PIN erstellen",
       "createHint": "Lege jetzt eine neue PIN fest.",
       "confirmTitle": "PIN bestätigen",

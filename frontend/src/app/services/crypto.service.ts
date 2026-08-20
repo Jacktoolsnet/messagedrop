@@ -276,6 +276,19 @@ export class CryptoService {
     const salt = this.base64ToBytes(envelope.kdf.salt);
     const iterations = envelope.kdf.iterations;
     const key = await this.derivePinKey(pin, salt, iterations);
+    const decrypted = await this.decryptWithKey(key, envelope);
+    return decrypted ? { ...decrypted, key } : null;
+  }
+
+  async decryptWithKey(
+    key: CryptoKey,
+    envelope: PinEncryptedPayload
+  ): Promise<{ plaintext: string; salt: Uint8Array<ArrayBuffer>; iterations: number } | null> {
+    if (!envelope?.kdf || !envelope?.cipher || envelope.payloadEncoding !== 'base64') {
+      return null;
+    }
+    const salt = this.base64ToBytes(envelope.kdf.salt);
+    const iterations = envelope.kdf.iterations;
     const iv = this.base64ToBytes(envelope.cipher.iv);
     const payloadBytes = this.base64ToBytes(envelope.payload);
 
@@ -288,7 +301,6 @@ export class CryptoService {
       const decoder = new TextDecoder('utf-8');
       return {
         plaintext: decoder.decode(decrypted),
-        key,
         salt,
         iterations
       };

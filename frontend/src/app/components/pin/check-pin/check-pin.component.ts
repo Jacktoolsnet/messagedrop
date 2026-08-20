@@ -4,11 +4,19 @@ import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { FormsModule } from '@angular/forms';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { PinInputFeedbackService } from '../../../services/pin-input-feedback.service';
 
 interface CheckPinDialogData {
   enterHintI18nKey?: string;
+  allowRememberDevice?: boolean;
+}
+
+export interface CheckPinDialogResult {
+  pin: string;
+  rememberDevice: boolean;
 }
 
 @Component({
@@ -17,7 +25,9 @@ interface CheckPinDialogData {
     CommonModule,
     MatIcon,
     MatInputModule,
+    MatCheckboxModule,
     MatButtonModule,
+    FormsModule,
     TranslocoPipe
   ],
   templateUrl: './check-pin.component.html',
@@ -27,6 +37,7 @@ interface CheckPinDialogData {
 
 export class CheckPinComponent implements OnDestroy {
   pin = '';
+  rememberDevice = false;
   pinLength = 6;
   pinDisplay: string[] = ['', '', '', '', '', ''];
   pinPulseStates: boolean[] = [false, false, false, false, false, false];
@@ -42,6 +53,10 @@ export class CheckPinComponent implements OnDestroy {
 
   get enterHintI18nKey(): string {
     return this.dialogData?.enterHintI18nKey ?? 'common.pin.enterHint';
+  }
+
+  get allowRememberDevice(): boolean {
+    return this.dialogData?.allowRememberDevice === true;
   }
 
   ngOnDestroy(): void {
@@ -108,7 +123,9 @@ export class CheckPinComponent implements OnDestroy {
 
   confirm(): void {
     if (this.pin.length === this.pinLength) {
-      this.dialogRef.close(this.pin);
+      this.dialogRef.close(this.allowRememberDevice
+        ? { pin: this.pin, rememberDevice: this.rememberDevice } satisfies CheckPinDialogResult
+        : this.pin);
     }
   }
 
