@@ -8,11 +8,14 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { EXTERNAL_CONTENT_SETTINGS_KEYS, ExternalContentPlatform, isExternalContentPlatform } from '../../../interfaces/external-content-platform';
 import { Multimedia } from '../../../interfaces/multimedia';
 import { MultimediaType } from '../../../interfaces/multimedia-type';
+import { Location } from '../../../interfaces/location';
 import { AppService } from '../../../services/app.service';
 import { OembedService } from '../../../services/oembed.service';
 import { StickerService } from '../../../services/sticker.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { ExternalContentComponent } from '../../legal/external-content/external-content.component';
+import { LocationPreviewComponent } from '../../utils/location-preview/location-preview.component';
+import { getMultimediaLocation } from '../../../utils/location-multimedia.util';
 
 @Component({
   selector: 'app-showmultimedia',
@@ -20,6 +23,7 @@ import { ExternalContentComponent } from '../../legal/external-content/external-
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    LocationPreviewComponent,
     TranslocoPipe
   ],
   templateUrl: './showmultimedia.component.html',
@@ -44,6 +48,7 @@ export class ShowmultimediaComponent implements OnChanges, OnDestroy {
   isPlatformEnabled = false;
   disabledReason = '';
   showExternalSettingsButton = false;
+  contentLocation: Location | null = null;
 
   private readonly sanitizer = inject(DomSanitizer);
   private readonly dialog = inject(MatDialog);
@@ -76,6 +81,7 @@ export class ShowmultimediaComponent implements OnChanges, OnDestroy {
   private updateFromMultimedia(): void {
     const settings = this.appService.getAppSettings();
     const platform = this.getCurrentPlatform();
+    this.contentLocation = getMultimediaLocation(this.multimedia);
 
     this.disabledReason = '';
     this.showExternalSettingsButton = false;

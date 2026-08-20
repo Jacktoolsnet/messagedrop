@@ -11,6 +11,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatTimepickerModule } from '@angular/material/timepicker';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
@@ -37,6 +38,10 @@ import { SelectMultimediaComponent } from '../multimedia/select-multimedia/selec
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { CreatePinComponent } from '../pin/create-pin/create-pin.component';
 import { DeleteMessageComponent } from '../messagelist/delete-message/delete-message.component';
+import { PlaceService } from '../../services/place.service';
+import { ContactChatroomPlaceSelectDialogComponent } from '../contact-chatroom/place-select-dialog/contact-chatroom-place-select-dialog.component';
+import { LocationPickerDialogComponent } from '../utils/location-picker-dialog/location-picker-dialog.component';
+import { createLocationMultimedia, getMultimediaLocation } from '../../utils/location-multimedia.util';
 
 interface TextDialogResult {
   text: string;
@@ -64,6 +69,7 @@ type SecretDropCreateAction = 'publish' | 'draft';
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
+    MatMenuModule,
     MatNativeDateModule,
     MatTimepickerModule,
     TranslocoPipe
@@ -79,6 +85,7 @@ export class EditSecretDropComponent {
   private readonly cryptoService = inject(SecretDropCryptoService);
   private readonly secretDropService = inject(SecretDropService);
   private readonly messageService = inject(MessageService);
+  private readonly placeService = inject(PlaceService);
   readonly contactService = inject(ContactService);
   private readonly userService = inject(UserService);
   private readonly geolocationService = inject(GeolocationService);
@@ -136,7 +143,7 @@ export class EditSecretDropComponent {
     this.validFromTime = drop.validFrom ? new Date(drop.validFrom * 1000) : null;
     this.validUntilDate = drop.validUntil ? new Date(drop.validUntil * 1000) : null;
     this.validUntilTime = drop.validUntil ? new Date(drop.validUntil * 1000) : null;
-    this.multimedia = drop.multimedia ?? this.emptyMultimedia();
+    this.multimedia = drop.multimedia ? structuredClone(drop.multimedia) : this.emptyMultimedia();
     this.pin = typeof drop.localSecretPin === 'string' ? drop.localSecretPin : '';
   }
 
@@ -484,6 +491,49 @@ export class EditSecretDropComponent {
 
   removeMultimedia(): void {
     this.multimedia = this.emptyMultimedia();
+  }
+
+  hasSavedPlaces(): boolean {
+    return this.placeService.sortedPlacesSignal().length > 0;
+  }
+
+  openSavedContentLocationPicker(): void {
+    const dialogRef = this.matDialog.open(ContactChatroomPlaceSelectDialogComponent, {
+      width: 'min(420px, 92vw)',
+      maxWidth: '92vw',
+      maxHeight: '80vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe((location?: Location) => {
+      if (location) {
+        this.applyNewMultimedia(createLocationMultimedia(location));
+      }
+    });
+  }
+
+  openContentLocationSearch(): void {
+    const initialLocation = getMultimediaLocation(this.multimedia) ?? this.location;
+    const dialogRef = this.matDialog.open(LocationPickerDialogComponent, {
+      data: { location: { ...initialLocation }, markerType: 'message' },
+      maxWidth: '95vw',
+      maxHeight: '95vh',
+      width: '95vw',
+      height: '95vh',
+      autoFocus: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false
+    });
+
+    dialogRef.afterClosed().subscribe((location?: Location) => {
+      if (location) {
+        this.applyNewMultimedia(createLocationMultimedia(location));
+      }
+    });
   }
 
   openTextDialog(): void {

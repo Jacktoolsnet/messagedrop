@@ -1,7 +1,11 @@
 <!-- Show existing content when the platform is enabled. -->
 @if (isPlatformEnabled) {
 @if (multimedia; as media) {
-@if (media.type === 'sticker') {
+@if (contentLocation; as location) {
+<div class="media_block media_block--location">
+    <app-location-preview [location]="location"></app-location-preview>
+</div>
+} @else if (media.type === 'sticker') {
 <div class="media_block">
     <div class="multimedia_container multimedia_container--sticker">
         @if (stickerImageLoading) {

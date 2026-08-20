@@ -33,6 +33,10 @@ import { DisplayMessage } from '../utils/display-message/display-message.compone
 import { FontPickerDialogComponent } from '../utils/font-picker-dialog/font-picker-dialog.component';
 import { MAX_PUBLIC_HASHTAGS, normalizeHashtags } from '../../utils/hashtag.util';
 import { DisplayMessageService } from '../../services/display-message.service';
+import { PlaceService } from '../../services/place.service';
+import { ContactChatroomPlaceSelectDialogComponent } from '../contact-chatroom/place-select-dialog/contact-chatroom-place-select-dialog.component';
+import { LocationPickerDialogComponent } from '../utils/location-picker-dialog/location-picker-dialog.component';
+import { createLocationMultimedia, getMultimediaLocation } from '../../utils/location-multimedia.util';
 
 interface TextDialogResult {
   text: string;
@@ -78,6 +82,7 @@ export class EditMessageComponent implements OnInit {
   private readonly translation = inject(TranslationHelperService);
   private readonly messageService = inject(MessageService);
   private readonly hashtagSuggestionService = inject(HashtagSuggestionService);
+  private readonly placeService = inject(PlaceService);
   readonly help = inject(HelpDialogService);
   readonly dialogRef = inject(MatDialogRef<EditMessageComponent>);
   readonly data = inject<{ mode: Mode; message: Message }>(MAT_DIALOG_DATA);
@@ -423,6 +428,7 @@ export class EditMessageComponent implements OnInit {
     multimedia.description = '';
     multimedia.url = '';
     multimedia.sourceUrl = '';
+    multimedia.location = null;
     this.safeHtml = undefined;
     this.showSaveHtml = false;
     this.sharedContentService.deleteSharedContent('last');
@@ -458,6 +464,50 @@ export class EditMessageComponent implements OnInit {
 
   public updateLocation(location: Location): void {
     this.data.message.location = { ...location };
+  }
+
+  hasSavedPlaces(): boolean {
+    return this.placeService.sortedPlacesSignal().length > 0;
+  }
+
+  openSavedContentLocationPicker(): void {
+    const dialogRef = this.matDialog.open(ContactChatroomPlaceSelectDialogComponent, {
+      width: 'min(420px, 92vw)',
+      maxWidth: '92vw',
+      maxHeight: '80vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe((location?: Location) => {
+      if (location) {
+        this.applyNewMultimedia(createLocationMultimedia(location));
+      }
+    });
+  }
+
+  openContentLocationSearch(): void {
+    const initialLocation = getMultimediaLocation(this.data.message.multimedia)
+      ?? this.data.message.location;
+    const dialogRef = this.matDialog.open(LocationPickerDialogComponent, {
+      data: { location: { ...initialLocation }, markerType: 'message' },
+      maxWidth: '95vw',
+      maxHeight: '95vh',
+      width: '95vw',
+      height: '95vh',
+      autoFocus: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false
+    });
+
+    dialogRef.afterClosed().subscribe((location?: Location) => {
+      if (location) {
+        this.applyNewMultimedia(createLocationMultimedia(location));
+      }
+    });
   }
 
 

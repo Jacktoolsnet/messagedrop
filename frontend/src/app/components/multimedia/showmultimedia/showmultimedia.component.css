@@ -264,3 +264,12 @@
     max-height: min(70vh, 36rem);
     background: #000;
 }
+.media_block--location {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.media_block--location app-location-preview {
+    display: block;
+    width: 100%;
+}
