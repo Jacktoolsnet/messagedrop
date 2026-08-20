@@ -34,7 +34,7 @@
 
 <mat-dialog-content>
     @if (results.length > 0) {
-    <div class="gallery">
+    <div class="gallery" [class.gallery--clips]="selectedKind === 'clip'">
         @for (result of results; track result.id) {
         <div>
             @if (isClipResult(result)) {

@@ -27,6 +27,12 @@
     border-radius: 1rem;
 }
 
+@media (max-width: 600px) {
+    .gallery.gallery--clips {
+        column-count: 1;
+    }
+}
+
 .gif-button {
     border: none;
     padding: 0;
@@ -95,6 +101,10 @@
         padding: 1rem;
         column-count: 6;
         column-gap: 10px;
+    }
+
+    .gallery.gallery--clips {
+        column-count: 3;
     }
 }
 
@@ -214,4 +224,3 @@
     align-items: center;
     white-space: nowrap;
 }
-
