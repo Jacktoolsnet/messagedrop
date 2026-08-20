@@ -54,7 +54,7 @@
                                     [class.chat-preview-bubble__text--icon-only]="(preview.kind === 'location' || preview.kind === 'media') && !preview.hasText">
                                     @if (preview.kind === 'location' || preview.kind === 'media') {
                                     <mat-icon class="chat-preview-bubble__icon" aria-hidden="true">{{ getPreviewIcon(preview) }}</mat-icon>
-                                    @if (preview.kind === 'media' && preview.hasText) {
+                                    @if ((preview.kind === 'location' || preview.kind === 'media') && preview.hasText) {
                                     <span>{{ preview.text }}</span>
                                     }
                                     } @else {

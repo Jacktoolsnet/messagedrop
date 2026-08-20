@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Input, OnChanges, OnDestroy, SimpleChanges, ChangeDetectionStrategy, inject } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnChanges, OnDestroy, SimpleChanges, ChangeDetectionStrategy, ViewChild, inject } from '@angular/core';
 import * as leaflet from 'leaflet';
 import { Location } from '../../../interfaces/location';
 
@@ -29,7 +29,7 @@ export class LocationPreviewComponent implements AfterViewInit, OnChanges, OnDes
   @Input() markerType: MarkerKind = 'message';
   @Input() zoom = 15;
 
-  readonly mapId = `location-preview-map-${Math.random().toString(36).slice(2)}`;
+  @ViewChild('mapElement', { static: true }) private mapElement!: ElementRef<HTMLDivElement>;
   private map?: leaflet.Map;
   private marker?: leaflet.Marker;
   private resizeObserver?: ResizeObserver;
@@ -60,7 +60,7 @@ export class LocationPreviewComponent implements AfterViewInit, OnChanges, OnDes
       return;
     }
     const { latitude, longitude } = this.location;
-    this.map = leaflet.map(this.mapId, {
+    this.map = leaflet.map(this.mapElement.nativeElement, {
       center: [latitude, longitude],
       zoom: this.zoom,
       worldCopyJump: true,

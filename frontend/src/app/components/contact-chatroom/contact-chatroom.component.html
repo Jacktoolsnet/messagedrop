@@ -106,12 +106,12 @@
             </div>
             } @else {
             @if (hasTabbedMultimediaContent(msg.payload)) {
-            <mat-tab-group class="chat-content-tabs" dynamicHeight animationDuration="160ms">
+            <mat-tab-group class="chat-content-tabs" [preserveContent]="true" animationDuration="0ms">
               <mat-tab [aria-label]="getMultimediaTabLabel(msg.payload)">
                 <ng-template mat-tab-label>
                   <mat-icon aria-hidden="true">{{ getMultimediaTabIcon(msg.payload) }}</mat-icon>
                 </ng-template>
-                <div class="chat-content-tab__panel">
+                <div class="chat-content-tab__panel" [style.min-height.px]="msg.payload.location ? 162 : null">
                   @if (msg.payload.multimedia.type !== 'undefined') {
                   <app-showmultimedia [multimedia]="msg.payload.multimedia"></app-showmultimedia>
                   }
@@ -281,12 +281,12 @@
             </div>
             } @else {
             @if (hasTabbedMultimediaContent(msg.payload)) {
-            <mat-tab-group class="chat-content-tabs" dynamicHeight animationDuration="160ms">
+            <mat-tab-group class="chat-content-tabs" [preserveContent]="true" animationDuration="0ms">
               <mat-tab [aria-label]="getMultimediaTabLabel(msg.payload)">
                 <ng-template mat-tab-label>
                   <mat-icon aria-hidden="true">{{ getMultimediaTabIcon(msg.payload) }}</mat-icon>
                 </ng-template>
-                <div class="chat-content-tab__panel">
+                <div class="chat-content-tab__panel" [style.min-height.px]="msg.payload.location ? 162 : null">
                   @if (msg.payload.multimedia.type !== 'undefined') {
                   <app-showmultimedia [multimedia]="msg.payload.multimedia"></app-showmultimedia>
                   }

@@ -1020,3 +1020,25 @@ h2[mat-dialog-title].dialog-title {
     pointer-events: auto;
   }
 }
+/* Keep Leaflet previews measurable while they are hosted inside chat tabs. */
+.chat-content-tabs {
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-content-tabs .mat-mdc-tab-body-wrapper,
+.chat-content-tabs .mat-mdc-tab-body-content,
+.chat-content-tabs .chat-content-tab__panel {
+  min-height: 162px;
+}
+
+.chat-content-tabs .mat-mdc-tab-body-content {
+  overflow: visible;
+}
+
+.chat-content-tabs .chat-content-tab__panel {
+  display: block;
+  width: 100%;
+  padding-bottom: 1.25rem;
+  box-sizing: border-box;
+}

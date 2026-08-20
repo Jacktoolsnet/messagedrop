@@ -697,6 +697,9 @@ export class ContactlistComponent {
     if (payload.multimedia?.type && payload.multimedia.type !== MultimediaType.UNDEFINED) {
       return 'media';
     }
+    if (payload.location) {
+      return 'location';
+    }
     if (payload.translatedMessage?.trim() || payload.message?.trim()) {
       return 'text';
     }
@@ -705,9 +708,6 @@ export class ContactlistComponent {
     }
     if (payload.experience) {
       return 'experience';
-    }
-    if (payload.location) {
-      return 'location';
     }
     return 'unreadable';
   }
