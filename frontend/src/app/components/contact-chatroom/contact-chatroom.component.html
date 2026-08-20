@@ -106,7 +106,7 @@
               <span>{{ 'common.contact.chatroom.messageUnreadable' | transloco }}</span>
             </div>
             } @else {
-            @if (hasTabbedMultimediaContent(msg.payload)) {
+            @if (shouldUseTabbedMultimediaContent(msg)) {
             <mat-tab-group class="chat-content-tabs" [preserveContent]="true" animationDuration="0ms">
               <mat-tab [aria-label]="getMultimediaTabLabel(msg.payload)">
                 <ng-template mat-tab-label>
@@ -139,12 +139,12 @@
               <span>{{ 'common.contact.chatroom.messageUnverified' | transloco }}</span>
             </div>
             }
-            @if (msg.payload.location && !hasTabbedMultimediaContent(msg.payload)) {
+            @if (msg.payload.location && !shouldUseTabbedMultimediaContent(msg)) {
             <div class="chat-location">
               <app-location-preview [location]="msg.payload.location"></app-location-preview>
             </div>
             }
-            @if (msg.payload.message.trim() !== '' && !hasTabbedMultimediaContent(msg.payload)) {
+            @if (msg.payload.message.trim() !== '' && !shouldUseTabbedMultimediaContent(msg)) {
             <app-showmessage [message]="msg.payload!.message" [style]="msg.payload!.style"></app-showmessage>
             }
             @if (msg.payload.experience) {
@@ -296,7 +296,7 @@
               <span>{{ 'common.contact.chatroom.messageUnreadable' | transloco }}</span>
             </div>
             } @else {
-            @if (hasTabbedMultimediaContent(msg.payload)) {
+            @if (shouldUseTabbedMultimediaContent(msg)) {
             <mat-tab-group class="chat-content-tabs" [preserveContent]="true" animationDuration="0ms">
               <mat-tab [aria-label]="getMultimediaTabLabel(msg.payload)">
                 <ng-template mat-tab-label>
@@ -329,12 +329,12 @@
               <span>{{ 'common.contact.chatroom.messageUnverified' | transloco }}</span>
             </div>
             }
-            @if (msg.payload.location && !hasTabbedMultimediaContent(msg.payload)) {
+            @if (msg.payload.location && !shouldUseTabbedMultimediaContent(msg)) {
             <div class="chat-location">
               <app-location-preview [location]="msg.payload.location"></app-location-preview>
             </div>
             }
-            @if (msg.payload.message.trim() !== '' && !hasTabbedMultimediaContent(msg.payload)) {
+            @if (msg.payload.message.trim() !== '' && !shouldUseTabbedMultimediaContent(msg)) {
             <app-showmessage [message]="getDisplayedMessage(msg)" [style]="msg.payload!.style"></app-showmessage>
             }
             @if (msg.payload.experience) {

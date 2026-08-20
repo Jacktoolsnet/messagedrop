@@ -160,6 +160,8 @@ export class ContactChatroomComponent implements AfterViewInit {
   );
   private readonly messageKeys = new Set<string>();
   private readonly payloadSyncInFlightContacts = new Set<string>();
+  private readonly tabbedMessageIds = new Set<string>();
+  private initialTabbedMessagesCaptured = false;
   private readonly experienceEditTarget = signal<ChatroomMessage | null>(null);
   private readonly gameMovesInFlight = signal<ReadonlySet<string>>(new Set());
   private scrolledToFirstUnread = false;
@@ -782,6 +784,12 @@ export class ContactChatroomComponent implements AfterViewInit {
     return hasMultimediaContent && message.message.trim() !== '';
   }
 
+  shouldUseTabbedMultimediaContent(message: ChatroomMessage): boolean {
+    return !!message.payload
+      && this.tabbedMessageIds.has(message.messageId)
+      && this.hasTabbedMultimediaContent(message.payload);
+  }
+
   getMultimediaTabIcon(message: ShortMessage): string {
     return message.multimedia?.type !== 'undefined' ? 'perm_media' : 'place';
   }
@@ -1355,6 +1363,12 @@ export class ContactChatroomComponent implements AfterViewInit {
             });
           }
           const mergedMessages = Array.from(merged.values()).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+          if (!this.initialTabbedMessagesCaptured) {
+            mergedMessages
+              .filter((message) => message.status === 'read' || !!message.readAt)
+              .forEach((message) => this.tabbedMessageIds.add(message.messageId));
+            this.initialTabbedMessagesCaptured = true;
+          }
           this.messages.set(mergedMessages);
           if (payloadsToPersist.length > 0) {
             void this.persistPayloadBatch(contact.id, payloadsToPersist);
