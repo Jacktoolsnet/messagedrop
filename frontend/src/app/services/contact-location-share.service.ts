@@ -67,7 +67,8 @@ export class ContactLocationShareService {
       contactUserId: contact.contactUserId,
       messageSignature: signature,
       userEncryptedMessage: encryptedMessageForUser,
-      contactUserEncryptedMessage: encryptedMessageForContact
+      contactUserEncryptedMessage: encryptedMessageForContact,
+      createdAt: response.createdAt ?? new Date().toISOString()
     });
   }
 

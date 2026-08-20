@@ -7,5 +7,6 @@ export interface Envelope {
     userEncryptedMessage: string,
     contactUserEncryptedMessage: string,
     id?: string,
-    messageId?: string
+    messageId?: string,
+    createdAt?: string
 }

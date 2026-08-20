@@ -22,4 +22,5 @@ export interface ContactMessageSendResponse {
   messageId: string;
   mirrorMessageId?: string;
   sharedMessageId: string;
+  createdAt?: string;
 }

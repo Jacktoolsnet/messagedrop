@@ -2131,7 +2131,8 @@ export class UserService {
           contactUserId: contact.contactUserId,
           messageSignature: signature,
           userEncryptedMessage: encryptedMessageForUser,
-          contactUserEncryptedMessage: encryptedMessageForContact
+          contactUserEncryptedMessage: encryptedMessageForContact,
+          createdAt: res.createdAt ?? new Date().toISOString()
         });
       } catch (err) {
         console.error('Failed to send key reset notice', err);

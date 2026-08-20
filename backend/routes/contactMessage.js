@@ -8,6 +8,7 @@ const metric = require('../middleware/metric');
 const tableContactMessage = require('../db/tableContactMessage');
 const notify = require('../utils/notify');
 const { apiError } = require('../middleware/api-error');
+const { createUtcTimestamp, normalizeUtcTimestamp } = require('../utils/utcTimestamp');
 
 const DEFAULT_MAX_MESSAGE_BYTES = 1_500_000;
 const DEFAULT_CONTACT_PUSH_BODY = 'You have received a new chat message.';
@@ -116,6 +117,7 @@ router.post('/send',
     const recordId = id || crypto.randomUUID();
     const sharedMessageId = providedMessageId || recordId;
     const mirrorMessageId = crypto.randomUUID();
+    const messageCreatedAt = normalizeUtcTimestamp(createdAt) || createUtcTimestamp();
 
     // Store message for sender's contact
     withContactOwnership(req, res, contactId, (contactRow) => {
@@ -131,7 +133,7 @@ router.post('/send',
         message: encryptedMessageForUser,
         signature,
         status,
-        createdAt
+        createdAt: messageCreatedAt
       }, (err) => {
         if (err) {
           return next(apiError.internal('db_error'));
@@ -147,7 +149,7 @@ router.post('/send',
               message: encryptedMessageForContact,
               signature,
               status: 'delivered',
-              createdAt
+              createdAt: messageCreatedAt
             }, (mirrorErr) => {
               if (mirrorErr) {
                 req.logger?.warn?.('contactMessage.send mirror insert failed; skipping push notification', {
@@ -179,7 +181,8 @@ router.post('/send',
             status: 200,
             messageId: recordId,
             mirrorMessageId,
-            sharedMessageId
+            sharedMessageId,
+            createdAt: messageCreatedAt
           });
         });
       });
@@ -417,7 +420,12 @@ router.get('/list/:contactId',
           return next(apiError.internal('db_error'));
         }
         // Auch bei leeren Ergebnissen 200 zurückgeben, damit das Frontend sauber rendern kann
-        return res.status(200).json({ status: 200, rows: rows || [] });
+        const normalizedRows = (rows || []).map((row) => ({
+          ...row,
+          createdAt: normalizeUtcTimestamp(row.createdAt) || row.createdAt,
+          readAt: row.readAt ? (normalizeUtcTimestamp(row.readAt) || row.readAt) : null
+        }));
+        return res.status(200).json({ status: 200, rows: normalizedRows });
       });
     }, next);
   }

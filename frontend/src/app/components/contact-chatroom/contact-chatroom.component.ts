@@ -1111,10 +1111,22 @@ export class ContactChatroomComponent implements AfterViewInit {
     return messageId;
   }
 
-  finalizeOptimisticMessage(tempMessageId: string, serverRecordId: string, sharedMessageId: string): void {
+  finalizeOptimisticMessage(
+    tempMessageId: string,
+    serverRecordId: string,
+    sharedMessageId: string,
+    createdAt?: string
+  ): void {
     this.messages.update((msgs) =>
       msgs.map((msg) =>
-        msg.messageId === tempMessageId ? { ...msg, id: serverRecordId, messageId: sharedMessageId } : msg
+        msg.messageId === tempMessageId
+          ? {
+            ...msg,
+            id: serverRecordId,
+            messageId: sharedMessageId,
+            createdAt: createdAt ?? msg.createdAt
+          }
+          : msg
       )
     );
   }
@@ -1592,7 +1604,7 @@ export class ContactChatroomComponent implements AfterViewInit {
     }).subscribe({
       next: (res) => {
         if (tempId) {
-          this.finalizeOptimisticMessage(tempId, res.messageId, res.sharedMessageId);
+          this.finalizeOptimisticMessage(tempId, res.messageId, res.sharedMessageId, res.createdAt);
         }
         void this.persistPayloadBatch(contact.id, [{ messageId: res.sharedMessageId, payload }]);
         this.socketioService.sendContactMessage({
@@ -1603,7 +1615,8 @@ export class ContactChatroomComponent implements AfterViewInit {
           contactUserId: contact.contactUserId,
           messageSignature: signature,
           userEncryptedMessage: encryptedMessageForUser,
-          contactUserEncryptedMessage: encryptedMessageForContact
+          contactUserEncryptedMessage: encryptedMessageForContact,
+          createdAt: res.createdAt ?? new Date().toISOString()
         });
       },
       error: (err) => {

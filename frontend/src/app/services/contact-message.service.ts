@@ -1,13 +1,14 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { Buffer } from 'buffer';
-import { catchError, throwError } from 'rxjs';
+import { catchError, map, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Contact } from '../interfaces/contact';
 import { ContactMessage, ContactMessageListResponse, ContactMessageSendResponse } from '../interfaces/contact-message';
 import { CryptoData } from '../interfaces/crypto-data';
 import { Envelope } from '../interfaces/envelope';
 import { ShortMessage } from '../interfaces/short-message';
+import { normalizeUtcTimestamp } from '../utils/utc-timestamp';
 import { ContactService } from './contact.service';
 import { CryptoService } from './crypto.service';
 import { IndexedDbService } from './indexed-db.service';
@@ -131,7 +132,17 @@ export class ContactMessageService {
     return this.http.get<ContactMessageListResponse>(
       `${environment.apiUrl}/contactMessage/list/${contactId}`,
       { ...this.httpOptions, params }
-    ).pipe(catchError(this.handleError));
+    ).pipe(
+      map((response) => ({
+        ...response,
+        rows: (response.rows ?? []).map((message) => ({
+          ...message,
+          createdAt: normalizeUtcTimestamp(message.createdAt),
+          readAt: message.readAt ? normalizeUtcTimestamp(message.readAt) : null
+        }))
+      })),
+      catchError(this.handleError)
+    );
   }
 
   send(payload: SendMessagePayload) {
@@ -268,7 +279,9 @@ export class ContactMessageService {
           message: payload.envelope.contactUserEncryptedMessage || payload.envelope.userEncryptedMessage,
           signature: payload.envelope.messageSignature,
           status: 'delivered',
-          createdAt: new Date().toISOString(),
+          createdAt: payload.envelope.createdAt
+            ? normalizeUtcTimestamp(payload.envelope.createdAt)
+            : new Date().toISOString(),
           readAt: null
         };
         this.liveMessages.set(msg);
