@@ -91,7 +91,7 @@ const placeSubscriptions = function (logger, db, lat, lon, userId, messageText, 
     }
 }
 
-const contactSubscriptions = function (logger, db, userId, contactUserId, message, messageId) {
+const contactSubscriptions = function (logger, db, userId, contactUserId, message, messageId, notificationType) {
     try {
         const normalizedMessageId = typeof messageId === 'string' && messageId.trim() !== ''
             ? messageId.trim()
@@ -123,10 +123,15 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
                         } catch (cryptoError) {
                             logger.warn('Failed to decrypt contact name', { error: cryptoError?.message });
                         }
+                        const notificationBody = notificationType === 'game_move'
+                            ? `@${contactName} hat den nächsten Zug gemacht.`
+                            : notificationType === 'game_started'
+                                ? `@${contactName} hat ein Tic-Tac-Toe-Spiel gestartet.`
+                                : message;
                         const payload = {
                             "notification": {
                                 "title": `New message from @${contactName}`,
-                                "body": message,
+                                "body": notificationBody,
                                 "icon": "assets/icons/notify-icon.png",
                                 "vibrate": [100, 50, 100],
                                 "data": {

@@ -187,6 +187,11 @@
               <span class="chat-audio__duration">{{ getAudioTimer(msg) }}</span>
             </div>
             }
+            @if (msg.payload.game?.type === 'ticTacToe') {
+            <app-tic-tac-toe-board [board]="msg.payload.game.board"
+              [disabled]="!canPlayTicTacToe(msg)" [statusText]="getTicTacToeStatusText(msg.payload.game)"
+              (move)="playTicTacToeMove(msg, $event)"></app-tic-tac-toe-board>
+            }
             }
             @if (msg.reaction) {
             <div class="reaction-chip reaction-chip--me">
@@ -234,7 +239,7 @@
                 (click)="editMessage(msg)">
                 <mat-icon>edit</mat-icon>
               </button>
-              } @else if (msg.payload) {
+              } @else if (msg.payload && !msg.payload.game) {
               <button mat-mini-fab color="primary" [attr.aria-label]="'common.contact.chatroom.editAria' | transloco"
                 (click)="editMessage(msg)">
                 <mat-icon>edit</mat-icon>
@@ -362,6 +367,11 @@
               <span class="chat-audio__duration">{{ getAudioTimer(msg) }}</span>
             </div>
             }
+            @if (msg.payload.game?.type === 'ticTacToe') {
+            <app-tic-tac-toe-board [board]="msg.payload.game.board"
+              [disabled]="!canPlayTicTacToe(msg)" [statusText]="getTicTacToeStatusText(msg.payload.game)"
+              (move)="playTicTacToeMove(msg, $event)"></app-tic-tac-toe-board>
+            }
             }
             <div class="reaction-chip reaction-chip--them" role="button" tabindex="0"
               (click)="openReactionPicker(msg, $event)" (keyup.enter)="openReactionPicker(msg, $event)"
@@ -451,6 +461,10 @@
   <button mat-icon-button type="button" (click)="help.open('myContactChatroom')"
     [attr.aria-label]="'common.actions.help' | transloco">
     <mat-icon>help</mat-icon>
+  </button>
+  <button mat-icon-button type="button" (click)="openGameSelection()"
+    [attr.aria-label]="'common.contact.chatroom.games.addGameAria' | transloco" [disabled]="contactRemoved()">
+    <mat-icon>sports_esports</mat-icon>
   </button>
   <button mat-icon-button type="button" [attr.aria-label]="'common.contact.chatroom.addExperienceAria' | transloco"
     [matMenuTriggerFor]="experienceMenu" [disabled]="contactRemoved()">

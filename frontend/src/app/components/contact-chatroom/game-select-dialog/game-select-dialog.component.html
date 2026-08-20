@@ -1,0 +1,23 @@
+<app-dialog-header icon="sports_esports" [title]="'common.contact.chatroom.games.selectTitle' | transloco"></app-dialog-header>
+
+<mat-dialog-content class="game-select-content">
+  <div class="game-select-grid">
+    <button type="button" class="game-tile" (click)="select('ticTacToe')">
+      <mat-icon class="game-tile__icon" aria-hidden="true">grid_3x3</mat-icon>
+      <span class="game-tile__title">{{ 'common.contact.chatroom.games.ticTacToe' | transloco }}</span>
+      <span class="game-tile__stats">
+        <span>{{ 'common.contact.chatroom.games.statsPlayed' | transloco }} <strong>{{ data.ticTacToeStats.played }}</strong></span>
+        <span>{{ 'common.contact.chatroom.games.statsWon' | transloco }} <strong>{{ data.ticTacToeStats.won }}</strong></span>
+        <span>{{ 'common.contact.chatroom.games.statsLost' | transloco }} <strong>{{ data.ticTacToeStats.lost }}</strong></span>
+        <span>{{ 'common.contact.chatroom.games.statsDrawn' | transloco }} <strong>{{ data.ticTacToeStats.drawn }}</strong></span>
+      </span>
+    </button>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-icon-button class="action-close" type="button" (click)="close()"
+    [attr.aria-label]="'common.actions.close' | transloco">
+    <mat-icon>close</mat-icon>
+  </button>
+</mat-dialog-actions>

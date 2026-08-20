@@ -1,0 +1,69 @@
+:host {
+  display: block;
+  color: var(--mat-app-text-color);
+}
+
+.game-select-content {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.game-select-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(12rem, 100%), 1fr));
+  gap: 0.75rem;
+}
+
+.game-tile {
+  display: grid;
+  justify-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  min-height: 12rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in srgb, var(--mat-sys-primary) 30%, var(--mat-card-outlined-outline-color));
+  background: var(--mat-sys-surface-container, var(--mat-card-filled-container-color));
+  color: var(--mat-app-text-color);
+  cursor: pointer;
+  box-shadow: 0 6px 16px color-mix(in srgb, black 12%, transparent);
+}
+
+.game-tile:hover,
+.game-tile:focus-visible {
+  background: var(--mat-sys-primary-container);
+  outline: 2px solid var(--mat-sys-primary);
+  outline-offset: 2px;
+}
+
+.game-tile__icon {
+  width: 3.5rem;
+  height: 3.5rem;
+  font-size: 3.5rem;
+  color: var(--mat-sys-primary);
+}
+
+.game-tile__title {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.game-tile__stats {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 0.35rem 0.8rem;
+  font-size: 0.78rem;
+  color: var(--mat-card-subtitle-text-color);
+}
+
+.sticky-actions {
+  position: sticky;
+  bottom: 0;
+  background: var(--mat-card-filled-container-color);
+  border-top: 1px solid var(--mat-card-outlined-outline-color);
+  box-shadow: 0 -2px 8px var(--mat-card-outlined-outline-color);
+}
+
+.action-close {
+  margin-inline-end: auto;
+}

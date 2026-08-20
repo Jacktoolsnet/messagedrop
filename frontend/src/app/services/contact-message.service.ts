@@ -15,6 +15,8 @@ import { IndexedDbService } from './indexed-db.service';
 import { SocketioService } from './socketio.service';
 import { UserService } from './user.service';
 
+export type ContactMessageNotificationType = 'game_started' | 'game_move';
+
 interface SendMessagePayload {
   id?: string;
   messageId?: string;
@@ -27,6 +29,7 @@ interface SendMessagePayload {
   createdAt?: string;
   userId: string;
   contactUserId: string;
+  notificationType?: ContactMessageNotificationType;
 }
 
 interface UpdateMessagePayload {

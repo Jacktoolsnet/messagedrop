@@ -50,11 +50,11 @@
                             (keyup.space)="openContactChatroom(contact, preview.messageId); $event.preventDefault()">
                             <div class="chat-preview-bubble">
                                 <div class="chat-preview-bubble__text" [attr.title]="preview.text"
-                                    [class.chat-preview-bubble__text--with-icon]="preview.kind === 'location' || preview.kind === 'media'"
-                                    [class.chat-preview-bubble__text--icon-only]="(preview.kind === 'location' || preview.kind === 'media') && !preview.hasText">
-                                    @if (preview.kind === 'location' || preview.kind === 'media') {
+                                    [class.chat-preview-bubble__text--with-icon]="preview.kind === 'location' || preview.kind === 'media' || preview.kind === 'game'"
+                                    [class.chat-preview-bubble__text--icon-only]="(preview.kind === 'location' || preview.kind === 'media' || preview.kind === 'game') && !preview.hasText && preview.kind !== 'game'">
+                                    @if (preview.kind === 'location' || preview.kind === 'media' || preview.kind === 'game') {
                                     <mat-icon class="chat-preview-bubble__icon" aria-hidden="true">{{ getPreviewIcon(preview) }}</mat-icon>
-                                    @if ((preview.kind === 'location' || preview.kind === 'media') && preview.hasText) {
+                                    @if (((preview.kind === 'location' || preview.kind === 'media') && preview.hasText) || preview.kind === 'game') {
                                     <span>{{ preview.text }}</span>
                                     }
                                     } @else {

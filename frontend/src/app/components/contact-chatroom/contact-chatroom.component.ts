@@ -10,13 +10,14 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
 import { Contact } from '../../interfaces/contact';
+import { TicTacToeGame, TicTacToeStats } from '../../interfaces/chat-game';
 import { ContactMessage } from '../../interfaces/contact-message';
 import { Location } from '../../interfaces/location';
 import { Mode } from '../../interfaces/mode';
 import { MultimediaType } from '../../interfaces/multimedia-type';
 import { ShortMessage } from '../../interfaces/short-message';
 import { ExperienceResult } from '../../interfaces/viator';
-import { ContactMessageService } from '../../services/contact-message.service';
+import { ContactMessageNotificationType, ContactMessageService } from '../../services/contact-message.service';
 import { ContactService } from '../../services/contact.service';
 import { AppService } from '../../services/app.service';
 import { ExperienceBookmarkService } from '../../services/experience-bookmark.service';
@@ -42,6 +43,9 @@ import { ExperienceSearchComponent } from '../utils/experience-search/experience
 import { ExperienceSearchDetailDialogComponent } from '../utils/experience-search/detail-dialog/experience-search-detail-dialog.component';
 import { DisplayMessage } from '../utils/display-message/display-message.component';
 import { ContactChatroomExperienceSelectDialogComponent } from './experience-select-dialog/contact-chatroom-experience-select-dialog.component';
+import { ChatGameType, GameSelectDialogComponent } from './game-select-dialog/game-select-dialog.component';
+import { NewTicTacToeDialogComponent } from './new-tic-tac-toe-dialog/new-tic-tac-toe-dialog.component';
+import { TicTacToeBoardComponent } from './tic-tac-toe-board/tic-tac-toe-board.component';
 import { DeleteContactMessageComponent } from './delete-contact-message/delete-contact-message.component';
 import { DisplayMessageService } from '../../services/display-message.service';
 import { ProtectedStickerImageComponent } from '../utils/protected-sticker-image/protected-sticker-image.component';
@@ -50,6 +54,7 @@ import {
   ContactMessageRevisionHistoryComponent,
   ContactMessageRevisionHistoryEntry
 } from './revision-history/contact-message-revision-history.component';
+import { applyTicTacToeMove, createTicTacToeGame } from '../../utils/tic-tac-toe';
 
 interface ChatroomMessage {
   id: string;
@@ -92,6 +97,7 @@ interface ContactChatroomDialogData {
     ShowmultimediaComponent,
     ShowmessageComponent,
     LocationPreviewComponent,
+    TicTacToeBoardComponent,
     TranslocoPipe
   ],
   templateUrl: './contact-chatroom.component.html',
@@ -153,6 +159,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   private readonly messageKeys = new Set<string>();
   private readonly payloadSyncInFlightContacts = new Set<string>();
   private readonly experienceEditTarget = signal<ChatroomMessage | null>(null);
+  private readonly gameMovesInFlight = signal<ReadonlySet<string>>(new Set());
   private scrolledToFirstUnread = false;
   private readTrackingEnabled = false;
   private visibilityObserver?: IntersectionObserver;
@@ -463,6 +470,128 @@ export class ContactChatroomComponent implements AfterViewInit {
     });
   }
 
+  openGameSelection(): void {
+    const contact = this.contact();
+    if (!contact || contact.status === 'removed_by_contact') {
+      return;
+    }
+    const dialogRef = this.matDialog.open(GameSelectDialogComponent, {
+      data: { ticTacToeStats: this.getTicTacToeStats() },
+      width: 'min(430px, 94vw)',
+      maxWidth: '94vw',
+      maxHeight: '85vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe((gameType?: ChatGameType) => {
+      if (gameType === 'ticTacToe') {
+        this.openNewTicTacToeDialog(contact);
+      }
+    });
+  }
+
+  private openNewTicTacToeDialog(contact: Contact): void {
+    const dialogRef = this.matDialog.open(NewTicTacToeDialogComponent, {
+      width: 'min(390px, 94vw)',
+      maxWidth: '94vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe((firstCell?: number) => {
+      if (!Number.isInteger(firstCell)) {
+        return;
+      }
+      const game = createTicTacToeGame(contact.userId, contact.contactUserId, firstCell!);
+      const payload = this.createEmptyMessage();
+      payload.game = game;
+      void this.sendAsNewMessage(contact, payload, undefined, 'game_started');
+    });
+  }
+
+  canPlayTicTacToe(message: ChatroomMessage): boolean {
+    const game = message.payload?.game;
+    if (!game || game.type !== 'ticTacToe' || this.gameMovesInFlight().has(game.gameId)) {
+      return false;
+    }
+    return game.status === 'active' && game.nextPlayerUserId === this.userService.getUser().id;
+  }
+
+  async playTicTacToeMove(message: ChatroomMessage, cellIndex: number): Promise<void> {
+    const contact = this.contact();
+    const game = message.payload?.game;
+    if (!contact || !game || game.type !== 'ticTacToe' || !this.canPlayTicTacToe(message)) {
+      return;
+    }
+    const nextGame = applyTicTacToeMove(game, this.userService.getUser().id, cellIndex);
+    if (!nextGame) {
+      return;
+    }
+
+    this.setGameMoveInFlight(game.gameId, true);
+    const payload = this.createEmptyMessage();
+    payload.game = nextGame;
+    await this.sendAsNewMessage(contact, payload, message.messageId, 'game_move');
+    this.setGameMoveInFlight(game.gameId, false);
+  }
+
+  getTicTacToeStatusText(game: TicTacToeGame): string {
+    const currentUserId = this.userService.getUser().id;
+    const contactName = this.contact()?.name || this.translation.t('common.contact.chatroom.contactLabel');
+    if (game.status === 'draw') {
+      return this.translation.t('common.contact.chatroom.games.statusDraw');
+    }
+    if (game.status === 'won') {
+      return game.winnerUserId === currentUserId
+        ? this.translation.t('common.contact.chatroom.games.statusWonYou')
+        : this.translation.t('common.contact.chatroom.games.statusWonContact', { name: contactName });
+    }
+    return game.nextPlayerUserId === currentUserId
+      ? this.translation.t('common.contact.chatroom.games.statusYourTurn')
+      : this.translation.t('common.contact.chatroom.games.statusContactTurn', { name: contactName });
+  }
+
+  private setGameMoveInFlight(gameId: string, inFlight: boolean): void {
+    this.gameMovesInFlight.update((current) => {
+      const next = new Set(current);
+      if (inFlight) {
+        next.add(gameId);
+      } else {
+        next.delete(gameId);
+      }
+      return next;
+    });
+  }
+
+  private getTicTacToeStats(): TicTacToeStats {
+    const currentUserId = this.userService.getUser().id;
+    const latestGames = new Map<string, TicTacToeGame>();
+    for (const message of this.visibleMessages()) {
+      const game = message.payload?.game;
+      if (game?.type === 'ticTacToe' && !latestGames.has(game.gameId)) {
+        latestGames.set(game.gameId, game);
+      }
+    }
+
+    const stats: TicTacToeStats = { played: latestGames.size, won: 0, lost: 0, drawn: 0 };
+    for (const game of latestGames.values()) {
+      if (game.status === 'draw') {
+        stats.drawn += 1;
+      } else if (game.status === 'won' && game.winnerUserId === currentUserId) {
+        stats.won += 1;
+      } else if (game.status === 'won') {
+        stats.lost += 1;
+      }
+    }
+    return stats;
+  }
+
   openExperienceSearch(message?: ChatroomMessage): void {
     if (!this.externalContentConsent.isEnabled('viator')) {
       this.externalContentConsent.request('viator').subscribe((enabled) => {
@@ -625,6 +754,7 @@ export class ContactChatroomComponent implements AfterViewInit {
       || message.multimedia?.type !== 'undefined'
       || !!message.location
       || !!message.experience
+      || !!message.game
       || !!message.audio
     );
   }
@@ -1551,7 +1681,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   hasRevisionHistory(message: ChatroomMessage): boolean {
-    return this.getRevisionHistory(message).length > 1;
+    return !message.payload?.game && this.getRevisionHistory(message).length > 1;
   }
 
   openRevisionHistory(message: ChatroomMessage): void {
@@ -1643,11 +1773,12 @@ export class ContactChatroomComponent implements AfterViewInit {
   private async sendAsNewMessage(
     contact: Contact,
     payload: ShortMessage,
-    revisionOfMessageId?: string
-  ): Promise<void> {
+    revisionOfMessageId?: string,
+    notificationType?: ContactMessageNotificationType
+  ): Promise<boolean> {
     if (contact.status === 'removed_by_contact') {
       this.snackBar.open(this.translation.t('common.contact.chatroom.contactRemovedSendBlocked'), '', { duration: 4000 });
-      return;
+      return false;
     }
 
     const versionedPayload: ShortMessage = revisionOfMessageId
@@ -1661,57 +1792,59 @@ export class ContactChatroomComponent implements AfterViewInit {
         await this.contactMessageService.encryptMessageForContact(contact, versionedPayload));
     } catch {
       this.snackBar.open(this.translation.t('common.contact.chatroom.sendFailed'), '', { duration: 3000 });
-      return;
+      return false;
     }
 
     if (!this.isEncryptedMessageWithinLimit(encryptedMessageForUser, encryptedMessageForContact)) {
       this.snackBar.open(this.translation.t('common.contact.chatroom.messageTooLarge'), '', { duration: 3000 });
-      return;
+      return false;
     }
-    if (!this.isRequestWithinLimit(contact, encryptedMessageForUser, encryptedMessageForContact, signature)) {
+    if (!this.isRequestWithinLimit(contact, encryptedMessageForUser, encryptedMessageForContact, signature, notificationType)) {
       this.snackBar.open(this.translation.t('common.contact.chatroom.messageTooLarge'), '', { duration: 3000 });
-      return;
+      return false;
     }
 
     const tempId = this.addOptimisticMessage(versionedPayload);
 
-    this.contactMessageService.send({
-      contactId: contact.id,
-      userId: contact.userId,
-      contactUserId: contact.contactUserId,
-      direction: 'user',
-      encryptedMessageForUser,
-      encryptedMessageForContact,
-      signature
-    }).subscribe({
-      next: (res) => {
-        if (tempId) {
-          this.finalizeOptimisticMessage(tempId, res.messageId, res.sharedMessageId, res.createdAt);
-        }
-        void this.persistPayloadBatch(contact.id, [{ messageId: res.sharedMessageId, payload: versionedPayload }]);
-        this.socketioService.sendContactMessage({
-          id: res.mirrorMessageId ?? res.messageId,
-          messageId: res.sharedMessageId,
-          contactId: contact.id,
-          userId: contact.userId,
-          contactUserId: contact.contactUserId,
-          messageSignature: signature,
-          userEncryptedMessage: encryptedMessageForUser,
-          contactUserEncryptedMessage: encryptedMessageForContact,
-          createdAt: res.createdAt ?? new Date().toISOString()
-        });
-      },
-      error: (err) => {
-        const isTooLarge = err?.status === 413 || `${err?.error?.error ?? ''}`.includes('too_large');
-        if (tempId && isTooLarge) {
-          this.removeOptimisticMessage(tempId);
-        }
-        const errorMessage = isTooLarge
-          ? this.translation.t('common.contact.chatroom.messageTooLarge')
-          : (err?.error?.error ?? this.translation.t('common.contact.chatroom.sendFailed'));
-        this.snackBar.open(errorMessage, '', { duration: 3000 });
+    try {
+      const res = await firstValueFrom(this.contactMessageService.send({
+        contactId: contact.id,
+        userId: contact.userId,
+        contactUserId: contact.contactUserId,
+        direction: 'user',
+        encryptedMessageForUser,
+        encryptedMessageForContact,
+        signature,
+        notificationType
+      }));
+      if (tempId) {
+        this.finalizeOptimisticMessage(tempId, res.messageId, res.sharedMessageId, res.createdAt);
       }
-    });
+      void this.persistPayloadBatch(contact.id, [{ messageId: res.sharedMessageId, payload: versionedPayload }]);
+      this.socketioService.sendContactMessage({
+        id: res.mirrorMessageId ?? res.messageId,
+        messageId: res.sharedMessageId,
+        contactId: contact.id,
+        userId: contact.userId,
+        contactUserId: contact.contactUserId,
+        messageSignature: signature,
+        userEncryptedMessage: encryptedMessageForUser,
+        contactUserEncryptedMessage: encryptedMessageForContact,
+        createdAt: res.createdAt ?? new Date().toISOString()
+      });
+      return true;
+    } catch (err: unknown) {
+      if (tempId) {
+        this.removeOptimisticMessage(tempId);
+      }
+      const httpError = err as { status?: number; error?: { error?: string } };
+      const isTooLarge = httpError?.status === 413 || `${httpError?.error?.error ?? ''}`.includes('too_large');
+      const errorMessage = isTooLarge
+        ? this.translation.t('common.contact.chatroom.messageTooLarge')
+        : (httpError?.error?.error ?? this.translation.t('common.contact.chatroom.sendFailed'));
+      this.snackBar.open(errorMessage, '', { duration: 3000 });
+      return false;
+    }
   }
 
   private isEncryptedMessageWithinLimit(forUser: string, forContact: string): boolean {
@@ -1719,7 +1852,13 @@ export class ContactChatroomComponent implements AfterViewInit {
       && this.utf8Size(forContact) <= this.maxEncryptedMessageBytes;
   }
 
-  private isRequestWithinLimit(contact: Contact, forUser: string, forContact: string, signature: string): boolean {
+  private isRequestWithinLimit(
+    contact: Contact,
+    forUser: string,
+    forContact: string,
+    signature: string,
+    notificationType?: ContactMessageNotificationType
+  ): boolean {
     const payload = {
       contactId: contact.id,
       userId: contact.userId,
@@ -1727,7 +1866,8 @@ export class ContactChatroomComponent implements AfterViewInit {
       direction: 'user',
       encryptedMessageForUser: forUser,
       encryptedMessageForContact: forContact,
-      signature
+      signature,
+      notificationType
     };
     return this.utf8Size(JSON.stringify(payload)) <= this.maxRequestBytes;
   }

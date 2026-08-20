@@ -107,8 +107,13 @@ router.post('/send',
       id,
       userId,
       contactUserId,
-      messageId: providedMessageId
+      messageId: providedMessageId,
+      notificationType
     } = req.body;
+
+    const normalizedNotificationType = ['game_started', 'game_move'].includes(notificationType)
+      ? notificationType
+      : null;
 
     if (!ensureSameUser(req, res, userId, next)) {
       return;
@@ -167,7 +172,8 @@ router.post('/send',
                 userId,
                 contactUserId,
                 CONTACT_PUSH_BODY,
-                sharedMessageId
+                sharedMessageId,
+                normalizedNotificationType
               );
             });
           } else if (lookupErr) {

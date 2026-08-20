@@ -52,7 +52,7 @@ interface ContactMessagePreview {
   outgoing: boolean;
   status: ContactMessage['status'];
   payload: ShortMessage | null;
-  kind: 'text' | 'audio' | 'experience' | 'location' | 'media' | 'deleted' | 'unreadable';
+  kind: 'text' | 'audio' | 'experience' | 'location' | 'media' | 'game' | 'deleted' | 'unreadable';
   hasText: boolean;
 }
 
@@ -700,6 +700,9 @@ export class ContactlistComponent {
     if (payload.location) {
       return 'location';
     }
+    if (payload.game?.type === 'ticTacToe') {
+      return 'game';
+    }
     if (payload.translatedMessage?.trim() || payload.message?.trim()) {
       return 'text';
     }
@@ -717,6 +720,9 @@ export class ContactlistComponent {
   }
 
   getPreviewIcon(preview: ContactMessagePreview): string {
+    if (preview.kind === 'game') {
+      return 'grid_3x3';
+    }
     if (preview.kind === 'location') {
       return 'location_on';
     }
@@ -765,6 +771,21 @@ export class ContactlistComponent {
     const plainText = payload.message?.trim();
     if (plainText) {
       return this.normalizePreviewText(plainText);
+    }
+
+    if (payload.game?.type === 'ticTacToe') {
+      const currentUserId = this.userService.getUser().id;
+      if (payload.game.status === 'draw') {
+        return this.translation.t('common.contact.chatroom.games.previewDraw');
+      }
+      if (payload.game.status === 'won') {
+        return payload.game.winnerUserId === currentUserId
+          ? this.translation.t('common.contact.chatroom.games.previewWon')
+          : this.translation.t('common.contact.chatroom.games.previewLost');
+      }
+      return payload.game.nextPlayerUserId === currentUserId
+        ? this.translation.t('common.contact.chatroom.games.previewYourTurn')
+        : this.translation.t('common.contact.chatroom.games.previewWaiting');
     }
 
     if (payload.audio) {

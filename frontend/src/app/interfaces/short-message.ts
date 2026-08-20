@@ -1,6 +1,7 @@
 import { Location } from "./location";
 import { Multimedia } from "./multimedia";
 import { ExperienceResult } from "./viator";
+import { ChatGame } from "./chat-game";
 
 export interface ShortMessage {
     message: string,
@@ -12,6 +13,7 @@ export interface ShortMessage {
     location?: Location | null,
     experience?: ExperienceResult | null,
     experienceSearchTerm?: string | null,
+    game?: ChatGame | null,
     audio?: {
         base64: string,
         mimeType: string,
