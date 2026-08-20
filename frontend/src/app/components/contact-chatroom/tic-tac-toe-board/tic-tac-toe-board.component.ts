@@ -20,6 +20,7 @@ export class TicTacToeBoardComponent {
   readonly playerMark = input<TicTacToeMark | null>(null);
   readonly variant = input<TicTacToeVariant>('standard');
   readonly statusText = input('');
+  readonly showStatus = input(true);
   readonly move = output<number>();
   readonly cells = computed(() => normalizeTicTacToeBoard(this.board()));
 

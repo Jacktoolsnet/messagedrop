@@ -558,6 +558,10 @@ export class ContactChatroomComponent implements AfterViewInit {
     return game.nextPlayerUserId === this.userService.getUser().id;
   }
 
+  isCurrentUserTicTacToeWinner(game: TicTacToeGame): boolean {
+    return game.winnerUserId === this.userService.getUser().id;
+  }
+
   openTicTacToeRules(game: TicTacToeGame): void {
     this.matDialog.open(GameRulesDialogComponent, {
       data: { variant: game.variant ?? 'standard' },

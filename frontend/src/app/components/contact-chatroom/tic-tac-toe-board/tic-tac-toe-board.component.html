@@ -19,7 +19,7 @@
     </button>
     }
   </div>
-  @if (statusText()) {
+  @if (statusText() && showStatus()) {
   <div class="tic-tac-toe__status" aria-live="polite">{{ statusText() }}</div>
   }
 </div>

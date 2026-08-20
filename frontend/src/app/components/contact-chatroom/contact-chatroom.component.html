@@ -109,7 +109,7 @@
           <div class="status-chip status-chip--me">
             <mat-icon>{{ mapStatus(msg.status) }}</mat-icon>
           </div>
-          <div class="bubble bubble--me">
+          <div class="bubble bubble--me" [style.padding-top.rem]="msg.payload?.game ? 2.5 : null">
             @if (!msg.payload) {
             <div class="message-warning">
               <mat-icon class="message-warning__icon">warning</mat-icon>
@@ -201,7 +201,7 @@
             @if (msg.payload.game; as game) {
             <app-tic-tac-toe-board [board]="game.board"
               [variant]="game.variant ?? 'standard'"
-              [disabled]="!canPlayTicTacToe(msg)" [statusText]="game.status === 'active' ? '' : getTicTacToeStatusText(game)"
+              [disabled]="!canPlayTicTacToe(msg)" [statusText]="getTicTacToeStatusText(game)" [showStatus]="false"
               (move)="playTicTacToeMove(msg, $event)"></app-tic-tac-toe-board>
             @if (game.status === 'active') {
             <div class="game-turn-box" role="status" aria-live="polite">
@@ -231,6 +231,44 @@
                 <span class="game-turn-box__status">{{ isCurrentUserTicTacToeTurn(game)
                   ? ('common.contact.chatroom.games.youPlayMark' | transloco:{ mark: getTicTacToePlayerMark(game) })
                   : ('common.contact.chatroom.games.isTurn' | transloco) }}</span>
+              </span>
+            </div>
+            } @else if (game.status === 'won') {
+            <div class="game-turn-box" role="status" aria-live="polite">
+              @if (isCurrentUserTicTacToeWinner(game)) {
+                @if (profile().avatarStickerId) {
+                <app-protected-sticker-image class="game-turn-box__avatar" [stickerId]="profile().avatarStickerId"
+                  [alt]="profile().name"></app-protected-sticker-image>
+                } @else if (profile().base64Avatar) {
+                <img class="game-turn-box__avatar" [src]="profile().base64Avatar" [alt]="profile().name" />
+                } @else {
+                <mat-icon class="game-turn-box__avatar-icon">person</mat-icon>
+                }
+              } @else {
+                @if (activeContact.avatarStickerId) {
+                <app-protected-sticker-image class="game-turn-box__avatar" [stickerId]="activeContact.avatarStickerId"
+                  [alt]="activeContact.name || ''"></app-protected-sticker-image>
+                } @else if (activeContact.base64Avatar) {
+                <img class="game-turn-box__avatar" [src]="activeContact.base64Avatar" [alt]="activeContact.name || ''" />
+                } @else {
+                <mat-icon class="game-turn-box__avatar-icon">person</mat-icon>
+                }
+              }
+              <span class="game-turn-box__text">
+                <span class="game-turn-box__name">{{ isCurrentUserTicTacToeWinner(game)
+                  ? ('common.contact.chatroom.games.iWon' | transloco)
+                  : (activeContact.name || ('common.contact.chatroom.contactLabel' | transloco)) }}</span>
+                <span class="game-turn-box__status">{{ isCurrentUserTicTacToeWinner(game)
+                  ? ('common.contact.chatroom.games.youPlayedMark' | transloco:{ mark: getTicTacToePlayerMark(game) })
+                  : ('common.contact.chatroom.games.hasWon' | transloco) }}</span>
+              </span>
+            </div>
+            } @else {
+            <div class="game-turn-box" role="status" aria-live="polite">
+              <mat-icon class="game-turn-box__avatar-icon game-result-box__draw-icon">handshake</mat-icon>
+              <span class="game-turn-box__text">
+                <span class="game-turn-box__name">{{ 'common.contact.chatroom.games.drawTitle' | transloco }}</span>
+                <span class="game-turn-box__status">{{ 'common.contact.chatroom.games.drawSubtitle' | transloco }}</span>
               </span>
             </div>
             }
@@ -344,7 +382,7 @@
           <div class="status-chip status-chip--them">
             <mat-icon>{{ mapStatus(msg.status) }}</mat-icon>
           </div>
-          <div class="bubble bubble--them">
+          <div class="bubble bubble--them" [style.padding-top.rem]="msg.payload?.game ? 2.5 : null">
             @if (!msg.payload) {
             <div class="message-warning">
               <mat-icon class="message-warning__icon">warning</mat-icon>
@@ -436,7 +474,7 @@
             @if (msg.payload.game; as game) {
             <app-tic-tac-toe-board [board]="game.board"
               [variant]="game.variant ?? 'standard'"
-              [disabled]="!canPlayTicTacToe(msg)" [statusText]="game.status === 'active' ? '' : getTicTacToeStatusText(game)"
+              [disabled]="!canPlayTicTacToe(msg)" [statusText]="getTicTacToeStatusText(game)" [showStatus]="false"
               (move)="playTicTacToeMove(msg, $event)"></app-tic-tac-toe-board>
             @if (game.status === 'active') {
             <div class="game-turn-box" role="status" aria-live="polite">
@@ -466,6 +504,44 @@
                 <span class="game-turn-box__status">{{ isCurrentUserTicTacToeTurn(game)
                   ? ('common.contact.chatroom.games.youPlayMark' | transloco:{ mark: getTicTacToePlayerMark(game) })
                   : ('common.contact.chatroom.games.isTurn' | transloco) }}</span>
+              </span>
+            </div>
+            } @else if (game.status === 'won') {
+            <div class="game-turn-box" role="status" aria-live="polite">
+              @if (isCurrentUserTicTacToeWinner(game)) {
+                @if (profile().avatarStickerId) {
+                <app-protected-sticker-image class="game-turn-box__avatar" [stickerId]="profile().avatarStickerId"
+                  [alt]="profile().name"></app-protected-sticker-image>
+                } @else if (profile().base64Avatar) {
+                <img class="game-turn-box__avatar" [src]="profile().base64Avatar" [alt]="profile().name" />
+                } @else {
+                <mat-icon class="game-turn-box__avatar-icon">person</mat-icon>
+                }
+              } @else {
+                @if (activeContact.avatarStickerId) {
+                <app-protected-sticker-image class="game-turn-box__avatar" [stickerId]="activeContact.avatarStickerId"
+                  [alt]="activeContact.name || ''"></app-protected-sticker-image>
+                } @else if (activeContact.base64Avatar) {
+                <img class="game-turn-box__avatar" [src]="activeContact.base64Avatar" [alt]="activeContact.name || ''" />
+                } @else {
+                <mat-icon class="game-turn-box__avatar-icon">person</mat-icon>
+                }
+              }
+              <span class="game-turn-box__text">
+                <span class="game-turn-box__name">{{ isCurrentUserTicTacToeWinner(game)
+                  ? ('common.contact.chatroom.games.iWon' | transloco)
+                  : (activeContact.name || ('common.contact.chatroom.contactLabel' | transloco)) }}</span>
+                <span class="game-turn-box__status">{{ isCurrentUserTicTacToeWinner(game)
+                  ? ('common.contact.chatroom.games.youPlayedMark' | transloco:{ mark: getTicTacToePlayerMark(game) })
+                  : ('common.contact.chatroom.games.hasWon' | transloco) }}</span>
+              </span>
+            </div>
+            } @else {
+            <div class="game-turn-box" role="status" aria-live="polite">
+              <mat-icon class="game-turn-box__avatar-icon game-result-box__draw-icon">handshake</mat-icon>
+              <span class="game-turn-box__text">
+                <span class="game-turn-box__name">{{ 'common.contact.chatroom.games.drawTitle' | transloco }}</span>
+                <span class="game-turn-box__status">{{ 'common.contact.chatroom.games.drawSubtitle' | transloco }}</span>
               </span>
             </div>
             }

@@ -159,6 +159,11 @@ app-contact-chatroom .game-turn-box__avatar-icon {
   font-size: 2rem;
 }
 
+app-contact-chatroom .game-result-box__draw-icon {
+  color: var(--mat-sys-on-primary-container, var(--mat-app-text-color));
+  background: var(--mat-sys-primary-container, var(--mat-card-filled-container-color));
+}
+
 app-contact-chatroom .game-turn-box__name {
   overflow: hidden;
   font-size: 1rem;
