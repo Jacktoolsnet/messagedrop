@@ -1135,6 +1135,7 @@ export class AppComponent implements OnInit {
     this.contactNotificationLoginRequested = false;
     const contactId = typeof action.id === 'string' ? action.id.trim() : '';
     const contactUserId = typeof action.contactUserId === 'string' ? action.contactUserId.trim() : '';
+    const messageId = typeof action.messageId === 'string' ? action.messageId.trim() : '';
     if (!contactId && !contactUserId) {
       this.pendingContactNotificationAction.set(null);
       await this.openContactListDialog();
@@ -1154,7 +1155,8 @@ export class AppComponent implements OnInit {
       this.pendingContactNotificationAction.set(null);
       await this.openContactListDialog({
         autoOpenContactId: contactId || undefined,
-        autoOpenContactUserId: contactUserId || undefined
+        autoOpenContactUserId: contactUserId || undefined,
+        autoOpenMessageId: messageId || undefined
       });
     } finally {
       this.openingContactNotification = false;
@@ -1306,7 +1308,12 @@ export class AppComponent implements OnInit {
     try {
       const url = new URL(window.location.href);
       const contactId = url.searchParams.get('contactNotification')?.trim() ?? '';
-      return contactId ? { type: 'contact', id: contactId } : null;
+      const messageId = url.searchParams.get('contactMessage')?.trim() ?? '';
+      return contactId ? {
+        type: 'contact',
+        id: contactId,
+        messageId: messageId || undefined
+      } : null;
     } catch {
       return null;
     }
@@ -1323,6 +1330,7 @@ export class AppComponent implements OnInit {
         return;
       }
       url.searchParams.delete('contactNotification');
+      url.searchParams.delete('contactMessage');
       const nextUrl = `${url.pathname}${url.search}${url.hash}`;
       window.history.replaceState(this.myHistory, '', nextUrl || '/');
     } catch {
@@ -2650,7 +2658,11 @@ export class AppComponent implements OnInit {
     });
   }
 
-  public async openContactListDialog(options: { autoOpenContactId?: string; autoOpenContactUserId?: string } = {}): Promise<void> {
+  public async openContactListDialog(options: {
+    autoOpenContactId?: string;
+    autoOpenContactUserId?: string;
+    autoOpenMessageId?: string;
+  } = {}): Promise<void> {
     if (!await this.ensureUserMenuActionAllowed()) {
       return;
     }
@@ -2669,7 +2681,8 @@ export class AppComponent implements OnInit {
       closeOnNavigation: true,
       data: {
         autoOpenContactId: options.autoOpenContactId,
-        autoOpenContactUserId: options.autoOpenContactUserId
+        autoOpenContactUserId: options.autoOpenContactUserId,
+        autoOpenMessageId: options.autoOpenMessageId
       },
       minWidth: 'min(360px, 95vw)',
       maxWidth: '95vw',

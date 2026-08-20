@@ -91,8 +91,11 @@ const placeSubscriptions = function (logger, db, lat, lon, userId, messageText, 
     }
 }
 
-const contactSubscriptions = function (logger, db, userId, contactUserId, message) {
+const contactSubscriptions = function (logger, db, userId, contactUserId, message, messageId) {
     try {
+        const normalizedMessageId = typeof messageId === 'string' && messageId.trim() !== ''
+            ? messageId.trim()
+            : null;
         let sql = `
         SELECT tableContact.id, tableContact.userId, tableContact.contactUserId, tableContact.subscribed, tableContact.name, tableUser.subscription
         FROM tableContact
@@ -132,12 +135,13 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
                                     "target": {
                                         "type": "contact",
                                         "id": row.id,
-                                        "contactUserId": row.contactUserId
+                                        "contactUserId": row.contactUserId,
+                                        ...(normalizedMessageId ? { "messageId": normalizedMessageId } : {})
                                     },
                                     "onActionClick": {
                                         "default": {
                                             "operation": "focusLastFocusedOrOpen",
-                                            "url": `/?contactNotification=${encodeURIComponent(row.id)}`,
+                                            "url": `/?contactNotification=${encodeURIComponent(row.id)}${normalizedMessageId ? `&contactMessage=${encodeURIComponent(normalizedMessageId)}` : ''}`,
                                         }
                                     },
                                 }

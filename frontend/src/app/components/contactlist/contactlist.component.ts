@@ -42,6 +42,7 @@ interface ConnectDialogResult {
 interface ContactlistDialogData {
   autoOpenContactId?: string;
   autoOpenContactUserId?: string;
+  autoOpenMessageId?: string;
 }
 
 interface ContactMessagePreview {
@@ -116,6 +117,7 @@ export class ContactlistComponent {
       }
       const autoOpenContactId = this.dialogData?.autoOpenContactId?.trim() ?? '';
       const autoOpenContactUserId = this.dialogData?.autoOpenContactUserId?.trim() ?? '';
+      const autoOpenMessageId = this.dialogData?.autoOpenMessageId?.trim() ?? '';
       if (!autoOpenContactId && !autoOpenContactUserId) {
         this.autoOpenHandled = true;
         return;
@@ -128,7 +130,7 @@ export class ContactlistComponent {
         return;
       }
       this.autoOpenHandled = true;
-      queueMicrotask(() => this.openContactChatroom(contact));
+      queueMicrotask(() => this.openContactChatroom(contact, autoOpenMessageId || undefined));
     });
 
     effect(() => {

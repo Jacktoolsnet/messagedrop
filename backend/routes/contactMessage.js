@@ -166,7 +166,8 @@ router.post('/send',
                 req.database.db,
                 userId,
                 contactUserId,
-                CONTACT_PUSH_BODY
+                CONTACT_PUSH_BODY,
+                sharedMessageId
               );
             });
           } else if (lookupErr) {

@@ -37,6 +37,7 @@ function normalizeNotificationTarget(value: unknown): NotificationAction | undef
         type?: unknown;
         id?: unknown;
         contactUserId?: unknown;
+        messageId?: unknown;
         placeId?: unknown;
         location?: unknown;
     };
@@ -50,6 +51,7 @@ function normalizeNotificationTarget(value: unknown): NotificationAction | undef
         type: target.type.trim(),
         id,
         contactUserId: normalizeId(target.contactUserId),
+        messageId: normalizeId(target.messageId),
         placeId,
         location
     };
