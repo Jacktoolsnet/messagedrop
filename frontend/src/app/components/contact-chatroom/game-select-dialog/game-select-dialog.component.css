@@ -4,7 +4,7 @@
 }
 
 .game-select-content {
-  padding-top: 1rem;
+  padding-top: 2rem;
   padding-bottom: 1rem;
 }
 
@@ -12,14 +12,18 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(12rem, 100%), 1fr));
   gap: 0.75rem;
+  min-width: 0;
 }
 
 .game-tile {
+  position: relative;
   display: grid;
   gap: 1rem;
   width: 100%;
+  min-width: 0;
   min-height: 17rem;
-  padding: 1rem;
+  box-sizing: border-box;
+  padding: 2.5rem 1rem 1rem;
   border-radius: 1rem;
   border: 1px solid color-mix(in srgb, var(--mat-sys-primary) 30%, var(--mat-card-outlined-outline-color));
   background:
@@ -30,6 +34,11 @@
 }
 
 .game-avatar-box {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate(-0.65rem, -40%);
+  z-index: 2;
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -40,6 +49,13 @@
   background: var(--mat-card-filled-container-color);
   border: 1px solid color-mix(in srgb, var(--mat-sys-primary) 32%, var(--mat-card-outlined-outline-color));
   box-shadow: 0 5px 14px color-mix(in srgb, black 14%, transparent);
+}
+
+@media (max-width: 600px) {
+  .game-avatar-box {
+    transform: translate(-0.5rem, -35%);
+    max-width: 85%;
+  }
 }
 
 .game-avatar-box__avatar {
