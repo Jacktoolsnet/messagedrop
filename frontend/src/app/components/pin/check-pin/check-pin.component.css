@@ -25,14 +25,28 @@
     width: 100%;
 }
 
-.remember-device {
-    align-self: stretch;
-    margin: -0.25rem 0 0;
+.remember-device-tile {
+    width: 100%;
+    margin-top: auto;
+    border-radius: 0.75rem;
+    color: var(--mat-card-subtitle-text-color);
+    background-color: var(--mat-card-filled-container-color);
+    box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+}
+
+.remember-device-tile mat-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 1rem;
+}
+
+.remember-device-tile mat-slide-toggle {
+    width: fit-content;
 }
 
 .remember-device-hint {
-    width: 100%;
-    margin: 0 0 1rem;
+    margin: 0;
     color: var(--mat-card-subtitle-text-color, var(--mat-app-text-color));
     font-size: 0.78rem;
     line-height: 1.3;

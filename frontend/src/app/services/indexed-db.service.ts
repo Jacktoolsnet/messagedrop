@@ -445,9 +445,10 @@ export class IndexedDbService {
 
     return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(this.rememberedLoginStore, 'readwrite');
-      const request = tx.objectStore(this.rememberedLoginStore).put(record, 'current');
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
+      tx.objectStore(this.rememberedLoginStore).put(record, 'current');
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+      tx.onabort = () => reject(tx.error);
     });
   }
 
@@ -458,10 +459,11 @@ export class IndexedDbService {
       const request = tx.objectStore(this.rememberedLoginStore).get('current');
       request.onsuccess = () => {
         const record = request.result as Partial<RememberedLoginRecord> | undefined;
+        const key = record?.key as CryptoKey | undefined;
         if (record?.version !== 1 || typeof record.userId !== 'string'
-          || typeof CryptoKey === 'undefined' || !(record.key instanceof CryptoKey)
-          || record.key.extractable || record.key.type !== 'secret'
-          || record.key.algorithm.name !== 'AES-GCM' || !record.key.usages.includes('decrypt')
+          || !key || typeof key !== 'object'
+          || key.extractable || key.type !== 'secret'
+          || key.algorithm?.name !== 'AES-GCM' || !Array.from(key.usages ?? []).includes('decrypt')
           || !Number.isFinite(record.expiresAt)) {
           resolve(undefined);
           return;
@@ -476,9 +478,10 @@ export class IndexedDbService {
     const db = await this.openDB();
     return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(this.rememberedLoginStore, 'readwrite');
-      const request = tx.objectStore(this.rememberedLoginStore).delete('current');
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
+      tx.objectStore(this.rememberedLoginStore).delete('current');
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+      tx.onabort = () => reject(tx.error);
     });
   }
 

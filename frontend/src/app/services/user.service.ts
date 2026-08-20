@@ -2345,13 +2345,22 @@ export class UserService {
     });
   }
 
-  public openCheckPinDialog(callback?: () => void, options?: { requireJwt?: boolean; attemptBackend?: boolean }): void {
+  public async openCheckPinDialog(callback?: () => void, options?: { requireJwt?: boolean; attemptBackend?: boolean }): Promise<void> {
     this.lastPinCallback = callback;
     this.lastPinOptions = options;
+    let rememberDevice = false;
+    try {
+      const remembered = await this.indexedDbService.getRememberedLogin();
+      rememberDevice = !!remembered
+        && remembered.userId === this.user.id
+        && remembered.expiresAt > Date.now();
+    } catch {
+      // The PIN login remains available even if the device preference cannot be read.
+    }
     const dialogRef = this.checkPinDialog.open(CheckPinComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: { allowRememberDevice: true },
+      data: { allowRememberDevice: true, rememberDevice },
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
       disableClose: false,
