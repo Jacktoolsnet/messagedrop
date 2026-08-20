@@ -18,6 +18,7 @@ import { AppSettingsComponent } from './components/app-settings/app-settings.com
 import { UsageProtectionComponent } from './components/app-settings/usage-protection/usage-protection.component';
 import { ContactlistComponent } from './components/contactlist/contactlist.component';
 import { LocationShareContactSelectComponent } from './components/contact/location-share-contact-select/location-share-contact-select.component';
+import { ContactEditMessageComponent } from './components/contact/contact-edit-message/contact-edit-message.component';
 import { DocumentlistComponent } from './components/documentlist/documentlist.component';
 import { EditMessageComponent } from './components/editmessage/edit-message.component';
 import { EditSecretDropComponent } from './components/edit-secret-drop/edit-secret-drop.component';
@@ -1657,7 +1658,29 @@ export class AppComponent implements OnInit {
       return;
     }
 
-    const result = await this.contactLocationShare.shareLocationWithContacts(location, selectedContacts as Contact[]);
+    const contacts = selectedContacts as Contact[];
+    const composeResult = await firstValueFrom(this.dialog.open(ContactEditMessageComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: {
+        mode: Mode.ADD_SHORT_MESSAGE,
+        contact: contacts[0],
+        shortMessage: this.contactLocationShare.createLocationMessage(location)
+      },
+      minWidth: '20vw',
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    }).afterClosed());
+
+    if (!composeResult?.shortMessage) {
+      return;
+    }
+
+    const result = await this.contactLocationShare.shareMessageWithContacts(composeResult.shortMessage, contacts);
     const messageKey = result.failed === 0
       ? 'common.share.locationContactShareSuccess'
       : result.sent > 0

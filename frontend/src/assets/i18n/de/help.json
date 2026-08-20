@@ -3013,7 +3013,7 @@
   },
   "locationShareContacts": {
     "title": "Ort mit Kontakten teilen",
-    "intro": "Wähle einen oder mehrere Kontakte aus. Der Ort wird als Nachricht im Chat geteilt.",
+    "intro": "Wähle einen oder mehrere Kontakte aus. Anschließend kannst du die Ortsnachricht bearbeiten und Text ergänzen.",
     "items": {
       "selection": {
         "title": "Kontakte auswählen",
@@ -3028,8 +3028,8 @@
         "desc": "Öffnet diese Hilfe zur Kontaktauswahl."
       },
       "apply": {
-        "title": "Teilen",
-        "desc": "Sendet den Ort als Chat-Nachricht an die ausgewählten Kontakte."
+        "title": "Weiter",
+        "desc": "Öffnet den Nachrichten-Editor für den ausgewählten Ort und die ausgewählten Kontakte."
       },
       "privacy": {
         "title": "Privatsphäre",

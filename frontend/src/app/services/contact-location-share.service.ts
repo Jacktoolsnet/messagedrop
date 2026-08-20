@@ -18,12 +18,16 @@ export class ContactLocationShareService {
   private readonly socketioService = inject(SocketioService);
 
   async shareLocationWithContacts(location: Location, contacts: Contact[]): Promise<ContactLocationShareResult> {
+    return this.shareMessageWithContacts(this.createLocationMessage(location), contacts);
+  }
+
+  async shareMessageWithContacts(message: ShortMessage, contacts: Contact[]): Promise<ContactLocationShareResult> {
     let sent = 0;
     let failed = 0;
 
     for (const contact of contacts) {
       try {
-        await this.sendLocationMessage(contact, location);
+        await this.sendMessage(contact, message);
         sent += 1;
       } catch (error) {
         console.error('Failed to share location with contact', contact.id, error);
@@ -34,14 +38,13 @@ export class ContactLocationShareService {
     return { sent, failed };
   }
 
-  private async sendLocationMessage(contact: Contact, location: Location): Promise<void> {
+  private async sendMessage(contact: Contact, payload: ShortMessage): Promise<void> {
     if ((contact.status || 'active') !== 'active') {
       throw new Error('contact_inactive');
     }
 
     this.socketioService.initSocket();
 
-    const payload = this.createLocationMessage(location);
     const { encryptedMessageForUser, encryptedMessageForContact, signature } =
       await this.contactMessageService.encryptMessageForContact(contact, payload);
 
@@ -68,7 +71,7 @@ export class ContactLocationShareService {
     });
   }
 
-  private createLocationMessage(location: Location): ShortMessage {
+  createLocationMessage(location: Location): ShortMessage {
     return {
       message: '',
       style: '',

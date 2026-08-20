@@ -3013,7 +3013,7 @@
   },
   "locationShareContacts": {
     "title": "Share location with contacts",
-    "intro": "Select one or more contacts. The location will be shared as a chat message.",
+    "intro": "Select one or more contacts. You can then edit the place message and add text.",
     "items": {
       "selection": {
         "title": "Select contacts",
@@ -3028,8 +3028,8 @@
         "desc": "Opens this help for contact selection."
       },
       "apply": {
-        "title": "Share",
-        "desc": "Sends the location as a chat message to the selected contacts."
+        "title": "Continue",
+        "desc": "Opens the message editor for the selected place and contacts."
       },
       "privacy": {
         "title": "Privacy",

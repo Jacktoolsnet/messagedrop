@@ -2995,7 +2995,7 @@
   },
   "locationShareContacts": {
     "title": "Partager le lieu avec des contacts",
-    "intro": "Sélectionnez un ou plusieurs contacts. Le lieu sera partagé comme message dans le chat.",
+    "intro": "Sélectionnez un ou plusieurs contacts. Vous pourrez ensuite modifier le message du lieu et ajouter du texte.",
     "items": {
       "selection": {
         "title": "Sélectionner des contacts",
@@ -3010,8 +3010,8 @@
         "desc": "Ouvre cette aide pour la sélection des contacts."
       },
       "apply": {
-        "title": "Partager",
-        "desc": "Envoie le lieu comme message de chat aux contacts sélectionnés."
+        "title": "Continuer",
+        "desc": "Ouvre l’éditeur de message pour le lieu et les contacts sélectionnés."
       },
       "privacy": {
         "title": "Confidentialité",

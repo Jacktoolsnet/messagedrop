@@ -2995,7 +2995,7 @@
   },
   "locationShareContacts": {
     "title": "Compartir ubicación con contactos",
-    "intro": "Selecciona uno o varios contactos. La ubicación se compartirá como mensaje en el chat.",
+    "intro": "Selecciona uno o varios contactos. Después podrás editar el mensaje del lugar y añadir texto.",
     "items": {
       "selection": {
         "title": "Seleccionar contactos",
@@ -3010,8 +3010,8 @@
         "desc": "Abre esta ayuda para la selección de contactos."
       },
       "apply": {
-        "title": "Compartir",
-        "desc": "Envía la ubicación como mensaje de chat a los contactos seleccionados."
+        "title": "Continuar",
+        "desc": "Abre el editor de mensajes para el lugar y los contactos seleccionados."
       },
       "privacy": {
         "title": "Privacidad",
