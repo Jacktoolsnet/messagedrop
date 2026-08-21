@@ -13,6 +13,10 @@
         [attr.aria-label]="(isVisible($index) ? 'common.contact.chatroom.games.memoryCardVisibleAria' : 'common.contact.chatroom.games.memoryCardHiddenAria') | transloco:{ card: $index + 1 }">
         <span class="memory-card__front"><mat-icon>{{ symbol }}</mat-icon></span>
         <span class="memory-card__back"><mat-icon>question_mark</mat-icon></span>
+        @if (owner($index); as mark) {
+          <span class="memory-card__owner" [class.memory-card__owner--x]="mark === 'X'"
+            [class.memory-card__owner--o]="mark === 'O'" aria-hidden="true">{{ mark }}</span>
+        }
       </button>
     }
   </div>
