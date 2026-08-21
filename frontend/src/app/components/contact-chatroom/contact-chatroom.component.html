@@ -379,7 +379,7 @@
               @if (canShowGameRematch(actionGame)) {
               <button mat-mini-fab color="primary"
                 [attr.aria-label]="'common.contact.chatroom.games.rematchAria' | transloco"
-                (click)="startGameRematch(actionGame)">
+                (click)="startGameRematch(actionGame, msg)">
                 <mat-icon>{{ actionGame.type === 'minefieldHideSeek' ? 'refresh' : 'replay' }}</mat-icon>
               </button>
               }
@@ -696,7 +696,7 @@
               @if (canShowGameRematch(actionGame)) {
               <button mat-mini-fab color="primary"
                 [attr.aria-label]="'common.contact.chatroom.games.rematchAria' | transloco"
-                (click)="startGameRematch(actionGame)">
+                (click)="startGameRematch(actionGame, msg)">
                 <mat-icon>{{ actionGame.type === 'minefieldHideSeek' ? 'refresh' : 'replay' }}</mat-icon>
               </button>
               }
