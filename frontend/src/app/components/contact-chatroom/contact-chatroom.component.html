@@ -205,12 +205,16 @@
               [moves]="game.moves ?? []"
               [disabled]="!canPlayTicTacToe(msg)" [statusText]="getTicTacToeStatusText(game)" [showStatus]="false"
               (move)="playTicTacToeMove(msg, $event)"></app-tic-tac-toe-board>
-            } @else {
+            } @else if (game.type === 'connectFour') {
             <app-connect-four-board [board]="game.board" [variant]="game.variant ?? 'standard'"
               [moves]="game.moves ?? []" [playerMark]="getCurrentUserGamePieceLabel(game)"
               [disabled]="!canPlayConnectFour(msg)"
               [statusText]="getConnectFourStatusText(game)" [showStatus]="false"
               (move)="playConnectFourMove(msg, $event)"></app-connect-four-board>
+            } @else {
+            <app-dots-and-boxes-board [game]="game" [disabled]="!canPlayDotsAndBoxes(msg)"
+              [statusText]="getDotsAndBoxesStatusText(game)" [showStatus]="false"
+              (move)="playDotsAndBoxesMove(msg, $event)"></app-dots-and-boxes-board>
             }
             @if (game.status === 'active') {
             <div class="game-turn-box" role="status" aria-live="polite">
@@ -487,12 +491,16 @@
               [moves]="game.moves ?? []"
               [disabled]="!canPlayTicTacToe(msg)" [statusText]="getTicTacToeStatusText(game)" [showStatus]="false"
               (move)="playTicTacToeMove(msg, $event)"></app-tic-tac-toe-board>
-            } @else {
+            } @else if (game.type === 'connectFour') {
             <app-connect-four-board [board]="game.board" [variant]="game.variant ?? 'standard'"
               [moves]="game.moves ?? []" [playerMark]="getCurrentUserGamePieceLabel(game)"
               [disabled]="!canPlayConnectFour(msg)"
               [statusText]="getConnectFourStatusText(game)" [showStatus]="false"
               (move)="playConnectFourMove(msg, $event)"></app-connect-four-board>
+            } @else {
+            <app-dots-and-boxes-board [game]="game" [disabled]="!canPlayDotsAndBoxes(msg)"
+              [statusText]="getDotsAndBoxesStatusText(game)" [showStatus]="false"
+              (move)="playDotsAndBoxesMove(msg, $event)"></app-dots-and-boxes-board>
             }
             @if (game.status === 'active') {
             <div class="game-turn-box" role="status" aria-live="polite">

@@ -1,0 +1,49 @@
+<div class="dots-and-boxes">
+  <div class="dots-and-boxes__score" aria-live="polite">
+    <span class="dots-and-boxes__score-mark dots-and-boxes__score-mark--x">X</span>
+    <strong>{{ xScore() }}</strong>
+    <span class="dots-and-boxes__score-separator">:</span>
+    <strong>{{ oScore() }}</strong>
+    <span class="dots-and-boxes__score-mark dots-and-boxes__score-mark--o">O</span>
+  </div>
+
+  <div class="dots-and-boxes__grid" role="grid" [attr.aria-label]="statusText()">
+    @for (row of rows; track row) {
+      @for (column of columns; track column) {
+        <span class="dots-and-boxes__dot" aria-hidden="true"></span>
+        @if (column < columns.length - 1) {
+          @let edgeIndex = horizontalEdgeIndex(row, column);
+          <button type="button" class="dots-and-boxes__edge dots-and-boxes__edge--horizontal"
+            [class.dots-and-boxes__edge--selected]="isEdgeSelected('horizontal', edgeIndex)"
+            [disabled]="disabled() || isEdgeSelected('horizontal', edgeIndex)"
+            [attr.aria-label]="getEdgeAriaLabel('horizontal', edgeIndex)"
+            (pointerenter)="previewEdge('horizontal', edgeIndex, $event)"
+            (click)="selectEdge('horizontal', edgeIndex)"></button>
+        }
+      }
+      @if (row < rows.length - 1) {
+        @for (column of columns; track column) {
+          @let edgeIndex = verticalEdgeIndex(row, column);
+          <button type="button" class="dots-and-boxes__edge dots-and-boxes__edge--vertical"
+            [class.dots-and-boxes__edge--selected]="isEdgeSelected('vertical', edgeIndex)"
+            [disabled]="disabled() || isEdgeSelected('vertical', edgeIndex)"
+            [attr.aria-label]="getEdgeAriaLabel('vertical', edgeIndex)"
+            (pointerenter)="previewEdge('vertical', edgeIndex, $event)"
+            (click)="selectEdge('vertical', edgeIndex)"></button>
+          @if (column < columns.length - 1) {
+            @let currentBoxIndex = boxIndex(row, column);
+            <span class="dots-and-boxes__box"
+              [class.dots-and-boxes__box--x]="game().boxes[currentBoxIndex] === 'X'"
+              [class.dots-and-boxes__box--o]="game().boxes[currentBoxIndex] === 'O'">
+              {{ game().boxes[currentBoxIndex] || '' }}
+            </span>
+          }
+        }
+      }
+    }
+  </div>
+
+  @if (statusText() && showStatus()) {
+    <div class="dots-and-boxes__status" aria-live="polite">{{ statusText() }}</div>
+  }
+</div>

@@ -50,7 +50,29 @@ export interface ConnectFourGame {
   moves?: ConnectFourMove[];
 }
 
-export type ChatGame = TicTacToeGame | ConnectFourGame;
+export type DotsAndBoxesEdgeOrientation = 'horizontal' | 'vertical';
+
+export interface DotsAndBoxesMove {
+  orientation: DotsAndBoxesEdgeOrientation;
+  index: number;
+}
+
+export interface DotsAndBoxesGame {
+  type: 'dotsAndBoxes';
+  version: 1;
+  gameId: string;
+  horizontalEdges: boolean[];
+  verticalEdges: boolean[];
+  boxes: TicTacToeCell[];
+  playerXUserId: string;
+  playerOUserId: string;
+  nextPlayerUserId: string | null;
+  status: TicTacToeStatus;
+  winnerUserId: string | null;
+  moveNumber: number;
+}
+
+export type ChatGame = TicTacToeGame | ConnectFourGame | DotsAndBoxesGame;
 
 export interface GameStats {
   played: number;

@@ -721,7 +721,8 @@ export class ContactlistComponent {
 
   getPreviewIcon(preview: ContactMessagePreview): string {
     if (preview.kind === 'game') {
-      return preview.payload?.game?.type === 'connectFour' ? 'view_column' : 'grid_3x3';
+      const gameType = preview.payload?.game?.type;
+      return gameType === 'connectFour' ? 'view_column' : gameType === 'dotsAndBoxes' ? 'border_outer' : 'grid_3x3';
     }
     if (preview.kind === 'location') {
       return 'location_on';
@@ -777,7 +778,9 @@ export class ContactlistComponent {
       const currentUserId = this.userService.getUser().id;
       const prefixKey = payload.game.type === 'connectFour'
         ? 'common.contact.chatroom.games.connectFourPreviewPrefix'
-        : 'common.contact.chatroom.games.ticTacToePreviewPrefix';
+        : payload.game.type === 'dotsAndBoxes'
+          ? 'common.contact.chatroom.games.dotsAndBoxesPreviewPrefix'
+          : 'common.contact.chatroom.games.ticTacToePreviewPrefix';
       const prefix = this.translation.t(prefixKey);
       if (payload.game.status === 'draw') {
         return `${prefix}: ${this.translation.t('common.contact.chatroom.games.previewDrawState')}`;

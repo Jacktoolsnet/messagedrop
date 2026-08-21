@@ -7,13 +7,14 @@ import { ConnectFourVariant, GameStats, TicTacToeStats, TicTacToeVariant } from 
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
 import { GameRulesDialogComponent } from '../game-rules-dialog/game-rules-dialog.component';
 
-export type ChatGameType = 'ticTacToe' | 'ticTacToeVanishing' | 'connectFour' | 'connectFourVanishing';
+export type ChatGameType = 'ticTacToe' | 'ticTacToeVanishing' | 'connectFour' | 'connectFourVanishing' | 'dotsAndBoxes';
 
 interface GameSelectDialogData {
   ticTacToeStats: TicTacToeStats;
   vanishingTicTacToeStats: TicTacToeStats;
   connectFourStats: GameStats;
   vanishingConnectFourStats: GameStats;
+  dotsAndBoxesStats: GameStats;
 }
 
 @Component({
@@ -53,6 +54,19 @@ export class GameSelectDialogComponent {
   openConnectFourRules(variant: ConnectFourVariant): void {
     this.dialog.open(GameRulesDialogComponent, {
       data: { gameType: 'connectFour', variant },
+      width: 'min(440px, 94vw)',
+      maxWidth: '94vw',
+      maxHeight: '85vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+  }
+
+  openDotsAndBoxesRules(): void {
+    this.dialog.open(GameRulesDialogComponent, {
+      data: { gameType: 'dotsAndBoxes', variant: 'standard' },
       width: 'min(440px, 94vw)',
       maxWidth: '94vw',
       maxHeight: '85vh',

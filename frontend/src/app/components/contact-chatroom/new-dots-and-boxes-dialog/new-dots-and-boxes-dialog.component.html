@@ -1,0 +1,19 @@
+<app-dialog-header icon="border_outer"
+  [title]="'common.contact.chatroom.games.newDotsAndBoxesTitle' | transloco"></app-dialog-header>
+
+<mat-dialog-content class="new-game-content">
+  <app-dots-and-boxes-board [game]="game()" [disabled]="false"
+    [statusText]="'common.contact.chatroom.games.chooseFirstDotsAndBoxesMove' | transloco"
+    (move)="selectMove($event)"></app-dots-and-boxes-board>
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-icon-button class="action-close" type="button" (click)="close()"
+    [attr.aria-label]="'common.actions.close' | transloco">
+    <mat-icon>close</mat-icon>
+  </button>
+  <button mat-icon-button color="primary" type="button" (click)="send()" [disabled]="selectedMove() === null"
+    [attr.aria-label]="'common.contact.chatroom.games.sendGameAria' | transloco">
+    <mat-icon>send</mat-icon>
+  </button>
+</mat-dialog-actions>

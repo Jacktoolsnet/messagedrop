@@ -1,0 +1,147 @@
+:host {
+  display: block;
+  width: min(18rem, calc(100vw - 8rem));
+  max-width: 100%;
+  min-width: min(14rem, calc(100vw - 8rem));
+  margin: 0 auto 1.25rem;
+  --dots-primary: var(--mat-sys-primary, var(--mat-primary-color, #3f51b5));
+  --dots-surface: var(--mat-sys-surface-container-high, var(--mat-card-filled-container-color, #fff));
+  --dots-cell: color-mix(in srgb, var(--dots-primary) 18%, var(--dots-surface));
+}
+
+.dots-and-boxes {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.dots-and-boxes__score {
+  justify-self: center;
+  display: inline-grid;
+  grid-template-columns: auto auto auto auto auto;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.35rem 0.8rem;
+  border: 1px solid color-mix(in srgb, var(--dots-primary) 48%, var(--mat-sys-outline-variant));
+  border-radius: 999px;
+  background: var(--mat-sys-surface-container-highest, var(--mat-card-filled-container-color));
+  color: var(--mat-sys-on-surface, var(--mat-app-text-color));
+}
+
+.dots-and-boxes__score-mark {
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.dots-and-boxes__score-mark--x {
+  color: var(--dots-primary);
+}
+
+.dots-and-boxes__score-mark--o {
+  color: var(--mat-sys-tertiary, var(--mat-sys-secondary, var(--mat-app-text-color)));
+}
+
+.dots-and-boxes__score-separator {
+  color: var(--mat-card-subtitle-text-color);
+}
+
+.dots-and-boxes__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 0.7rem minmax(0, 1fr)) 0.7rem;
+  grid-template-rows: repeat(3, 0.7rem minmax(0, 1fr)) 0.7rem;
+  width: 100%;
+  aspect-ratio: 1;
+  box-sizing: border-box;
+  padding: 0.55rem;
+  border: 1px solid color-mix(in srgb, var(--dots-primary) 60%, var(--mat-sys-outline-variant));
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--dots-primary) 38%, var(--dots-surface));
+  box-shadow: inset 0 1px 5px color-mix(in srgb, black 12%, transparent);
+}
+
+.dots-and-boxes__dot {
+  position: relative;
+  z-index: 2;
+  align-self: center;
+  justify-self: center;
+  width: 0.62rem;
+  height: 0.62rem;
+  border-radius: 50%;
+  background: var(--mat-sys-on-surface, var(--mat-app-text-color));
+  box-shadow: 0 1px 3px color-mix(in srgb, black 28%, transparent);
+}
+
+.dots-and-boxes__edge {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.dots-and-boxes__edge::after {
+  content: '';
+  position: absolute;
+  inset: 50% auto auto 50%;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--mat-sys-outline, var(--mat-app-text-color)) 25%, transparent);
+  transform: translate(-50%, -50%);
+  transition: background-color 140ms ease, box-shadow 140ms ease, width 140ms ease;
+}
+
+.dots-and-boxes__edge--horizontal::after {
+  width: calc(100% + 0.18rem);
+  height: 0.24rem;
+}
+
+.dots-and-boxes__edge--vertical::after {
+  width: 0.24rem;
+  height: calc(100% + 0.18rem);
+}
+
+.dots-and-boxes__edge:not(:disabled):hover::after,
+.dots-and-boxes__edge:not(:disabled):focus-visible::after {
+  background: var(--mat-sys-primary-container, var(--dots-primary));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--dots-primary) 38%, transparent);
+}
+
+.dots-and-boxes__edge:focus-visible {
+  outline: none;
+}
+
+.dots-and-boxes__edge--selected::after {
+  background: var(--dots-primary);
+  box-shadow: 0 1px 3px color-mix(in srgb, black 22%, transparent);
+}
+
+.dots-and-boxes__edge:disabled {
+  cursor: default;
+}
+
+.dots-and-boxes__box {
+  display: grid;
+  place-items: center;
+  margin: 0.16rem;
+  border-radius: 0.65rem;
+  background: var(--dots-cell);
+  color: var(--mat-sys-on-surface, var(--mat-app-text-color));
+  font: 800 clamp(1.15rem, 5vw, 2rem) / 1 sans-serif;
+}
+
+.dots-and-boxes__box--x {
+  background: var(--mat-sys-primary-container, color-mix(in srgb, var(--dots-primary) 38%, var(--dots-surface)));
+  color: var(--mat-sys-on-primary-container, var(--dots-primary));
+}
+
+.dots-and-boxes__box--o {
+  background: var(--mat-sys-tertiary-container, var(--dots-cell));
+  color: var(--mat-sys-on-tertiary-container, var(--mat-sys-tertiary, var(--mat-app-text-color)));
+}
+
+.dots-and-boxes__status {
+  text-align: center;
+  font-weight: 600;
+  color: var(--mat-sys-on-surface, var(--mat-app-text-color));
+}

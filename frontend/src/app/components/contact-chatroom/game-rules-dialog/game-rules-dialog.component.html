@@ -1,9 +1,15 @@
-<app-dialog-header [icon]="data.gameType === 'connectFour' ? 'view_column' : 'grid_3x3'"
-  [title]="(data.gameType === 'connectFour' ? (data.variant === 'vanishing' ? 'common.contact.chatroom.games.vanishingConnectFourRulesTitle' : 'common.contact.chatroom.games.connectFourRulesTitle') : data.variant === 'vanishing' ? 'common.contact.chatroom.games.vanishingRulesTitle' : 'common.contact.chatroom.games.rulesTitle') | transloco"></app-dialog-header>
+<app-dialog-header [icon]="data.gameType === 'connectFour' ? 'view_column' : data.gameType === 'dotsAndBoxes' ? 'border_outer' : 'grid_3x3'"
+  [title]="(data.gameType === 'dotsAndBoxes' ? 'common.contact.chatroom.games.dotsAndBoxesRulesTitle' : data.gameType === 'connectFour' ? (data.variant === 'vanishing' ? 'common.contact.chatroom.games.vanishingConnectFourRulesTitle' : 'common.contact.chatroom.games.connectFourRulesTitle') : data.variant === 'vanishing' ? 'common.contact.chatroom.games.vanishingRulesTitle' : 'common.contact.chatroom.games.rulesTitle') | transloco"></app-dialog-header>
 
 <mat-dialog-content class="rules-content">
   <ol class="rules-list">
-    @if (data.gameType === 'connectFour') {
+    @if (data.gameType === 'dotsAndBoxes') {
+    <li>{{ 'common.contact.chatroom.games.dotsAndBoxesRuleFirstMove' | transloco }}</li>
+    <li>{{ 'common.contact.chatroom.games.dotsAndBoxesRuleClaim' | transloco }}</li>
+    <li>{{ 'common.contact.chatroom.games.dotsAndBoxesRuleExtraMove' | transloco }}</li>
+    <li>{{ 'common.contact.chatroom.games.dotsAndBoxesRuleWin' | transloco }}</li>
+    <li>{{ 'common.contact.chatroom.games.ruleFinished' | transloco }}</li>
+    } @else if (data.gameType === 'connectFour') {
     <li>{{ 'common.contact.chatroom.games.connectFourRuleFirstMove' | transloco }}</li>
     <li>{{ 'common.contact.chatroom.games.connectFourRuleDrop' | transloco }}</li>
     <li>{{ 'common.contact.chatroom.games.connectFourRuleWin' | transloco }}</li>

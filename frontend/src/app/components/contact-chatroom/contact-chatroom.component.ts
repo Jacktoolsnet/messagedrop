@@ -14,6 +14,8 @@ import {
   ChatGame,
   ConnectFourGame,
   ConnectFourVariant,
+  DotsAndBoxesGame,
+  DotsAndBoxesMove,
   GameStats,
   TicTacToeGame,
   TicTacToeMark,
@@ -59,6 +61,8 @@ import { NewTicTacToeDialogComponent } from './new-tic-tac-toe-dialog/new-tic-ta
 import { TicTacToeBoardComponent } from './tic-tac-toe-board/tic-tac-toe-board.component';
 import { NewConnectFourDialogComponent } from './new-connect-four-dialog/new-connect-four-dialog.component';
 import { ConnectFourBoardComponent } from './connect-four-board/connect-four-board.component';
+import { DotsAndBoxesBoardComponent } from './dots-and-boxes-board/dots-and-boxes-board.component';
+import { NewDotsAndBoxesDialogComponent } from './new-dots-and-boxes-dialog/new-dots-and-boxes-dialog.component';
 import { DeleteContactMessageComponent } from './delete-contact-message/delete-contact-message.component';
 import { DisplayMessageService } from '../../services/display-message.service';
 import { ProtectedStickerImageComponent } from '../utils/protected-sticker-image/protected-sticker-image.component';
@@ -69,6 +73,7 @@ import {
 } from './revision-history/contact-message-revision-history.component';
 import { applyTicTacToeMove, createTicTacToeGame } from '../../utils/tic-tac-toe';
 import { applyConnectFourMove, createConnectFourGame } from '../../utils/connect-four';
+import { applyDotsAndBoxesMove, createDotsAndBoxesGame } from '../../utils/dots-and-boxes';
 
 interface ChatroomMessage {
   id: string;
@@ -113,6 +118,7 @@ interface ContactChatroomDialogData {
     LocationPreviewComponent,
     TicTacToeBoardComponent,
     ConnectFourBoardComponent,
+    DotsAndBoxesBoardComponent,
     TranslocoPipe
   ],
   templateUrl: './contact-chatroom.component.html',
@@ -498,7 +504,8 @@ export class ContactChatroomComponent implements AfterViewInit {
         ticTacToeStats: this.getTicTacToeStats('standard'),
         vanishingTicTacToeStats: this.getTicTacToeStats('vanishing'),
         connectFourStats: this.getConnectFourStats('standard'),
-        vanishingConnectFourStats: this.getConnectFourStats('vanishing')
+        vanishingConnectFourStats: this.getConnectFourStats('vanishing'),
+        dotsAndBoxesStats: this.getDotsAndBoxesStats()
       },
       width: 'min(760px, 94vw)',
       maxWidth: '94vw',
@@ -518,6 +525,8 @@ export class ContactChatroomComponent implements AfterViewInit {
         this.openNewConnectFourDialog(contact, 'standard');
       } else if (gameType === 'connectFourVanishing') {
         this.openNewConnectFourDialog(contact, 'vanishing');
+      } else if (gameType === 'dotsAndBoxes') {
+        this.openNewDotsAndBoxesDialog(contact);
       }
     });
   }
@@ -537,6 +546,24 @@ export class ContactChatroomComponent implements AfterViewInit {
       if (!Number.isInteger(firstColumn)) return;
       const payload = this.createEmptyMessage();
       payload.game = createConnectFourGame(contact.userId, contact.contactUserId, firstColumn!, variant);
+      void this.sendAsNewMessage(contact, payload, undefined, 'game_started');
+    });
+  }
+
+  private openNewDotsAndBoxesDialog(contact: Contact): void {
+    const dialogRef = this.matDialog.open(NewDotsAndBoxesDialogComponent, {
+      width: 'min(470px, 96vw)',
+      maxWidth: '96vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+    dialogRef.afterClosed().subscribe((firstMove?: DotsAndBoxesMove) => {
+      if (!firstMove) return;
+      const payload = this.createEmptyMessage();
+      payload.game = createDotsAndBoxesGame(contact.userId, contact.contactUserId, firstMove);
       void this.sendAsNewMessage(contact, payload, undefined, 'game_started');
     });
   }
@@ -582,17 +609,21 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getChatGameIcon(game: ChatGame): string {
+    if (game.type === 'dotsAndBoxes') return 'border_outer';
     return game.variant === 'vanishing' ? 'change_circle' : game.type === 'connectFour' ? 'view_column' : 'grid_3x3';
   }
 
   getChatGameTitle(game: ChatGame): string {
-    return this.translation.t(game.type === 'connectFour'
+    const key = game.type === 'connectFour'
       ? 'common.contact.chatroom.games.connectFour'
-      : 'common.contact.chatroom.games.ticTacToe');
+      : game.type === 'dotsAndBoxes'
+        ? 'common.contact.chatroom.games.dotsAndBoxes'
+        : 'common.contact.chatroom.games.ticTacToe';
+    return this.translation.t(key);
   }
 
   getChatGameVariantLabel(game: ChatGame): string {
-    const key = game.variant === 'vanishing'
+    const key = game.type !== 'dotsAndBoxes' && game.variant === 'vanishing'
       ? 'common.contact.chatroom.games.vanishingVariant'
       : 'common.contact.chatroom.games.standardVariant';
     return this.translation.t(key);
@@ -608,6 +639,10 @@ export class ContactChatroomComponent implements AfterViewInit {
 
   getCurrentUserGamePieceLabel(game: ChatGame): TicTacToeMark | null {
     if (game.type === 'ticTacToe') return this.getTicTacToePlayerMark(game);
+    if (game.type === 'dotsAndBoxes') {
+      const currentUserId = this.userService.getUser().id;
+      return game.playerXUserId === currentUserId ? 'X' : game.playerOUserId === currentUserId ? 'O' : null;
+    }
     const currentUserId = this.userService.getUser().id;
     return game.playerRedUserId === currentUserId ? 'X' : game.playerYellowUserId === currentUserId ? 'O' : null;
   }
@@ -616,7 +651,7 @@ export class ContactChatroomComponent implements AfterViewInit {
     this.matDialog.open(GameRulesDialogComponent, {
       data: {
         gameType: game.type,
-        variant: game.variant ?? 'standard'
+        variant: game.type === 'dotsAndBoxes' ? 'standard' : game.variant ?? 'standard'
       },
       width: 'min(440px, 94vw)',
       maxWidth: '94vw',
@@ -635,6 +670,28 @@ export class ContactChatroomComponent implements AfterViewInit {
       && !this.gameMovesInFlight().has(game.gameId)
       && game.status === 'active'
       && game.nextPlayerUserId === this.userService.getUser().id;
+  }
+
+  canPlayDotsAndBoxes(message: ChatroomMessage): boolean {
+    const game = message.payload?.game;
+    return !!game
+      && game.type === 'dotsAndBoxes'
+      && !this.gameMovesInFlight().has(game.gameId)
+      && game.status === 'active'
+      && game.nextPlayerUserId === this.userService.getUser().id;
+  }
+
+  async playDotsAndBoxesMove(message: ChatroomMessage, move: DotsAndBoxesMove): Promise<void> {
+    const contact = this.contact();
+    const game = message.payload?.game;
+    if (!contact || !game || game.type !== 'dotsAndBoxes' || !this.canPlayDotsAndBoxes(message)) return;
+    const nextGame = applyDotsAndBoxesMove(game, this.userService.getUser().id, move);
+    if (!nextGame) return;
+    this.setGameMoveInFlight(game.gameId, true);
+    const payload = this.createEmptyMessage();
+    payload.game = nextGame;
+    await this.sendAsNewMessage(contact, payload, message.messageId, 'game_move');
+    this.setGameMoveInFlight(game.gameId, false);
   }
 
   async playConnectFourMove(message: ChatroomMessage, column: number): Promise<void> {
@@ -698,6 +755,20 @@ export class ContactChatroomComponent implements AfterViewInit {
       : this.translation.t('common.contact.chatroom.games.statusContactTurn', { name: contactName });
   }
 
+  getDotsAndBoxesStatusText(game: DotsAndBoxesGame): string {
+    const currentUserId = this.userService.getUser().id;
+    const contactName = this.contact()?.name || this.translation.t('common.contact.chatroom.contactLabel');
+    if (game.status === 'draw') return this.translation.t('common.contact.chatroom.games.statusDraw');
+    if (game.status === 'won') {
+      return game.winnerUserId === currentUserId
+        ? this.translation.t('common.contact.chatroom.games.statusWonYou')
+        : this.translation.t('common.contact.chatroom.games.statusWonContact', { name: contactName });
+    }
+    return game.nextPlayerUserId === currentUserId
+      ? this.translation.t('common.contact.chatroom.games.statusYourTurn')
+      : this.translation.t('common.contact.chatroom.games.statusContactTurn', { name: contactName });
+  }
+
   private setGameMoveInFlight(gameId: string, inFlight: boolean): void {
     this.gameMovesInFlight.update((current) => {
       const next = new Set(current);
@@ -742,6 +813,22 @@ export class ContactChatroomComponent implements AfterViewInit {
       const game = message.payload?.game;
       if (game?.type !== 'connectFour' || (game.variant ?? 'standard') !== variant) continue;
       if (!latestGames.has(game.gameId)) latestGames.set(game.gameId, game);
+    }
+    const stats: GameStats = { played: latestGames.size, won: 0, lost: 0, drawn: 0 };
+    for (const game of latestGames.values()) {
+      if (game.status === 'draw') stats.drawn += 1;
+      else if (game.status === 'won' && game.winnerUserId === currentUserId) stats.won += 1;
+      else if (game.status === 'won') stats.lost += 1;
+    }
+    return stats;
+  }
+
+  private getDotsAndBoxesStats(): GameStats {
+    const currentUserId = this.userService.getUser().id;
+    const latestGames = new Map<string, DotsAndBoxesGame>();
+    for (const message of this.visibleMessages()) {
+      const game = message.payload?.game;
+      if (game?.type === 'dotsAndBoxes' && !latestGames.has(game.gameId)) latestGames.set(game.gameId, game);
     }
     const stats: GameStats = { played: latestGames.size, won: 0, lost: 0, drawn: 0 };
     for (const game of latestGames.values()) {
