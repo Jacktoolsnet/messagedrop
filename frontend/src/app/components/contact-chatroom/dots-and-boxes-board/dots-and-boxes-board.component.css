@@ -7,6 +7,13 @@
   --dots-primary: var(--mat-sys-primary, var(--mat-primary-color, #3f51b5));
   --dots-surface: var(--mat-sys-surface-container-high, var(--mat-card-filled-container-color, #fff));
   --dots-cell: color-mix(in srgb, var(--dots-primary) 18%, var(--dots-surface));
+  --dots-x: #0057d9;
+  --dots-o: #b0006f;
+}
+
+:host-context(.dark) {
+  --dots-x: #4fd8ff;
+  --dots-o: #ff66c4;
 }
 
 .dots-and-boxes {
@@ -33,11 +40,13 @@
 }
 
 .dots-and-boxes__score-mark--x {
-  color: var(--dots-primary);
+  color: var(--dots-x);
+  text-shadow: 0 0 6px color-mix(in srgb, var(--dots-x) 55%, transparent);
 }
 
 .dots-and-boxes__score-mark--o {
-  color: var(--mat-sys-tertiary, var(--mat-sys-secondary, var(--mat-app-text-color)));
+  color: var(--dots-o);
+  text-shadow: 0 0 6px color-mix(in srgb, var(--dots-o) 55%, transparent);
 }
 
 .dots-and-boxes__score-separator {
@@ -93,11 +102,11 @@
 
 .dots-and-boxes__edge--horizontal::after {
   width: calc(100% + 0.18rem);
-  height: 0.24rem;
+  height: 0.34rem;
 }
 
 .dots-and-boxes__edge--vertical::after {
-  width: 0.24rem;
+  width: 0.34rem;
   height: calc(100% + 0.18rem);
 }
 
@@ -113,7 +122,46 @@
 
 .dots-and-boxes__edge--selected::after {
   background: var(--dots-primary);
-  box-shadow: 0 1px 3px color-mix(in srgb, black 22%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--mat-sys-surface-bright, white) 62%, transparent),
+    0 1px 4px color-mix(in srgb, black 32%, transparent);
+}
+
+.dots-and-boxes__edge--selected[data-edge-owner='x']::after {
+  background: var(--dots-x);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--mat-sys-surface-bright, white) 72%, transparent),
+    0 0 9px color-mix(in srgb, var(--dots-x) 82%, transparent);
+}
+
+.dots-and-boxes__edge--selected[data-edge-owner='o']::after {
+  background: var(--dots-o);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--mat-sys-surface-bright, white) 72%, transparent),
+    0 0 9px color-mix(in srgb, var(--dots-o) 82%, transparent);
+}
+
+.dots-and-boxes__edge--horizontal[data-edge-owner='x-o']::after {
+  background: linear-gradient(to bottom, var(--dots-x) 0 50%, var(--dots-o) 50% 100%);
+}
+
+.dots-and-boxes__edge--horizontal[data-edge-owner='o-x']::after {
+  background: linear-gradient(to bottom, var(--dots-o) 0 50%, var(--dots-x) 50% 100%);
+}
+
+.dots-and-boxes__edge--vertical[data-edge-owner='x-o']::after {
+  background: linear-gradient(to right, var(--dots-x) 0 50%, var(--dots-o) 50% 100%);
+}
+
+.dots-and-boxes__edge--vertical[data-edge-owner='o-x']::after {
+  background: linear-gradient(to right, var(--dots-o) 0 50%, var(--dots-x) 50% 100%);
+}
+
+.dots-and-boxes__edge--selected[data-edge-owner='x-o']::after,
+.dots-and-boxes__edge--selected[data-edge-owner='o-x']::after {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--mat-sys-surface-bright, white) 72%, transparent),
+    0 0 9px color-mix(in srgb, var(--dots-x) 48%, var(--dots-o));
 }
 
 .dots-and-boxes__edge:disabled {
@@ -131,13 +179,17 @@
 }
 
 .dots-and-boxes__box--x {
-  background: var(--mat-sys-primary-container, color-mix(in srgb, var(--dots-primary) 38%, var(--dots-surface)));
-  color: var(--mat-sys-on-primary-container, var(--dots-primary));
+  background: color-mix(in srgb, var(--dots-x) 28%, var(--dots-surface));
+  color: var(--dots-x);
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--dots-x) 72%, transparent);
+  text-shadow: 0 0 7px color-mix(in srgb, var(--dots-x) 65%, transparent);
 }
 
 .dots-and-boxes__box--o {
-  background: var(--mat-sys-tertiary-container, var(--dots-cell));
-  color: var(--mat-sys-on-tertiary-container, var(--mat-sys-tertiary, var(--mat-app-text-color)));
+  background: color-mix(in srgb, var(--dots-o) 28%, var(--dots-surface));
+  color: var(--dots-o);
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--dots-o) 72%, transparent);
+  text-shadow: 0 0 7px color-mix(in srgb, var(--dots-o) 65%, transparent);
 }
 
 .dots-and-boxes__status {

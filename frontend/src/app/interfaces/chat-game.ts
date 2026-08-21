@@ -63,6 +63,9 @@ export interface DotsAndBoxesGame {
   gameId: string;
   horizontalEdges: boolean[];
   verticalEdges: boolean[];
+  /** Owners are optional for compatibility with game messages created before colored edges existed. */
+  horizontalEdgeOwners?: TicTacToeCell[];
+  verticalEdgeOwners?: TicTacToeCell[];
   boxes: TicTacToeCell[];
   playerXUserId: string;
   playerOUserId: string;

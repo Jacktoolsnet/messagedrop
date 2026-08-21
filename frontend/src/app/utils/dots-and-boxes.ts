@@ -17,6 +17,8 @@ export function createEmptyDotsAndBoxesGame(playerXUserId: string, playerOUserId
     gameId: crypto.randomUUID(),
     horizontalEdges: Array(DOTS_AND_BOXES_HORIZONTAL_EDGE_COUNT).fill(false),
     verticalEdges: Array(DOTS_AND_BOXES_VERTICAL_EDGE_COUNT).fill(false),
+    horizontalEdgeOwners: Array(DOTS_AND_BOXES_HORIZONTAL_EDGE_COUNT).fill(null),
+    verticalEdgeOwners: Array(DOTS_AND_BOXES_VERTICAL_EDGE_COUNT).fill(null),
     boxes: Array(DOTS_AND_BOXES_BOX_COUNT).fill(null),
     playerXUserId,
     playerOUserId,
@@ -53,9 +55,13 @@ export function applyDotsAndBoxesMove(
 
   const horizontalEdges = normalizeEdges(game.horizontalEdges, DOTS_AND_BOXES_HORIZONTAL_EDGE_COUNT);
   const verticalEdges = normalizeEdges(game.verticalEdges, DOTS_AND_BOXES_VERTICAL_EDGE_COUNT);
+  const horizontalEdgeOwners = normalizeOwners(game.horizontalEdgeOwners, horizontalEdges);
+  const verticalEdgeOwners = normalizeOwners(game.verticalEdgeOwners, verticalEdges);
   const edges = move.orientation === 'horizontal' ? horizontalEdges : verticalEdges;
   if (edges[move.index]) return null;
   edges[move.index] = true;
+  const edgeOwners = move.orientation === 'horizontal' ? horizontalEdgeOwners : verticalEdgeOwners;
+  edgeOwners[move.index] = mark;
 
   const boxes = normalizeBoxes(game.boxes);
   let claimedBoxes = 0;
@@ -75,6 +81,8 @@ export function applyDotsAndBoxesMove(
       ...game,
       horizontalEdges,
       verticalEdges,
+      horizontalEdgeOwners,
+      verticalEdgeOwners,
       boxes,
       moveNumber,
       status: draw ? 'draw' : 'won',
@@ -87,6 +95,8 @@ export function applyDotsAndBoxesMove(
     ...game,
     horizontalEdges,
     verticalEdges,
+    horizontalEdgeOwners,
+    verticalEdgeOwners,
     boxes,
     moveNumber,
     nextPlayerUserId: claimedBoxes > 0
@@ -97,6 +107,16 @@ export function applyDotsAndBoxesMove(
 
 function normalizeEdges(edges: readonly boolean[], count: number): boolean[] {
   return Array.from({ length: count }, (_, index) => edges[index] === true);
+}
+
+function normalizeOwners(
+  owners: readonly (TicTacToeMark | null)[] | undefined,
+  edges: readonly boolean[]
+): Array<TicTacToeMark | null> {
+  return Array.from({ length: edges.length }, (_, index) => {
+    const owner = owners?.[index];
+    return edges[index] && (owner === 'X' || owner === 'O') ? owner : null;
+  });
 }
 
 function normalizeBoxes(boxes: readonly (TicTacToeMark | null)[]): Array<TicTacToeMark | null> {

@@ -5,6 +5,7 @@ describe('dots-and-boxes', () => {
     const game = createEmptyDotsAndBoxesGame('sender', 'recipient');
     const next = applyDotsAndBoxesMove(game, 'sender', { orientation: 'horizontal', index: 0 });
     expect(next?.nextPlayerUserId).toBe('recipient');
+    expect(next?.horizontalEdgeOwners?.[0]).toBe('X');
   });
 
   it('claims a completed box and gives the player another move', () => {

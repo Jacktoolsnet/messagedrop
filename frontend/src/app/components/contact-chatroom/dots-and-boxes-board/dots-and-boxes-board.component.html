@@ -15,6 +15,7 @@
           @let edgeIndex = horizontalEdgeIndex(row, column);
           <button type="button" class="dots-and-boxes__edge dots-and-boxes__edge--horizontal"
             [class.dots-and-boxes__edge--selected]="isEdgeSelected('horizontal', edgeIndex)"
+            [attr.data-edge-owner]="getEdgeOwnerState('horizontal', edgeIndex)"
             [disabled]="disabled() || isEdgeSelected('horizontal', edgeIndex)"
             [attr.aria-label]="getEdgeAriaLabel('horizontal', edgeIndex)"
             (pointerenter)="previewEdge('horizontal', edgeIndex, $event)"
@@ -26,6 +27,7 @@
           @let edgeIndex = verticalEdgeIndex(row, column);
           <button type="button" class="dots-and-boxes__edge dots-and-boxes__edge--vertical"
             [class.dots-and-boxes__edge--selected]="isEdgeSelected('vertical', edgeIndex)"
+            [attr.data-edge-owner]="getEdgeOwnerState('vertical', edgeIndex)"
             [disabled]="disabled() || isEdgeSelected('vertical', edgeIndex)"
             [attr.aria-label]="getEdgeAriaLabel('vertical', edgeIndex)"
             (pointerenter)="previewEdge('vertical', edgeIndex, $event)"

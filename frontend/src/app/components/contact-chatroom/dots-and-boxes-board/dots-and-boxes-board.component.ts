@@ -1,8 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
-import { DotsAndBoxesGame, DotsAndBoxesMove } from '../../../interfaces/chat-game';
+import { DotsAndBoxesGame, DotsAndBoxesMove, TicTacToeMark } from '../../../interfaces/chat-game';
 import { GameFeedbackService } from '../../../services/game-feedback.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { DOTS_AND_BOXES_DOTS_PER_SIDE } from '../../../utils/dots-and-boxes';
+
+type EdgeOwnerState = 'x' | 'o' | 'x-o' | 'o-x' | 'neutral';
 
 @Component({
   selector: 'app-dots-and-boxes-board',
@@ -61,5 +63,41 @@ export class DotsAndBoxesBoardComponent {
         : 'common.contact.chatroom.games.verticalEdge'),
       edge: index + 1
     });
+  }
+
+  getEdgeOwnerState(orientation: DotsAndBoxesMove['orientation'], index: number): EdgeOwnerState {
+    if (!this.isEdgeSelected(orientation, index)) return 'neutral';
+    const boxOwners = this.getAdjacentBoxOwners(orientation, index);
+    if (boxOwners.length === 2 && boxOwners[0] !== boxOwners[1]) {
+      return `${boxOwners[0].toLowerCase()}-${boxOwners[1].toLowerCase()}` as EdgeOwnerState;
+    }
+    const owner = boxOwners[0] ?? (orientation === 'horizontal'
+      ? this.game().horizontalEdgeOwners?.[index]
+      : this.game().verticalEdgeOwners?.[index]);
+    return owner === 'X' ? 'x' : owner === 'O' ? 'o' : 'neutral';
+  }
+
+  private getAdjacentBoxOwners(
+    orientation: DotsAndBoxesMove['orientation'],
+    index: number
+  ): TicTacToeMark[] {
+    const boxes = this.game().boxes;
+    const owners: Array<TicTacToeMark | null | undefined> = [];
+    if (orientation === 'horizontal') {
+      const row = Math.floor(index / (DOTS_AND_BOXES_DOTS_PER_SIDE - 1));
+      const column = index % (DOTS_AND_BOXES_DOTS_PER_SIDE - 1);
+      if (row > 0) owners.push(boxes[(row - 1) * (DOTS_AND_BOXES_DOTS_PER_SIDE - 1) + column]);
+      if (row < DOTS_AND_BOXES_DOTS_PER_SIDE - 1) {
+        owners.push(boxes[row * (DOTS_AND_BOXES_DOTS_PER_SIDE - 1) + column]);
+      }
+    } else {
+      const row = Math.floor(index / DOTS_AND_BOXES_DOTS_PER_SIDE);
+      const column = index % DOTS_AND_BOXES_DOTS_PER_SIDE;
+      if (column > 0) owners.push(boxes[row * (DOTS_AND_BOXES_DOTS_PER_SIDE - 1) + column - 1]);
+      if (column < DOTS_AND_BOXES_DOTS_PER_SIDE - 1) {
+        owners.push(boxes[row * (DOTS_AND_BOXES_DOTS_PER_SIDE - 1) + column]);
+      }
+    }
+    return owners.filter((owner): owner is TicTacToeMark => owner === 'X' || owner === 'O');
   }
 }
