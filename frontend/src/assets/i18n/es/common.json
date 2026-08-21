@@ -722,7 +722,8 @@
           "showMinesAria": "Mostrar las minas ocultas",
           "hideMinesAria": "Ocultar las minas",
           "confirmMinePlacementAria": "Confirmar la colocación",
-          "hideSeekPreviewPrefix": "Campo minado – Esconder y buscar"
+          "hideSeekPreviewPrefix": "Campo minado – Esconder y buscar",
+          "continueToPlacementAria": "Continuar con la siguiente colocación de minas"
         },
         "revisionHistory": {
           "title": "Historial de cambios",

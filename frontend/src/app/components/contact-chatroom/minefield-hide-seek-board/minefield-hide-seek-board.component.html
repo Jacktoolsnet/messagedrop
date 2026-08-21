@@ -16,6 +16,10 @@
    </button>
   }
  </div>
+ @if(canContinueToPlacement()){
+  <button mat-mini-fab color="primary" class="hide-seek__continue" type="button" (click)="continueToPlacement()"
+   [attr.aria-label]="'common.contact.chatroom.games.continueToPlacementAria'|transloco"><mat-icon>arrow_forward</mat-icon></button>
+ }
  @if(isPlacement()&&!placementMode()&&!isShowingRoundResult()){
   <button mat-mini-fab color="primary" class="hide-seek__submit" type="button" [disabled]="selectedMines().length!==mineCount" (click)="submitPlacement()" [attr.aria-label]="'common.contact.chatroom.games.confirmMinePlacementAria'|transloco"><mat-icon>check</mat-icon></button>
  }

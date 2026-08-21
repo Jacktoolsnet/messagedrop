@@ -723,7 +723,8 @@
           "showMinesAria": "Show hidden mines",
           "hideMinesAria": "Hide mines",
           "confirmMinePlacementAria": "Confirm mine placement",
-          "hideSeekPreviewPrefix": "Minefield – Hide & Seek"
+          "hideSeekPreviewPrefix": "Minefield – Hide & Seek",
+          "continueToPlacementAria": "Continue to the next mine placement"
         },
         "revisionHistory": {
           "title": "Change history",

@@ -722,7 +722,8 @@
           "showMinesAria": "Afficher les mines cachées",
           "hideMinesAria": "Masquer les mines",
           "confirmMinePlacementAria": "Confirmer le placement",
-          "hideSeekPreviewPrefix": "Champ de mines – Cacher et chercher"
+          "hideSeekPreviewPrefix": "Champ de mines – Cacher et chercher",
+          "continueToPlacementAria": "Continuer avec le prochain placement de mines"
         },
         "revisionHistory": {
           "title": "Historique des modifications",

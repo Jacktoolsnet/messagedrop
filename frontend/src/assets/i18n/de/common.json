@@ -723,7 +723,8 @@
           "showMinesAria": "Versteckte Minen anzeigen",
           "hideMinesAria": "Versteckte Minen ausblenden",
           "confirmMinePlacementAria": "Minenplatzierung bestätigen",
-          "hideSeekPreviewPrefix": "Minenfeld – Verstecken & Suchen"
+          "hideSeekPreviewPrefix": "Minenfeld – Verstecken & Suchen",
+          "continueToPlacementAria": "Mit der nächsten Minenplatzierung fortfahren"
         },
         "revisionHistory": {
           "title": "Änderungshistorie",
