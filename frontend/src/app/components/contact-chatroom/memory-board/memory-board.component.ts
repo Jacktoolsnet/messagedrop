@@ -28,11 +28,7 @@ export class MemoryBoardComponent {
     if (this.disabled() || this.resolving() || !this.cards()[index] || game?.matchedBy[index]) return;
     if (game?.lastMove && !game.lastMove.matched && !this.lastMoveDismissed()) this.lastMoveDismissed.set(true);
     const current = this.selected();
-    if (current.includes(index)) {
-      this.feedback.notifySelection();
-      this.selected.set(current.filter(value => value !== index));
-      return;
-    }
+    if (current.includes(index)) return;
     if (current.length >= 2) return;
     this.feedback.notifySelection();
     const next = [...current, index];

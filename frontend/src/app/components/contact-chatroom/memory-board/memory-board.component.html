@@ -9,7 +9,7 @@
       <button type="button" class="memory-card" [class.memory-card--visible]="isVisible($index)"
         [class.memory-card--x]="owner($index) === 'X'" [class.memory-card--o]="owner($index) === 'O'"
         [attr.data-symbol]="isVisible($index) ? symbol : null"
-        [disabled]="disabled() || resolving() || !!owner($index)" (click)="selectCard($index)"
+        [disabled]="disabled() || resolving() || selected().includes($index) || !!owner($index)" (click)="selectCard($index)"
         [attr.aria-label]="(isVisible($index) ? 'common.contact.chatroom.games.memoryCardVisibleAria' : 'common.contact.chatroom.games.memoryCardHiddenAria') | transloco:{ card: $index + 1 }">
         <span class="memory-card__front"><mat-icon>{{ symbol }}</mat-icon></span>
         <span class="memory-card__back"><mat-icon>question_mark</mat-icon></span>
