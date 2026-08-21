@@ -28,6 +28,16 @@ export class GameFeedbackService {
     }
   }
 
+  notifyCorrect(): void {
+    this.tryVibrate([35, 35, 55, 35, 80]);
+    if (!this.audioMuted()) void this.playCorrectSound();
+  }
+
+  notifyIncorrect(): void {
+    this.tryVibrate([70, 35, 70]);
+    if (!this.audioMuted()) void this.playIncorrectSound();
+  }
+
   toggleAudioMuted(): void {
     const muted = !this.audioMuted();
     this.audioMuted.set(muted);
@@ -59,6 +69,23 @@ export class GameFeedbackService {
     const now = context.currentTime;
     this.playTone(context, now, 420, 560, 0.14, 0.04, 'triangle');
     this.playTone(context, now + 0.075, 620, 780, 0.16, 0.028, 'sine');
+  }
+
+  private async playCorrectSound(): Promise<void> {
+    const context = await this.getReadyAudioContext();
+    if (!context) return;
+    const now = context.currentTime;
+    this.playTone(context, now, 520, 660, 0.16, 0.04, 'triangle');
+    this.playTone(context, now + 0.09, 660, 840, 0.18, 0.04, 'triangle');
+    this.playTone(context, now + 0.19, 840, 1040, 0.24, 0.035, 'sine');
+  }
+
+  private async playIncorrectSound(): Promise<void> {
+    const context = await this.getReadyAudioContext();
+    if (!context) return;
+    const now = context.currentTime;
+    this.playTone(context, now, 260, 190, 0.2, 0.045, 'square');
+    this.playTone(context, now + 0.13, 210, 145, 0.24, 0.035, 'sawtooth');
   }
 
   private playTone(

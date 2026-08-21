@@ -778,6 +778,11 @@ export class ContactChatroomComponent implements AfterViewInit {
       if (!isValidCode(secret.code) || await createCodeCommitment(secret) !== game.commitment) throw new Error('invalid_commitment');
       const nextGame = submitAndEvaluateCodeGuess(game, this.userService.getUser().id, symbols, secret);
       if (!nextGame) return;
+      if (nextGame.status === 'won' && nextGame.winnerUserId === game.codeBreakerUserId) {
+        this.gameFeedback.notifyCorrect();
+      } else {
+        this.gameFeedback.notifyIncorrect();
+      }
       const payload = this.createEmptyMessage();
       payload.game = nextGame;
       await this.sendAsNewMessage(contact, payload, message.messageId, 'game_move');
@@ -810,12 +815,6 @@ export class ContactChatroomComponent implements AfterViewInit {
     } finally {
       this.setGameMoveInFlight(game.gameId, false);
     }
-  }
-
-  getCodeTurnInstruction(game: CodeGame): string {
-    return game.nextPlayerUserId === game.codeMakerUserId
-      ? this.translation.t('common.contact.chatroom.games.evaluateTurn')
-      : this.translation.t('common.contact.chatroom.games.guessTurn');
   }
 
   canPlayConnectFour(message: ChatroomMessage): boolean {

@@ -657,7 +657,7 @@
           "codeRuleSecurity": "El secreto se guarda cifrado exclusivamente para quien lo creó. Al final se revela y se verifica mediante un compromiso criptográfico.",
           "codeSecret": "Código secreto",
           "evaluateCode": "Evaluar intento",
-          "submitGuess": "Enviar intento",
+          "submitGuess": "Comprobar código",
           "evaluateTurn": "Evalúo el intento",
           "guessTurn": "Descifro el código",
           "codeWonSubtitle": "El código se ha revelado",
@@ -675,7 +675,9 @@
           },
           "codeVerified": "Código verificado criptográficamente",
           "codeInvalid": "Aviso: el código no coincide con el compromiso original",
-          "codeRuleWatch": "Quien creó el código recibe información de cada intento y puede seguir la partida en directo o más tarde."
+          "codeRuleWatch": "Quien creó el código recibe información de cada intento y puede seguir la partida en directo o más tarde.",
+          "showCodeAria": "Mostrar tu código",
+          "hideCodeAria": "Ocultar tu código"
         },
         "revisionHistory": {
           "title": "Historial de cambios",

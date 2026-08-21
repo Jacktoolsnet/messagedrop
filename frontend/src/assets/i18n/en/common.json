@@ -658,7 +658,7 @@
           "codeRuleSecurity": "The secret is stored encrypted exclusively for the codemaker. At the end it is revealed and verified against a cryptographic commitment.",
           "codeSecret": "Secret code",
           "evaluateCode": "Evaluate attempt",
-          "submitGuess": "Send attempt",
+          "submitGuess": "Check code",
           "evaluateTurn": "I evaluate the attempt",
           "guessTurn": "I crack the code",
           "codeWonSubtitle": "The code is revealed",
@@ -676,7 +676,9 @@
           },
           "codeVerified": "Code cryptographically verified",
           "codeInvalid": "Warning: code does not match the original commitment",
-          "codeRuleWatch": "The codemaker is notified about every attempt and can follow the game live or later."
+          "codeRuleWatch": "The codemaker is notified about every attempt and can follow the game live or later.",
+          "showCodeAria": "Show your code",
+          "hideCodeAria": "Hide your code"
         },
         "revisionHistory": {
           "title": "Change history",

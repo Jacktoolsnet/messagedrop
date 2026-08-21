@@ -657,7 +657,7 @@
           "codeRuleSecurity": "Le secret est chiffré exclusivement pour son créateur. À la fin, il est révélé et vérifié avec un engagement cryptographique.",
           "codeSecret": "Code secret",
           "evaluateCode": "Évaluer l’essai",
-          "submitGuess": "Envoyer l’essai",
+          "submitGuess": "Vérifier le code",
           "evaluateTurn": "J’évalue l’essai",
           "guessTurn": "Je déchiffre le code",
           "codeWonSubtitle": "Le code est révélé",
@@ -675,7 +675,9 @@
           },
           "codeVerified": "Code vérifié cryptographiquement",
           "codeInvalid": "Attention : le code ne correspond pas à l’engagement initial",
-          "codeRuleWatch": "La personne ayant créé le code est informée de chaque essai et peut suivre la partie en direct ou plus tard."
+          "codeRuleWatch": "La personne ayant créé le code est informée de chaque essai et peut suivre la partie en direct ou plus tard.",
+          "showCodeAria": "Afficher ton code",
+          "hideCodeAria": "Masquer ton code"
         },
         "revisionHistory": {
           "title": "Historique des modifications",

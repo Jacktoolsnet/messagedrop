@@ -1,14 +1,21 @@
-:host { display:block; width:min(25rem, calc(100vw - 7rem)); max-width:100%; margin:0 auto 1.25rem; }
+:host { display:block; width:min(25rem, calc(100vw - 7rem)); max-width:100%; margin:0 auto 1.25rem; --code-star:#e09500; --code-heart:#e00059; --code-circle:#007fc9; --code-square:#7048d8; --code-triangle:#008d70; --code-hexagon:#dc4a20; }
+:host-context(.dark) { --code-star:#ffd34f; --code-heart:#ff5b9d; --code-circle:#4fd8ff; --code-square:#b89aff; --code-triangle:#43f0c5; --code-hexagon:#ff835f; }
 .code-board { display:grid; gap:.8rem; --code-surface:var(--mat-sys-surface-container-highest, var(--mat-card-filled-container-color)); }
 .code-board__secret,.code-board__slots,.code-board__palette,.code-guess-row__symbols { display:flex; justify-content:center; gap:.4rem; }
+.code-board__secret-row{display:grid;grid-template-columns:2.5rem minmax(0,1fr) 2.5rem;align-items:center;gap:.25rem}.code-board__secret-action{color:var(--mat-sys-primary)}.code-board__secret-action-spacer{width:2.5rem;height:2.5rem}
 .code-board__secret { padding:.65rem; border-radius:1rem; background:var(--code-surface); border:1px solid var(--mat-sys-outline-variant, var(--mat-card-outlined-outline-color)); }
 .code-symbol { display:grid; place-items:center; width:2.35rem; height:2.35rem; box-sizing:border-box; border:2px solid var(--mat-sys-primary, currentColor); border-radius:.7rem; background:color-mix(in srgb, var(--mat-sys-primary, #6750a4) 15%, var(--code-surface)); color:var(--mat-sys-primary, inherit); }
 .code-symbol--secret { border-color:var(--mat-sys-outline, currentColor); color:var(--mat-sys-on-surface-variant, inherit); }
 button.code-symbol { font:inherit; cursor:pointer; }
 button.code-symbol:disabled { cursor:default; opacity:.55; }
-.code-symbol--star { color:#d48b00; border-color:currentColor; }.code-symbol--heart { color:#d2185b; border-color:currentColor; }
-.code-symbol--circle { color:#087cc1; border-color:currentColor; }.code-symbol--square { color:#6c4bc2; border-color:currentColor; }
-.code-symbol--triangle { color:#00866b; border-color:currentColor; }.code-symbol--hexagon { color:#d64b25; border-color:currentColor; }
+.code-symbol--star,.code-symbol[data-symbol="star"] { color:var(--code-star); }
+.code-symbol--heart,.code-symbol[data-symbol="heart"] { color:var(--code-heart); }
+.code-symbol--circle,.code-symbol[data-symbol="circle"] { color:var(--code-circle); }
+.code-symbol--square,.code-symbol[data-symbol="square"] { color:var(--code-square); }
+.code-symbol--triangle,.code-symbol[data-symbol="triangle"] { color:var(--code-triangle); }
+.code-symbol--hexagon,.code-symbol[data-symbol="hexagon"] { color:var(--code-hexagon); }
+.code-symbol[data-symbol],.code-symbol--choice { border-color:currentColor; background:color-mix(in srgb, currentColor 21%, var(--code-surface)); box-shadow:inset 0 0 0 1px color-mix(in srgb, currentColor 38%, transparent),0 0 9px color-mix(in srgb, currentColor 52%, transparent); text-shadow:0 0 7px color-mix(in srgb, currentColor 72%, transparent); }
+.code-symbol[data-symbol] mat-icon,.code-symbol--choice mat-icon { filter:drop-shadow(0 0 4px color-mix(in srgb, currentColor 72%, transparent)); }
 .code-board__history { display:grid; gap:.4rem; }
 .code-guess-row { display:grid; grid-template-columns:1.5rem minmax(0,1fr) auto; align-items:center; gap:.35rem; padding:.4rem; border-radius:.8rem; background:var(--code-surface); border:1px solid var(--mat-sys-outline-variant, var(--mat-card-outlined-outline-color)); }
 .code-guess-row--pending { border-style:dashed; }
@@ -19,6 +26,7 @@ button.code-symbol:disabled { cursor:default; opacity:.55; }
 .code-feedback mat-icon { font-size:1rem; width:1rem; height:1rem; }
 .code-feedback__exact { color:#00866b; }.code-feedback__misplaced { color:#d48b00; }
 .code-board__composer { display:grid; justify-items:center; gap:.65rem; }
+.code-board__selection-row{display:grid;grid-template-columns:2.5rem minmax(0,1fr) 2.5rem;align-items:center;gap:.25rem;width:100%}.code-board__selection-action-spacer{width:2.5rem;height:2.5rem}.code-board__check{justify-self:center;box-shadow:0 0 10px color-mix(in srgb, var(--mat-sys-primary) 55%, transparent)}
 .code-board__palette { flex-wrap:wrap; }
 .code-board__evaluate { justify-self:center; }
 .code-board__verification{display:flex;align-items:center;justify-content:center;gap:.35rem;color:var(--mat-sys-primary);font-size:.78rem;font-weight:700}.code-board__verification--invalid{color:var(--mat-sys-error)}

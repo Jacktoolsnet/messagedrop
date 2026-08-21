@@ -658,7 +658,7 @@
           "codeRuleSecurity": "Der geheime Code ist nur für den Codegeber verschlüsselt gespeichert. Nach Spielende wird er aufgedeckt und anhand einer kryptografischen Prüfsumme verifiziert.",
           "codeSecret": "Geheimer Code",
           "evaluateCode": "Versuch auswerten",
-          "submitGuess": "Versuch senden",
+          "submitGuess": "Code prüfen",
           "evaluateTurn": "Ich werte den Versuch aus",
           "guessTurn": "Ich entschlüssle den Code",
           "codeWonSubtitle": "Der Code ist aufgedeckt",
@@ -676,7 +676,9 @@
           },
           "codeVerified": "Code kryptografisch bestätigt",
           "codeInvalid": "Warnung: Code stimmt nicht mit der ursprünglichen Prüfsumme überein",
-          "codeRuleWatch": "Der Codegeber wird über jeden Versuch informiert und kann den Spielverlauf live oder später verfolgen."
+          "codeRuleWatch": "Der Codegeber wird über jeden Versuch informiert und kann den Spielverlauf live oder später verfolgen.",
+          "showCodeAria": "Eigenen Code anzeigen",
+          "hideCodeAria": "Eigenen Code ausblenden"
         },
         "revisionHistory": {
           "title": "Änderungshistorie",
