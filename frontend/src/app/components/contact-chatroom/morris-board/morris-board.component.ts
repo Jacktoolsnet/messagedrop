@@ -8,7 +8,15 @@ export class MorrisBoardComponent{
  readonly feedback=inject(GameFeedbackService);
  readonly game=input<MorrisGame|null>(null);readonly currentUserId=input('');readonly selectionMode=input(false);readonly disabled=input(false);
  readonly action=output<MorrisAction>();readonly firstPosition=output<number>();readonly selected=signal<number|null>(null);
- readonly traySlots=Array.from({length:9},(_,index)=>index);
+ readonly trayStones=computed(()=>{
+  const game=this.game(),own=this.currentMark();if(!game||!own)return [] as {mark:TicTacToeMark;captured:boolean}[];
+  const opponent:TicTacToeMark=own==='X'?'O':'X';
+  const ownInHand=own==='X'?game.inHandX:game.inHandO;
+  const opponentInHand=opponent==='X'?game.inHandX:game.inHandO;
+  const opponentOnBoard=game.board.filter(mark=>mark===opponent).length;
+  const captured=Math.max(0,9-opponentInHand-opponentOnBoard);
+  return [...Array.from({length:ownInHand},()=>({mark:own,captured:false})),...Array.from({length:captured},()=>({mark:opponent,captured:true}))];
+ });
  readonly points=[{x:9,y:9},{x:50,y:9},{x:91,y:9},{x:23,y:23},{x:50,y:23},{x:77,y:23},{x:36,y:36},{x:50,y:36},{x:64,y:36},{x:9,y:50},{x:23,y:50},{x:36,y:50},{x:64,y:50},{x:77,y:50},{x:91,y:50},{x:36,y:64},{x:50,y:64},{x:64,y:64},{x:23,y:77},{x:50,y:77},{x:77,y:77},{x:9,y:91},{x:50,y:91},{x:91,y:91}];
  readonly validTargets=computed(()=>{
   if(this.selectionMode())return new Set(this.points.map((_,index)=>index));const game=this.game();if(!game||game.status!=='active'||game.nextPlayerUserId!==this.currentUserId())return new Set<number>();
@@ -30,14 +38,4 @@ export class MorrisBoardComponent{
  }
  owner(index:number):TicTacToeMark|null{return this.game()?.board[index]??null}
  isValid(index:number):boolean{return this.validTargets().has(index)}
- isReserveTray():boolean{const g=this.game();return !!g&&(g.inHandX>0||g.inHandO>0)}
- trayMark():TicTacToeMark{
-  const own=this.currentMark()??'X';
-  return this.isReserveTray()?own:own==='X'?'O':'X';
- }
- trayCount():number{
-  const g=this.game(),mark=this.trayMark();if(!g)return 0;
-  if(this.isReserveTray())return mark==='X'?g.inHandX:g.inHandO;
-  return 9-g.board.filter(owner=>owner===mark).length;
- }
 }

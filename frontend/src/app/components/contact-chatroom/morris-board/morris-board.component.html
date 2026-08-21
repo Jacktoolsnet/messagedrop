@@ -1,7 +1,7 @@
 <div class="morris">
  @if(game()){
-  <div class="morris__tray" [class.morris__tray--captured]="!isReserveTray()" aria-live="polite">
-   <div class="morris__tray-side">@for(slot of traySlots;track slot){<span class="morris__tray-slot"><span class="morris__tray-stone" [class.morris__tray-stone--x]="trayMark()==='X'" [class.morris__tray-stone--o]="trayMark()==='O'" [class.morris__tray-stone--visible]="slot<trayCount()">{{trayMark()}}</span></span>}</div>
+  <div class="morris__tray" aria-live="polite">
+   <div class="morris__tray-side">@for(stone of trayStones();track $index){<span class="morris__tray-slot morris__tray-slot--visible"><span class="morris__tray-stone morris__tray-stone--visible" [class.morris__tray-stone--x]="stone.mark==='X'" [class.morris__tray-stone--o]="stone.mark==='O'" [class.morris__tray-stone--captured]="stone.captured">{{stone.mark}}</span></span>}</div>
   </div>
  }
  <div class="morris__board">
