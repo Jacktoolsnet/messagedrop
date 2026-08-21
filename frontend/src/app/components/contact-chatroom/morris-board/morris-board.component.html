@@ -1,7 +1,11 @@
 <div class="morris">
- @if(game();as g){<div class="morris__stock"><span class="x">X {{g.inHandX}}</span><span>:</span><span class="o">{{g.inHandO}} O</span></div>}
+ @if(game()){
+  <div class="morris__tray" [class.morris__tray--captured]="!isReserveTray()" aria-live="polite">
+   <div class="morris__tray-side">@for(slot of traySlots;track slot){<span class="morris__tray-slot"><span class="morris__tray-stone" [class.morris__tray-stone--x]="trayMark()==='X'" [class.morris__tray-stone--o]="trayMark()==='O'" [class.morris__tray-stone--visible]="slot<trayCount()">{{trayMark()}}</span></span>}</div>
+  </div>
+ }
  <div class="morris__board">
-  <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M5 5H95V95H5ZM20 20H80V80H20ZM35 35H65V65H35ZM50 5V35M50 65V95M5 50H35M65 50H95"/></svg>
+  <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M9 9H91V91H9ZM23 23H77V77H23ZM36 36H64V64H36ZM50 9V36M50 64V91M9 50H36M64 50H91"/></svg>
   @for(point of points;track $index){<button type="button" class="morris-point" [class.morris-point--valid]="isValid($index)" [class.morris-point--turn-x]="isValid($index)&&(selectionMode()||currentMark()==='X')" [class.morris-point--turn-o]="isValid($index)&&currentMark()==='O'" [class.morris-point--selectable]="isSelectableStone($index)" [class.morris-point--selected]="selected()===$index" [class.morris-point--x]="owner($index)==='X'" [class.morris-point--o]="owner($index)==='O'" [style.left.%]="point.x" [style.top.%]="point.y" [disabled]="disabled()||(!isValid($index)&&!isSelectableStone($index))" (click)="choose($index)" (pointerenter)="(isValid($index)||isSelectableStone($index))&&feedback.notifyHover()"><span>{{owner($index)??''}}</span></button>}
  </div>
 </div>

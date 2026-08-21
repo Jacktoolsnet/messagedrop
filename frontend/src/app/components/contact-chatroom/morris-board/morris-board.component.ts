@@ -8,7 +8,8 @@ export class MorrisBoardComponent{
  readonly feedback=inject(GameFeedbackService);
  readonly game=input<MorrisGame|null>(null);readonly currentUserId=input('');readonly selectionMode=input(false);readonly disabled=input(false);
  readonly action=output<MorrisAction>();readonly firstPosition=output<number>();readonly selected=signal<number|null>(null);
- readonly points=[{x:5,y:5},{x:50,y:5},{x:95,y:5},{x:20,y:20},{x:50,y:20},{x:80,y:20},{x:35,y:35},{x:50,y:35},{x:65,y:35},{x:5,y:50},{x:20,y:50},{x:35,y:50},{x:65,y:50},{x:80,y:50},{x:95,y:50},{x:35,y:65},{x:50,y:65},{x:65,y:65},{x:20,y:80},{x:50,y:80},{x:80,y:80},{x:5,y:95},{x:50,y:95},{x:95,y:95}];
+ readonly traySlots=Array.from({length:9},(_,index)=>index);
+ readonly points=[{x:9,y:9},{x:50,y:9},{x:91,y:9},{x:23,y:23},{x:50,y:23},{x:77,y:23},{x:36,y:36},{x:50,y:36},{x:64,y:36},{x:9,y:50},{x:23,y:50},{x:36,y:50},{x:64,y:50},{x:77,y:50},{x:91,y:50},{x:36,y:64},{x:50,y:64},{x:64,y:64},{x:23,y:77},{x:50,y:77},{x:77,y:77},{x:9,y:91},{x:50,y:91},{x:91,y:91}];
  readonly validTargets=computed(()=>{
   if(this.selectionMode())return new Set(this.points.map((_,index)=>index));const game=this.game();if(!game||game.status!=='active'||game.nextPlayerUserId!==this.currentUserId())return new Set<number>();
   if(game.phase==='placing')return new Set(game.board.flatMap((cell,index)=>cell?[]:[index]));
@@ -29,4 +30,14 @@ export class MorrisBoardComponent{
  }
  owner(index:number):TicTacToeMark|null{return this.game()?.board[index]??null}
  isValid(index:number):boolean{return this.validTargets().has(index)}
+ isReserveTray():boolean{const g=this.game();return !!g&&(g.inHandX>0||g.inHandO>0)}
+ trayMark():TicTacToeMark{
+  const own=this.currentMark()??'X';
+  return this.isReserveTray()?own:own==='X'?'O':'X';
+ }
+ trayCount():number{
+  const g=this.game(),mark=this.trayMark();if(!g)return 0;
+  if(this.isReserveTray())return mark==='X'?g.inHandX:g.inHandO;
+  return 9-g.board.filter(owner=>owner===mark).length;
+ }
 }
