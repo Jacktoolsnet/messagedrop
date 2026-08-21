@@ -97,7 +97,7 @@ import { applyRockPaperScissorsChoice, createRockPaperScissorsGame } from '../..
 import { createCodeCommitment, createCodeGame, CodeSecret, evaluateCodeGuess, isValidCode, submitAndEvaluateCodeGuess } from '../../utils/code-game';
 import { applyMemoryTurn, createMemoryGame } from '../../utils/memory-game';
 import { applyMinefieldMove, createMinefieldGame } from '../../utils/minefield-game';
-import { applyHideSeekSearch, applySecondMinePlacement, createMinefieldHideSeekGame } from '../../utils/minefield-hide-seek';
+import { applyHideSeekSearch, applySecondMinePlacement, createMinefieldHideSeekGame, currentHideSeekRound } from '../../utils/minefield-hide-seek';
 
 interface ChatroomMessage {
   id: string;
@@ -214,6 +214,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   private initialTabbedMessagesCaptured = false;
   private readonly experienceEditTarget = signal<ChatroomMessage | null>(null);
   private readonly gameMovesInFlight = signal<ReadonlySet<string>>(new Set());
+  private readonly visibleMinefieldLayouts = signal<ReadonlySet<string>>(new Set());
   private scrolledToFirstUnread = false;
   private readTrackingEnabled = false;
   private visibilityObserver?: IntersectionObserver;
@@ -883,6 +884,24 @@ export class ContactChatroomComponent implements AfterViewInit {
     return !!game && game.type === 'minefieldHideSeek' && game.status === 'active'
       && game.nextPlayerUserId === this.userService.getUser().id
       && !this.gameMovesInFlight().has(game.gameId);
+  }
+
+  canToggleMinefieldLayout(game: ChatGame): boolean {
+    if (game.type !== 'minefieldHideSeek' || game.status !== 'active'
+      || (game.phase !== 'searchingFirst' && game.phase !== 'searchingSecond')) return false;
+    return currentHideSeekRound(game)?.hiderUserId === this.userService.getUser().id;
+  }
+
+  isMinefieldLayoutVisible(gameId: string): boolean {
+    return this.visibleMinefieldLayouts().has(gameId);
+  }
+
+  toggleMinefieldLayout(gameId: string): void {
+    this.visibleMinefieldLayouts.update(current => {
+      const next = new Set(current);
+      if (next.has(gameId)) next.delete(gameId); else next.add(gameId);
+      return next;
+    });
   }
 
   async playMinefieldHideSeekMove(message: ChatroomMessage, cellIndex: number): Promise<void> {

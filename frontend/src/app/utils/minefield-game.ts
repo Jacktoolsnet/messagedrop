@@ -86,9 +86,31 @@ export function createMineLayout(firstCellIndex: number, random: () => number = 
     const swapIndex = Math.floor(random() * (index + 1));
     [candidates[index], candidates[swapIndex]] = [candidates[swapIndex], candidates[index]];
   }
+  const selected: number[] = [];
+  const findPlacement = (candidateIndex: number): boolean => {
+    if (selected.length === MINEFIELD_MINE_COUNT) return true;
+    if (candidates.length - candidateIndex < MINEFIELD_MINE_COUNT - selected.length) return false;
+    for (let index = candidateIndex; index < candidates.length; index += 1) {
+      const candidate = candidates[index];
+      if (selected.some(mine => areMinefieldCellsAdjacent(mine, candidate))) continue;
+      selected.push(candidate);
+      if (findPlacement(index + 1)) return true;
+      selected.pop();
+    }
+    return false;
+  };
+  if (!findPlacement(0)) throw new Error('mine_placement_failed');
   const mines = Array(MINEFIELD_CELL_COUNT).fill(false) as boolean[];
-  candidates.slice(0, MINEFIELD_MINE_COUNT).forEach(index => { mines[index] = true; });
+  selected.forEach(index => { mines[index] = true; });
   return mines;
+}
+
+export function areMinefieldCellsAdjacent(first: number, second: number): boolean {
+  const firstRow = Math.floor(first / MINEFIELD_SIZE);
+  const firstColumn = first % MINEFIELD_SIZE;
+  const secondRow = Math.floor(second / MINEFIELD_SIZE);
+  const secondColumn = second % MINEFIELD_SIZE;
+  return Math.abs(firstRow - secondRow) <= 1 && Math.abs(firstColumn - secondColumn) <= 1;
 }
 
 function isCellIndex(value: number): boolean {

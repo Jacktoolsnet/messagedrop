@@ -1,11 +1,6 @@
 <div class="hide-seek">
- @if(game();as currentGame){
-  <div class="hide-seek__score"><span class="x">X</span><strong>{{ mistakes(currentGame.playerXUserId) ?? '–' }}</strong><mat-icon>warning</mat-icon><strong>{{ mistakes(currentGame.playerOUserId) ?? '–' }}</strong><span class="o">O</span></div>
- }
  @if(isPlacement()){
   <div class="hide-seek__placement-status">{{ 'common.contact.chatroom.games.hideSeekPlaceCount'|transloco:{selected:selectedMines().length,total:mineCount} }}</div>
- } @else if(round()?.hiderUserId===currentUserId()&&game()?.status==='active'){
-  <button mat-icon-button type="button" class="hide-seek__visibility" (click)="showHiddenMines.update(value=>!value)" [attr.aria-label]="(showHiddenMines()?'common.contact.chatroom.games.hideMinesAria':'common.contact.chatroom.games.showMinesAria')|transloco"><mat-icon>{{showHiddenMines()?'visibility_off':'visibility'}}</mat-icon></button>
  }
  <div class="hide-seek-grid">
   @for(index of cells;track index){

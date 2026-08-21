@@ -188,6 +188,8 @@ export interface MinefieldHideSeekRound {
   mines: boolean[];
   revealed: boolean[];
   mistakes: number;
+  /** True when the seeker revealed every mine before clearing all safe cells. */
+  lost?: boolean;
   lastMove: MinefieldLastMove | null;
 }
 

@@ -699,7 +699,7 @@
           "chooseFirstMinefieldMove": "Elige tu primera casilla. Esa casilla y todas las vecinas son seguras. Juegas con X.",
           "playMinefieldAria": "Iniciar duelo de Campo minado",
           "minefieldRulesTitle": "Reglas de Campo minado – Duelo",
-          "minefieldRuleFirstMove": "Se juega en un tablero de 8 × 8 con diez minas ocultas. La primera casilla y todas sus vecinas son seguras.",
+          "minefieldRuleFirstMove": "Se juega en un tablero de 8 × 8 con diez minas ocultas. Las minas no se tocan en horizontal, vertical ni diagonal. La primera casilla y todas sus vecinas son seguras.",
           "minefieldRuleAlternate": "Por turnos descubrís exactamente una casilla oculta. El último movimiento se resalta para el rival.",
           "minefieldRuleNumbers": "Un número indica cuántas minas hay en las ocho casillas vecinas. No se abren casillas adicionales automáticamente.",
           "minefieldRuleScore": "Una casilla segura da un punto. Tocar una mina resta dos puntos y la partida continúa.",

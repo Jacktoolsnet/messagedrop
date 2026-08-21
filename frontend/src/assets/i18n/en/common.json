@@ -700,7 +700,7 @@
           "chooseFirstMinefieldMove": "Choose your first square. It and every neighboring square are guaranteed safe. You play X.",
           "playMinefieldAria": "Start Minefield duel",
           "minefieldRulesTitle": "Minefield – Duel rules",
-          "minefieldRuleFirstMove": "The game uses an 8 × 8 board with ten hidden mines. The first square and all directly neighboring squares are guaranteed safe.",
+          "minefieldRuleFirstMove": "The game uses an 8 × 8 board with ten hidden mines. Mines never touch horizontally, vertically, or diagonally. The first square and all directly neighboring squares are guaranteed safe.",
           "minefieldRuleAlternate": "Take turns revealing exactly one hidden square. The latest move is highlighted for the other player.",
           "minefieldRuleNumbers": "A number shows how many mines occupy the eight neighboring squares. No additional squares open automatically.",
           "minefieldRuleScore": "A safe square awards one point. Hitting a mine costs two points and the game continues.",

@@ -29,22 +29,30 @@ export function applyHideSeekSearch(game: MinefieldHideSeekGame, userId: string,
   const hitMine = !!round.mines[cellIndex];
   const mistakes = round.mistakes + (hitMine ? 1 : 0);
   const moveNumber = game.moveNumber + 1;
+  const safeCellsComplete = round.mines.every((mine, index) => mine || revealed[index]);
+  const allMinesHit = round.mines.every((mine, index) => !mine || revealed[index]);
+  const lost = allMinesHit && !safeCellsComplete;
   const nextRound: MinefieldHideSeekRound = {
     ...round, revealed, mistakes,
+    lost,
     lastMove: { playerUserId: userId, cellIndex, hitMine, adjacentMines: countHideSeekAdjacentMines(round.mines, cellIndex), moveNumber }
   };
   const rounds = game.rounds.map((value, index) => index === roundIndex ? nextRound : value);
-  const complete = round.mines.every((mine, index) => mine || revealed[index]);
+  const complete = safeCellsComplete || lost;
   if (!complete) return { ...game, rounds, moveNumber };
   if (roundIndex === 0) {
     return { ...game, rounds, phase: 'placingSecond', nextPlayerUserId: game.playerOUserId, moveNumber };
   }
+  const firstRoundLost = !!rounds[0].lost;
+  const secondRoundLost = !!rounds[1].lost;
   const playerOMistakes = rounds[0].mistakes;
   const playerXMistakes = rounds[1].mistakes;
-  const status = playerXMistakes === playerOMistakes ? 'draw' : 'won';
-  const winnerUserId = status === 'won'
-    ? playerXMistakes < playerOMistakes ? game.playerXUserId : game.playerOUserId
-    : null;
+  const winnerUserId = firstRoundLost !== secondRoundLost
+    ? firstRoundLost ? game.playerXUserId : game.playerOUserId
+    : !firstRoundLost && playerXMistakes !== playerOMistakes
+      ? playerXMistakes < playerOMistakes ? game.playerXUserId : game.playerOUserId
+      : null;
+  const status = winnerUserId ? 'won' : 'draw';
   return { ...game, rounds, phase: 'finished', nextPlayerUserId: null, status, winnerUserId, moveNumber };
 }
 
@@ -96,7 +104,7 @@ export function currentHideSeekRound(game: MinefieldHideSeekGame): MinefieldHide
 }
 
 function createRound(hiderUserId: string, seekerUserId: string, mines: boolean[]): MinefieldHideSeekRound {
-  return { hiderUserId, seekerUserId, mines, revealed: Array(HIDE_SEEK_CELL_COUNT).fill(false), mistakes: 0, lastMove: null };
+  return { hiderUserId, seekerUserId, mines, revealed: Array(HIDE_SEEK_CELL_COUNT).fill(false), mistakes: 0, lost: false, lastMove: null };
 }
 function isSearching(game: MinefieldHideSeekGame): boolean { return game.phase === 'searchingFirst' || game.phase === 'searchingSecond'; }
 function isCellIndex(index: number): boolean { return Number.isInteger(index) && index >= 0 && index < HIDE_SEEK_CELL_COUNT; }

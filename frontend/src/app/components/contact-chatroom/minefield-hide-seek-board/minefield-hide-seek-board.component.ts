@@ -14,11 +14,11 @@ export class MinefieldHideSeekBoardComponent{
  readonly currentUserId=input('');
  readonly placementMode=input(false);
  readonly disabled=input(false);
+ readonly showHiddenMines=input(false);
  readonly search=output<number>();
  readonly placement=output<number[]>();
  readonly placementChange=output<number[]>();
  readonly selectedMines=signal<number[]>([]);
- readonly showHiddenMines=signal(false);
  readonly cells=Array.from({length:HIDE_SEEK_CELL_COUNT},(_,index)=>index);
  readonly mineCount=HIDE_SEEK_MINE_COUNT;
 
@@ -48,5 +48,4 @@ export class MinefieldHideSeekBoardComponent{
  }
  adjacent(index:number):number{return this.round()?countHideSeekAdjacentMines(this.round()!.mines,index):0}
  isLast(index:number):boolean{return this.round()?.lastMove?.cellIndex===index}
- mistakes(userId:string):number|null{return this.game()?.rounds.find(round=>round.seekerUserId===userId)?.mistakes??null}
 }

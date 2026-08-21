@@ -10,4 +10,10 @@ describe('minefield hide and seek', () => {
     game=applySecondMinePlacement(game,'o',placement)!;
     expect(game.phase).toBe('searchingSecond');expect(game.nextPlayerUserId).toBe('x');
   });
+  it('ends the round as lost when every mine is hit first',()=>{
+    let game=createMinefieldHideSeekGame('x','o',placement);
+    for(const index of placement)game=applyHideSeekSearch(game,'o',index)!;
+    expect(game.phase).toBe('placingSecond');
+    expect(game.rounds[0].lost).toBeTrue();
+  });
 });

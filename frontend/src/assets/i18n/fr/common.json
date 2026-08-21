@@ -699,7 +699,7 @@
           "chooseFirstMinefieldMove": "Choisis ta première case. Cette case et toutes ses voisines sont garanties sans mine. Tu joues avec X.",
           "playMinefieldAria": "Démarrer le duel Champ de mines",
           "minefieldRulesTitle": "Règles de Champ de mines – Duel",
-          "minefieldRuleFirstMove": "La partie se joue sur une grille de 8 × 8 avec dix mines cachées. La première case et toutes ses voisines sont garanties sans mine.",
+          "minefieldRuleFirstMove": "La partie se joue sur une grille de 8 × 8 avec dix mines cachées. Les mines ne se touchent ni horizontalement, ni verticalement, ni en diagonale. La première case et toutes ses voisines sont garanties sans mine.",
           "minefieldRuleAlternate": "À tour de rôle, vous révélez exactement une case cachée. Le dernier coup est mis en évidence pour l’autre personne.",
           "minefieldRuleNumbers": "Un nombre indique combien de mines se trouvent dans les huit cases voisines. Aucune autre case ne s’ouvre automatiquement.",
           "minefieldRuleScore": "Une case sûre rapporte un point. Toucher une mine retire deux points et la partie continue.",

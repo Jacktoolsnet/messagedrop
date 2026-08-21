@@ -1,10 +1,16 @@
-import { applyMinefieldMove, countAdjacentMines, createMineLayout, createMinefieldGame, MINEFIELD_MINE_COUNT } from './minefield-game';
+import { applyMinefieldMove, areMinefieldCellsAdjacent, countAdjacentMines, createMineLayout, createMinefieldGame, MINEFIELD_MINE_COUNT } from './minefield-game';
 
 describe('minefield game', () => {
   it('keeps the first cell and its neighbors safe', () => {
     const mines = createMineLayout(27, () => 0.42);
     expect(mines.filter(Boolean).length).toBe(MINEFIELD_MINE_COUNT);
     for (const index of [18,19,20,26,27,28,34,35,36]) expect(mines[index]).toBeFalse();
+    const mineIndices = mines.flatMap((mine, index) => mine ? [index] : []);
+    for (let first = 0; first < mineIndices.length; first += 1) {
+      for (let second = first + 1; second < mineIndices.length; second += 1) {
+        expect(areMinefieldCellsAdjacent(mineIndices[first], mineIndices[second])).toBeFalse();
+      }
+    }
   });
 
   it('awards safe cells, penalizes mines and alternates turns', () => {

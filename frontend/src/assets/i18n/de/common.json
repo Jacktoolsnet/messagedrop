@@ -700,7 +700,7 @@
           "chooseFirstMinefieldMove": "Wähle dein erstes Feld. Dieses Feld und seine Umgebung sind garantiert sicher. Du spielst X.",
           "playMinefieldAria": "Minenfeld-Duell starten",
           "minefieldRulesTitle": "Regeln für Minenfeld – Duell",
-          "minefieldRuleFirstMove": "Gespielt wird auf einem Feld mit 8 × 8 Feldern und zehn versteckten Minen. Der erste Zug und seine direkt angrenzenden Felder sind garantiert sicher.",
+          "minefieldRuleFirstMove": "Gespielt wird auf einem Feld mit 8 × 8 Feldern und zehn versteckten Minen. Minen liegen weder waagerecht, senkrecht noch diagonal direkt nebeneinander. Der erste Zug und seine direkt angrenzenden Felder sind garantiert sicher.",
           "minefieldRuleAlternate": "Ihr deckt abwechselnd jeweils genau ein noch verborgenes Feld auf. Der letzte Zug wird für den Kontakt hervorgehoben.",
           "minefieldRuleNumbers": "Eine Zahl zeigt, wie viele Minen sich auf den acht angrenzenden Feldern befinden. Es werden keine zusätzlichen Felder automatisch geöffnet.",
           "minefieldRuleScore": "Ein sicheres Feld gibt einen Punkt. Wer eine Mine trifft, verliert zwei Punkte; das Spiel geht anschließend weiter.",
