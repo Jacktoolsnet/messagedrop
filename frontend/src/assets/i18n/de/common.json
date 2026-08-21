@@ -678,7 +678,22 @@
           "codeInvalid": "Warnung: Code stimmt nicht mit der ursprünglichen Prüfsumme überein",
           "codeRuleWatch": "Der Codegeber wird über jeden Versuch informiert und kann den Spielverlauf live oder später verfolgen.",
           "showCodeAria": "Eigenen Code anzeigen",
-          "hideCodeAria": "Eigenen Code ausblenden"
+          "hideCodeAria": "Eigenen Code ausblenden",
+          "memory": "Finde Paare",
+          "newMemoryTitle": "Neue Runde Finde Paare",
+          "chooseFirstMemoryTurn": "Decke zwei Karten für deinen ersten Zug auf. Du spielst X.",
+          "playMemoryAria": "Finde Paare starten",
+          "memoryRulesTitle": "Regeln für Finde Paare",
+          "memoryRuleFirstTurn": "Der Absender beginnt und deckt vor dem Senden zwei Karten auf.",
+          "memoryRulePair": "Zeigen beide Karten dasselbe Symbol, gehört das Paar dir und du bist erneut am Zug.",
+          "memoryRuleMiss": "Zeigen die Karten unterschiedliche Symbole, wechselt der Zug zum Kontakt.",
+          "memoryRuleOffline": "Der letzte gegnerische Zug bleibt gespeichert und beim Öffnen des Chats sichtbar. Ein Fehlversuch wird erst beim Beginn des eigenen Zuges wieder verdeckt.",
+          "memoryRuleWin": "Wenn alle acht Paare gefunden wurden, gewinnt die Person mit den meisten Paaren. Bei Gleichstand endet das Spiel unentschieden.",
+          "memoryCardVisibleAria": "Karte {{ card }} ist aufgedeckt",
+          "memoryCardHiddenAria": "Karte {{ card }} aufdecken",
+          "memoryLastMoveHint": "Der letzte Zug bleibt sichtbar, bis du deine erste Karte auswählst.",
+          "memoryStartFailed": "Finde Paare konnte nicht gestartet werden.",
+          "memoryPreviewPrefix": "Finde Paare"
         },
         "revisionHistory": {
           "title": "Änderungshistorie",

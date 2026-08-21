@@ -678,7 +678,22 @@
           "codeInvalid": "Warning: code does not match the original commitment",
           "codeRuleWatch": "The codemaker is notified about every attempt and can follow the game live or later.",
           "showCodeAria": "Show your code",
-          "hideCodeAria": "Hide your code"
+          "hideCodeAria": "Hide your code",
+          "memory": "Find Pairs",
+          "newMemoryTitle": "New Find Pairs game",
+          "chooseFirstMemoryTurn": "Reveal two cards for your first turn. You play X.",
+          "playMemoryAria": "Start Find Pairs",
+          "memoryRulesTitle": "Find Pairs rules",
+          "memoryRuleFirstTurn": "The sender starts by revealing two cards before sending the game.",
+          "memoryRulePair": "If both cards show the same symbol, the pair is yours and you take another turn.",
+          "memoryRuleMiss": "If the symbols differ, the turn passes to your contact.",
+          "memoryRuleOffline": "The opponent’s last turn is stored and remains visible when the chat is opened. A missed pair turns face down when you start your own turn.",
+          "memoryRuleWin": "When all eight pairs have been found, the player with the most pairs wins. Equal scores end in a draw.",
+          "memoryCardVisibleAria": "Card {{ card }} is revealed",
+          "memoryCardHiddenAria": "Reveal card {{ card }}",
+          "memoryLastMoveHint": "The last turn remains visible until you select your first card.",
+          "memoryStartFailed": "Find Pairs could not be started.",
+          "memoryPreviewPrefix": "Find Pairs"
         },
         "revisionHistory": {
           "title": "Change history",

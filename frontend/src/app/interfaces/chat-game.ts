@@ -131,7 +131,31 @@ export interface CodeGame {
   moveNumber: number;
 }
 
-export type ChatGame = TicTacToeGame | ConnectFourGame | DotsAndBoxesGame | RockPaperScissorsGame | CodeGame;
+export type MemorySymbol = 'pets' | 'forest' | 'star' | 'favorite' | 'music_note' | 'flight' | 'restaurant' | 'sports_soccer';
+
+export interface MemoryLastMove {
+  playerUserId: string;
+  cardIndices: [number, number];
+  matched: boolean;
+  moveNumber: number;
+}
+
+export interface MemoryGame {
+  type: 'memory';
+  version: 1;
+  gameId: string;
+  cards: MemorySymbol[];
+  matchedBy: TicTacToeCell[];
+  playerXUserId: string;
+  playerOUserId: string;
+  nextPlayerUserId: string | null;
+  status: TicTacToeStatus;
+  winnerUserId: string | null;
+  moveNumber: number;
+  lastMove: MemoryLastMove | null;
+}
+
+export type ChatGame = TicTacToeGame | ConnectFourGame | DotsAndBoxesGame | RockPaperScissorsGame | CodeGame | MemoryGame;
 
 export interface GameStats {
   played: number;

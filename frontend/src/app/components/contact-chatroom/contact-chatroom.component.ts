@@ -19,6 +19,7 @@ import {
   DotsAndBoxesGame,
   DotsAndBoxesMove,
   GameStats,
+  MemoryGame,
   RockPaperScissorsChoice,
   RockPaperScissorsGame,
   TicTacToeGame,
@@ -73,6 +74,8 @@ import { NewRockPaperScissorsDialogComponent } from './new-rock-paper-scissors-d
 import { RockPaperScissorsBoardComponent } from './rock-paper-scissors-board/rock-paper-scissors-board.component';
 import { CodeBoardComponent } from './code-board/code-board.component';
 import { NewCodeDialogComponent } from './new-code-dialog/new-code-dialog.component';
+import { MemoryBoardComponent } from './memory-board/memory-board.component';
+import { NewMemoryDialogComponent, NewMemoryDialogResult } from './new-memory-dialog/new-memory-dialog.component';
 import { DeleteContactMessageComponent } from './delete-contact-message/delete-contact-message.component';
 import { DisplayMessageService } from '../../services/display-message.service';
 import { ProtectedStickerImageComponent } from '../utils/protected-sticker-image/protected-sticker-image.component';
@@ -86,6 +89,7 @@ import { applyConnectFourMove, createConnectFourGame } from '../../utils/connect
 import { applyDotsAndBoxesMove, createDotsAndBoxesGame } from '../../utils/dots-and-boxes';
 import { applyRockPaperScissorsChoice, createRockPaperScissorsGame } from '../../utils/rock-paper-scissors';
 import { createCodeCommitment, createCodeGame, CodeSecret, evaluateCodeGuess, isValidCode, submitAndEvaluateCodeGuess } from '../../utils/code-game';
+import { applyMemoryTurn, createMemoryGame } from '../../utils/memory-game';
 
 interface ChatroomMessage {
   id: string;
@@ -133,6 +137,7 @@ interface ContactChatroomDialogData {
     DotsAndBoxesBoardComponent,
     RockPaperScissorsBoardComponent,
     CodeBoardComponent,
+    MemoryBoardComponent,
     TranslocoPipe
   ],
   templateUrl: './contact-chatroom.component.html',
@@ -522,7 +527,8 @@ export class ContactChatroomComponent implements AfterViewInit {
         vanishingConnectFourStats: this.getConnectFourStats('vanishing'),
         dotsAndBoxesStats: this.getDotsAndBoxesStats(),
         rockPaperScissorsStats: this.getRockPaperScissorsStats(),
-        codeStats: this.getCodeStats()
+        codeStats: this.getCodeStats(),
+        memoryStats: this.getMemoryStats()
       },
       width: 'min(760px, 94vw)',
       maxWidth: '94vw',
@@ -548,6 +554,8 @@ export class ContactChatroomComponent implements AfterViewInit {
         this.openNewRockPaperScissorsDialog(contact);
       } else if (gameType === 'code') {
         this.openNewCodeDialog(contact);
+      } else if (gameType === 'memory') {
+        this.openNewMemoryDialog(contact);
       }
     });
   }
@@ -618,6 +626,23 @@ export class ContactChatroomComponent implements AfterViewInit {
     });
   }
 
+  private openNewMemoryDialog(contact: Contact): void {
+    const dialogRef = this.matDialog.open(NewMemoryDialogComponent, {
+      width: 'min(470px, 96vw)', maxWidth: '96vw', maxHeight: '90vh', hasBackdrop: true,
+      backdropClass: 'dialog-backdrop', disableClose: false, autoFocus: false
+    });
+    dialogRef.afterClosed().subscribe((result?: NewMemoryDialogResult) => {
+      if (!result) return;
+      try {
+        const payload = this.createEmptyMessage();
+        payload.game = createMemoryGame(contact.userId, contact.contactUserId, result.cards, result.firstTurn);
+        void this.sendAsNewMessage(contact, payload, undefined, 'game_started');
+      } catch {
+        this.snackBar.open(this.translation.t('common.contact.chatroom.games.memoryStartFailed'), '', { duration: 3000 });
+      }
+    });
+  }
+
   private async startCodeGame(contact: Contact, code: CodeSymbol[]): Promise<void> {
     try {
       const secret: CodeSecret = { code: [...code], nonce: crypto.randomUUID() };
@@ -675,6 +700,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getChatGameIcon(game: ChatGame): string {
+    if (game.type === 'memory') return 'style';
     if (game.type === 'code') return 'password';
     if (game.type === 'dotsAndBoxes') return 'border_outer';
     if (game.type === 'rockPaperScissors') return 'content_cut';
@@ -682,7 +708,9 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getChatGameTitle(game: ChatGame): string {
-    const key = game.type === 'code'
+    const key = game.type === 'memory'
+      ? 'common.contact.chatroom.games.memory'
+      : game.type === 'code'
       ? 'common.contact.chatroom.games.code'
       : game.type === 'connectFour'
       ? 'common.contact.chatroom.games.connectFour'
@@ -695,7 +723,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getChatGameVariantLabel(game: ChatGame): string {
-    const key = game.type !== 'dotsAndBoxes' && game.type !== 'rockPaperScissors' && game.type !== 'code' && game.variant === 'vanishing'
+    const key = game.type !== 'dotsAndBoxes' && game.type !== 'rockPaperScissors' && game.type !== 'code' && game.type !== 'memory' && game.variant === 'vanishing'
       ? 'common.contact.chatroom.games.vanishingVariant'
       : 'common.contact.chatroom.games.standardVariant';
     return this.translation.t(key);
@@ -719,6 +747,10 @@ export class ContactChatroomComponent implements AfterViewInit {
       const currentUserId = this.userService.getUser().id;
       return game.playerXUserId === currentUserId ? 'X' : game.playerOUserId === currentUserId ? 'O' : null;
     }
+    if (game.type === 'memory') {
+      const currentUserId = this.userService.getUser().id;
+      return game.playerXUserId === currentUserId ? 'X' : game.playerOUserId === currentUserId ? 'O' : null;
+    }
     if (game.type === 'rockPaperScissors' || game.type === 'code') return null;
     const currentUserId = this.userService.getUser().id;
     return game.playerRedUserId === currentUserId ? 'X' : game.playerYellowUserId === currentUserId ? 'O' : null;
@@ -728,7 +760,7 @@ export class ContactChatroomComponent implements AfterViewInit {
     this.matDialog.open(GameRulesDialogComponent, {
       data: {
         gameType: game.type,
-        variant: game.type === 'dotsAndBoxes' || game.type === 'rockPaperScissors' || game.type === 'code' ? 'standard' : game.variant ?? 'standard'
+        variant: game.type === 'dotsAndBoxes' || game.type === 'rockPaperScissors' || game.type === 'code' || game.type === 'memory' ? 'standard' : game.variant ?? 'standard'
       },
       width: 'min(440px, 94vw)',
       maxWidth: '94vw',
@@ -751,6 +783,8 @@ export class ContactChatroomComponent implements AfterViewInit {
       this.openNewDotsAndBoxesDialog(contact);
     } else if (game.type === 'rockPaperScissors') {
       this.openNewRockPaperScissorsDialog(contact);
+    } else if (game.type === 'memory') {
+      this.openNewMemoryDialog(contact);
     } else {
       this.openNewCodeDialog(contact);
     }
@@ -761,6 +795,38 @@ export class ContactChatroomComponent implements AfterViewInit {
     return !!game && game.type === 'code' && game.status === 'active'
       && game.nextPlayerUserId === this.userService.getUser().id
       && !this.gameMovesInFlight().has(game.gameId);
+  }
+
+  canPlayMemory(message: ChatroomMessage): boolean {
+    const game = message.payload?.game;
+    return !!game && game.type === 'memory' && game.status === 'active'
+      && game.nextPlayerUserId === this.userService.getUser().id
+      && !this.gameMovesInFlight().has(game.gameId);
+  }
+
+  async playMemoryTurn(message: ChatroomMessage, cardIndices: [number, number]): Promise<void> {
+    const contact = this.contact();
+    const game = message.payload?.game;
+    if (!contact || !game || game.type !== 'memory' || !this.canPlayMemory(message)) return;
+    const nextGame = applyMemoryTurn(game, this.userService.getUser().id, cardIndices);
+    if (!nextGame) return;
+    this.setGameMoveInFlight(game.gameId, true);
+    const payload = this.createEmptyMessage();
+    payload.game = nextGame;
+    await this.sendAsNewMessage(contact, payload, message.messageId, 'game_move');
+    this.setGameMoveInFlight(game.gameId, false);
+  }
+
+  getMemoryStatusText(game: MemoryGame): string {
+    const currentUserId = this.userService.getUser().id;
+    const contactName = this.contact()?.name || this.translation.t('common.contact.chatroom.contactLabel');
+    if (game.status === 'draw') return this.translation.t('common.contact.chatroom.games.statusDraw');
+    if (game.status === 'won') return game.winnerUserId === currentUserId
+      ? this.translation.t('common.contact.chatroom.games.statusWonYou')
+      : this.translation.t('common.contact.chatroom.games.statusWonContact', { name: contactName });
+    return game.nextPlayerUserId === currentUserId
+      ? this.translation.t('common.contact.chatroom.games.statusYourTurn')
+      : this.translation.t('common.contact.chatroom.games.statusContactTurn', { name: contactName });
   }
 
   async submitCodeGuess(message: ChatroomMessage, symbols: CodeSymbol[]): Promise<void> {
@@ -1061,6 +1127,22 @@ export class ContactChatroomComponent implements AfterViewInit {
     const stats: GameStats = { played: latestGames.size, won: 0, lost: 0, drawn: 0 };
     for (const game of latestGames.values()) {
       if (game.status === 'won' && game.winnerUserId === currentUserId) stats.won += 1;
+      else if (game.status === 'won') stats.lost += 1;
+    }
+    return stats;
+  }
+
+  private getMemoryStats(): GameStats {
+    const currentUserId = this.userService.getUser().id;
+    const latestGames = new Map<string, MemoryGame>();
+    for (const message of this.visibleMessages()) {
+      const game = message.payload?.game;
+      if (game?.type === 'memory' && !latestGames.has(game.gameId)) latestGames.set(game.gameId, game);
+    }
+    const stats: GameStats = { played: latestGames.size, won: 0, lost: 0, drawn: 0 };
+    for (const game of latestGames.values()) {
+      if (game.status === 'draw') stats.drawn += 1;
+      else if (game.status === 'won' && game.winnerUserId === currentUserId) stats.won += 1;
       else if (game.status === 'won') stats.lost += 1;
     }
     return stats;

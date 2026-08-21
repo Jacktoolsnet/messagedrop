@@ -219,6 +219,9 @@
             <app-rock-paper-scissors-board [game]="game" [currentUserId]="getCurrentUserId()"
               [disabled]="!canPlayRockPaperScissors(msg)" [statusText]="getRockPaperScissorsStatusText(game)"
               [showStatus]="false" (choice)="playRockPaperScissorsChoice(msg, $event)"></app-rock-paper-scissors-board>
+            } @else if (game.type === 'memory') {
+            <app-memory-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayMemory(msg)"
+              (turn)="playMemoryTurn(msg, $event)"></app-memory-board>
             } @else {
             <app-code-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayCode(msg)"
               (guess)="submitCodeGuess(msg, $event)" (evaluate)="evaluateCodeGuess(msg)"></app-code-board>
@@ -523,6 +526,9 @@
             <app-rock-paper-scissors-board [game]="game" [currentUserId]="getCurrentUserId()"
               [disabled]="!canPlayRockPaperScissors(msg)" [statusText]="getRockPaperScissorsStatusText(game)"
               [showStatus]="false" (choice)="playRockPaperScissorsChoice(msg, $event)"></app-rock-paper-scissors-board>
+            } @else if (game.type === 'memory') {
+            <app-memory-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayMemory(msg)"
+              (turn)="playMemoryTurn(msg, $event)"></app-memory-board>
             } @else {
             <app-code-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayCode(msg)"
               (guess)="submitCodeGuess(msg, $event)" (evaluate)="evaluateCodeGuess(msg)"></app-code-board>

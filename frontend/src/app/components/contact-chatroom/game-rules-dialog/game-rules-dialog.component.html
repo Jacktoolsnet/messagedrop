@@ -1,9 +1,15 @@
-<app-dialog-header [icon]="data.gameType === 'code' ? 'password' : data.gameType === 'connectFour' ? 'view_column' : data.gameType === 'dotsAndBoxes' ? 'border_outer' : data.gameType === 'rockPaperScissors' ? 'content_cut' : 'grid_3x3'"
-  [title]="(data.gameType === 'code' ? 'common.contact.chatroom.games.codeRulesTitle' : data.gameType === 'rockPaperScissors' ? 'common.contact.chatroom.games.rockPaperScissorsRulesTitle' : data.gameType === 'dotsAndBoxes' ? 'common.contact.chatroom.games.dotsAndBoxesRulesTitle' : data.gameType === 'connectFour' ? (data.variant === 'vanishing' ? 'common.contact.chatroom.games.vanishingConnectFourRulesTitle' : 'common.contact.chatroom.games.connectFourRulesTitle') : data.variant === 'vanishing' ? 'common.contact.chatroom.games.vanishingRulesTitle' : 'common.contact.chatroom.games.rulesTitle') | transloco"></app-dialog-header>
+<app-dialog-header [icon]="data.gameType === 'memory' ? 'style' : data.gameType === 'code' ? 'password' : data.gameType === 'connectFour' ? 'view_column' : data.gameType === 'dotsAndBoxes' ? 'border_outer' : data.gameType === 'rockPaperScissors' ? 'content_cut' : 'grid_3x3'"
+  [title]="(data.gameType === 'memory' ? 'common.contact.chatroom.games.memoryRulesTitle' : data.gameType === 'code' ? 'common.contact.chatroom.games.codeRulesTitle' : data.gameType === 'rockPaperScissors' ? 'common.contact.chatroom.games.rockPaperScissorsRulesTitle' : data.gameType === 'dotsAndBoxes' ? 'common.contact.chatroom.games.dotsAndBoxesRulesTitle' : data.gameType === 'connectFour' ? (data.variant === 'vanishing' ? 'common.contact.chatroom.games.vanishingConnectFourRulesTitle' : 'common.contact.chatroom.games.connectFourRulesTitle') : data.variant === 'vanishing' ? 'common.contact.chatroom.games.vanishingRulesTitle' : 'common.contact.chatroom.games.rulesTitle') | transloco"></app-dialog-header>
 
 <mat-dialog-content class="rules-content">
   <ol class="rules-list">
-    @if (data.gameType === 'code') {
+    @if (data.gameType === 'memory') {
+    <li>{{ 'common.contact.chatroom.games.memoryRuleFirstTurn' | transloco }}</li>
+    <li>{{ 'common.contact.chatroom.games.memoryRulePair' | transloco }}</li>
+    <li>{{ 'common.contact.chatroom.games.memoryRuleMiss' | transloco }}</li>
+    <li>{{ 'common.contact.chatroom.games.memoryRuleOffline' | transloco }}</li>
+    <li>{{ 'common.contact.chatroom.games.memoryRuleWin' | transloco }}</li>
+    } @else if (data.gameType === 'code') {
     <li>{{ 'common.contact.chatroom.games.codeRuleSecret' | transloco }}</li>
     <li>{{ 'common.contact.chatroom.games.codeRuleGuess' | transloco }}</li>
     <li>{{ 'common.contact.chatroom.games.codeRuleFeedback' | transloco }}</li>

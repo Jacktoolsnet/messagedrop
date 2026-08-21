@@ -677,7 +677,22 @@
           "codeInvalid": "Aviso: el código no coincide con el compromiso original",
           "codeRuleWatch": "Quien creó el código recibe información de cada intento y puede seguir la partida en directo o más tarde.",
           "showCodeAria": "Mostrar tu código",
-          "hideCodeAria": "Ocultar tu código"
+          "hideCodeAria": "Ocultar tu código",
+          "memory": "Encuentra parejas",
+          "newMemoryTitle": "Nueva partida de Encuentra parejas",
+          "chooseFirstMemoryTurn": "Descubre dos cartas para tu primer turno. Juegas con X.",
+          "playMemoryAria": "Iniciar Encuentra parejas",
+          "memoryRulesTitle": "Reglas de Encuentra parejas",
+          "memoryRuleFirstTurn": "El remitente empieza descubriendo dos cartas antes de enviar la partida.",
+          "memoryRulePair": "Si ambas cartas muestran el mismo símbolo, la pareja es tuya y vuelves a jugar.",
+          "memoryRuleMiss": "Si los símbolos son distintos, el turno pasa al contacto.",
+          "memoryRuleOffline": "El último turno del rival se guarda y permanece visible al abrir el chat. Un fallo se oculta al comenzar tu propio turno.",
+          "memoryRuleWin": "Cuando se encuentran las ocho parejas, gana quien tenga más. Un empate termina la partida en tablas.",
+          "memoryCardVisibleAria": "La carta {{ card }} está descubierta",
+          "memoryCardHiddenAria": "Descubrir la carta {{ card }}",
+          "memoryLastMoveHint": "El último turno permanece visible hasta que elijas tu primera carta.",
+          "memoryStartFailed": "No se pudo iniciar Encuentra parejas.",
+          "memoryPreviewPrefix": "Encuentra parejas"
         },
         "revisionHistory": {
           "title": "Historial de cambios",

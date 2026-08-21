@@ -677,7 +677,22 @@
           "codeInvalid": "Attention : le code ne correspond pas à l’engagement initial",
           "codeRuleWatch": "La personne ayant créé le code est informée de chaque essai et peut suivre la partie en direct ou plus tard.",
           "showCodeAria": "Afficher ton code",
-          "hideCodeAria": "Masquer ton code"
+          "hideCodeAria": "Masquer ton code",
+          "memory": "Trouve les paires",
+          "newMemoryTitle": "Nouvelle partie de Trouve les paires",
+          "chooseFirstMemoryTurn": "Retourne deux cartes pour ton premier tour. Tu joues avec X.",
+          "playMemoryAria": "Démarrer Trouve les paires",
+          "memoryRulesTitle": "Règles de Trouve les paires",
+          "memoryRuleFirstTurn": "L’expéditeur commence en retournant deux cartes avant d’envoyer la partie.",
+          "memoryRulePair": "Si les deux cartes montrent le même symbole, la paire est à toi et tu rejoues.",
+          "memoryRuleMiss": "Si les symboles diffèrent, le tour passe au contact.",
+          "memoryRuleOffline": "Le dernier tour adverse est enregistré et reste visible à l’ouverture du chat. Un échec est masqué au début de ton propre tour.",
+          "memoryRuleWin": "Lorsque les huit paires sont trouvées, la personne qui en possède le plus gagne. Une égalité termine la partie sur un nul.",
+          "memoryCardVisibleAria": "La carte {{ card }} est retournée",
+          "memoryCardHiddenAria": "Retourner la carte {{ card }}",
+          "memoryLastMoveHint": "Le dernier tour reste visible jusqu’à ce que tu choisisses ta première carte.",
+          "memoryStartFailed": "Trouve les paires n’a pas pu démarrer.",
+          "memoryPreviewPrefix": "Trouve les paires"
         },
         "revisionHistory": {
           "title": "Historique des modifications",
