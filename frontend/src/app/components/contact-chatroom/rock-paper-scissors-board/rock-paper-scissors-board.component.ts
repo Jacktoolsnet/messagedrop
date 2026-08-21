@@ -44,8 +44,16 @@ export class RockPaperScissorsBoardComponent {
     this.feedback.notifyHover();
   }
 
-  showFirstChoice(game: RockPaperScissorsGame): boolean {
-    return game.status !== 'active' || game.playerXUserId === this.currentUserId();
+  showPlayerChoice(game: RockPaperScissorsGame, playerUserId: string): boolean {
+    return game.status !== 'active' || playerUserId === this.currentUserId();
+  }
+
+  getPlayerXScore(game: RockPaperScissorsGame): number {
+    return game.playerXScore ?? game.rounds?.filter(round => round.winnerUserId === game.playerXUserId).length ?? 0;
+  }
+
+  getPlayerOScore(game: RockPaperScissorsGame): number {
+    return game.playerOScore ?? game.rounds?.filter(round => round.winnerUserId === game.playerOUserId).length ?? 0;
   }
 
   getChoiceIcon(choice: RockPaperScissorsChoice): string {

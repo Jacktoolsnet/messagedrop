@@ -19,6 +19,30 @@
   gap: 0.85rem;
 }
 
+.rps__score {
+  justify-self: center;
+  display: inline-grid;
+  grid-template-columns: repeat(5, auto);
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.35rem 0.8rem;
+  border: 1px solid var(--mat-sys-outline-variant, var(--mat-card-outlined-outline-color));
+  border-radius: 999px;
+  background: var(--mat-sys-surface-container-highest, var(--mat-card-filled-container-color));
+}
+
+.rps__score-x {
+  color: var(--rps-x);
+  font-weight: 800;
+  text-shadow: 0 0 6px color-mix(in srgb, var(--rps-x) 58%, transparent);
+}
+
+.rps__score-o {
+  color: var(--rps-o);
+  font-weight: 800;
+  text-shadow: 0 0 6px color-mix(in srgb, var(--rps-o) 58%, transparent);
+}
+
 .rps__duel {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
@@ -64,6 +88,23 @@
   color: var(--mat-card-subtitle-text-color);
   font-size: 0.75rem;
   font-weight: 800;
+}
+
+.rps__rounds {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.rps__round {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid var(--mat-sys-outline-variant, var(--mat-card-outlined-outline-color));
+  border-radius: 0.7rem;
+  background: var(--mat-sys-surface-container-highest, var(--mat-card-filled-container-color));
+  font-size: 0.72rem;
 }
 
 .rps__choices {

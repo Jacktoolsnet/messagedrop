@@ -77,14 +77,24 @@ export interface DotsAndBoxesGame {
 
 export type RockPaperScissorsChoice = 'rock' | 'paper' | 'scissors';
 
+export interface RockPaperScissorsRound {
+  playerXChoice: RockPaperScissorsChoice;
+  playerOChoice: RockPaperScissorsChoice;
+  winnerUserId: string | null;
+}
+
 export interface RockPaperScissorsGame {
   type: 'rockPaperScissors';
   version: 1;
   gameId: string;
   playerXUserId: string;
   playerOUserId: string;
-  playerXChoice: RockPaperScissorsChoice;
+  playerXChoice: RockPaperScissorsChoice | null;
   playerOChoice: RockPaperScissorsChoice | null;
+  rounds?: RockPaperScissorsRound[];
+  playerXScore?: number;
+  playerOScore?: number;
+  roundFirstPlayerUserId?: string;
   nextPlayerUserId: string | null;
   status: TicTacToeStatus;
   winnerUserId: string | null;

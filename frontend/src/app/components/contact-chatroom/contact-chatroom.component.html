@@ -354,10 +354,17 @@
                 <mat-icon>history</mat-icon>
               </button>
               }
-              @if (msg.payload?.game) {
+              @if (msg.payload?.game; as actionGame) {
+              @if (actionGame.status !== 'active') {
+              <button mat-mini-fab color="primary"
+                [attr.aria-label]="'common.contact.chatroom.games.rematchAria' | transloco"
+                (click)="startGameRematch(actionGame)">
+                <mat-icon>replay</mat-icon>
+              </button>
+              }
               <button mat-mini-fab color="primary"
                 [attr.aria-label]="'common.contact.chatroom.games.rulesAria' | transloco"
-                (click)="openGameRules(msg.payload.game)">
+                (click)="openGameRules(actionGame)">
                 <mat-icon>help</mat-icon>
               </button>
               <button mat-mini-fab color="primary"
@@ -643,10 +650,17 @@
                 <mat-icon>history</mat-icon>
               </button>
               }
-              @if (msg.payload?.game) {
+              @if (msg.payload?.game; as actionGame) {
+              @if (actionGame.status !== 'active') {
+              <button mat-mini-fab color="primary"
+                [attr.aria-label]="'common.contact.chatroom.games.rematchAria' | transloco"
+                (click)="startGameRematch(actionGame)">
+                <mat-icon>replay</mat-icon>
+              </button>
+              }
               <button mat-mini-fab color="primary"
                 [attr.aria-label]="'common.contact.chatroom.games.rulesAria' | transloco"
-                (click)="openGameRules(msg.payload.game)">
+                (click)="openGameRules(actionGame)">
                 <mat-icon>help</mat-icon>
               </button>
               <button mat-mini-fab color="primary"

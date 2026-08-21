@@ -8,15 +8,30 @@ describe('rock-paper-scissors', () => {
     expect(game.nextPlayerUserId).toBe('recipient');
   });
 
-  it('detects the winner', () => {
+  it('awards a round and continues until a player has two points', () => {
     const game = createRockPaperScissorsGame('sender', 'recipient', 'rock');
     const result = applyRockPaperScissorsChoice(game, 'recipient', 'paper');
-    expect(result?.winnerUserId).toBe('recipient');
-    expect(result?.status).toBe('won');
+    expect(result?.playerOScore).toBe(1);
+    expect(result?.status).toBe('active');
+    expect(result?.nextPlayerUserId).toBe('recipient');
   });
 
-  it('detects a draw', () => {
+  it('does not award a point for a drawn round', () => {
     const game = createRockPaperScissorsGame('sender', 'recipient', 'scissors');
-    expect(applyRockPaperScissorsChoice(game, 'recipient', 'scissors')?.status).toBe('draw');
+    const result = applyRockPaperScissorsChoice(game, 'recipient', 'scissors');
+    expect(result?.playerXScore).toBe(0);
+    expect(result?.playerOScore).toBe(0);
+    expect(result?.rounds?.length).toBe(1);
+    expect(result?.status).toBe('active');
+  });
+
+  it('ends the match when a player wins a second round', () => {
+    let game = createRockPaperScissorsGame('sender', 'recipient', 'rock');
+    game = applyRockPaperScissorsChoice(game, 'recipient', 'paper')!;
+    game = applyRockPaperScissorsChoice(game, 'recipient', 'paper')!;
+    game = applyRockPaperScissorsChoice(game, 'sender', 'rock')!;
+    expect(game.status).toBe('won');
+    expect(game.winnerUserId).toBe('recipient');
+    expect(game.playerOScore).toBe(2);
   });
 });

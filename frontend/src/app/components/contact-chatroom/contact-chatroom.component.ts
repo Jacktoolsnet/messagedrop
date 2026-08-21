@@ -698,6 +698,20 @@ export class ContactChatroomComponent implements AfterViewInit {
     });
   }
 
+  startGameRematch(game: ChatGame): void {
+    const contact = this.contact();
+    if (!contact || contact.status === 'removed_by_contact') return;
+    if (game.type === 'ticTacToe') {
+      this.openNewTicTacToeDialog(contact, game.variant ?? 'standard');
+    } else if (game.type === 'connectFour') {
+      this.openNewConnectFourDialog(contact, game.variant ?? 'standard');
+    } else if (game.type === 'dotsAndBoxes') {
+      this.openNewDotsAndBoxesDialog(contact);
+    } else {
+      this.openNewRockPaperScissorsDialog(contact);
+    }
+  }
+
   canPlayConnectFour(message: ChatroomMessage): boolean {
     const game = message.payload?.game;
     return !!game

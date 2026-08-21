@@ -1,28 +1,57 @@
 <div class="rps">
   @if (game(); as currentGame) {
+    <div class="rps__score" aria-live="polite">
+      <span class="rps__score-x">X</span>
+      <strong>{{ getPlayerXScore(currentGame) }}</strong>
+      <span>:</span>
+      <strong>{{ getPlayerOScore(currentGame) }}</strong>
+      <span class="rps__score-o">O</span>
+    </div>
     <div class="rps__duel" [class.rps__duel--finished]="currentGame.status !== 'active'">
       <div class="rps__player-choice rps__player-choice--x">
         <span class="rps__player">X</span>
-        @if (showFirstChoice(currentGame)) {
-          <span class="rps__choice-icon">{{ getChoiceIcon(currentGame.playerXChoice) }}</span>
-          <span>{{ getChoiceLabel(currentGame.playerXChoice) }}</span>
+        @if (currentGame.playerXChoice; as firstChoice) {
+          @if (showPlayerChoice(currentGame, currentGame.playerXUserId)) {
+            <span class="rps__choice-icon">{{ getChoiceIcon(firstChoice) }}</span>
+            <span>{{ getChoiceLabel(firstChoice) }}</span>
+          } @else {
+            <span class="rps__choice-icon">🔒</span>
+            <span>{{ 'common.contact.chatroom.games.choiceHidden' | transloco }}</span>
+          }
         } @else {
-          <span class="rps__choice-icon">🔒</span>
-          <span>{{ 'common.contact.chatroom.games.choiceHidden' | transloco }}</span>
+          <span class="rps__choice-icon">❔</span>
+          <span>{{ 'common.contact.chatroom.games.choicePending' | transloco }}</span>
         }
       </div>
       <span class="rps__versus">VS</span>
       <div class="rps__player-choice rps__player-choice--o">
         <span class="rps__player">O</span>
         @if (currentGame.playerOChoice; as secondChoice) {
-          <span class="rps__choice-icon">{{ getChoiceIcon(secondChoice) }}</span>
-          <span>{{ getChoiceLabel(secondChoice) }}</span>
+          @if (showPlayerChoice(currentGame, currentGame.playerOUserId)) {
+            <span class="rps__choice-icon">{{ getChoiceIcon(secondChoice) }}</span>
+            <span>{{ getChoiceLabel(secondChoice) }}</span>
+          } @else {
+            <span class="rps__choice-icon">🔒</span>
+            <span>{{ 'common.contact.chatroom.games.choiceHidden' | transloco }}</span>
+          }
         } @else {
           <span class="rps__choice-icon">❔</span>
           <span>{{ 'common.contact.chatroom.games.choicePending' | transloco }}</span>
         }
       </div>
     </div>
+    @if (currentGame.rounds?.length) {
+      <div class="rps__rounds">
+        @for (round of currentGame.rounds; track $index) {
+          <div class="rps__round">
+            <span>{{ 'common.contact.chatroom.games.roundLabel' | transloco:{ round: $index + 1 } }}</span>
+            <span>{{ getChoiceIcon(round.playerXChoice) }}</span>
+            <span>–</span>
+            <span>{{ getChoiceIcon(round.playerOChoice) }}</span>
+          </div>
+        }
+      </div>
+    }
   }
 
   @if (selectionMode() || canChoose()) {
