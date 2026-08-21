@@ -7,7 +7,7 @@ import { ConnectFourVariant, GameStats, TicTacToeStats, TicTacToeVariant } from 
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
 import { GameRulesDialogComponent } from '../game-rules-dialog/game-rules-dialog.component';
 
-export type ChatGameType = 'ticTacToe' | 'ticTacToeVanishing' | 'connectFour' | 'connectFourVanishing' | 'dotsAndBoxes' | 'rockPaperScissors' | 'code' | 'memory' | 'minefield' | 'minefieldHideSeek';
+export type ChatGameType = 'ticTacToe' | 'ticTacToeVanishing' | 'connectFour' | 'connectFourVanishing' | 'dotsAndBoxes' | 'rockPaperScissors' | 'code' | 'memory' | 'minefield' | 'minefieldHideSeek'|'morris';
 
 interface GameSelectDialogData {
   ticTacToeStats: TicTacToeStats;
@@ -20,6 +20,7 @@ interface GameSelectDialogData {
   memoryStats: GameStats;
   minefieldStats: GameStats;
   minefieldHideSeekStats: GameStats;
+  morrisStats:GameStats;
 }
 
 @Component({
@@ -122,4 +123,5 @@ export class GameSelectDialogComponent {
       maxHeight: '85vh', hasBackdrop: true, backdropClass: 'dialog-backdrop', disableClose: false, autoFocus: false
     });
   }
+  openMorrisRules():void{this.dialog.open(GameRulesDialogComponent,{data:{gameType:'morris',variant:'standard'},width:'min(440px,94vw)',maxWidth:'94vw',maxHeight:'85vh',hasBackdrop:true,backdropClass:'dialog-backdrop',autoFocus:false})}
 }

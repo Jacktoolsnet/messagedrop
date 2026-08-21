@@ -22,6 +22,7 @@ import {
   MemoryGame,
   MinefieldGame,
   MinefieldHideSeekGame,
+  MorrisGame,
   RockPaperScissorsChoice,
   RockPaperScissorsGame,
   TicTacToeGame,
@@ -82,6 +83,8 @@ import { MinefieldBoardComponent } from './minefield-board/minefield-board.compo
 import { NewMinefieldDialogComponent } from './new-minefield-dialog/new-minefield-dialog.component';
 import { MinefieldHideSeekBoardComponent } from './minefield-hide-seek-board/minefield-hide-seek-board.component';
 import { NewMinefieldHideSeekDialogComponent } from './new-minefield-hide-seek-dialog/new-minefield-hide-seek-dialog.component';
+import { MorrisBoardComponent } from './morris-board/morris-board.component';
+import { NewMorrisDialogComponent } from './new-morris-dialog/new-morris-dialog.component';
 import { DeleteContactMessageComponent } from './delete-contact-message/delete-contact-message.component';
 import { DisplayMessageService } from '../../services/display-message.service';
 import { ProtectedStickerImageComponent } from '../utils/protected-sticker-image/protected-sticker-image.component';
@@ -98,6 +101,7 @@ import { createCodeCommitment, createCodeGame, CodeSecret, evaluateCodeGuess, is
 import { applyMemoryTurn, createMemoryGame } from '../../utils/memory-game';
 import { applyMinefieldMove, createMinefieldGame } from '../../utils/minefield-game';
 import { applyHideSeekSearch, applySecondMinePlacement, createMinefieldHideSeekGame, currentHideSeekRound } from '../../utils/minefield-hide-seek';
+import { applyMorrisAction, createMorrisGame, MorrisAction } from '../../utils/morris-game';
 
 interface ChatroomMessage {
   id: string;
@@ -148,6 +152,7 @@ interface ContactChatroomDialogData {
     MemoryBoardComponent,
     MinefieldBoardComponent,
     MinefieldHideSeekBoardComponent,
+    MorrisBoardComponent,
     TranslocoPipe
   ],
   templateUrl: './contact-chatroom.component.html',
@@ -548,6 +553,7 @@ export class ContactChatroomComponent implements AfterViewInit {
         memoryStats: this.getMemoryStats(),
         minefieldStats: this.getMinefieldStats(),
         minefieldHideSeekStats: this.getMinefieldHideSeekStats()
+        ,morrisStats:this.getMorrisStats()
       },
       width: 'min(760px, 94vw)',
       maxWidth: '94vw',
@@ -579,6 +585,8 @@ export class ContactChatroomComponent implements AfterViewInit {
         this.openNewMinefieldDialog(contact);
       } else if (gameType === 'minefieldHideSeek') {
         this.openNewMinefieldHideSeekDialog(contact);
+      } else if(gameType==='morris'){
+        this.openNewMorrisDialog(contact);
       }
     });
   }
@@ -700,6 +708,11 @@ export class ContactChatroomComponent implements AfterViewInit {
     });
   }
 
+  private openNewMorrisDialog(contact:Contact,revisionOfMessageId?:string):void{
+    const ref=this.matDialog.open(NewMorrisDialogComponent,{width:'min(500px,96vw)',maxWidth:'96vw',maxHeight:'90vh',hasBackdrop:true,backdropClass:'dialog-backdrop',autoFocus:false});
+    ref.afterClosed().subscribe((position?:number)=>{if(!Number.isInteger(position))return;const payload=this.createEmptyMessage();payload.game=createMorrisGame(contact.userId,contact.contactUserId,position!);void this.sendAsNewMessage(contact,payload,revisionOfMessageId,'game_started')});
+  }
+
   private async startCodeGame(contact: Contact, code: CodeSymbol[], revisionOfMessageId?:string): Promise<void> {
     try {
       const secret: CodeSecret = { code: [...code], nonce: crypto.randomUUID() };
@@ -757,6 +770,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getChatGameIcon(game: ChatGame): string {
+    if(game.type==='morris')return'hub';
     if (game.type === 'minefieldHideSeek') return 'radar';
     if (game.type === 'minefield') return 'grid_on';
     if (game.type === 'memory') return 'style';
@@ -767,7 +781,9 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getChatGameTitle(game: ChatGame): string {
-    const key = game.type === 'minefieldHideSeek'
+    const key = game.type === 'morris'
+      ? 'common.contact.chatroom.games.morris'
+      : game.type === 'minefieldHideSeek'
       ? 'common.contact.chatroom.games.minefield'
       : game.type === 'minefield'
       ? 'common.contact.chatroom.games.minefield'
@@ -786,6 +802,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getChatGameVariantLabel(game: ChatGame): string {
+    if(game.type==='morris')return this.translation.t('common.contact.chatroom.games.standardVariant');
     if (game.type === 'minefieldHideSeek') return this.translation.t('common.contact.chatroom.games.hideSeekVariant');
     if (game.type === 'minefield') return this.translation.t('common.contact.chatroom.games.duelVariant');
     const key = game.type !== 'dotsAndBoxes' && game.type !== 'rockPaperScissors' && game.type !== 'code' && game.type !== 'memory' && game.variant === 'vanishing'
@@ -821,6 +838,9 @@ export class ContactChatroomComponent implements AfterViewInit {
       const currentUserId = this.userService.getUser().id;
       return game.playerXUserId === currentUserId ? 'X' : game.playerOUserId === currentUserId ? 'O' : null;
     }
+    if(game.type==='morris'){
+      const id=this.userService.getUser().id;return game.playerXUserId===id?'X':game.playerOUserId===id?'O':null;
+    }
     if (game.type === 'minefield') {
       const currentUserId = this.userService.getUser().id;
       return game.playerXUserId === currentUserId ? 'X' : game.playerOUserId === currentUserId ? 'O' : null;
@@ -835,7 +855,7 @@ export class ContactChatroomComponent implements AfterViewInit {
     this.matDialog.open(GameRulesDialogComponent, {
       data: {
         gameType: game.type,
-        variant: game.type === 'dotsAndBoxes' || game.type === 'rockPaperScissors' || game.type === 'code' || game.type === 'memory' || game.type === 'minefield' || game.type === 'minefieldHideSeek' ? 'standard' : game.variant ?? 'standard'
+        variant: game.type === 'dotsAndBoxes' || game.type === 'rockPaperScissors' || game.type === 'code' || game.type === 'memory' || game.type === 'minefield' || game.type === 'minefieldHideSeek'||game.type==='morris' ? 'standard' : game.variant ?? 'standard'
       },
       width: 'min(440px, 94vw)',
       maxWidth: '94vw',
@@ -864,6 +884,8 @@ export class ContactChatroomComponent implements AfterViewInit {
       this.openNewMinefieldDialog(contact, message.messageId);
     } else if (game.type === 'minefieldHideSeek') {
       this.openNewMinefieldHideSeekDialog(contact, message.messageId);
+    }else if(game.type==='morris'){
+      this.openNewMorrisDialog(contact,message.messageId);
     } else {
       this.openNewCodeDialog(contact, message.messageId);
     }
@@ -876,6 +898,9 @@ export class ContactChatroomComponent implements AfterViewInit {
     }
     return game.status!=='active';
   }
+
+  canPlayMorris(message:ChatroomMessage):boolean{const g=message.payload?.game;return !!g&&g.type==='morris'&&g.status==='active'&&g.nextPlayerUserId===this.userService.getUser().id&&!this.gameMovesInFlight().has(g.gameId)}
+  async playMorris(message:ChatroomMessage,action:MorrisAction):Promise<void>{const contact=this.contact(),g=message.payload?.game;if(!contact||!g||g.type!=='morris'||!this.canPlayMorris(message))return;const next=applyMorrisAction(g,this.userService.getUser().id,action);if(!next)return;this.setGameMoveInFlight(g.gameId,true);try{const payload=this.createEmptyMessage();payload.game=next;await this.sendAsNewMessage(contact,payload,message.messageId,'game_move')}finally{this.setGameMoveInFlight(g.gameId,false)}}
 
   canPlayCode(message: ChatroomMessage): boolean {
     const game = message.payload?.game;
@@ -1345,6 +1370,13 @@ export class ContactChatroomComponent implements AfterViewInit {
       else if(game.status==='won'||!!legacyRound)stats.lost++;
     }
     return stats;
+  }
+
+  private getMorrisStats():GameStats{
+    const current=this.userService.getUser().id,latest=new Map<string,MorrisGame>();
+    for(const message of this.messages()){const game=message.payload?.game;if(game?.type==='morris'&&!latest.has(game.gameId))latest.set(game.gameId,game)}
+    const stats:GameStats={played:latest.size,won:0,lost:0,drawn:0};
+    for(const game of latest.values()){if(game.status==='draw')stats.drawn++;else if(game.status==='won'&&game.winnerUserId===current)stats.won++;else if(game.status==='won')stats.lost++}return stats;
   }
 
   openExperienceSearch(message?: ChatroomMessage): void {

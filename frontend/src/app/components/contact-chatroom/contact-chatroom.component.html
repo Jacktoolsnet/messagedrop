@@ -222,6 +222,8 @@
             } @else if (game.type === 'memory') {
             <app-memory-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayMemory(msg)"
               (turn)="playMemoryTurn(msg, $event)"></app-memory-board>
+            } @else if(game.type==='morris'){
+            <app-morris-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayMorris(msg)" (action)="playMorris(msg,$event)"></app-morris-board>
             } @else if (game.type === 'minefield') {
             <app-minefield-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayMinefield(msg)"
               (move)="playMinefieldMove(msg, $event)"></app-minefield-board>
@@ -544,6 +546,8 @@
             } @else if (game.type === 'memory') {
             <app-memory-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayMemory(msg)"
               (turn)="playMemoryTurn(msg, $event)"></app-memory-board>
+            } @else if(game.type==='morris'){
+            <app-morris-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayMorris(msg)" (action)="playMorris(msg,$event)"></app-morris-board>
             } @else if (game.type === 'minefield') {
             <app-minefield-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayMinefield(msg)"
               (move)="playMinefieldMove(msg, $event)"></app-minefield-board>

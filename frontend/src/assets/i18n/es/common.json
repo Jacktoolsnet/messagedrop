@@ -723,7 +723,18 @@
           "hideMinesAria": "Ocultar las minas",
           "confirmMinePlacementAria": "Confirmar la colocación",
           "hideSeekPreviewPrefix": "Campo minado – Esconder y buscar",
-          "continueToPlacementAria": "Continuar con la siguiente colocación de minas"
+          "continueToPlacementAria": "Continuar con la siguiente colocación de minas",
+          "morris": "Molino",
+          "newMorrisTitle": "Nueva partida de Molino",
+          "chooseFirstMorrisPosition": "Coloca tu primera ficha.",
+          "playMorrisAria": "Iniciar Molino",
+          "morrisPreviewPrefix": "Molino",
+          "morrisRulesTitle": "Reglas de Molino",
+          "morrisRulePlace": "Cada jugador coloca por turnos nueve fichas en intersecciones libres.",
+          "morrisRuleMove": "Después, se mueve una ficha por turno a una intersección libre adyacente siguiendo una línea.",
+          "morrisRuleMill": "Tres fichas en línea forman un molino y permiten retirar una ficha rival válida. Las fichas de un molino solo están protegidas mientras haya otras disponibles.",
+          "morrisRuleFly": "Con solo tres fichas se puede saltar a cualquier intersección libre.",
+          "morrisRuleWin": "Pierde quien tenga menos de tres fichas o no pueda realizar ningún movimiento válido."
         },
         "revisionHistory": {
           "title": "Historial de cambios",

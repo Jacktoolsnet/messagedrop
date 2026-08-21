@@ -723,7 +723,18 @@
           "hideMinesAria": "Masquer les mines",
           "confirmMinePlacementAria": "Confirmer le placement",
           "hideSeekPreviewPrefix": "Champ de mines – Cacher et chercher",
-          "continueToPlacementAria": "Continuer avec le prochain placement de mines"
+          "continueToPlacementAria": "Continuer avec le prochain placement de mines",
+          "morris": "Marelle",
+          "newMorrisTitle": "Nouvelle partie de Marelle",
+          "chooseFirstMorrisPosition": "Placez votre premier pion.",
+          "playMorrisAria": "Démarrer la Marelle",
+          "morrisPreviewPrefix": "Marelle",
+          "morrisRulesTitle": "Règles de la Marelle",
+          "morrisRulePlace": "Chaque joueur place à tour de rôle neuf pions sur des intersections libres.",
+          "morrisRuleMove": "Ensuite, un pion est déplacé par tour le long d’une ligne vers une intersection libre voisine.",
+          "morrisRuleMill": "Trois pions alignés forment un moulin et permettent de retirer un pion adverse autorisé. Les pions d’un moulin ne sont protégés que tant que d’autres sont disponibles.",
+          "morrisRuleFly": "Avec seulement trois pions, un joueur peut sauter vers toute intersection libre.",
+          "morrisRuleWin": "Un joueur perd avec moins de trois pions ou sans déplacement possible."
         },
         "revisionHistory": {
           "title": "Historique des modifications",

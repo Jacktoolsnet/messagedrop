@@ -724,7 +724,18 @@
           "hideMinesAria": "Hide mines",
           "confirmMinePlacementAria": "Confirm mine placement",
           "hideSeekPreviewPrefix": "Minefield – Hide & Seek",
-          "continueToPlacementAria": "Continue to the next mine placement"
+          "continueToPlacementAria": "Continue to the next mine placement",
+          "morris": "Nine Men's Morris",
+          "newMorrisTitle": "New Nine Men's Morris game",
+          "chooseFirstMorrisPosition": "Place your first piece.",
+          "playMorrisAria": "Start Nine Men's Morris",
+          "morrisPreviewPrefix": "Nine Men's Morris",
+          "morrisRulesTitle": "Nine Men's Morris rules",
+          "morrisRulePlace": "Players alternately place nine pieces each on empty intersections.",
+          "morrisRuleMove": "After placement, move one piece per turn along a line to an empty adjacent intersection.",
+          "morrisRuleMill": "Three pieces in a line form a mill and allow one eligible opposing piece to be removed. Pieces in mills are protected only while other pieces are available.",
+          "morrisRuleFly": "A player with only three pieces may jump to any empty intersection.",
+          "morrisRuleWin": "A player loses with fewer than three pieces or without a legal move."
         },
         "revisionHistory": {
           "title": "Change history",

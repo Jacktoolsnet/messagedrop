@@ -209,7 +209,16 @@ export interface MinefieldHideSeekGame {
   moveNumber: number;
 }
 
-export type ChatGame = TicTacToeGame | ConnectFourGame | DotsAndBoxesGame | RockPaperScissorsGame | CodeGame | MemoryGame | MinefieldGame | MinefieldHideSeekGame;
+export type MorrisPhase = 'placing' | 'moving' | 'removing';
+export interface MorrisMove { playerUserId:string; from:number|null; to:number|null; removed:number|null; moveNumber:number; }
+export interface MorrisGame {
+  type:'morris'; version:1; gameId:string; board:TicTacToeCell[];
+  playerXUserId:string; playerOUserId:string; inHandX:number; inHandO:number;
+  phase:MorrisPhase; nextPlayerUserId:string|null; status:TicTacToeStatus;
+  winnerUserId:string|null; moveNumber:number; lastMove:MorrisMove|null;
+}
+
+export type ChatGame = TicTacToeGame | ConnectFourGame | DotsAndBoxesGame | RockPaperScissorsGame | CodeGame | MemoryGame | MinefieldGame | MinefieldHideSeekGame | MorrisGame;
 
 export interface GameStats {
   played: number;

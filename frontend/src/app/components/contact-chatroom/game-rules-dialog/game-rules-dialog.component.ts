@@ -7,7 +7,7 @@ import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.c
 import { ConnectFourVariant, TicTacToeVariant } from '../../../interfaces/chat-game';
 
 export interface GameRulesDialogData {
-  gameType: 'ticTacToe' | 'connectFour' | 'dotsAndBoxes' | 'rockPaperScissors' | 'code' | 'memory' | 'minefield' | 'minefieldHideSeek';
+  gameType: 'ticTacToe' | 'connectFour' | 'dotsAndBoxes' | 'rockPaperScissors' | 'code' | 'memory' | 'minefield' | 'minefieldHideSeek'|'morris';
   variant?: TicTacToeVariant | ConnectFourVariant;
 }
 

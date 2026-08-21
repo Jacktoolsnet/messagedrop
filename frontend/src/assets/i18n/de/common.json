@@ -724,7 +724,18 @@
           "hideMinesAria": "Versteckte Minen ausblenden",
           "confirmMinePlacementAria": "Minenplatzierung bestätigen",
           "hideSeekPreviewPrefix": "Minenfeld – Verstecken & Suchen",
-          "continueToPlacementAria": "Mit der nächsten Minenplatzierung fortfahren"
+          "continueToPlacementAria": "Mit der nächsten Minenplatzierung fortfahren",
+          "morris": "Mühle",
+          "newMorrisTitle": "Neue Mühle-Partie",
+          "chooseFirstMorrisPosition": "Setze deinen ersten Stein.",
+          "playMorrisAria": "Mühle starten",
+          "morrisPreviewPrefix": "Mühle",
+          "morrisRulesTitle": "Mühle – Regeln",
+          "morrisRulePlace": "Beide Spieler setzen abwechselnd jeweils neun Steine auf freie Schnittpunkte.",
+          "morrisRuleMove": "Danach wird pro Zug ein eigener Stein entlang einer Linie auf einen freien benachbarten Schnittpunkt gezogen.",
+          "morrisRuleMill": "Drei eigene Steine auf einer Linie bilden eine Mühle. Dann darf ein erlaubter gegnerischer Stein entfernt werden. Steine aus einer Mühle sind nur geschützt, solange andere Steine verfügbar sind.",
+          "morrisRuleFly": "Wer nur noch drei Steine besitzt, darf mit ihnen auf jeden freien Schnittpunkt springen.",
+          "morrisRuleWin": "Wer weniger als drei Steine besitzt oder keinen gültigen Zug mehr ausführen kann, verliert."
         },
         "revisionHistory": {
           "title": "Änderungshistorie",
