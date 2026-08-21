@@ -114,18 +114,6 @@ export class MinefieldHideSeekBoardComponent{
  isDefused(index:number):boolean{return this.defusedMines().has(index)}
  isShowingRoundResult():boolean{return this.showingLostRound()||this.showingWonRound()}
  isCurrentUserHider():boolean{return this.round()?.hiderUserId===this.currentUserId()}
- canContinueToPlacement():boolean{
-  const game=this.game();
-  return !!game&&game.phase==='placingSecond'&&game.nextPlayerUserId===this.currentUserId()
-   &&this.isShowingRoundResult()&&this.roundResultAnimationComplete();
- }
- continueToPlacement():void{
-  if(!this.canContinueToPlacement())return;
-  this.showingLostRound.set(false);this.showingWonRound.set(false);
-  this.explodedMines.set(new Set());this.defusedMines.set(new Set());
-  this.roundResultAnimationComplete.set(false);
- }
-
  private async animateMineAndSearch(mine:number):Promise<void>{
   this.locallyAnimatedMine=mine;
   this.detonatingMine.set(mine);

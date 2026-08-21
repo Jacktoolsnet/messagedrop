@@ -869,6 +869,14 @@ export class ContactChatroomComponent implements AfterViewInit {
     }
   }
 
+  canShowGameRematch(game:ChatGame):boolean{
+    if(game.type==='minefieldHideSeek'){
+      const ended=game.status!=='active'||game.phase==='placingSecond';
+      return ended&&game.playerXUserId===this.userService.getUser().id;
+    }
+    return game.status!=='active';
+  }
+
   canPlayCode(message: ChatroomMessage): boolean {
     const game = message.payload?.game;
     return !!game && game.type === 'code' && game.status === 'active'
@@ -1329,7 +1337,13 @@ export class ContactChatroomComponent implements AfterViewInit {
     const latest = new Map<string, MinefieldHideSeekGame>();
     for (const message of this.visibleMessages()) { const game = message.payload?.game; if (game?.type === 'minefieldHideSeek' && !latest.has(game.gameId)) latest.set(game.gameId, game); }
     const stats: GameStats = { played: latest.size, won: 0, lost: 0, drawn: 0 };
-    for (const game of latest.values()) { if (game.status === 'draw') stats.drawn++; else if (game.status === 'won' && game.winnerUserId === currentUserId) stats.won++; else if (game.status === 'won') stats.lost++; }
+    for(const game of latest.values()){
+      const legacyRound=game.phase==='placingSecond'?game.rounds[0]:null;
+      const winnerUserId=game.winnerUserId??(legacyRound?(legacyRound.lost?legacyRound.hiderUserId:legacyRound.seekerUserId):null);
+      if(game.status==='draw')stats.drawn++;
+      else if((game.status==='won'||!!legacyRound)&&winnerUserId===currentUserId)stats.won++;
+      else if(game.status==='won'||!!legacyRound)stats.lost++;
+    }
     return stats;
   }
 

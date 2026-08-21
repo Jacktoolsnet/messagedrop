@@ -376,11 +376,11 @@
                 <mat-icon>{{ isMinefieldLayoutVisible(actionGame.gameId) ? 'visibility_off' : 'visibility' }}</mat-icon>
               </button>
               }
-              @if (actionGame.status !== 'active') {
+              @if (canShowGameRematch(actionGame)) {
               <button mat-mini-fab color="primary"
                 [attr.aria-label]="'common.contact.chatroom.games.rematchAria' | transloco"
                 (click)="startGameRematch(actionGame)">
-                <mat-icon>replay</mat-icon>
+                <mat-icon>{{ actionGame.type === 'minefieldHideSeek' ? 'refresh' : 'replay' }}</mat-icon>
               </button>
               }
               <button mat-mini-fab color="primary"
@@ -693,11 +693,11 @@
                 <mat-icon>{{ isMinefieldLayoutVisible(actionGame.gameId) ? 'visibility_off' : 'visibility' }}</mat-icon>
               </button>
               }
-              @if (actionGame.status !== 'active') {
+              @if (canShowGameRematch(actionGame)) {
               <button mat-mini-fab color="primary"
                 [attr.aria-label]="'common.contact.chatroom.games.rematchAria' | transloco"
                 (click)="startGameRematch(actionGame)">
-                <mat-icon>replay</mat-icon>
+                <mat-icon>{{ actionGame.type === 'minefieldHideSeek' ? 'refresh' : 'replay' }}</mat-icon>
               </button>
               }
               <button mat-mini-fab color="primary"

@@ -718,7 +718,7 @@
           "hideSeekRuleSearch": "The other player reveals squares. Numbers show mines in the eight neighboring squares. Searching continues until every safe square is found.",
           "hideSeekRuleMistake": "Every mine hit counts as a mistake. If all six mines are found before every safe square is open, the search round is lost immediately and cannot be continued.",
           "hideSeekRuleSwap": "The roles then switch: the previous seeker hides six new mines and the other player searches.",
-          "hideSeekRuleWin": "The player who hits fewer mines during their search round wins. Equal mistakes end in a draw.",
+          "hideSeekRuleWin": "The seeker wins by finding every safe square. If all six mines are revealed first, the minefield creator wins.",
           "hideSeekPlaceCount": "{{ selected }} of {{ total }} mines placed",
           "showMinesAria": "Show hidden mines",
           "hideMinesAria": "Hide mines",

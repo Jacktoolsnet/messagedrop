@@ -717,7 +717,7 @@
           "hideSeekRuleSearch": "El otro jugador descubre casillas. Los números indican las minas en las ocho casillas vecinas. La búsqueda continúa hasta encontrar todas las casillas seguras.",
           "hideSeekRuleMistake": "Cada mina tocada cuenta como un error. Si se encuentran las seis minas antes de abrir todas las casillas seguras, la ronda de búsqueda se pierde inmediatamente y no puede continuar.",
           "hideSeekRuleSwap": "Después se intercambian los papeles: quien buscó oculta seis minas nuevas y el otro busca.",
-          "hideSeekRuleWin": "Gana quien toque menos minas durante su ronda de búsqueda. Con los mismos errores hay empate.",
+          "hideSeekRuleWin": "Quien busca gana al encontrar todas las casillas seguras. Si descubre antes las seis minas, gana quien creó el campo minado.",
           "hideSeekPlaceCount": "{{ selected }} de {{ total }} minas colocadas",
           "showMinesAria": "Mostrar las minas ocultas",
           "hideMinesAria": "Ocultar las minas",

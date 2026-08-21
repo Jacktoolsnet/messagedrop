@@ -718,7 +718,7 @@
           "hideSeekRuleSearch": "Der andere Spieler deckt Felder auf. Zahlen zeigen die Minen auf den acht angrenzenden Feldern. Die Suche läuft weiter, bis alle sicheren Felder gefunden wurden.",
           "hideSeekRuleMistake": "Jede getroffene Mine zählt als Fehler. Werden alle sechs Minen gefunden, bevor alle sicheren Felder geöffnet sind, ist die Suchrunde sofort verloren und kann nicht fortgesetzt werden.",
           "hideSeekRuleSwap": "Danach werden die Rollen getauscht: Der bisherige Sucher versteckt sechs neue Minen und der andere Spieler sucht.",
-          "hideSeekRuleWin": "Wer in seiner Suchrunde weniger Minen trifft, gewinnt. Bei gleich vielen Fehlern endet das Spiel unentschieden.",
+          "hideSeekRuleWin": "Findet der Sucher alle sicheren Felder, gewinnt er. Deckt er vorher alle sechs Minen auf, gewinnt der Ersteller des Minenfelds.",
           "hideSeekPlaceCount": "{{ selected }} von {{ total }} Minen platziert",
           "showMinesAria": "Versteckte Minen anzeigen",
           "hideMinesAria": "Versteckte Minen ausblenden",

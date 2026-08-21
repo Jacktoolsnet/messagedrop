@@ -41,7 +41,10 @@ export function applyHideSeekSearch(game: MinefieldHideSeekGame, userId: string,
   const complete = safeCellsComplete || lost;
   if (!complete) return { ...game, rounds, moveNumber };
   if (roundIndex === 0) {
-    return { ...game, rounds, phase: 'placingSecond', nextPlayerUserId: game.playerOUserId, moveNumber };
+    return {
+      ...game, rounds, phase: 'finished', nextPlayerUserId: null, status: 'won',
+      winnerUserId: lost ? round.hiderUserId : round.seekerUserId, moveNumber
+    };
   }
   const firstRoundLost = !!rounds[0].lost;
   const secondRoundLost = !!rounds[1].lost;
@@ -100,7 +103,9 @@ export function countHideSeekAdjacentMines(mines: boolean[], cellIndex: number):
 }
 
 export function currentHideSeekRound(game: MinefieldHideSeekGame): MinefieldHideSeekRound | null {
-  return game.rounds[game.phase === 'searchingSecond' || game.phase === 'finished' ? 1 : 0] ?? null;
+  if(game.phase==='searchingSecond')return game.rounds[1]??null;
+  if(game.phase==='finished')return game.rounds.at(-1)??null;
+  return game.rounds[0]??null;
 }
 
 function createRound(hiderUserId: string, seekerUserId: string, mines: boolean[]): MinefieldHideSeekRound {
