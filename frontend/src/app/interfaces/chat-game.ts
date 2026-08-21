@@ -182,7 +182,32 @@ export interface MinefieldGame {
   lastMove: MinefieldLastMove | null;
 }
 
-export type ChatGame = TicTacToeGame | ConnectFourGame | DotsAndBoxesGame | RockPaperScissorsGame | CodeGame | MemoryGame | MinefieldGame;
+export interface MinefieldHideSeekRound {
+  hiderUserId: string;
+  seekerUserId: string;
+  mines: boolean[];
+  revealed: boolean[];
+  mistakes: number;
+  lastMove: MinefieldLastMove | null;
+}
+
+export interface MinefieldHideSeekGame {
+  type: 'minefieldHideSeek';
+  version: 1;
+  gameId: string;
+  rows: 6;
+  columns: 6;
+  playerXUserId: string;
+  playerOUserId: string;
+  phase: 'searchingFirst' | 'placingSecond' | 'searchingSecond' | 'finished';
+  rounds: MinefieldHideSeekRound[];
+  nextPlayerUserId: string | null;
+  status: TicTacToeStatus;
+  winnerUserId: string | null;
+  moveNumber: number;
+}
+
+export type ChatGame = TicTacToeGame | ConnectFourGame | DotsAndBoxesGame | RockPaperScissorsGame | CodeGame | MemoryGame | MinefieldGame | MinefieldHideSeekGame;
 
 export interface GameStats {
   played: number;

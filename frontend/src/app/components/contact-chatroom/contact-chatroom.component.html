@@ -225,11 +225,15 @@
             } @else if (game.type === 'minefield') {
             <app-minefield-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayMinefield(msg)"
               (move)="playMinefieldMove(msg, $event)"></app-minefield-board>
+            } @else if (game.type === 'minefieldHideSeek') {
+            <app-minefield-hide-seek-board [game]="game" [currentUserId]="getCurrentUserId()"
+              [disabled]="!canPlayMinefieldHideSeek(msg)" (search)="playMinefieldHideSeekMove(msg, $event)"
+              (placement)="placeSecondMinefield(msg, $event)"></app-minefield-hide-seek-board>
             } @else {
             <app-code-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayCode(msg)"
               (guess)="submitCodeGuess(msg, $event)" (evaluate)="evaluateCodeGuess(msg)"></app-code-board>
             }
-            @if (game.type !== 'code' && game.status === 'active') {
+            @if (game.type !== 'code' && game.type !== 'minefieldHideSeek' && game.status === 'active') {
             <div class="game-turn-box" role="status" aria-live="polite">
               @if (isCurrentUserGameTurn(game)) {
                 @if (profile().avatarStickerId) {
@@ -261,7 +265,7 @@
                   : ('common.contact.chatroom.games.isTurn' | transloco) }}</span>
               </span>
             </div>
-            } @else if (game.type !== 'code' && game.status === 'won') {
+            } @else if (game.type !== 'code' && game.type !== 'minefieldHideSeek' && game.status === 'won') {
             <div class="game-turn-box" role="status" aria-live="polite">
               @if (isCurrentUserGameWinner(game)) {
                 @if (profile().avatarStickerId) {
@@ -293,7 +297,7 @@
                   : ('common.contact.chatroom.games.hasWon' | transloco) }}</span>
               </span>
             </div>
-            } @else if (game.type !== 'code') {
+            } @else if (game.type !== 'code' && game.type !== 'minefieldHideSeek') {
             <div class="game-turn-box" role="status" aria-live="polite">
               <mat-icon class="game-turn-box__avatar-icon game-result-box__draw-icon">handshake</mat-icon>
               <span class="game-turn-box__text">
@@ -535,11 +539,15 @@
             } @else if (game.type === 'minefield') {
             <app-minefield-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayMinefield(msg)"
               (move)="playMinefieldMove(msg, $event)"></app-minefield-board>
+            } @else if (game.type === 'minefieldHideSeek') {
+            <app-minefield-hide-seek-board [game]="game" [currentUserId]="getCurrentUserId()"
+              [disabled]="!canPlayMinefieldHideSeek(msg)" (search)="playMinefieldHideSeekMove(msg, $event)"
+              (placement)="placeSecondMinefield(msg, $event)"></app-minefield-hide-seek-board>
             } @else {
             <app-code-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayCode(msg)"
               (guess)="submitCodeGuess(msg, $event)" (evaluate)="evaluateCodeGuess(msg)"></app-code-board>
             }
-            @if (game.type !== 'code' && game.status === 'active') {
+            @if (game.type !== 'code' && game.type !== 'minefieldHideSeek' && game.status === 'active') {
             <div class="game-turn-box" role="status" aria-live="polite">
               @if (isCurrentUserGameTurn(game)) {
                 @if (profile().avatarStickerId) {
@@ -571,7 +579,7 @@
                   : ('common.contact.chatroom.games.isTurn' | transloco) }}</span>
               </span>
             </div>
-            } @else if (game.type !== 'code' && game.status === 'won') {
+            } @else if (game.type !== 'code' && game.type !== 'minefieldHideSeek' && game.status === 'won') {
             <div class="game-turn-box" role="status" aria-live="polite">
               @if (isCurrentUserGameWinner(game)) {
                 @if (profile().avatarStickerId) {
@@ -603,7 +611,7 @@
                   : ('common.contact.chatroom.games.hasWon' | transloco) }}</span>
               </span>
             </div>
-            } @else if (game.type !== 'code') {
+            } @else if (game.type !== 'code' && game.type !== 'minefieldHideSeek') {
             <div class="game-turn-box" role="status" aria-live="polite">
               <mat-icon class="game-turn-box__avatar-icon game-result-box__draw-icon">handshake</mat-icon>
               <span class="game-turn-box__text">

@@ -708,7 +708,22 @@
           "minefieldCellRevealedAria": "Square {{ cell }} is revealed",
           "minefieldCellHiddenAria": "Reveal square {{ cell }}",
           "minefieldStartFailed": "The Minefield duel could not be started.",
-          "minefieldPreviewPrefix": "Minefield"
+          "minefieldPreviewPrefix": "Minefield",
+          "hideSeekVariant": "Hide & Seek",
+          "newHideSeekTitle": "Hide a minefield",
+          "chooseMinePlacement": "Hide six mines. Mines may not touch each other.",
+          "playHideSeekAria": "Start Minefield – Hide and Seek",
+          "hideSeekRulesTitle": "Minefield – Hide & Seek rules",
+          "hideSeekRulePlace": "The first player hides six mines on a 6 × 6 board. Mines may not touch horizontally, vertically, or diagonally.",
+          "hideSeekRuleSearch": "The other player reveals squares. Numbers show mines in the eight neighboring squares. Searching continues until every safe square is found.",
+          "hideSeekRuleMistake": "Every mine hit counts as a mistake. The hider can follow the search live or later.",
+          "hideSeekRuleSwap": "The roles then switch: the previous seeker hides six new mines and the other player searches.",
+          "hideSeekRuleWin": "The player who hits fewer mines during their search round wins. Equal mistakes end in a draw.",
+          "hideSeekPlaceCount": "{{ selected }} of {{ total }} mines placed",
+          "showMinesAria": "Show hidden mines",
+          "hideMinesAria": "Hide mines",
+          "confirmMinePlacementAria": "Confirm mine placement",
+          "hideSeekPreviewPrefix": "Minefield – Hide & Seek"
         },
         "revisionHistory": {
           "title": "Change history",

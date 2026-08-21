@@ -7,7 +7,7 @@ import { ConnectFourVariant, GameStats, TicTacToeStats, TicTacToeVariant } from 
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
 import { GameRulesDialogComponent } from '../game-rules-dialog/game-rules-dialog.component';
 
-export type ChatGameType = 'ticTacToe' | 'ticTacToeVanishing' | 'connectFour' | 'connectFourVanishing' | 'dotsAndBoxes' | 'rockPaperScissors' | 'code' | 'memory' | 'minefield';
+export type ChatGameType = 'ticTacToe' | 'ticTacToeVanishing' | 'connectFour' | 'connectFourVanishing' | 'dotsAndBoxes' | 'rockPaperScissors' | 'code' | 'memory' | 'minefield' | 'minefieldHideSeek';
 
 interface GameSelectDialogData {
   ticTacToeStats: TicTacToeStats;
@@ -19,6 +19,7 @@ interface GameSelectDialogData {
   codeStats: GameStats;
   memoryStats: GameStats;
   minefieldStats: GameStats;
+  minefieldHideSeekStats: GameStats;
 }
 
 @Component({
@@ -111,6 +112,13 @@ export class GameSelectDialogComponent {
   openMinefieldRules(): void {
     this.dialog.open(GameRulesDialogComponent, {
       data: { gameType: 'minefield', variant: 'standard' }, width: 'min(440px, 94vw)', maxWidth: '94vw',
+      maxHeight: '85vh', hasBackdrop: true, backdropClass: 'dialog-backdrop', disableClose: false, autoFocus: false
+    });
+  }
+
+  openMinefieldHideSeekRules(): void {
+    this.dialog.open(GameRulesDialogComponent, {
+      data: { gameType: 'minefieldHideSeek', variant: 'standard' }, width: 'min(440px, 94vw)', maxWidth: '94vw',
       maxHeight: '85vh', hasBackdrop: true, backdropClass: 'dialog-backdrop', disableClose: false, autoFocus: false
     });
   }

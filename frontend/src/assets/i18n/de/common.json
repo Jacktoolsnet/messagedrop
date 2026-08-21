@@ -708,7 +708,22 @@
           "minefieldCellRevealedAria": "Feld {{ cell }} ist aufgedeckt",
           "minefieldCellHiddenAria": "Feld {{ cell }} aufdecken",
           "minefieldStartFailed": "Das Minenfeld-Duell konnte nicht gestartet werden.",
-          "minefieldPreviewPrefix": "Minenfeld"
+          "minefieldPreviewPrefix": "Minenfeld",
+          "hideSeekVariant": "Verstecken & Suchen",
+          "newHideSeekTitle": "Minenfeld verstecken",
+          "chooseMinePlacement": "Verstecke sechs Minen. Minen dürfen nicht direkt nebeneinander liegen.",
+          "playHideSeekAria": "Minenfeld – Verstecken und Suchen starten",
+          "hideSeekRulesTitle": "Regeln für Minenfeld – Verstecken & Suchen",
+          "hideSeekRulePlace": "Der erste Spieler versteckt auf einem Feld mit 6 × 6 Feldern sechs Minen. Minen dürfen weder waagerecht, senkrecht noch diagonal direkt nebeneinander liegen.",
+          "hideSeekRuleSearch": "Der andere Spieler deckt Felder auf. Zahlen zeigen die Minen auf den acht angrenzenden Feldern. Die Suche läuft weiter, bis alle sicheren Felder gefunden wurden.",
+          "hideSeekRuleMistake": "Jede getroffene Mine zählt als Fehler. Der Minenleger kann die Suche live oder später verfolgen.",
+          "hideSeekRuleSwap": "Danach werden die Rollen getauscht: Der bisherige Sucher versteckt sechs neue Minen und der andere Spieler sucht.",
+          "hideSeekRuleWin": "Wer in seiner Suchrunde weniger Minen trifft, gewinnt. Bei gleich vielen Fehlern endet das Spiel unentschieden.",
+          "hideSeekPlaceCount": "{{ selected }} von {{ total }} Minen platziert",
+          "showMinesAria": "Versteckte Minen anzeigen",
+          "hideMinesAria": "Versteckte Minen ausblenden",
+          "confirmMinePlacementAria": "Minenplatzierung bestätigen",
+          "hideSeekPreviewPrefix": "Minenfeld – Verstecken & Suchen"
         },
         "revisionHistory": {
           "title": "Änderungshistorie",

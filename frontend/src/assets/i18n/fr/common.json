@@ -707,7 +707,22 @@
           "minefieldCellRevealedAria": "La case {{ cell }} est révélée",
           "minefieldCellHiddenAria": "Révéler la case {{ cell }}",
           "minefieldStartFailed": "Le duel Champ de mines n’a pas pu démarrer.",
-          "minefieldPreviewPrefix": "Champ de mines"
+          "minefieldPreviewPrefix": "Champ de mines",
+          "hideSeekVariant": "Cacher et chercher",
+          "newHideSeekTitle": "Cacher un champ de mines",
+          "chooseMinePlacement": "Cache six mines. Les mines ne doivent pas se toucher.",
+          "playHideSeekAria": "Démarrer Champ de mines – Cacher et chercher",
+          "hideSeekRulesTitle": "Règles de Champ de mines – Cacher et chercher",
+          "hideSeekRulePlace": "La première personne cache six mines sur une grille de 6 × 6. Elles ne doivent se toucher ni horizontalement, ni verticalement, ni en diagonale.",
+          "hideSeekRuleSearch": "L’autre personne révèle des cases. Les nombres indiquent les mines dans les huit cases voisines. La recherche continue jusqu’à ce que toutes les cases sûres soient trouvées.",
+          "hideSeekRuleMistake": "Chaque mine touchée compte comme une erreur. La personne qui a caché les mines peut suivre la recherche en direct ou plus tard.",
+          "hideSeekRuleSwap": "Les rôles sont ensuite inversés : la personne qui cherchait cache six nouvelles mines et l’autre cherche.",
+          "hideSeekRuleWin": "La personne qui touche le moins de mines pendant sa recherche gagne. Le même nombre d’erreurs donne une égalité.",
+          "hideSeekPlaceCount": "{{ selected }} mines placées sur {{ total }}",
+          "showMinesAria": "Afficher les mines cachées",
+          "hideMinesAria": "Masquer les mines",
+          "confirmMinePlacementAria": "Confirmer le placement",
+          "hideSeekPreviewPrefix": "Champ de mines – Cacher et chercher"
         },
         "revisionHistory": {
           "title": "Historique des modifications",

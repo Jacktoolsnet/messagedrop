@@ -707,7 +707,22 @@
           "minefieldCellRevealedAria": "La casilla {{ cell }} está descubierta",
           "minefieldCellHiddenAria": "Descubrir la casilla {{ cell }}",
           "minefieldStartFailed": "No se pudo iniciar el duelo de Campo minado.",
-          "minefieldPreviewPrefix": "Campo minado"
+          "minefieldPreviewPrefix": "Campo minado",
+          "hideSeekVariant": "Esconder y buscar",
+          "newHideSeekTitle": "Ocultar un campo minado",
+          "chooseMinePlacement": "Oculta seis minas. Las minas no pueden tocarse.",
+          "playHideSeekAria": "Iniciar Campo minado – Esconder y buscar",
+          "hideSeekRulesTitle": "Reglas de Campo minado – Esconder y buscar",
+          "hideSeekRulePlace": "El primer jugador oculta seis minas en un tablero de 6 × 6. No pueden tocarse en horizontal, vertical ni diagonal.",
+          "hideSeekRuleSearch": "El otro jugador descubre casillas. Los números indican las minas en las ocho casillas vecinas. La búsqueda continúa hasta encontrar todas las casillas seguras.",
+          "hideSeekRuleMistake": "Cada mina tocada cuenta como un error. Quien escondió las minas puede seguir la búsqueda en directo o más tarde.",
+          "hideSeekRuleSwap": "Después se intercambian los papeles: quien buscó oculta seis minas nuevas y el otro busca.",
+          "hideSeekRuleWin": "Gana quien toque menos minas durante su ronda de búsqueda. Con los mismos errores hay empate.",
+          "hideSeekPlaceCount": "{{ selected }} de {{ total }} minas colocadas",
+          "showMinesAria": "Mostrar las minas ocultas",
+          "hideMinesAria": "Ocultar las minas",
+          "confirmMinePlacementAria": "Confirmar la colocación",
+          "hideSeekPreviewPrefix": "Campo minado – Esconder y buscar"
         },
         "revisionHistory": {
           "title": "Historial de cambios",

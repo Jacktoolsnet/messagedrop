@@ -1,9 +1,15 @@
-<app-dialog-header [icon]="data.gameType === 'minefield' ? 'grid_on' : data.gameType === 'memory' ? 'style' : data.gameType === 'code' ? 'password' : data.gameType === 'connectFour' ? 'view_column' : data.gameType === 'dotsAndBoxes' ? 'border_outer' : data.gameType === 'rockPaperScissors' ? 'content_cut' : 'grid_3x3'"
-  [title]="(data.gameType === 'minefield' ? 'common.contact.chatroom.games.minefieldRulesTitle' : data.gameType === 'memory' ? 'common.contact.chatroom.games.memoryRulesTitle' : data.gameType === 'code' ? 'common.contact.chatroom.games.codeRulesTitle' : data.gameType === 'rockPaperScissors' ? 'common.contact.chatroom.games.rockPaperScissorsRulesTitle' : data.gameType === 'dotsAndBoxes' ? 'common.contact.chatroom.games.dotsAndBoxesRulesTitle' : data.gameType === 'connectFour' ? (data.variant === 'vanishing' ? 'common.contact.chatroom.games.vanishingConnectFourRulesTitle' : 'common.contact.chatroom.games.connectFourRulesTitle') : data.variant === 'vanishing' ? 'common.contact.chatroom.games.vanishingRulesTitle' : 'common.contact.chatroom.games.rulesTitle') | transloco"></app-dialog-header>
+<app-dialog-header [icon]="data.gameType === 'minefieldHideSeek' ? 'radar' : data.gameType === 'minefield' ? 'grid_on' : data.gameType === 'memory' ? 'style' : data.gameType === 'code' ? 'password' : data.gameType === 'connectFour' ? 'view_column' : data.gameType === 'dotsAndBoxes' ? 'border_outer' : data.gameType === 'rockPaperScissors' ? 'content_cut' : 'grid_3x3'"
+  [title]="(data.gameType === 'minefieldHideSeek' ? 'common.contact.chatroom.games.hideSeekRulesTitle' : data.gameType === 'minefield' ? 'common.contact.chatroom.games.minefieldRulesTitle' : data.gameType === 'memory' ? 'common.contact.chatroom.games.memoryRulesTitle' : data.gameType === 'code' ? 'common.contact.chatroom.games.codeRulesTitle' : data.gameType === 'rockPaperScissors' ? 'common.contact.chatroom.games.rockPaperScissorsRulesTitle' : data.gameType === 'dotsAndBoxes' ? 'common.contact.chatroom.games.dotsAndBoxesRulesTitle' : data.gameType === 'connectFour' ? (data.variant === 'vanishing' ? 'common.contact.chatroom.games.vanishingConnectFourRulesTitle' : 'common.contact.chatroom.games.connectFourRulesTitle') : data.variant === 'vanishing' ? 'common.contact.chatroom.games.vanishingRulesTitle' : 'common.contact.chatroom.games.rulesTitle') | transloco"></app-dialog-header>
 
 <mat-dialog-content class="rules-content">
   <ol class="rules-list">
-    @if (data.gameType === 'minefield') {
+    @if (data.gameType === 'minefieldHideSeek') {
+    <li>{{ 'common.contact.chatroom.games.hideSeekRulePlace' | transloco }}</li>
+    <li>{{ 'common.contact.chatroom.games.hideSeekRuleSearch' | transloco }}</li>
+    <li>{{ 'common.contact.chatroom.games.hideSeekRuleMistake' | transloco }}</li>
+    <li>{{ 'common.contact.chatroom.games.hideSeekRuleSwap' | transloco }}</li>
+    <li>{{ 'common.contact.chatroom.games.hideSeekRuleWin' | transloco }}</li>
+    } @else if (data.gameType === 'minefield') {
     <li>{{ 'common.contact.chatroom.games.minefieldRuleFirstMove' | transloco }}</li>
     <li>{{ 'common.contact.chatroom.games.minefieldRuleAlternate' | transloco }}</li>
     <li>{{ 'common.contact.chatroom.games.minefieldRuleNumbers' | transloco }}</li>

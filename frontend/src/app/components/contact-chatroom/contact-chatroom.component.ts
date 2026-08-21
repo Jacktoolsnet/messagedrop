@@ -21,6 +21,7 @@ import {
   GameStats,
   MemoryGame,
   MinefieldGame,
+  MinefieldHideSeekGame,
   RockPaperScissorsChoice,
   RockPaperScissorsGame,
   TicTacToeGame,
@@ -79,6 +80,8 @@ import { MemoryBoardComponent } from './memory-board/memory-board.component';
 import { NewMemoryDialogComponent, NewMemoryDialogResult } from './new-memory-dialog/new-memory-dialog.component';
 import { MinefieldBoardComponent } from './minefield-board/minefield-board.component';
 import { NewMinefieldDialogComponent } from './new-minefield-dialog/new-minefield-dialog.component';
+import { MinefieldHideSeekBoardComponent } from './minefield-hide-seek-board/minefield-hide-seek-board.component';
+import { NewMinefieldHideSeekDialogComponent } from './new-minefield-hide-seek-dialog/new-minefield-hide-seek-dialog.component';
 import { DeleteContactMessageComponent } from './delete-contact-message/delete-contact-message.component';
 import { DisplayMessageService } from '../../services/display-message.service';
 import { ProtectedStickerImageComponent } from '../utils/protected-sticker-image/protected-sticker-image.component';
@@ -94,6 +97,7 @@ import { applyRockPaperScissorsChoice, createRockPaperScissorsGame } from '../..
 import { createCodeCommitment, createCodeGame, CodeSecret, evaluateCodeGuess, isValidCode, submitAndEvaluateCodeGuess } from '../../utils/code-game';
 import { applyMemoryTurn, createMemoryGame } from '../../utils/memory-game';
 import { applyMinefieldMove, createMinefieldGame } from '../../utils/minefield-game';
+import { applyHideSeekSearch, applySecondMinePlacement, createMinefieldHideSeekGame } from '../../utils/minefield-hide-seek';
 
 interface ChatroomMessage {
   id: string;
@@ -143,6 +147,7 @@ interface ContactChatroomDialogData {
     CodeBoardComponent,
     MemoryBoardComponent,
     MinefieldBoardComponent,
+    MinefieldHideSeekBoardComponent,
     TranslocoPipe
   ],
   templateUrl: './contact-chatroom.component.html',
@@ -534,7 +539,8 @@ export class ContactChatroomComponent implements AfterViewInit {
         rockPaperScissorsStats: this.getRockPaperScissorsStats(),
         codeStats: this.getCodeStats(),
         memoryStats: this.getMemoryStats(),
-        minefieldStats: this.getMinefieldStats()
+        minefieldStats: this.getMinefieldStats(),
+        minefieldHideSeekStats: this.getMinefieldHideSeekStats()
       },
       width: 'min(760px, 94vw)',
       maxWidth: '94vw',
@@ -564,6 +570,8 @@ export class ContactChatroomComponent implements AfterViewInit {
         this.openNewMemoryDialog(contact);
       } else if (gameType === 'minefield') {
         this.openNewMinefieldDialog(contact);
+      } else if (gameType === 'minefieldHideSeek') {
+        this.openNewMinefieldHideSeekDialog(contact);
       }
     });
   }
@@ -668,6 +676,23 @@ export class ContactChatroomComponent implements AfterViewInit {
     });
   }
 
+  private openNewMinefieldHideSeekDialog(contact: Contact): void {
+    const ref = this.matDialog.open(NewMinefieldHideSeekDialogComponent, {
+      width: 'min(500px, 96vw)', maxWidth: '96vw', maxHeight: '90vh', hasBackdrop: true,
+      backdropClass: 'dialog-backdrop', disableClose: false, autoFocus: false
+    });
+    ref.afterClosed().subscribe((mines?: number[]) => {
+      if (!mines) return;
+      try {
+        const payload = this.createEmptyMessage();
+        payload.game = createMinefieldHideSeekGame(contact.userId, contact.contactUserId, mines);
+        void this.sendAsNewMessage(contact, payload, undefined, 'game_started');
+      } catch {
+        this.snackBar.open(this.translation.t('common.contact.chatroom.games.minefieldStartFailed'), '', { duration: 3000 });
+      }
+    });
+  }
+
   private async startCodeGame(contact: Contact, code: CodeSymbol[]): Promise<void> {
     try {
       const secret: CodeSecret = { code: [...code], nonce: crypto.randomUUID() };
@@ -725,6 +750,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getChatGameIcon(game: ChatGame): string {
+    if (game.type === 'minefieldHideSeek') return 'radar';
     if (game.type === 'minefield') return 'grid_on';
     if (game.type === 'memory') return 'style';
     if (game.type === 'code') return 'password';
@@ -734,7 +760,9 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getChatGameTitle(game: ChatGame): string {
-    const key = game.type === 'minefield'
+    const key = game.type === 'minefieldHideSeek'
+      ? 'common.contact.chatroom.games.minefield'
+      : game.type === 'minefield'
       ? 'common.contact.chatroom.games.minefield'
       : game.type === 'memory'
       ? 'common.contact.chatroom.games.memory'
@@ -751,6 +779,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getChatGameVariantLabel(game: ChatGame): string {
+    if (game.type === 'minefieldHideSeek') return this.translation.t('common.contact.chatroom.games.hideSeekVariant');
     if (game.type === 'minefield') return this.translation.t('common.contact.chatroom.games.duelVariant');
     const key = game.type !== 'dotsAndBoxes' && game.type !== 'rockPaperScissors' && game.type !== 'code' && game.type !== 'memory' && game.variant === 'vanishing'
       ? 'common.contact.chatroom.games.vanishingVariant'
@@ -784,6 +813,7 @@ export class ContactChatroomComponent implements AfterViewInit {
       const currentUserId = this.userService.getUser().id;
       return game.playerXUserId === currentUserId ? 'X' : game.playerOUserId === currentUserId ? 'O' : null;
     }
+    if (game.type === 'minefieldHideSeek') return null;
     if (game.type === 'rockPaperScissors' || game.type === 'code') return null;
     const currentUserId = this.userService.getUser().id;
     return game.playerRedUserId === currentUserId ? 'X' : game.playerYellowUserId === currentUserId ? 'O' : null;
@@ -793,7 +823,7 @@ export class ContactChatroomComponent implements AfterViewInit {
     this.matDialog.open(GameRulesDialogComponent, {
       data: {
         gameType: game.type,
-        variant: game.type === 'dotsAndBoxes' || game.type === 'rockPaperScissors' || game.type === 'code' || game.type === 'memory' || game.type === 'minefield' ? 'standard' : game.variant ?? 'standard'
+        variant: game.type === 'dotsAndBoxes' || game.type === 'rockPaperScissors' || game.type === 'code' || game.type === 'memory' || game.type === 'minefield' || game.type === 'minefieldHideSeek' ? 'standard' : game.variant ?? 'standard'
       },
       width: 'min(440px, 94vw)',
       maxWidth: '94vw',
@@ -820,6 +850,8 @@ export class ContactChatroomComponent implements AfterViewInit {
       this.openNewMemoryDialog(contact);
     } else if (game.type === 'minefield') {
       this.openNewMinefieldDialog(contact);
+    } else if (game.type === 'minefieldHideSeek') {
+      this.openNewMinefieldHideSeekDialog(contact);
     } else {
       this.openNewCodeDialog(contact);
     }
@@ -844,6 +876,34 @@ export class ContactChatroomComponent implements AfterViewInit {
     return !!game && game.type === 'minefield' && game.status === 'active'
       && game.nextPlayerUserId === this.userService.getUser().id
       && !this.gameMovesInFlight().has(game.gameId);
+  }
+
+  canPlayMinefieldHideSeek(message: ChatroomMessage): boolean {
+    const game = message.payload?.game;
+    return !!game && game.type === 'minefieldHideSeek' && game.status === 'active'
+      && game.nextPlayerUserId === this.userService.getUser().id
+      && !this.gameMovesInFlight().has(game.gameId);
+  }
+
+  async playMinefieldHideSeekMove(message: ChatroomMessage, cellIndex: number): Promise<void> {
+    const game = message.payload?.game;
+    if (!game || game.type !== 'minefieldHideSeek') return;
+    const next = applyHideSeekSearch(game, this.userService.getUser().id, cellIndex);
+    if (next) await this.sendMinefieldHideSeekRevision(message, next);
+  }
+
+  async placeSecondMinefield(message: ChatroomMessage, indices: number[]): Promise<void> {
+    const game = message.payload?.game;
+    if (!game || game.type !== 'minefieldHideSeek') return;
+    const next = applySecondMinePlacement(game, this.userService.getUser().id, indices);
+    if (next) await this.sendMinefieldHideSeekRevision(message, next);
+  }
+
+  private async sendMinefieldHideSeekRevision(message: ChatroomMessage, game: MinefieldHideSeekGame): Promise<void> {
+    const contact = this.contact(); if (!contact || !this.canPlayMinefieldHideSeek(message)) return;
+    this.setGameMoveInFlight(game.gameId, true);
+    try { const payload = this.createEmptyMessage(); payload.game = game; await this.sendAsNewMessage(contact, payload, message.messageId, 'game_move'); }
+    finally { this.setGameMoveInFlight(game.gameId, false); }
   }
 
   async playMinefieldMove(message: ChatroomMessage, cellIndex: number): Promise<void> {
@@ -1231,6 +1291,15 @@ export class ContactChatroomComponent implements AfterViewInit {
       else if (game.status === 'won' && game.winnerUserId === currentUserId) stats.won += 1;
       else if (game.status === 'won') stats.lost += 1;
     }
+    return stats;
+  }
+
+  private getMinefieldHideSeekStats(): GameStats {
+    const currentUserId = this.userService.getUser().id;
+    const latest = new Map<string, MinefieldHideSeekGame>();
+    for (const message of this.visibleMessages()) { const game = message.payload?.game; if (game?.type === 'minefieldHideSeek' && !latest.has(game.gameId)) latest.set(game.gameId, game); }
+    const stats: GameStats = { played: latest.size, won: 0, lost: 0, drawn: 0 };
+    for (const game of latest.values()) { if (game.status === 'draw') stats.drawn++; else if (game.status === 'won' && game.winnerUserId === currentUserId) stats.won++; else if (game.status === 'won') stats.lost++; }
     return stats;
   }
 

@@ -1,0 +1,24 @@
+<div class="hide-seek">
+ @if(game();as currentGame){
+  <div class="hide-seek__score"><span class="x">X</span><strong>{{ mistakes(currentGame.playerXUserId) ?? '–' }}</strong><mat-icon>warning</mat-icon><strong>{{ mistakes(currentGame.playerOUserId) ?? '–' }}</strong><span class="o">O</span></div>
+ }
+ @if(isPlacement()){
+  <div class="hide-seek__placement-status">{{ 'common.contact.chatroom.games.hideSeekPlaceCount'|transloco:{selected:selectedMines().length,total:mineCount} }}</div>
+ } @else if(round()?.hiderUserId===currentUserId()&&game()?.status==='active'){
+  <button mat-icon-button type="button" class="hide-seek__visibility" (click)="showHiddenMines.update(value=>!value)" [attr.aria-label]="(showHiddenMines()?'common.contact.chatroom.games.hideMinesAria':'common.contact.chatroom.games.showMinesAria')|transloco"><mat-icon>{{showHiddenMines()?'visibility_off':'visibility'}}</mat-icon></button>
+ }
+ <div class="hide-seek-grid">
+  @for(index of cells;track index){
+   <button type="button" class="hide-seek-cell" [class.hide-seek-cell--revealed]="isRevealed(index)" [class.hide-seek-cell--mine]="isMineVisible(index)" [class.hide-seek-cell--selected]="selectedMines().includes(index)" [class.hide-seek-cell--last]="isLast(index)"
+    [attr.data-adjacent]="isRevealed(index)&&!isMineVisible(index)?adjacent(index):null"
+    [disabled]="disabled()||isBlockedForPlacement(index)||(!isPlacement()&&(!!isRevealed(index)||game()?.status!=='active'||round()?.seekerUserId!==currentUserId()))" (click)="selectCell(index)">
+    @if(isMineVisible(index)){<mat-icon>emergency</mat-icon>}
+    @else if(isRevealed(index)){<strong>{{adjacent(index)}}</strong>}
+    @else{<mat-icon class="hide-seek-cell__hidden">crop_square</mat-icon>}
+   </button>
+  }
+ </div>
+ @if(isPlacement()&&!placementMode()){
+  <button mat-mini-fab color="primary" class="hide-seek__submit" type="button" [disabled]="selectedMines().length!==mineCount" (click)="submitPlacement()" [attr.aria-label]="'common.contact.chatroom.games.confirmMinePlacementAria'|transloco"><mat-icon>check</mat-icon></button>
+ }
+</div>
