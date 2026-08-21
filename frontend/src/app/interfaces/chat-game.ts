@@ -75,7 +75,23 @@ export interface DotsAndBoxesGame {
   moveNumber: number;
 }
 
-export type ChatGame = TicTacToeGame | ConnectFourGame | DotsAndBoxesGame;
+export type RockPaperScissorsChoice = 'rock' | 'paper' | 'scissors';
+
+export interface RockPaperScissorsGame {
+  type: 'rockPaperScissors';
+  version: 1;
+  gameId: string;
+  playerXUserId: string;
+  playerOUserId: string;
+  playerXChoice: RockPaperScissorsChoice;
+  playerOChoice: RockPaperScissorsChoice | null;
+  nextPlayerUserId: string | null;
+  status: TicTacToeStatus;
+  winnerUserId: string | null;
+  moveNumber: number;
+}
+
+export type ChatGame = TicTacToeGame | ConnectFourGame | DotsAndBoxesGame | RockPaperScissorsGame;
 
 export interface GameStats {
   played: number;

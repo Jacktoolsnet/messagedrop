@@ -1,9 +1,14 @@
-<app-dialog-header [icon]="data.gameType === 'connectFour' ? 'view_column' : data.gameType === 'dotsAndBoxes' ? 'border_outer' : 'grid_3x3'"
-  [title]="(data.gameType === 'dotsAndBoxes' ? 'common.contact.chatroom.games.dotsAndBoxesRulesTitle' : data.gameType === 'connectFour' ? (data.variant === 'vanishing' ? 'common.contact.chatroom.games.vanishingConnectFourRulesTitle' : 'common.contact.chatroom.games.connectFourRulesTitle') : data.variant === 'vanishing' ? 'common.contact.chatroom.games.vanishingRulesTitle' : 'common.contact.chatroom.games.rulesTitle') | transloco"></app-dialog-header>
+<app-dialog-header [icon]="data.gameType === 'connectFour' ? 'view_column' : data.gameType === 'dotsAndBoxes' ? 'border_outer' : data.gameType === 'rockPaperScissors' ? 'content_cut' : 'grid_3x3'"
+  [title]="(data.gameType === 'rockPaperScissors' ? 'common.contact.chatroom.games.rockPaperScissorsRulesTitle' : data.gameType === 'dotsAndBoxes' ? 'common.contact.chatroom.games.dotsAndBoxesRulesTitle' : data.gameType === 'connectFour' ? (data.variant === 'vanishing' ? 'common.contact.chatroom.games.vanishingConnectFourRulesTitle' : 'common.contact.chatroom.games.connectFourRulesTitle') : data.variant === 'vanishing' ? 'common.contact.chatroom.games.vanishingRulesTitle' : 'common.contact.chatroom.games.rulesTitle') | transloco"></app-dialog-header>
 
 <mat-dialog-content class="rules-content">
   <ol class="rules-list">
-    @if (data.gameType === 'dotsAndBoxes') {
+    @if (data.gameType === 'rockPaperScissors') {
+    <li>{{ 'common.contact.chatroom.games.rockPaperScissorsRuleFirstChoice' | transloco }}</li>
+    <li>{{ 'common.contact.chatroom.games.rockPaperScissorsRuleHidden' | transloco }}</li>
+    <li>{{ 'common.contact.chatroom.games.rockPaperScissorsRuleWinner' | transloco }}</li>
+    <li>{{ 'common.contact.chatroom.games.ruleFinished' | transloco }}</li>
+    } @else if (data.gameType === 'dotsAndBoxes') {
     <li>{{ 'common.contact.chatroom.games.dotsAndBoxesRuleFirstMove' | transloco }}</li>
     <li>{{ 'common.contact.chatroom.games.dotsAndBoxesRuleClaim' | transloco }}</li>
     <li>{{ 'common.contact.chatroom.games.dotsAndBoxesRuleExtraMove' | transloco }}</li>

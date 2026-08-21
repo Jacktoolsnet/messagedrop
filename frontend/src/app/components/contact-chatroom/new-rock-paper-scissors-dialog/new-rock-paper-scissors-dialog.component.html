@@ -1,0 +1,19 @@
+<app-dialog-header icon="content_cut"
+  [title]="'common.contact.chatroom.games.newRockPaperScissorsTitle' | transloco"></app-dialog-header>
+
+<mat-dialog-content class="new-game-content">
+  <app-rock-paper-scissors-board [selectionMode]="true" [selectedChoice]="selectedChoice()"
+    [statusText]="'common.contact.chatroom.games.chooseRockPaperScissors' | transloco"
+    (choice)="selectChoice($event)"></app-rock-paper-scissors-board>
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-icon-button class="action-close" type="button" (click)="close()"
+    [attr.aria-label]="'common.actions.close' | transloco">
+    <mat-icon>close</mat-icon>
+  </button>
+  <button mat-icon-button color="primary" type="button" (click)="send()" [disabled]="selectedChoice() === null"
+    [attr.aria-label]="'common.contact.chatroom.games.sendGameAria' | transloco">
+    <mat-icon>send</mat-icon>
+  </button>
+</mat-dialog-actions>

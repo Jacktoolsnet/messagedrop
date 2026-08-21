@@ -7,7 +7,7 @@ import { ConnectFourVariant, GameStats, TicTacToeStats, TicTacToeVariant } from 
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
 import { GameRulesDialogComponent } from '../game-rules-dialog/game-rules-dialog.component';
 
-export type ChatGameType = 'ticTacToe' | 'ticTacToeVanishing' | 'connectFour' | 'connectFourVanishing' | 'dotsAndBoxes';
+export type ChatGameType = 'ticTacToe' | 'ticTacToeVanishing' | 'connectFour' | 'connectFourVanishing' | 'dotsAndBoxes' | 'rockPaperScissors';
 
 interface GameSelectDialogData {
   ticTacToeStats: TicTacToeStats;
@@ -15,6 +15,7 @@ interface GameSelectDialogData {
   connectFourStats: GameStats;
   vanishingConnectFourStats: GameStats;
   dotsAndBoxesStats: GameStats;
+  rockPaperScissorsStats: GameStats;
 }
 
 @Component({
@@ -67,6 +68,19 @@ export class GameSelectDialogComponent {
   openDotsAndBoxesRules(): void {
     this.dialog.open(GameRulesDialogComponent, {
       data: { gameType: 'dotsAndBoxes', variant: 'standard' },
+      width: 'min(440px, 94vw)',
+      maxWidth: '94vw',
+      maxHeight: '85vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+  }
+
+  openRockPaperScissorsRules(): void {
+    this.dialog.open(GameRulesDialogComponent, {
+      data: { gameType: 'rockPaperScissors', variant: 'standard' },
       width: 'min(440px, 94vw)',
       maxWidth: '94vw',
       maxHeight: '85vh',

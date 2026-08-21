@@ -1,0 +1,44 @@
+<div class="rps">
+  @if (game(); as currentGame) {
+    <div class="rps__duel" [class.rps__duel--finished]="currentGame.status !== 'active'">
+      <div class="rps__player-choice rps__player-choice--x">
+        <span class="rps__player">X</span>
+        @if (showFirstChoice(currentGame)) {
+          <span class="rps__choice-icon">{{ getChoiceIcon(currentGame.playerXChoice) }}</span>
+          <span>{{ getChoiceLabel(currentGame.playerXChoice) }}</span>
+        } @else {
+          <span class="rps__choice-icon">🔒</span>
+          <span>{{ 'common.contact.chatroom.games.choiceHidden' | transloco }}</span>
+        }
+      </div>
+      <span class="rps__versus">VS</span>
+      <div class="rps__player-choice rps__player-choice--o">
+        <span class="rps__player">O</span>
+        @if (currentGame.playerOChoice; as secondChoice) {
+          <span class="rps__choice-icon">{{ getChoiceIcon(secondChoice) }}</span>
+          <span>{{ getChoiceLabel(secondChoice) }}</span>
+        } @else {
+          <span class="rps__choice-icon">❔</span>
+          <span>{{ 'common.contact.chatroom.games.choicePending' | transloco }}</span>
+        }
+      </div>
+    </div>
+  }
+
+  @if (selectionMode() || canChoose()) {
+    <div class="rps__choices" role="group" [attr.aria-label]="statusText()">
+      @for (item of choices; track item) {
+        <button type="button" class="rps__choice-button" [class.rps__choice-button--selected]="selectedChoice() === item"
+          [disabled]="disabled()" [attr.aria-label]="getChoiceLabel(item)"
+          (pointerenter)="previewChoice($event)" (click)="selectChoice(item)">
+          <span class="rps__choice-button-icon">{{ getChoiceIcon(item) }}</span>
+          <span>{{ getChoiceLabel(item) }}</span>
+        </button>
+      }
+    </div>
+  }
+
+  @if (statusText() && showStatus()) {
+    <div class="rps__status" aria-live="polite">{{ statusText() }}</div>
+  }
+</div>
