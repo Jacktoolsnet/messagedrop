@@ -77,6 +77,24 @@
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--mat-sys-tertiary, var(--connect-four-primary)) 24%, transparent);
 }
 
+.connect-four__cell--fading {
+  border-style: dashed;
+  border-color: color-mix(in srgb, currentColor 62%, transparent);
+}
+
+.connect-four__cell--fading .connect-four__stone {
+  opacity: 0.6;
+}
+
+.connect-four__cell--winning .connect-four__stone {
+  opacity: 1;
+}
+
+.connect-four__cell--winning.connect-four__cell--fading {
+  border-style: solid;
+  border-color: var(--mat-sys-tertiary, var(--connect-four-primary));
+}
+
 .connect-four__controls {
   position: absolute;
   z-index: 2;

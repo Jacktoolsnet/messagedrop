@@ -5,6 +5,7 @@
       [class.connect-four__cell--red]="cell === 'R'"
       [class.connect-four__cell--yellow]="cell === 'Y'"
       [class.connect-four__cell--winning]="winningCellIndexes().has($index)"
+      [class.connect-four__cell--fading]="fadingCellIndexes().has($index)"
       [class.connect-four__cell--target]="hoveredDropIndex() === $index">
       <span class="connect-four__stone">{{ getCellMark(cell) }}</span>
     </span>

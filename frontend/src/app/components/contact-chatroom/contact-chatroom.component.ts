@@ -13,6 +13,7 @@ import { Contact } from '../../interfaces/contact';
 import {
   ChatGame,
   ConnectFourGame,
+  ConnectFourVariant,
   GameStats,
   TicTacToeGame,
   TicTacToeMark,
@@ -496,7 +497,8 @@ export class ContactChatroomComponent implements AfterViewInit {
       data: {
         ticTacToeStats: this.getTicTacToeStats('standard'),
         vanishingTicTacToeStats: this.getTicTacToeStats('vanishing'),
-        connectFourStats: this.getConnectFourStats()
+        connectFourStats: this.getConnectFourStats('standard'),
+        vanishingConnectFourStats: this.getConnectFourStats('vanishing')
       },
       width: 'min(760px, 94vw)',
       maxWidth: '94vw',
@@ -513,13 +515,16 @@ export class ContactChatroomComponent implements AfterViewInit {
       } else if (gameType === 'ticTacToeVanishing') {
         this.openNewTicTacToeDialog(contact, 'vanishing');
       } else if (gameType === 'connectFour') {
-        this.openNewConnectFourDialog(contact);
+        this.openNewConnectFourDialog(contact, 'standard');
+      } else if (gameType === 'connectFourVanishing') {
+        this.openNewConnectFourDialog(contact, 'vanishing');
       }
     });
   }
 
-  private openNewConnectFourDialog(contact: Contact): void {
+  private openNewConnectFourDialog(contact: Contact, variant: ConnectFourVariant): void {
     const dialogRef = this.matDialog.open(NewConnectFourDialogComponent, {
+      data: { variant },
       width: 'min(470px, 96vw)',
       maxWidth: '96vw',
       maxHeight: '90vh',
@@ -531,7 +536,7 @@ export class ContactChatroomComponent implements AfterViewInit {
     dialogRef.afterClosed().subscribe((firstColumn?: number) => {
       if (!Number.isInteger(firstColumn)) return;
       const payload = this.createEmptyMessage();
-      payload.game = createConnectFourGame(contact.userId, contact.contactUserId, firstColumn!);
+      payload.game = createConnectFourGame(contact.userId, contact.contactUserId, firstColumn!, variant);
       void this.sendAsNewMessage(contact, payload, undefined, 'game_started');
     });
   }
@@ -577,7 +582,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getChatGameIcon(game: ChatGame): string {
-    return game.type === 'connectFour' ? 'view_column' : game.variant === 'vanishing' ? 'change_circle' : 'grid_3x3';
+    return game.variant === 'vanishing' ? 'change_circle' : game.type === 'connectFour' ? 'view_column' : 'grid_3x3';
   }
 
   getChatGameTitle(game: ChatGame): string {
@@ -587,7 +592,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getChatGameVariantLabel(game: ChatGame): string {
-    const key = game.type === 'ticTacToe' && game.variant === 'vanishing'
+    const key = game.variant === 'vanishing'
       ? 'common.contact.chatroom.games.vanishingVariant'
       : 'common.contact.chatroom.games.standardVariant';
     return this.translation.t(key);
@@ -601,17 +606,17 @@ export class ContactChatroomComponent implements AfterViewInit {
     return game.winnerUserId === this.userService.getUser().id;
   }
 
-  getCurrentUserGamePieceLabel(game: ChatGame): string {
-    if (game.type === 'ticTacToe') return this.getTicTacToePlayerMark(game) ?? '';
+  getCurrentUserGamePieceLabel(game: ChatGame): TicTacToeMark | null {
+    if (game.type === 'ticTacToe') return this.getTicTacToePlayerMark(game);
     const currentUserId = this.userService.getUser().id;
-    return game.playerRedUserId === currentUserId ? 'X' : game.playerYellowUserId === currentUserId ? 'O' : '';
+    return game.playerRedUserId === currentUserId ? 'X' : game.playerYellowUserId === currentUserId ? 'O' : null;
   }
 
   openGameRules(game: ChatGame): void {
     this.matDialog.open(GameRulesDialogComponent, {
       data: {
         gameType: game.type,
-        variant: game.type === 'ticTacToe' ? game.variant ?? 'standard' : undefined
+        variant: game.variant ?? 'standard'
       },
       width: 'min(440px, 94vw)',
       maxWidth: '94vw',
@@ -730,12 +735,13 @@ export class ContactChatroomComponent implements AfterViewInit {
     return stats;
   }
 
-  private getConnectFourStats(): GameStats {
+  private getConnectFourStats(variant: ConnectFourVariant): GameStats {
     const currentUserId = this.userService.getUser().id;
     const latestGames = new Map<string, ConnectFourGame>();
     for (const message of this.visibleMessages()) {
       const game = message.payload?.game;
-      if (game?.type === 'connectFour' && !latestGames.has(game.gameId)) latestGames.set(game.gameId, game);
+      if (game?.type !== 'connectFour' || (game.variant ?? 'standard') !== variant) continue;
+      if (!latestGames.has(game.gameId)) latestGames.set(game.gameId, game);
     }
     const stats: GameStats = { played: latestGames.size, won: 0, lost: 0, drawn: 0 };
     for (const game of latestGames.values()) {

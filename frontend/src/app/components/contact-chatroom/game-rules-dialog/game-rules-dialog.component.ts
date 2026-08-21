@@ -4,11 +4,11 @@ import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef } fro
 import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
-import { TicTacToeVariant } from '../../../interfaces/chat-game';
+import { ConnectFourVariant, TicTacToeVariant } from '../../../interfaces/chat-game';
 
 export interface GameRulesDialogData {
   gameType: 'ticTacToe' | 'connectFour';
-  variant?: TicTacToeVariant;
+  variant?: TicTacToeVariant | ConnectFourVariant;
 }
 
 @Component({

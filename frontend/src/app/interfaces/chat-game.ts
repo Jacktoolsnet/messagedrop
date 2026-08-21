@@ -26,6 +26,12 @@ export interface TicTacToeGame {
 }
 
 export type ConnectFourCell = 'R' | 'Y' | null;
+export type ConnectFourVariant = 'standard' | 'vanishing';
+
+export interface ConnectFourMove {
+  mark: Exclude<ConnectFourCell, null>;
+  cellIndex: number;
+}
 
 export interface ConnectFourGame {
   type: 'connectFour';
@@ -38,6 +44,10 @@ export interface ConnectFourGame {
   status: TicTacToeStatus;
   winnerUserId: string | null;
   moveNumber: number;
+  /** Missing on existing production messages and therefore treated as standard. */
+  variant?: ConnectFourVariant;
+  /** Current placements in chronological order; used by the vanishing variant. */
+  moves?: ConnectFourMove[];
 }
 
 export type ChatGame = TicTacToeGame | ConnectFourGame;

@@ -3,16 +3,17 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDial
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { GameStats, TicTacToeStats, TicTacToeVariant } from '../../../interfaces/chat-game';
+import { ConnectFourVariant, GameStats, TicTacToeStats, TicTacToeVariant } from '../../../interfaces/chat-game';
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
 import { GameRulesDialogComponent } from '../game-rules-dialog/game-rules-dialog.component';
 
-export type ChatGameType = 'ticTacToe' | 'ticTacToeVanishing' | 'connectFour';
+export type ChatGameType = 'ticTacToe' | 'ticTacToeVanishing' | 'connectFour' | 'connectFourVanishing';
 
 interface GameSelectDialogData {
   ticTacToeStats: TicTacToeStats;
   vanishingTicTacToeStats: TicTacToeStats;
   connectFourStats: GameStats;
+  vanishingConnectFourStats: GameStats;
 }
 
 @Component({
@@ -49,9 +50,9 @@ export class GameSelectDialogComponent {
     });
   }
 
-  openConnectFourRules(): void {
+  openConnectFourRules(variant: ConnectFourVariant): void {
     this.dialog.open(GameRulesDialogComponent, {
-      data: { gameType: 'connectFour' },
+      data: { gameType: 'connectFour', variant },
       width: 'min(440px, 94vw)',
       maxWidth: '94vw',
       maxHeight: '85vh',

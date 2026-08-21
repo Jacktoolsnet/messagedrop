@@ -1,8 +1,9 @@
-<app-dialog-header icon="view_column" [title]="'common.contact.chatroom.games.newConnectFourTitle' | transloco"></app-dialog-header>
+<app-dialog-header [icon]="data.variant === 'vanishing' ? 'change_circle' : 'view_column'"
+  [title]="(data.variant === 'vanishing' ? 'common.contact.chatroom.games.newVanishingConnectFourTitle' : 'common.contact.chatroom.games.newConnectFourTitle') | transloco"></app-dialog-header>
 
 <mat-dialog-content class="new-game-content">
-  <app-connect-four-board [board]="board()" [disabled]="false"
-    [statusText]="'common.contact.chatroom.games.chooseFirstConnectFourMove' | transloco"
+  <app-connect-four-board [board]="board()" [moves]="moves()" [variant]="data.variant" [playerMark]="'X'" [disabled]="false"
+    [statusText]="(data.variant === 'vanishing' ? 'common.contact.chatroom.games.chooseFirstConnectFourMoveVanishing' : 'common.contact.chatroom.games.chooseFirstConnectFourMove') | transloco"
     (move)="selectColumn($event)"></app-connect-four-board>
 </mat-dialog-content>
 
