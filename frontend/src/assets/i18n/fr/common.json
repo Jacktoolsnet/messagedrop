@@ -692,7 +692,22 @@
           "memoryCardHiddenAria": "Retourner la carte {{ card }}",
           "memoryLastMoveHint": "Le dernier tour reste visible jusqu’à ce que tu choisisses ta première carte.",
           "memoryStartFailed": "Trouve les paires n’a pas pu démarrer.",
-          "memoryPreviewPrefix": "Trouve les paires"
+          "memoryPreviewPrefix": "Trouve les paires",
+          "minefield": "Champ de mines",
+          "duelVariant": "Duel",
+          "newMinefieldTitle": "Nouveau duel Champ de mines",
+          "chooseFirstMinefieldMove": "Choisis ta première case. Cette case et toutes ses voisines sont garanties sans mine. Tu joues avec X.",
+          "playMinefieldAria": "Démarrer le duel Champ de mines",
+          "minefieldRulesTitle": "Règles de Champ de mines – Duel",
+          "minefieldRuleFirstMove": "La partie se joue sur une grille de 8 × 8 avec dix mines cachées. La première case et toutes ses voisines sont garanties sans mine.",
+          "minefieldRuleAlternate": "À tour de rôle, vous révélez exactement une case cachée. Le dernier coup est mis en évidence pour l’autre personne.",
+          "minefieldRuleNumbers": "Un nombre indique combien de mines se trouvent dans les huit cases voisines. Aucune autre case ne s’ouvre automatiquement.",
+          "minefieldRuleScore": "Une case sûre rapporte un point. Toucher une mine retire deux points et la partie continue.",
+          "minefieldRuleWin": "Lorsque toutes les cases sûres sont révélées, la personne avec le plus de points gagne. Une égalité donne un match nul.",
+          "minefieldCellRevealedAria": "La case {{ cell }} est révélée",
+          "minefieldCellHiddenAria": "Révéler la case {{ cell }}",
+          "minefieldStartFailed": "Le duel Champ de mines n’a pas pu démarrer.",
+          "minefieldPreviewPrefix": "Champ de mines"
         },
         "revisionHistory": {
           "title": "Historique des modifications",

@@ -155,7 +155,34 @@ export interface MemoryGame {
   lastMove: MemoryLastMove | null;
 }
 
-export type ChatGame = TicTacToeGame | ConnectFourGame | DotsAndBoxesGame | RockPaperScissorsGame | CodeGame | MemoryGame;
+export interface MinefieldLastMove {
+  playerUserId: string;
+  cellIndex: number;
+  hitMine: boolean;
+  adjacentMines: number;
+  moveNumber: number;
+}
+
+export interface MinefieldGame {
+  type: 'minefield';
+  version: 1;
+  gameId: string;
+  rows: 8;
+  columns: 8;
+  mines: boolean[];
+  revealedBy: TicTacToeCell[];
+  playerXUserId: string;
+  playerOUserId: string;
+  playerXScore: number;
+  playerOScore: number;
+  nextPlayerUserId: string | null;
+  status: TicTacToeStatus;
+  winnerUserId: string | null;
+  moveNumber: number;
+  lastMove: MinefieldLastMove | null;
+}
+
+export type ChatGame = TicTacToeGame | ConnectFourGame | DotsAndBoxesGame | RockPaperScissorsGame | CodeGame | MemoryGame | MinefieldGame;
 
 export interface GameStats {
   played: number;

@@ -1,0 +1,9 @@
+<app-dialog-header icon="grid_on" [title]="'common.contact.chatroom.games.newMinefieldTitle' | transloco"></app-dialog-header>
+<mat-dialog-content class="new-game-content">
+ <p>{{ 'common.contact.chatroom.games.chooseFirstMinefieldMove' | transloco }}</p>
+ <app-minefield-board [selectionMode]="true" (move)="selectCell($event)"></app-minefield-board>
+</mat-dialog-content>
+<mat-dialog-actions class="sticky-actions" align="end">
+ <button mat-icon-button class="action-close" type="button" (click)="close()" [attr.aria-label]="'common.actions.close' | transloco"><mat-icon>close</mat-icon></button>
+ <button mat-icon-button color="primary" type="button" (click)="send()" [disabled]="firstCell()===null" [attr.aria-label]="'common.contact.chatroom.games.sendGameAria' | transloco"><mat-icon>send</mat-icon></button>
+</mat-dialog-actions>

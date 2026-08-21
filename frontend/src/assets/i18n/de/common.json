@@ -693,7 +693,22 @@
           "memoryCardHiddenAria": "Karte {{ card }} aufdecken",
           "memoryLastMoveHint": "Der letzte Zug bleibt sichtbar, bis du deine erste Karte auswählst.",
           "memoryStartFailed": "Finde Paare konnte nicht gestartet werden.",
-          "memoryPreviewPrefix": "Finde Paare"
+          "memoryPreviewPrefix": "Finde Paare",
+          "minefield": "Minenfeld",
+          "duelVariant": "Duell",
+          "newMinefieldTitle": "Neues Minenfeld-Duell",
+          "chooseFirstMinefieldMove": "Wähle dein erstes Feld. Dieses Feld und seine Umgebung sind garantiert sicher. Du spielst X.",
+          "playMinefieldAria": "Minenfeld-Duell starten",
+          "minefieldRulesTitle": "Regeln für Minenfeld – Duell",
+          "minefieldRuleFirstMove": "Gespielt wird auf einem Feld mit 8 × 8 Feldern und zehn versteckten Minen. Der erste Zug und seine direkt angrenzenden Felder sind garantiert sicher.",
+          "minefieldRuleAlternate": "Ihr deckt abwechselnd jeweils genau ein noch verborgenes Feld auf. Der letzte Zug wird für den Kontakt hervorgehoben.",
+          "minefieldRuleNumbers": "Eine Zahl zeigt, wie viele Minen sich auf den acht angrenzenden Feldern befinden. Es werden keine zusätzlichen Felder automatisch geöffnet.",
+          "minefieldRuleScore": "Ein sicheres Feld gibt einen Punkt. Wer eine Mine trifft, verliert zwei Punkte; das Spiel geht anschließend weiter.",
+          "minefieldRuleWin": "Sobald alle sicheren Felder aufgedeckt sind, gewinnt die Person mit den meisten Punkten. Bei gleicher Punktzahl endet das Duell unentschieden.",
+          "minefieldCellRevealedAria": "Feld {{ cell }} ist aufgedeckt",
+          "minefieldCellHiddenAria": "Feld {{ cell }} aufdecken",
+          "minefieldStartFailed": "Das Minenfeld-Duell konnte nicht gestartet werden.",
+          "minefieldPreviewPrefix": "Minenfeld"
         },
         "revisionHistory": {
           "title": "Änderungshistorie",

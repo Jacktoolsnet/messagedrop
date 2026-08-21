@@ -1,0 +1,27 @@
+<div class="minefield-board">
+  @if (game(); as currentGame) {
+    <div class="minefield-score" aria-live="polite">
+      <span class="minefield-score__x">X</span><strong>{{ currentGame.playerXScore }}</strong><span>:</span><strong>{{ currentGame.playerOScore }}</strong><span class="minefield-score__o">O</span>
+    </div>
+  }
+  <div class="minefield-grid">
+    @for (index of cells; track index) {
+      <button type="button" class="minefield-cell" [class.minefield-cell--revealed]="isRevealed(index)"
+        [class.minefield-cell--mine]="isRevealed(index) && isMine(index)" [class.minefield-cell--last]="isLastMove(index)"
+        [class.minefield-cell--x]="owner(index)==='X'" [class.minefield-cell--o]="owner(index)==='O'"
+        [attr.data-adjacent]="isRevealed(index) && !isMine(index) ? adjacentMines(index) : null"
+        [disabled]="disabled() || !!owner(index) || (!selectionMode() && game()?.status !== 'active')" (click)="selectCell(index)"
+        [attr.aria-label]="(isRevealed(index) ? 'common.contact.chatroom.games.minefieldCellRevealedAria' : 'common.contact.chatroom.games.minefieldCellHiddenAria') | transloco:{ cell:index+1 }">
+        @if (isRevealed(index)) {
+          @if (selectionMode()) { <mat-icon>touch_app</mat-icon> }
+          @else if (isMine(index)) { <mat-icon>emergency</mat-icon> }
+          @else if (adjacentMines(index); as count) { <strong>{{ count }}</strong> }
+          @else { <span class="minefield-cell__empty"></span> }
+          @if (owner(index); as mark) {
+            <span class="minefield-cell__owner" [class.minefield-cell__owner--x]="mark==='X'" [class.minefield-cell__owner--o]="mark==='O'">{{ mark }}</span>
+          }
+        } @else { <mat-icon class="minefield-cell__hidden">crop_square</mat-icon> }
+      </button>
+    }
+  </div>
+</div>

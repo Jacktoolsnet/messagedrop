@@ -20,6 +20,7 @@ import {
   DotsAndBoxesMove,
   GameStats,
   MemoryGame,
+  MinefieldGame,
   RockPaperScissorsChoice,
   RockPaperScissorsGame,
   TicTacToeGame,
@@ -76,6 +77,8 @@ import { CodeBoardComponent } from './code-board/code-board.component';
 import { NewCodeDialogComponent } from './new-code-dialog/new-code-dialog.component';
 import { MemoryBoardComponent } from './memory-board/memory-board.component';
 import { NewMemoryDialogComponent, NewMemoryDialogResult } from './new-memory-dialog/new-memory-dialog.component';
+import { MinefieldBoardComponent } from './minefield-board/minefield-board.component';
+import { NewMinefieldDialogComponent } from './new-minefield-dialog/new-minefield-dialog.component';
 import { DeleteContactMessageComponent } from './delete-contact-message/delete-contact-message.component';
 import { DisplayMessageService } from '../../services/display-message.service';
 import { ProtectedStickerImageComponent } from '../utils/protected-sticker-image/protected-sticker-image.component';
@@ -90,6 +93,7 @@ import { applyDotsAndBoxesMove, createDotsAndBoxesGame } from '../../utils/dots-
 import { applyRockPaperScissorsChoice, createRockPaperScissorsGame } from '../../utils/rock-paper-scissors';
 import { createCodeCommitment, createCodeGame, CodeSecret, evaluateCodeGuess, isValidCode, submitAndEvaluateCodeGuess } from '../../utils/code-game';
 import { applyMemoryTurn, createMemoryGame } from '../../utils/memory-game';
+import { applyMinefieldMove, createMinefieldGame } from '../../utils/minefield-game';
 
 interface ChatroomMessage {
   id: string;
@@ -138,6 +142,7 @@ interface ContactChatroomDialogData {
     RockPaperScissorsBoardComponent,
     CodeBoardComponent,
     MemoryBoardComponent,
+    MinefieldBoardComponent,
     TranslocoPipe
   ],
   templateUrl: './contact-chatroom.component.html',
@@ -528,7 +533,8 @@ export class ContactChatroomComponent implements AfterViewInit {
         dotsAndBoxesStats: this.getDotsAndBoxesStats(),
         rockPaperScissorsStats: this.getRockPaperScissorsStats(),
         codeStats: this.getCodeStats(),
-        memoryStats: this.getMemoryStats()
+        memoryStats: this.getMemoryStats(),
+        minefieldStats: this.getMinefieldStats()
       },
       width: 'min(760px, 94vw)',
       maxWidth: '94vw',
@@ -556,6 +562,8 @@ export class ContactChatroomComponent implements AfterViewInit {
         this.openNewCodeDialog(contact);
       } else if (gameType === 'memory') {
         this.openNewMemoryDialog(contact);
+      } else if (gameType === 'minefield') {
+        this.openNewMinefieldDialog(contact);
       }
     });
   }
@@ -643,6 +651,23 @@ export class ContactChatroomComponent implements AfterViewInit {
     });
   }
 
+  private openNewMinefieldDialog(contact: Contact): void {
+    const dialogRef = this.matDialog.open(NewMinefieldDialogComponent, {
+      width: 'min(500px, 96vw)', maxWidth: '96vw', maxHeight: '90vh', hasBackdrop: true,
+      backdropClass: 'dialog-backdrop', disableClose: false, autoFocus: false
+    });
+    dialogRef.afterClosed().subscribe((firstCell?: number) => {
+      if (!Number.isInteger(firstCell)) return;
+      try {
+        const payload = this.createEmptyMessage();
+        payload.game = createMinefieldGame(contact.userId, contact.contactUserId, firstCell!);
+        void this.sendAsNewMessage(contact, payload, undefined, 'game_started');
+      } catch {
+        this.snackBar.open(this.translation.t('common.contact.chatroom.games.minefieldStartFailed'), '', { duration: 3000 });
+      }
+    });
+  }
+
   private async startCodeGame(contact: Contact, code: CodeSymbol[]): Promise<void> {
     try {
       const secret: CodeSecret = { code: [...code], nonce: crypto.randomUUID() };
@@ -700,6 +725,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getChatGameIcon(game: ChatGame): string {
+    if (game.type === 'minefield') return 'grid_on';
     if (game.type === 'memory') return 'style';
     if (game.type === 'code') return 'password';
     if (game.type === 'dotsAndBoxes') return 'border_outer';
@@ -708,7 +734,9 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getChatGameTitle(game: ChatGame): string {
-    const key = game.type === 'memory'
+    const key = game.type === 'minefield'
+      ? 'common.contact.chatroom.games.minefield'
+      : game.type === 'memory'
       ? 'common.contact.chatroom.games.memory'
       : game.type === 'code'
       ? 'common.contact.chatroom.games.code'
@@ -723,6 +751,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getChatGameVariantLabel(game: ChatGame): string {
+    if (game.type === 'minefield') return this.translation.t('common.contact.chatroom.games.duelVariant');
     const key = game.type !== 'dotsAndBoxes' && game.type !== 'rockPaperScissors' && game.type !== 'code' && game.type !== 'memory' && game.variant === 'vanishing'
       ? 'common.contact.chatroom.games.vanishingVariant'
       : 'common.contact.chatroom.games.standardVariant';
@@ -751,6 +780,10 @@ export class ContactChatroomComponent implements AfterViewInit {
       const currentUserId = this.userService.getUser().id;
       return game.playerXUserId === currentUserId ? 'X' : game.playerOUserId === currentUserId ? 'O' : null;
     }
+    if (game.type === 'minefield') {
+      const currentUserId = this.userService.getUser().id;
+      return game.playerXUserId === currentUserId ? 'X' : game.playerOUserId === currentUserId ? 'O' : null;
+    }
     if (game.type === 'rockPaperScissors' || game.type === 'code') return null;
     const currentUserId = this.userService.getUser().id;
     return game.playerRedUserId === currentUserId ? 'X' : game.playerYellowUserId === currentUserId ? 'O' : null;
@@ -760,7 +793,7 @@ export class ContactChatroomComponent implements AfterViewInit {
     this.matDialog.open(GameRulesDialogComponent, {
       data: {
         gameType: game.type,
-        variant: game.type === 'dotsAndBoxes' || game.type === 'rockPaperScissors' || game.type === 'code' || game.type === 'memory' ? 'standard' : game.variant ?? 'standard'
+        variant: game.type === 'dotsAndBoxes' || game.type === 'rockPaperScissors' || game.type === 'code' || game.type === 'memory' || game.type === 'minefield' ? 'standard' : game.variant ?? 'standard'
       },
       width: 'min(440px, 94vw)',
       maxWidth: '94vw',
@@ -785,6 +818,8 @@ export class ContactChatroomComponent implements AfterViewInit {
       this.openNewRockPaperScissorsDialog(contact);
     } else if (game.type === 'memory') {
       this.openNewMemoryDialog(contact);
+    } else if (game.type === 'minefield') {
+      this.openNewMinefieldDialog(contact);
     } else {
       this.openNewCodeDialog(contact);
     }
@@ -802,6 +837,41 @@ export class ContactChatroomComponent implements AfterViewInit {
     return !!game && game.type === 'memory' && game.status === 'active'
       && game.nextPlayerUserId === this.userService.getUser().id
       && !this.gameMovesInFlight().has(game.gameId);
+  }
+
+  canPlayMinefield(message: ChatroomMessage): boolean {
+    const game = message.payload?.game;
+    return !!game && game.type === 'minefield' && game.status === 'active'
+      && game.nextPlayerUserId === this.userService.getUser().id
+      && !this.gameMovesInFlight().has(game.gameId);
+  }
+
+  async playMinefieldMove(message: ChatroomMessage, cellIndex: number): Promise<void> {
+    const contact = this.contact();
+    const game = message.payload?.game;
+    if (!contact || !game || game.type !== 'minefield' || !this.canPlayMinefield(message)) return;
+    const nextGame = applyMinefieldMove(game, this.userService.getUser().id, cellIndex);
+    if (!nextGame) return;
+    this.setGameMoveInFlight(game.gameId, true);
+    try {
+      const payload = this.createEmptyMessage();
+      payload.game = nextGame;
+      await this.sendAsNewMessage(contact, payload, message.messageId, 'game_move');
+    } finally {
+      this.setGameMoveInFlight(game.gameId, false);
+    }
+  }
+
+  getMinefieldStatusText(game: MinefieldGame): string {
+    const currentUserId = this.userService.getUser().id;
+    const contactName = this.contact()?.name || this.translation.t('common.contact.chatroom.contactLabel');
+    if (game.status === 'draw') return this.translation.t('common.contact.chatroom.games.statusDraw');
+    if (game.status === 'won') return game.winnerUserId === currentUserId
+      ? this.translation.t('common.contact.chatroom.games.statusWonYou')
+      : this.translation.t('common.contact.chatroom.games.statusWonContact', { name: contactName });
+    return game.nextPlayerUserId === currentUserId
+      ? this.translation.t('common.contact.chatroom.games.statusYourTurn')
+      : this.translation.t('common.contact.chatroom.games.statusContactTurn', { name: contactName });
   }
 
   async playMemoryTurn(message: ChatroomMessage, cardIndices: [number, number]): Promise<void> {
@@ -1138,6 +1208,22 @@ export class ContactChatroomComponent implements AfterViewInit {
     for (const message of this.visibleMessages()) {
       const game = message.payload?.game;
       if (game?.type === 'memory' && !latestGames.has(game.gameId)) latestGames.set(game.gameId, game);
+    }
+    const stats: GameStats = { played: latestGames.size, won: 0, lost: 0, drawn: 0 };
+    for (const game of latestGames.values()) {
+      if (game.status === 'draw') stats.drawn += 1;
+      else if (game.status === 'won' && game.winnerUserId === currentUserId) stats.won += 1;
+      else if (game.status === 'won') stats.lost += 1;
+    }
+    return stats;
+  }
+
+  private getMinefieldStats(): GameStats {
+    const currentUserId = this.userService.getUser().id;
+    const latestGames = new Map<string, MinefieldGame>();
+    for (const message of this.visibleMessages()) {
+      const game = message.payload?.game;
+      if (game?.type === 'minefield' && !latestGames.has(game.gameId)) latestGames.set(game.gameId, game);
     }
     const stats: GameStats = { played: latestGames.size, won: 0, lost: 0, drawn: 0 };
     for (const game of latestGames.values()) {
