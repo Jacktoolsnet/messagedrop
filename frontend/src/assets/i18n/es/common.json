@@ -651,7 +651,7 @@
           "playCodeAria": "Iniciar Código",
           "codeRulesTitle": "Reglas de Código",
           "codeRuleSecret": "El remitente crea un código secreto con cuatro de los seis símbolos. Se pueden repetir.",
-          "codeRuleGuess": "El destinatario dispone de hasta ocho intentos para descifrarlo.",
+          "codeRuleGuess": "El destinatario dispone de hasta ocho intentos. Cada intento se evalúa inmediatamente en su dispositivo, por lo que quien creó el código no tiene que estar conectado.",
           "codeRuleFeedback": "Tras cada intento, la diana cuenta los símbolos en la posición correcta y las flechas los símbolos correctos en otra posición.",
           "codeRuleWin": "Quien descifra gana si resuelve el código a tiempo. Tras ocho intentos fallidos gana quien creó el código.",
           "codeRuleSecurity": "El secreto se guarda cifrado exclusivamente para quien lo creó. Al final se revela y se verifica mediante un compromiso criptográfico.",
@@ -674,7 +674,8 @@
             "hexagon": "Hexágono"
           },
           "codeVerified": "Código verificado criptográficamente",
-          "codeInvalid": "Aviso: el código no coincide con el compromiso original"
+          "codeInvalid": "Aviso: el código no coincide con el compromiso original",
+          "codeRuleWatch": "Quien creó el código recibe información de cada intento y puede seguir la partida en directo o más tarde."
         },
         "revisionHistory": {
           "title": "Historial de cambios",

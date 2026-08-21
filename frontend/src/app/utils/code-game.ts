@@ -19,7 +19,8 @@ export function createCodeGame(
   codeMakerUserId: string,
   codeBreakerUserId: string,
   encryptedSecret: string,
-  commitment: string
+  commitment: string,
+  encryptedSecretForCodeBreaker?: string
 ): CodeGame {
   if (!encryptedSecret || !commitment) throw new Error('invalid_secret');
   return {
@@ -29,6 +30,7 @@ export function createCodeGame(
     codeMakerUserId,
     codeBreakerUserId,
     encryptedSecret,
+    encryptedSecretForCodeBreaker,
     commitment,
     guesses: [],
     pendingGuess: null,
@@ -38,6 +40,32 @@ export function createCodeGame(
     status: 'active',
     winnerUserId: null,
     moveNumber: 0
+  };
+}
+
+/** Evaluates on the code breaker's device, avoiding a separate codemaker turn. */
+export function submitAndEvaluateCodeGuess(
+  game: CodeGame,
+  userId: string,
+  symbols: CodeSymbol[],
+  secret: CodeSecret
+): CodeGame | null {
+  if (game.status !== 'active' || game.nextPlayerUserId !== userId || userId !== game.codeBreakerUserId
+    || game.pendingGuess || !isValidCode(symbols) || !isValidCode(secret.code)) return null;
+  const result = scoreCodeGuess(secret.code, symbols);
+  const guesses: CodeGuess[] = [...game.guesses, { symbols: [...symbols], ...result }];
+  const solved = result.exact === CODE_LENGTH;
+  const exhausted = guesses.length >= CODE_MAX_GUESSES;
+  return {
+    ...game,
+    guesses,
+    pendingGuess: null,
+    revealedCode: solved || exhausted ? [...secret.code] : null,
+    revealNonce: solved || exhausted ? secret.nonce : null,
+    nextPlayerUserId: solved || exhausted ? null : game.codeBreakerUserId,
+    status: solved || exhausted ? 'won' : 'active',
+    winnerUserId: solved ? game.codeBreakerUserId : exhausted ? game.codeMakerUserId : null,
+    moveNumber: game.moveNumber + 1
   };
 }
 

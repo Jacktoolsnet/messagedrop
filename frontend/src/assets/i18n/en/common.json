@@ -652,7 +652,7 @@
           "playCodeAria": "Start Code",
           "codeRulesTitle": "Code rules",
           "codeRuleSecret": "The sender creates a secret code using four of the six symbols. Symbols may be repeated.",
-          "codeRuleGuess": "The recipient has up to eight attempts to crack the code.",
+          "codeRuleGuess": "The recipient has up to eight attempts to crack the code. Every attempt is evaluated immediately on their device, so the codemaker does not need to be online.",
           "codeRuleFeedback": "After each attempt, the target counts symbols in the correct position; the arrows count correct symbols in the wrong position.",
           "codeRuleWin": "The codebreaker wins by solving the code in time. After eight failed attempts, the codemaker wins.",
           "codeRuleSecurity": "The secret is stored encrypted exclusively for the codemaker. At the end it is revealed and verified against a cryptographic commitment.",
@@ -675,7 +675,8 @@
             "hexagon": "Hexagon"
           },
           "codeVerified": "Code cryptographically verified",
-          "codeInvalid": "Warning: code does not match the original commitment"
+          "codeInvalid": "Warning: code does not match the original commitment",
+          "codeRuleWatch": "The codemaker is notified about every attempt and can follow the game live or later."
         },
         "revisionHistory": {
           "title": "Change history",

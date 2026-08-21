@@ -651,7 +651,7 @@
           "playCodeAria": "Démarrer Code",
           "codeRulesTitle": "Règles de Code",
           "codeRuleSecret": "L’expéditeur crée un code secret avec quatre des six symboles. Les symboles peuvent se répéter.",
-          "codeRuleGuess": "Le destinataire dispose de huit essais au maximum pour trouver le code.",
+          "codeRuleGuess": "Le destinataire dispose de huit essais au maximum. Chaque essai est évalué immédiatement sur son appareil, sans que la personne ayant créé le code doive être en ligne.",
           "codeRuleFeedback": "Après chaque essai, la cible compte les symboles bien placés et les flèches les bons symboles mal placés.",
           "codeRuleWin": "La personne qui déchiffre gagne si elle trouve le code à temps. Après huit échecs, la personne qui l’a créé gagne.",
           "codeRuleSecurity": "Le secret est chiffré exclusivement pour son créateur. À la fin, il est révélé et vérifié avec un engagement cryptographique.",
@@ -674,7 +674,8 @@
             "hexagon": "Hexagone"
           },
           "codeVerified": "Code vérifié cryptographiquement",
-          "codeInvalid": "Attention : le code ne correspond pas à l’engagement initial"
+          "codeInvalid": "Attention : le code ne correspond pas à l’engagement initial",
+          "codeRuleWatch": "La personne ayant créé le code est informée de chaque essai et peut suivre la partie en direct ou plus tard."
         },
         "revisionHistory": {
           "title": "Historique des modifications",

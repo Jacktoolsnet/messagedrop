@@ -652,7 +652,7 @@
           "playCodeAria": "Code starten",
           "codeRulesTitle": "Code-Regeln",
           "codeRuleSecret": "Der Absender legt einen geheimen Code aus vier der sechs Symbole fest. Symbole dürfen mehrfach vorkommen.",
-          "codeRuleGuess": "Der Empfänger versucht, den Code in höchstens acht Versuchen zu entschlüsseln.",
+          "codeRuleGuess": "Der Empfänger versucht, den Code in höchstens acht Versuchen zu entschlüsseln. Jeder Versuch wird sofort auf seinem Gerät ausgewertet; der Codegeber muss dafür nicht online sein.",
           "codeRuleFeedback": "Nach jedem Versuch zeigt das Fadenkreuz die Symbole am richtigen Platz; die Pfeile zeigen richtige Symbole am falschen Platz.",
           "codeRuleWin": "Wird der Code rechtzeitig gelöst, gewinnt der Codeknacker. Nach acht erfolglosen Versuchen gewinnt der Codegeber.",
           "codeRuleSecurity": "Der geheime Code ist nur für den Codegeber verschlüsselt gespeichert. Nach Spielende wird er aufgedeckt und anhand einer kryptografischen Prüfsumme verifiziert.",
@@ -675,7 +675,8 @@
             "hexagon": "Sechseck"
           },
           "codeVerified": "Code kryptografisch bestätigt",
-          "codeInvalid": "Warnung: Code stimmt nicht mit der ursprünglichen Prüfsumme überein"
+          "codeInvalid": "Warnung: Code stimmt nicht mit der ursprünglichen Prüfsumme überein",
+          "codeRuleWatch": "Der Codegeber wird über jeden Versuch informiert und kann den Spielverlauf live oder später verfolgen."
         },
         "revisionHistory": {
           "title": "Änderungshistorie",

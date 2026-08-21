@@ -85,7 +85,7 @@ import { applyTicTacToeMove, createTicTacToeGame } from '../../utils/tic-tac-toe
 import { applyConnectFourMove, createConnectFourGame } from '../../utils/connect-four';
 import { applyDotsAndBoxesMove, createDotsAndBoxesGame } from '../../utils/dots-and-boxes';
 import { applyRockPaperScissorsChoice, createRockPaperScissorsGame } from '../../utils/rock-paper-scissors';
-import { createCodeCommitment, createCodeGame, CodeSecret, evaluateCodeGuess, isValidCode, submitCodeGuess as applyCodeGuess } from '../../utils/code-game';
+import { createCodeCommitment, createCodeGame, CodeSecret, evaluateCodeGuess, isValidCode, submitAndEvaluateCodeGuess } from '../../utils/code-game';
 
 interface ChatroomMessage {
   id: string;
@@ -621,12 +621,13 @@ export class ContactChatroomComponent implements AfterViewInit {
   private async startCodeGame(contact: Contact, code: CodeSymbol[]): Promise<void> {
     try {
       const secret: CodeSecret = { code: [...code], nonce: crypto.randomUUID() };
-      const [encryptedSecret, commitment] = await Promise.all([
+      const [encryptedSecret, encryptedSecretForCodeBreaker, commitment] = await Promise.all([
         this.cryptoService.encrypt(this.userService.getUser().cryptoKeyPair.publicKey, JSON.stringify(secret)),
+        this.cryptoService.encrypt(contact.contactUserEncryptionPublicKey!, JSON.stringify(secret)),
         createCodeCommitment(secret)
       ]);
       const payload = this.createEmptyMessage();
-      payload.game = createCodeGame(contact.userId, contact.contactUserId, encryptedSecret, commitment);
+      payload.game = createCodeGame(contact.userId, contact.contactUserId, encryptedSecret, commitment, encryptedSecretForCodeBreaker);
       await this.sendAsNewMessage(contact, payload, undefined, 'game_started');
     } catch {
       this.snackBar.open(this.translation.t('common.contact.chatroom.games.codeStartFailed'), '', { duration: 3000 });
@@ -766,9 +767,25 @@ export class ContactChatroomComponent implements AfterViewInit {
     const contact = this.contact();
     const game = message.payload?.game;
     if (!contact || !game || game.type !== 'code' || !this.canPlayCode(message)) return;
-    const nextGame = applyCodeGuess(game, this.userService.getUser().id, symbols);
-    if (!nextGame) return;
-    await this.sendGameRevision(contact, message, nextGame);
+    if (!game.encryptedSecretForCodeBreaker) return;
+    this.setGameMoveInFlight(game.gameId, true);
+    try {
+      const decrypted = await this.cryptoService.decrypt(
+        this.userService.getUser().cryptoKeyPair.privateKey,
+        JSON.parse(game.encryptedSecretForCodeBreaker) as CryptoData
+      );
+      const secret = JSON.parse(decrypted) as CodeSecret;
+      if (!isValidCode(secret.code) || await createCodeCommitment(secret) !== game.commitment) throw new Error('invalid_commitment');
+      const nextGame = submitAndEvaluateCodeGuess(game, this.userService.getUser().id, symbols, secret);
+      if (!nextGame) return;
+      const payload = this.createEmptyMessage();
+      payload.game = nextGame;
+      await this.sendAsNewMessage(contact, payload, message.messageId, 'game_move');
+    } catch {
+      this.snackBar.open(this.translation.t('common.contact.chatroom.games.codeEvaluationFailed'), '', { duration: 3000 });
+    } finally {
+      this.setGameMoveInFlight(game.gameId, false);
+    }
   }
 
   async evaluateCodeGuess(message: ChatroomMessage): Promise<void> {
@@ -799,14 +816,6 @@ export class ContactChatroomComponent implements AfterViewInit {
     return game.nextPlayerUserId === game.codeMakerUserId
       ? this.translation.t('common.contact.chatroom.games.evaluateTurn')
       : this.translation.t('common.contact.chatroom.games.guessTurn');
-  }
-
-  private async sendGameRevision(contact: Contact, message: ChatroomMessage, game: ChatGame): Promise<void> {
-    this.setGameMoveInFlight(game.gameId, true);
-    const payload = this.createEmptyMessage();
-    payload.game = game;
-    await this.sendAsNewMessage(contact, payload, message.messageId, 'game_move');
-    this.setGameMoveInFlight(game.gameId, false);
   }
 
   canPlayConnectFour(message: ChatroomMessage): boolean {

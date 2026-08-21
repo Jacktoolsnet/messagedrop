@@ -117,6 +117,8 @@ export interface CodeGame {
   codeBreakerUserId: string;
   /** The secret is encrypted exclusively with the code maker's public key. */
   encryptedSecret: string;
+  /** Encrypted for the code breaker's device so guesses can be evaluated locally without waiting. */
+  encryptedSecretForCodeBreaker?: string;
   /** SHA-256 of the original code and nonce, allowing verification after reveal. */
   commitment: string;
   guesses: CodeGuess[];
