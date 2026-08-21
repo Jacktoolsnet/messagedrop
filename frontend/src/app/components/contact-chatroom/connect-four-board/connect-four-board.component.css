@@ -79,7 +79,17 @@
 
 .connect-four__cell--fading {
   border-style: dashed;
-  border-color: color-mix(in srgb, currentColor 62%, transparent);
+  border-color: var(--mat-sys-error, var(--mat-warn-color, #b3261e));
+  background: color-mix(
+    in srgb,
+    var(--mat-sys-error-container, #ffdad6) 68%,
+    var(--connect-four-cell-color)
+  );
+  box-shadow: inset 0 0 0 1px color-mix(
+    in srgb,
+    var(--mat-sys-error, var(--mat-warn-color, #b3261e)) 28%,
+    transparent
+  );
 }
 
 .connect-four__cell--fading .connect-four__stone {
@@ -93,6 +103,11 @@
 .connect-four__cell--winning.connect-four__cell--fading {
   border-style: solid;
   border-color: var(--mat-sys-tertiary, var(--connect-four-primary));
+  background: color-mix(
+    in srgb,
+    var(--mat-sys-tertiary-container, var(--connect-four-primary)) 55%,
+    var(--connect-four-cell-color)
+  );
 }
 
 .connect-four__controls {

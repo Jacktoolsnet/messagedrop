@@ -134,7 +134,17 @@
 
 .tic-tac-toe__cell--fading {
   border-style: dashed;
-  border-color: color-mix(in srgb, currentColor 62%, transparent);
+  border-color: var(--mat-sys-error, var(--mat-warn-color, #b3261e));
+  background: color-mix(
+    in srgb,
+    var(--mat-sys-error-container, #ffdad6) 68%,
+    var(--tic-tac-toe-cell-color)
+  );
+  box-shadow: inset 0 0 0 1px color-mix(
+    in srgb,
+    var(--mat-sys-error, var(--mat-warn-color, #b3261e)) 28%,
+    transparent
+  );
 }
 
 .tic-tac-toe__cell--fading .tic-tac-toe__mark {
