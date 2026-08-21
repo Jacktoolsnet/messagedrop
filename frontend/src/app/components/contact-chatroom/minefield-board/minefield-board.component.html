@@ -15,8 +15,7 @@
         @if (isRevealed(index)) {
           @if (selectionMode()) { <mat-icon>touch_app</mat-icon> }
           @else if (isMine(index)) { <mat-icon>emergency</mat-icon> }
-          @else if (adjacentMines(index); as count) { <strong>{{ count }}</strong> }
-          @else { <span class="minefield-cell__empty"></span> }
+          @else { <strong>{{ adjacentMines(index) }}</strong> }
           @if (owner(index); as mark) {
             <span class="minefield-cell__owner" [class.minefield-cell__owner--x]="mark==='X'" [class.minefield-cell__owner--o]="mark==='O'">{{ mark }}</span>
           }
