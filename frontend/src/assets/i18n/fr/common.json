@@ -734,7 +734,18 @@
           "morrisRuleMove": "Ensuite, un pion est déplacé par tour le long d’une ligne vers une intersection libre voisine.",
           "morrisRuleMill": "Trois pions alignés forment un moulin et permettent de retirer un pion adverse autorisé. Les pions d’un moulin ne sont protégés que tant que d’autres sont disponibles.",
           "morrisRuleFly": "Avec seulement trois pions, un joueur peut sauter vers toute intersection libre.",
-          "morrisRuleWin": "Un joueur perd avec moins de trois pions ou sans déplacement possible."
+          "morrisRuleWin": "Un joueur perd avec moins de trois pions ou sans déplacement possible.",
+          "checkers": "Dames",
+          "newCheckersTitle": "Nouvelle partie de Dames",
+          "chooseFirstCheckersMove": "Choisissez votre premier coup.",
+          "playCheckersAria": "Démarrer les Dames",
+          "checkersPreviewPrefix": "Dames",
+          "checkersRulesTitle": "Règles des Dames",
+          "checkersRuleMove": "Les pions ordinaires avancent d’une case en diagonale.",
+          "checkersRuleCapture": "Les pions adverses sont capturés en sautant par-dessus. La prise est obligatoire et les pions ordinaires peuvent prendre dans les deux directions.",
+          "checkersRuleChain": "Si une autre prise est possible, la rafle doit continuer avec le même pion.",
+          "checkersRuleKing": "Un pion atteignant le bord opposé devient une dame, qui se déplace et capture en diagonale sur toute distance libre.",
+          "checkersRuleWin": "Un joueur perd s’il n’a plus de pion ou de coup valide."
         },
         "revisionHistory": {
           "title": "Historique des modifications",

@@ -12,6 +12,7 @@ import { firstValueFrom } from 'rxjs';
 import { Contact } from '../../interfaces/contact';
 import {
   ChatGame,
+  CheckersGame,
   CodeGame,
   CodeSymbol,
   ConnectFourGame,
@@ -85,6 +86,8 @@ import { MinefieldHideSeekBoardComponent } from './minefield-hide-seek-board/min
 import { NewMinefieldHideSeekDialogComponent } from './new-minefield-hide-seek-dialog/new-minefield-hide-seek-dialog.component';
 import { MorrisBoardComponent } from './morris-board/morris-board.component';
 import { NewMorrisDialogComponent } from './new-morris-dialog/new-morris-dialog.component';
+import { CheckersBoardComponent } from './checkers-board/checkers-board.component';
+import { NewCheckersDialogComponent } from './new-checkers-dialog/new-checkers-dialog.component';
 import { DeleteContactMessageComponent } from './delete-contact-message/delete-contact-message.component';
 import { DisplayMessageService } from '../../services/display-message.service';
 import { ProtectedStickerImageComponent } from '../utils/protected-sticker-image/protected-sticker-image.component';
@@ -102,6 +105,7 @@ import { applyMemoryTurn, createMemoryGame } from '../../utils/memory-game';
 import { applyMinefieldMove, createMinefieldGame } from '../../utils/minefield-game';
 import { applyHideSeekSearch, applySecondMinePlacement, createMinefieldHideSeekGame, currentHideSeekRound } from '../../utils/minefield-hide-seek';
 import { applyMorrisAction, createMorrisGame, MorrisAction } from '../../utils/morris-game';
+import { applyCheckersMove, CheckersAction, createCheckersGame } from '../../utils/checkers-game';
 
 interface ChatroomMessage {
   id: string;
@@ -153,6 +157,7 @@ interface ContactChatroomDialogData {
     MinefieldBoardComponent,
     MinefieldHideSeekBoardComponent,
     MorrisBoardComponent,
+    CheckersBoardComponent,
     TranslocoPipe
   ],
   templateUrl: './contact-chatroom.component.html',
@@ -553,7 +558,7 @@ export class ContactChatroomComponent implements AfterViewInit {
         memoryStats: this.getMemoryStats(),
         minefieldStats: this.getMinefieldStats(),
         minefieldHideSeekStats: this.getMinefieldHideSeekStats()
-        ,morrisStats:this.getMorrisStats()
+        ,morrisStats:this.getMorrisStats(),checkersStats:this.getCheckersStats()
       },
       width: 'min(760px, 94vw)',
       maxWidth: '94vw',
@@ -587,6 +592,8 @@ export class ContactChatroomComponent implements AfterViewInit {
         this.openNewMinefieldHideSeekDialog(contact);
       } else if(gameType==='morris'){
         this.openNewMorrisDialog(contact);
+      }else if(gameType==='checkers'){
+        this.openNewCheckersDialog(contact);
       }
     });
   }
@@ -712,6 +719,7 @@ export class ContactChatroomComponent implements AfterViewInit {
     const ref=this.matDialog.open(NewMorrisDialogComponent,{width:'min(500px,96vw)',maxWidth:'96vw',maxHeight:'90vh',hasBackdrop:true,backdropClass:'dialog-backdrop',autoFocus:false});
     ref.afterClosed().subscribe((position?:number)=>{if(!Number.isInteger(position))return;const payload=this.createEmptyMessage();payload.game=createMorrisGame(contact.userId,contact.contactUserId,position!);void this.sendAsNewMessage(contact,payload,revisionOfMessageId,'game_started')});
   }
+  private openNewCheckersDialog(contact:Contact,revisionOfMessageId?:string):void{const ref=this.matDialog.open(NewCheckersDialogComponent,{width:'min(500px,96vw)',maxWidth:'96vw',maxHeight:'90vh',hasBackdrop:true,backdropClass:'dialog-backdrop',autoFocus:false});ref.afterClosed().subscribe((move?:CheckersAction)=>{if(!move)return;const payload=this.createEmptyMessage();payload.game=createCheckersGame(contact.userId,contact.contactUserId,move);void this.sendAsNewMessage(contact,payload,revisionOfMessageId,'game_started')})}
 
   private async startCodeGame(contact: Contact, code: CodeSymbol[], revisionOfMessageId?:string): Promise<void> {
     try {
@@ -770,6 +778,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getChatGameIcon(game: ChatGame): string {
+    if(game.type==='checkers')return'grid_view';
     if(game.type==='morris')return'hub';
     if (game.type === 'minefieldHideSeek') return 'radar';
     if (game.type === 'minefield') return 'grid_on';
@@ -781,7 +790,9 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getChatGameTitle(game: ChatGame): string {
-    const key = game.type === 'morris'
+    const key = game.type === 'checkers'
+      ? 'common.contact.chatroom.games.checkers'
+      : game.type === 'morris'
       ? 'common.contact.chatroom.games.morris'
       : game.type === 'minefieldHideSeek'
       ? 'common.contact.chatroom.games.minefield'
@@ -802,6 +813,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getChatGameVariantLabel(game: ChatGame): string {
+    if(game.type==='checkers')return this.translation.t('common.contact.chatroom.games.standardVariant');
     if(game.type==='morris')return this.translation.t('common.contact.chatroom.games.standardVariant');
     if (game.type === 'minefieldHideSeek') return this.translation.t('common.contact.chatroom.games.hideSeekVariant');
     if (game.type === 'minefield') return this.translation.t('common.contact.chatroom.games.duelVariant');
@@ -841,6 +853,7 @@ export class ContactChatroomComponent implements AfterViewInit {
     if(game.type==='morris'){
       const id=this.userService.getUser().id;return game.playerXUserId===id?'X':game.playerOUserId===id?'O':null;
     }
+    if(game.type==='checkers'){const id=this.userService.getUser().id;return game.playerXUserId===id?'X':game.playerOUserId===id?'O':null}
     if (game.type === 'minefield') {
       const currentUserId = this.userService.getUser().id;
       return game.playerXUserId === currentUserId ? 'X' : game.playerOUserId === currentUserId ? 'O' : null;
@@ -855,7 +868,7 @@ export class ContactChatroomComponent implements AfterViewInit {
     this.matDialog.open(GameRulesDialogComponent, {
       data: {
         gameType: game.type,
-        variant: game.type === 'dotsAndBoxes' || game.type === 'rockPaperScissors' || game.type === 'code' || game.type === 'memory' || game.type === 'minefield' || game.type === 'minefieldHideSeek'||game.type==='morris' ? 'standard' : game.variant ?? 'standard'
+        variant: game.type === 'dotsAndBoxes' || game.type === 'rockPaperScissors' || game.type === 'code' || game.type === 'memory' || game.type === 'minefield' || game.type === 'minefieldHideSeek'||game.type==='morris'||game.type==='checkers' ? 'standard' : game.variant ?? 'standard'
       },
       width: 'min(440px, 94vw)',
       maxWidth: '94vw',
@@ -886,6 +899,8 @@ export class ContactChatroomComponent implements AfterViewInit {
       this.openNewMinefieldHideSeekDialog(contact, message.messageId);
     }else if(game.type==='morris'){
       this.openNewMorrisDialog(contact,message.messageId);
+    }else if(game.type==='checkers'){
+      this.openNewCheckersDialog(contact,message.messageId);
     } else {
       this.openNewCodeDialog(contact, message.messageId);
     }
@@ -901,6 +916,8 @@ export class ContactChatroomComponent implements AfterViewInit {
 
   canPlayMorris(message:ChatroomMessage):boolean{const g=message.payload?.game;return !!g&&g.type==='morris'&&g.status==='active'&&g.nextPlayerUserId===this.userService.getUser().id&&!this.gameMovesInFlight().has(g.gameId)}
   async playMorris(message:ChatroomMessage,action:MorrisAction):Promise<void>{const contact=this.contact(),g=message.payload?.game;if(!contact||!g||g.type!=='morris'||!this.canPlayMorris(message))return;const next=applyMorrisAction(g,this.userService.getUser().id,action);if(!next)return;this.setGameMoveInFlight(g.gameId,true);try{const payload=this.createEmptyMessage();payload.game=next;await this.sendAsNewMessage(contact,payload,message.messageId,'game_move')}finally{this.setGameMoveInFlight(g.gameId,false)}}
+  canPlayCheckers(message:ChatroomMessage):boolean{const g=message.payload?.game;return !!g&&g.type==='checkers'&&g.status==='active'&&g.nextPlayerUserId===this.userService.getUser().id&&!this.gameMovesInFlight().has(g.gameId)}
+  async playCheckers(message:ChatroomMessage,action:CheckersAction):Promise<void>{const contact=this.contact(),g=message.payload?.game;if(!contact||!g||g.type!=='checkers'||!this.canPlayCheckers(message))return;const next=applyCheckersMove(g,this.userService.getUser().id,action);if(!next)return;this.setGameMoveInFlight(g.gameId,true);try{const payload=this.createEmptyMessage();payload.game=next;await this.sendAsNewMessage(contact,payload,message.messageId,'game_move')}finally{this.setGameMoveInFlight(g.gameId,false)}}
 
   canPlayCode(message: ChatroomMessage): boolean {
     const game = message.payload?.game;
@@ -1378,6 +1395,7 @@ export class ContactChatroomComponent implements AfterViewInit {
     const stats:GameStats={played:latest.size,won:0,lost:0,drawn:0};
     for(const game of latest.values()){if(game.status==='draw')stats.drawn++;else if(game.status==='won'&&game.winnerUserId===current)stats.won++;else if(game.status==='won')stats.lost++}return stats;
   }
+  private getCheckersStats():GameStats{const current=this.userService.getUser().id,latest=new Map<string,CheckersGame>();for(const message of this.messages()){const game=message.payload?.game;if(game?.type==='checkers'&&!latest.has(game.gameId))latest.set(game.gameId,game)}const stats:GameStats={played:latest.size,won:0,lost:0,drawn:0};for(const game of latest.values()){if(game.status==='draw')stats.drawn++;else if(game.status==='won'&&game.winnerUserId===current)stats.won++;else if(game.status==='won')stats.lost++}return stats}
 
   openExperienceSearch(message?: ChatroomMessage): void {
     if (!this.externalContentConsent.isEnabled('viator')) {

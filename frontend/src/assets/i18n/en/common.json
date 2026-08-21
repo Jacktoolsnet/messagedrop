@@ -735,7 +735,18 @@
           "morrisRuleMove": "After placement, move one piece per turn along a line to an empty adjacent intersection.",
           "morrisRuleMill": "Three pieces in a line form a mill and allow one eligible opposing piece to be removed. Pieces in mills are protected only while other pieces are available.",
           "morrisRuleFly": "A player with only three pieces may jump to any empty intersection.",
-          "morrisRuleWin": "A player loses with fewer than three pieces or without a legal move."
+          "morrisRuleWin": "A player loses with fewer than three pieces or without a legal move.",
+          "checkers": "Checkers",
+          "newCheckersTitle": "New Checkers game",
+          "chooseFirstCheckersMove": "Choose your first move.",
+          "playCheckersAria": "Start Checkers",
+          "checkersPreviewPrefix": "Checkers",
+          "checkersRulesTitle": "Checkers rules",
+          "checkersRuleMove": "Regular pieces move one square diagonally forward.",
+          "checkersRuleCapture": "Opposing pieces are captured by jumping over them. Capturing is mandatory and regular pieces may capture in both directions.",
+          "checkersRuleChain": "If another capture is available, the capturing sequence must continue with the same piece.",
+          "checkersRuleKing": "A piece reaching the far edge becomes a king. Kings move and capture diagonally across any number of empty squares.",
+          "checkersRuleWin": "A player loses with no pieces or no legal move."
         },
         "revisionHistory": {
           "title": "Change history",

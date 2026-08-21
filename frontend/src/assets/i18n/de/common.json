@@ -735,7 +735,18 @@
           "morrisRuleMove": "Danach wird pro Zug ein eigener Stein entlang einer Linie auf einen freien benachbarten Schnittpunkt gezogen.",
           "morrisRuleMill": "Drei eigene Steine auf einer Linie bilden eine Mühle. Dann darf ein erlaubter gegnerischer Stein entfernt werden. Steine aus einer Mühle sind nur geschützt, solange andere Steine verfügbar sind.",
           "morrisRuleFly": "Wer nur noch drei Steine besitzt, darf mit ihnen auf jeden freien Schnittpunkt springen.",
-          "morrisRuleWin": "Wer weniger als drei Steine besitzt oder keinen gültigen Zug mehr ausführen kann, verliert."
+          "morrisRuleWin": "Wer weniger als drei Steine besitzt oder keinen gültigen Zug mehr ausführen kann, verliert.",
+          "checkers": "Dame",
+          "newCheckersTitle": "Neue Dame-Partie",
+          "chooseFirstCheckersMove": "Wähle deinen ersten Zug.",
+          "playCheckersAria": "Dame starten",
+          "checkersPreviewPrefix": "Dame",
+          "checkersRulesTitle": "Dame – Regeln",
+          "checkersRuleMove": "Normale Steine ziehen diagonal um ein Feld nach vorne.",
+          "checkersRuleCapture": "Gegnerische Steine werden durch Überspringen geschlagen. Schlagen ist verpflichtend und mit normalen Steinen in beide Richtungen möglich.",
+          "checkersRuleChain": "Ist nach einem Schlag ein weiterer Schlag möglich, muss die Schlagfolge mit demselben Stein fortgesetzt werden.",
+          "checkersRuleKing": "Auf der gegnerischen Grundlinie wird ein Stein zur Dame. Damen dürfen diagonal über beliebig viele freie Felder ziehen und schlagen.",
+          "checkersRuleWin": "Wer keine Steine oder keinen gültigen Zug mehr hat, verliert."
         },
         "revisionHistory": {
           "title": "Änderungshistorie",

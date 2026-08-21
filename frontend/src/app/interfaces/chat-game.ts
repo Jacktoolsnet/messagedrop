@@ -218,7 +218,16 @@ export interface MorrisGame {
   winnerUserId:string|null; moveNumber:number; lastMove:MorrisMove|null;
 }
 
-export type ChatGame = TicTacToeGame | ConnectFourGame | DotsAndBoxesGame | RockPaperScissorsGame | CodeGame | MemoryGame | MinefieldGame | MinefieldHideSeekGame | MorrisGame;
+export interface CheckersPiece { mark:TicTacToeMark; king:boolean; }
+export interface CheckersLastMove { playerUserId:string; from:number; to:number; captured:number|null; moveNumber:number; }
+export interface CheckersGame {
+  type:'checkers';version:1;gameId:string;board:(CheckersPiece|null)[];
+  playerXUserId:string;playerOUserId:string;nextPlayerUserId:string|null;
+  forcedPieceIndex:number|null;status:TicTacToeStatus;winnerUserId:string|null;
+  moveNumber:number;lastMove:CheckersLastMove|null;
+}
+
+export type ChatGame = TicTacToeGame | ConnectFourGame | DotsAndBoxesGame | RockPaperScissorsGame | CodeGame | MemoryGame | MinefieldGame | MinefieldHideSeekGame | MorrisGame | CheckersGame;
 
 export interface GameStats {
   played: number;
