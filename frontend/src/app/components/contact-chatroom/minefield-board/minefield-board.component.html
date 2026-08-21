@@ -8,13 +8,14 @@
     @for (index of cells; track index) {
       <button type="button" class="minefield-cell" [class.minefield-cell--revealed]="isRevealed(index)"
         [class.minefield-cell--mine]="isRevealed(index) && isMine(index)" [class.minefield-cell--last]="isLastMove(index)"
+        [class.minefield-cell--exploded]="isExplosionAnimating(index)"
         [class.minefield-cell--x]="owner(index)==='X'" [class.minefield-cell--o]="owner(index)==='O'"
         [attr.data-adjacent]="isRevealed(index) && !isMine(index) ? adjacentMines(index) : null"
-        [disabled]="disabled() || !!owner(index) || (!selectionMode() && game()?.status !== 'active')" (click)="selectCell(index)"
+        [disabled]="disabled() || detonatingMine()!==null || !!owner(index) || (!selectionMode() && game()?.status !== 'active')" (click)="selectCell(index)"
         [attr.aria-label]="(isRevealed(index) ? 'common.contact.chatroom.games.minefieldCellRevealedAria' : 'common.contact.chatroom.games.minefieldCellHiddenAria') | transloco:{ cell:index+1 }">
         @if (isRevealed(index)) {
           @if (selectionMode()) { <mat-icon>touch_app</mat-icon> }
-          @else if (isMine(index)) { <span class="minefield-cell__bomb" aria-hidden="true">💣</span> }
+          @else if (isMine(index)) { <span class="minefield-cell__bomb" aria-hidden="true">{{ showsExplosion(index) ? '💥' : '💣' }}</span> }
           @else { <strong>{{ adjacentMines(index) }}</strong> }
           @if (owner(index); as mark) {
             <span class="minefield-cell__owner" [class.minefield-cell__owner--x]="mark==='X'" [class.minefield-cell__owner--o]="mark==='O'">{{ mark }}</span>

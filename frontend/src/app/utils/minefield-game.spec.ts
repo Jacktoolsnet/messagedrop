@@ -28,4 +28,26 @@ describe('minefield game', () => {
     mines[0] = true; mines[2] = true; mines[9] = true;
     expect(countAdjacentMines(mines, 1)).toBe(3);
   });
+
+  it('ends immediately with a loss when a player reveals the last mine', () => {
+    const game = createMinefieldGame('x', 'o', 0, () => 0.3);
+    const mineIndices = game.mines.flatMap((mine, index) => mine ? [index] : []);
+    const revealedBy = Array(64).fill(null);
+    mineIndices.slice(0, -1).forEach(index => { revealedBy[index] = 'O'; });
+    const beforeLastMine = {
+      ...game,
+      revealedBy,
+      playerXScore: 100,
+      playerOScore: -18,
+      nextPlayerUserId: 'x',
+      status: 'active' as const
+    };
+
+    const finished = applyMinefieldMove(beforeLastMine, 'x', mineIndices.at(-1)!)!;
+
+    expect(finished.status).toBe('won');
+    expect(finished.winnerUserId).toBe('o');
+    expect(finished.nextPlayerUserId).toBeNull();
+    expect(applyMinefieldMove(finished, 'o', 1)).toBeNull();
+  });
 });

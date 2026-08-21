@@ -43,6 +43,15 @@ export class GameFeedbackService {
     if (!this.audioMuted()) void this.playExplosionSound(step);
   }
 
+  async notifyMineCountdown(): Promise<void> {
+    this.tryVibrate([18, 180, 18, 180, 24]);
+    if (!this.audioMuted()) {
+      await this.playMineCountdownSound();
+      return;
+    }
+    await this.wait(800);
+  }
+
   notifyDefused(step = 0): void {
     this.tryVibrate([22, 18, 34]);
     if (!this.audioMuted()) void this.playDefusedSound(step);
@@ -105,6 +114,25 @@ export class GameFeedbackService {
     const variation = Math.min(Math.max(step, 0), 8) * 7;
     this.playTone(context, now, 150 + variation, 48, 0.32, 0.055, 'sawtooth');
     this.playTone(context, now + 0.025, 95 + variation, 36, 0.38, 0.045, 'square');
+  }
+
+  private async playMineCountdownSound(): Promise<void> {
+    const context = await this.getReadyAudioContext();
+    if (!context) {
+      await this.wait(800);
+      return;
+    }
+    const now = context.currentTime;
+    // A small scheduling lead-in prevents Firefox from swallowing the first tone
+    // while an AudioContext has just been resumed.
+    this.playTone(context, now + 0.06, 720, 720, 0.11, 0.035, 'square');
+    this.playTone(context, now + 0.34, 830, 830, 0.11, 0.04, 'square');
+    this.playTone(context, now + 0.62, 980, 980, 0.12, 0.045, 'square');
+    await this.wait(800);
+  }
+
+  private wait(milliseconds: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, milliseconds));
   }
 
   private async playDefusedSound(step: number): Promise<void> {

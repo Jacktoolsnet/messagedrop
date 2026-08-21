@@ -35,11 +35,16 @@ export function applyMinefieldMove(game: MinefieldGame, userId: string, cellInde
   const delta = hitMine ? -2 : 1;
   const playerXScore = game.playerXScore + (mark === 'X' ? delta : 0);
   const playerOScore = game.playerOScore + (mark === 'O' ? delta : 0);
-  const finished = game.mines.every((mine, index) => mine || !!revealedBy[index]);
-  const status = finished ? (playerXScore === playerOScore ? 'draw' : 'won') : 'active';
-  const winnerUserId = status === 'won'
-    ? playerXScore > playerOScore ? game.playerXUserId : game.playerOUserId
-    : null;
+  const allMinesRevealed = game.mines.every((mine, index) => !mine || !!revealedBy[index]);
+  const lostByLastMine = hitMine && allMinesRevealed;
+  const allSafeCellsRevealed = game.mines.every((mine, index) => mine || !!revealedBy[index]);
+  const finished = lostByLastMine || allSafeCellsRevealed;
+  const status = finished ? lostByLastMine || playerXScore !== playerOScore ? 'won' : 'draw' : 'active';
+  const winnerUserId = lostByLastMine
+    ? otherPlayer(game, userId)
+    : status === 'won'
+      ? playerXScore > playerOScore ? game.playerXUserId : game.playerOUserId
+      : null;
   const moveNumber = game.moveNumber + 1;
   return {
     ...game,
