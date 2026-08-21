@@ -19,7 +19,7 @@
           @if (owner(index); as mark) {
             <span class="minefield-cell__owner" [class.minefield-cell__owner--x]="mark==='X'" [class.minefield-cell__owner--o]="mark==='O'">{{ mark }}</span>
           }
-        } @else { <span class="minefield-cell__ground" aria-hidden="true">🟫</span> }
+        }
       </button>
     }
   </div>
