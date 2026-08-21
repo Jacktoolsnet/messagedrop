@@ -12,6 +12,7 @@ export class MinefieldHideSeekBoardComponent{
  private readonly feedback=inject(GameFeedbackService);
  readonly game=input<MinefieldHideSeekGame|null>(null);
  readonly currentUserId=input('');
+ readonly animateInitialMine=input(false);
  readonly placementMode=input(false);
  readonly disabled=input(false);
  readonly showHiddenMines=input(false);
@@ -28,6 +29,7 @@ export class MinefieldHideSeekBoardComponent{
  readonly cells=Array.from({length:HIDE_SEEK_CELL_COUNT},(_,index)=>index);
  readonly mineCount=HIDE_SEEK_MINE_COUNT;
  private observedMoveKey:string|null=null;
+ private locallyAnimatedMine:number|null=null;
 
  constructor(){
   effect(()=>{
@@ -43,6 +45,9 @@ export class MinefieldHideSeekBoardComponent{
     this.showingWonRound.set(won);
     this.roundResultAnimationComplete.set(completed);
     if(won)this.defusedMines.set(new Set(round.mines.flatMap((mine,index)=>mine?[index]:[])));
+    if(this.animateInitialMine()&&round.lastMove?.hitMine){
+     void this.animateRevealedMine(round.lastMove.cellIndex,completed);
+    }
     return;
    }
    if(this.observedMoveKey===key)return;
@@ -52,7 +57,15 @@ export class MinefieldHideSeekBoardComponent{
    this.roundResultAnimationComplete.set(!completed);
    this.defusedMines.set(new Set());
    if(round.lastMove?.hitMine){
-    this.animateRevealedMine(round.lastMove.cellIndex,completed);
+    if(this.locallyAnimatedMine===round.lastMove.cellIndex){
+     this.locallyAnimatedMine=null;
+     setTimeout(()=>{
+      this.explodedMines.set(new Set());
+      if(completed)this.roundResultAnimationComplete.set(true);
+     },560);
+    }else{
+     void this.animateRevealedMine(round.lastMove.cellIndex,completed);
+    }
    }else if(won){
     this.animateWonRound(round);
    }else if(completed){
@@ -74,14 +87,22 @@ export class MinefieldHideSeekBoardComponent{
   if(this.isPlacement()){this.toggleMine(index);return}
   const game=this.game(),round=this.round();
   if(this.disabled()||this.detonatingMine()!==null||!game||!round||round.revealed[index]||game.nextPlayerUserId!==this.currentUserId()||round.seekerUserId!==this.currentUserId())return;
-  if(!round.mines[index])this.feedback.notifySelection();
+  if(round.mines[index]){
+   void this.animateMineAndSearch(index);
+   return;
+  }
+  this.feedback.notifySelection();
   this.search.emit(index);
  }
  submitPlacement():void{if(this.selectedMines().length===HIDE_SEEK_MINE_COUNT)this.placement.emit([...this.selectedMines()])}
  isBlockedForPlacement(index:number):boolean{return !this.selectedMines().includes(index)&&this.selectedMines().some(selected=>areHideSeekCellsAdjacent(selected,index))}
- isRevealed(index:number):boolean{return this.isPlacement()&&!this.isShowingRoundResult()?false:!!this.round()?.revealed[index]}
+ isRevealed(index:number):boolean{
+  if(this.detonatingMine()===index||this.explodedMines().has(index))return true;
+  return this.isPlacement()&&!this.isShowingRoundResult()?false:!!this.round()?.revealed[index];
+ }
  isMineVisible(index:number):boolean{
   if(this.selectedMines().includes(index))return true;
+  if(this.detonatingMine()===index||this.explodedMines().has(index))return true;
   if(this.isPlacement()&&!this.isShowingRoundResult())return false;
   const game=this.game(),round=this.round();if(!game||!round||!round.mines[index])return false;
   return round.revealed[index]||this.showingWonRound()||game.status!=='active'||(round.hiderUserId===this.currentUserId()&&this.showHiddenMines());
@@ -89,7 +110,7 @@ export class MinefieldHideSeekBoardComponent{
  adjacent(index:number):number{return this.round()?countHideSeekAdjacentMines(this.round()!.mines,index):0}
  isLast(index:number):boolean{return !(this.isPlacement()&&!this.isShowingRoundResult())&&this.round()?.lastMove?.cellIndex===index}
  isExplosionAnimating(index:number):boolean{return this.explodedMines().has(index)}
- showsExplosion(index:number):boolean{return !!this.round()?.revealed[index]&&!!this.round()?.mines[index]&&this.detonatingMine()!==index}
+ showsExplosion(index:number):boolean{return this.explodedMines().has(index)||(!!this.round()?.revealed[index]&&!!this.round()?.mines[index]&&this.detonatingMine()!==index)}
  isDefused(index:number):boolean{return this.defusedMines().has(index)}
  isShowingRoundResult():boolean{return this.showingLostRound()||this.showingWonRound()}
  isCurrentUserHider():boolean{return this.round()?.hiderUserId===this.currentUserId()}
@@ -103,6 +124,18 @@ export class MinefieldHideSeekBoardComponent{
   this.showingLostRound.set(false);this.showingWonRound.set(false);
   this.explodedMines.set(new Set());this.defusedMines.set(new Set());
   this.roundResultAnimationComplete.set(false);
+ }
+
+ private async animateMineAndSearch(mine:number):Promise<void>{
+  this.locallyAnimatedMine=mine;
+  this.detonatingMine.set(mine);
+  this.explodedMines.set(new Set());
+  await this.feedback.notifyMineCountdown();
+  if(this.detonatingMine()!==mine)return;
+  this.detonatingMine.set(null);
+  this.explodedMines.set(new Set([mine]));
+  this.feedback.notifyExplosion();
+  this.search.emit(mine);
  }
 
  private async animateRevealedMine(mine:number,completed:boolean):Promise<void>{

@@ -209,6 +209,7 @@ export class ContactChatroomComponent implements AfterViewInit {
     this.translation.t(`common.languageNames.${this.languageService.effectiveLanguage()}`)
   );
   private readonly messageKeys = new Set<string>();
+  private readonly liveMineAnimationMessageIds = new Set<string>();
   private readonly payloadSyncInFlightContacts = new Set<string>();
   private readonly tabbedMessageIds = new Set<string>();
   private initialTabbedMessagesCaptured = false;
@@ -318,6 +319,11 @@ export class ContactChatroomComponent implements AfterViewInit {
     const payload = await this.contactMessageService.decryptAndVerify(contact, incoming);
     if (!this.messageKeys.has(key)) {
       this.messageKeys.add(key);
+      if(incoming.direction==='contactUser'&&payload?.game?.type==='minefieldHideSeek'
+        &&currentHideSeekRound(payload.game)?.lastMove?.hitMine){
+        this.liveMineAnimationMessageIds.add(incoming.id);
+        setTimeout(()=>this.liveMineAnimationMessageIds.delete(incoming.id),10_000);
+      }
       this.messages.update(msgs => [{
         id: incoming.id,
         messageId: incoming.messageId,
@@ -794,6 +800,11 @@ export class ContactChatroomComponent implements AfterViewInit {
 
   getCurrentUserId(): string {
     return this.userService.getUser().id;
+  }
+
+  shouldAnimateIncomingMine(message:ChatroomMessage,game:MinefieldHideSeekGame):boolean{
+    return message.direction==='contactUser'&&this.liveMineAnimationMessageIds.has(message.id)
+      &&!!currentHideSeekRound(game)?.lastMove?.hitMine;
   }
 
   isCurrentUserGameWinner(game: ChatGame): boolean {
