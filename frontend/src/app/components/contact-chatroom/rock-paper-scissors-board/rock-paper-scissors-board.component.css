@@ -129,6 +129,13 @@
   color: var(--rps-o);
 }
 
+.rps__round-choice--winner {
+  background: color-mix(in srgb, currentColor 38%, black 30%);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, currentColor 68%, transparent),
+    0 0 10px color-mix(in srgb, currentColor 72%, transparent);
+}
+
 .rps__choices {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

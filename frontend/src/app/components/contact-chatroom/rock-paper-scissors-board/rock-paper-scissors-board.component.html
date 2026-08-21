@@ -7,7 +7,8 @@
       <strong>{{ getPlayerOScore(currentGame) }}</strong>
       <span class="rps__score-o">O</span>
     </div>
-    <div class="rps__duel" [class.rps__duel--finished]="currentGame.status !== 'active'">
+    @if (currentGame.status === 'active') {
+    <div class="rps__duel">
       <div class="rps__player-choice rps__player-choice--x">
         <span class="rps__player">X</span>
         @if (currentGame.playerXChoice; as firstChoice) {
@@ -40,6 +41,7 @@
         }
       </div>
     </div>
+    }
   }
 
   @if (selectionMode() || canChoose()) {
@@ -61,9 +63,15 @@
         @for (round of currentGame.rounds; track $index) {
           <div class="rps__round">
             <span>{{ 'common.contact.chatroom.games.roundLabel' | transloco:{ round: $index + 1 } }}</span>
-            <span class="rps__round-choice rps__round-choice--x">{{ getChoiceIcon(round.playerXChoice) }}</span>
+            <span class="rps__round-choice rps__round-choice--x"
+              [class.rps__round-choice--winner]="round.winnerUserId === currentGame.playerXUserId">
+              {{ getChoiceIcon(round.playerXChoice) }}
+            </span>
             <span>–</span>
-            <span class="rps__round-choice rps__round-choice--o">{{ getChoiceIcon(round.playerOChoice) }}</span>
+            <span class="rps__round-choice rps__round-choice--o"
+              [class.rps__round-choice--winner]="round.winnerUserId === currentGame.playerOUserId">
+              {{ getChoiceIcon(round.playerOChoice) }}
+            </span>
           </div>
         }
       </div>
