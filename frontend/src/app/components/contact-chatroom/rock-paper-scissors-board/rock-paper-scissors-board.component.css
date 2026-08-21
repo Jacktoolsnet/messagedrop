@@ -107,6 +107,28 @@
   font-size: 0.72rem;
 }
 
+.rps__round-choice {
+  display: grid;
+  place-items: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  box-sizing: border-box;
+  border: 2px solid currentColor;
+  border-radius: 0.65rem;
+  background: color-mix(in srgb, currentColor 18%, var(--rps-surface));
+  font-size: 1.45rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 5px color-mix(in srgb, currentColor 48%, transparent));
+}
+
+.rps__round-choice--x {
+  color: var(--rps-x);
+}
+
+.rps__round-choice--o {
+  color: var(--rps-o);
+}
+
 .rps__choices {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
