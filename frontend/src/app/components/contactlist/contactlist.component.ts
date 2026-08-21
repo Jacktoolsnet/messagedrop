@@ -722,8 +722,10 @@ export class ContactlistComponent {
   getPreviewIcon(preview: ContactMessagePreview): string {
     if (preview.kind === 'game') {
       const gameType = preview.payload?.game?.type;
-      return gameType === 'connectFour'
-        ? 'view_column'
+      return gameType === 'code'
+        ? 'password'
+        : gameType === 'connectFour'
+          ? 'view_column'
         : gameType === 'dotsAndBoxes'
           ? 'border_outer'
           : gameType === 'rockPaperScissors' ? 'content_cut' : 'grid_3x3';
@@ -780,8 +782,10 @@ export class ContactlistComponent {
 
     if (payload.game) {
       const currentUserId = this.userService.getUser().id;
-      const prefixKey = payload.game.type === 'connectFour'
-        ? 'common.contact.chatroom.games.connectFourPreviewPrefix'
+      const prefixKey = payload.game.type === 'code'
+        ? 'common.contact.chatroom.games.codePreviewPrefix'
+        : payload.game.type === 'connectFour'
+          ? 'common.contact.chatroom.games.connectFourPreviewPrefix'
         : payload.game.type === 'dotsAndBoxes'
           ? 'common.contact.chatroom.games.dotsAndBoxesPreviewPrefix'
           : payload.game.type === 'rockPaperScissors'

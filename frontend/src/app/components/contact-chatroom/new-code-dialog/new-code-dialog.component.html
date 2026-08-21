@@ -1,0 +1,9 @@
+<app-dialog-header icon="password" [title]="'common.contact.chatroom.games.newCodeTitle' | transloco"></app-dialog-header>
+<mat-dialog-content class="new-game-content">
+  <p>{{ 'common.contact.chatroom.games.chooseSecretCode' | transloco }}</p>
+  <app-code-board [selectionMode]="true" (selectionChange)="code.set($event)"></app-code-board>
+</mat-dialog-content>
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-icon-button class="action-close" type="button" (click)="close()" [attr.aria-label]="'common.actions.close' | transloco"><mat-icon>close</mat-icon></button>
+  <button mat-icon-button color="primary" type="button" (click)="send()" [disabled]="code().length !== 4" [attr.aria-label]="'common.contact.chatroom.games.sendGameAria' | transloco"><mat-icon>send</mat-icon></button>
+</mat-dialog-actions>

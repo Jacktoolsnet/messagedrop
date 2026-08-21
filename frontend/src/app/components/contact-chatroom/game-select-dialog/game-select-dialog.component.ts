@@ -7,7 +7,7 @@ import { ConnectFourVariant, GameStats, TicTacToeStats, TicTacToeVariant } from 
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
 import { GameRulesDialogComponent } from '../game-rules-dialog/game-rules-dialog.component';
 
-export type ChatGameType = 'ticTacToe' | 'ticTacToeVanishing' | 'connectFour' | 'connectFourVanishing' | 'dotsAndBoxes' | 'rockPaperScissors';
+export type ChatGameType = 'ticTacToe' | 'ticTacToeVanishing' | 'connectFour' | 'connectFourVanishing' | 'dotsAndBoxes' | 'rockPaperScissors' | 'code';
 
 interface GameSelectDialogData {
   ticTacToeStats: TicTacToeStats;
@@ -16,6 +16,7 @@ interface GameSelectDialogData {
   vanishingConnectFourStats: GameStats;
   dotsAndBoxesStats: GameStats;
   rockPaperScissorsStats: GameStats;
+  codeStats: GameStats;
 }
 
 @Component({
@@ -88,6 +89,13 @@ export class GameSelectDialogComponent {
       backdropClass: 'dialog-backdrop',
       disableClose: false,
       autoFocus: false
+    });
+  }
+
+  openCodeRules(): void {
+    this.dialog.open(GameRulesDialogComponent, {
+      data: { gameType: 'code', variant: 'standard' }, width: 'min(440px, 94vw)', maxWidth: '94vw',
+      maxHeight: '85vh', hasBackdrop: true, backdropClass: 'dialog-backdrop', disableClose: false, autoFocus: false
     });
   }
 }

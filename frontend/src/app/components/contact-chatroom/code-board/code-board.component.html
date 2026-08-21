@@ -1,0 +1,79 @@
+<div class="code-board">
+  @if (game(); as currentGame) {
+    <div class="code-board__secret" [attr.aria-label]="'common.contact.chatroom.games.codeSecret' | transloco">
+      @for (slot of [0, 1, 2, 3]; track slot) {
+        <span class="code-symbol code-symbol--secret">
+          @if (currentGame.revealedCode?.[slot]; as symbol) { <mat-icon>{{ icon(symbol) }}</mat-icon> }
+          @else { <mat-icon>lock</mat-icon> }
+        </span>
+      }
+    </div>
+    @if (commitmentVerified() !== null) {
+      <div class="code-board__verification" [class.code-board__verification--invalid]="!commitmentVerified()">
+        <mat-icon>{{ commitmentVerified() ? 'verified_user' : 'gpp_bad' }}</mat-icon>
+        {{ (commitmentVerified() ? 'common.contact.chatroom.games.codeVerified' : 'common.contact.chatroom.games.codeInvalid') | transloco }}
+      </div>
+    }
+
+    @if (currentGame.guesses.length) {
+      <div class="code-board__history">
+        @for (entry of currentGame.guesses; track $index) {
+          <div class="code-guess-row">
+            <span class="code-guess-row__number">{{ $index + 1 }}</span>
+            <span class="code-guess-row__symbols">
+              @for (symbol of entry.symbols; track $index) {
+                <span class="code-symbol"><mat-icon>{{ icon(symbol) }}</mat-icon></span>
+              }
+            </span>
+            <span class="code-feedback" [attr.aria-label]="'common.contact.chatroom.games.codeFeedbackAria' | transloco:{ exact: entry.exact, misplaced: entry.misplaced }">
+              <span class="code-feedback__exact"><mat-icon>my_location</mat-icon>{{ entry.exact }}</span>
+              <span class="code-feedback__misplaced"><mat-icon>shuffle</mat-icon>{{ entry.misplaced }}</span>
+            </span>
+          </div>
+        }
+      </div>
+    }
+
+    @if (currentGame.pendingGuess) {
+      <div class="code-guess-row code-guess-row--pending">
+        <span class="code-guess-row__number"><mat-icon>hourglass_top</mat-icon></span>
+        <span class="code-guess-row__symbols">
+          @for (symbol of currentGame.pendingGuess; track $index) {
+            <span class="code-symbol"><mat-icon>{{ icon(symbol) }}</mat-icon></span>
+          }
+        </span>
+      </div>
+      @if (currentGame.nextPlayerUserId === currentUserId()) {
+        <button mat-flat-button color="primary" type="button" class="code-board__evaluate" [disabled]="disabled()" (click)="evaluate.emit()">
+          <mat-icon>fact_check</mat-icon>{{ 'common.contact.chatroom.games.evaluateCode' | transloco }}
+        </button>
+      }
+    }
+  }
+
+  @if (selectionMode() || (game()?.nextPlayerUserId === currentUserId() && game()?.codeBreakerUserId === currentUserId())) {
+    <div class="code-board__composer">
+      <div class="code-board__slots">
+        @for (slot of [0, 1, 2, 3]; track slot) {
+          <button type="button" class="code-symbol code-symbol--slot" [disabled]="disabled() || !selection()[slot]" (click)="remove(slot)">
+            @if (selection()[slot]; as symbol) { <mat-icon>{{ icon(symbol) }}</mat-icon> }
+            @else { <mat-icon>add</mat-icon> }
+          </button>
+        }
+      </div>
+      <div class="code-board__palette">
+        @for (symbol of symbols; track symbol) {
+          <button type="button" class="code-symbol code-symbol--choice code-symbol--{{ symbol }}" [disabled]="disabled() || selection().length >= 4" (click)="add(symbol)"
+            [attr.aria-label]="('common.contact.chatroom.games.codeSymbol.' + symbol) | transloco">
+            <mat-icon>{{ icon(symbol) }}</mat-icon>
+          </button>
+        }
+      </div>
+      @if (!selectionMode()) {
+        <button mat-flat-button color="primary" type="button" [disabled]="!canSubmit()" (click)="submit()">
+          <mat-icon>send</mat-icon>{{ 'common.contact.chatroom.games.submitGuess' | transloco }}
+        </button>
+      }
+    </div>
+  }
+</div>

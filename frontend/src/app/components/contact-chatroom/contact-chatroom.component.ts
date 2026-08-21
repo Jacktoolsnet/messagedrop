@@ -12,6 +12,8 @@ import { firstValueFrom } from 'rxjs';
 import { Contact } from '../../interfaces/contact';
 import {
   ChatGame,
+  CodeGame,
+  CodeSymbol,
   ConnectFourGame,
   ConnectFourVariant,
   DotsAndBoxesGame,
@@ -31,6 +33,8 @@ import { MultimediaType } from '../../interfaces/multimedia-type';
 import { ShortMessage } from '../../interfaces/short-message';
 import { ExperienceResult } from '../../interfaces/viator';
 import { ContactMessageNotificationType, ContactMessageService } from '../../services/contact-message.service';
+import { CryptoService } from '../../services/crypto.service';
+import { CryptoData } from '../../interfaces/crypto-data';
 import { ContactService } from '../../services/contact.service';
 import { AppService } from '../../services/app.service';
 import { ExperienceBookmarkService } from '../../services/experience-bookmark.service';
@@ -67,6 +71,8 @@ import { DotsAndBoxesBoardComponent } from './dots-and-boxes-board/dots-and-boxe
 import { NewDotsAndBoxesDialogComponent } from './new-dots-and-boxes-dialog/new-dots-and-boxes-dialog.component';
 import { NewRockPaperScissorsDialogComponent } from './new-rock-paper-scissors-dialog/new-rock-paper-scissors-dialog.component';
 import { RockPaperScissorsBoardComponent } from './rock-paper-scissors-board/rock-paper-scissors-board.component';
+import { CodeBoardComponent } from './code-board/code-board.component';
+import { NewCodeDialogComponent } from './new-code-dialog/new-code-dialog.component';
 import { DeleteContactMessageComponent } from './delete-contact-message/delete-contact-message.component';
 import { DisplayMessageService } from '../../services/display-message.service';
 import { ProtectedStickerImageComponent } from '../utils/protected-sticker-image/protected-sticker-image.component';
@@ -79,6 +85,7 @@ import { applyTicTacToeMove, createTicTacToeGame } from '../../utils/tic-tac-toe
 import { applyConnectFourMove, createConnectFourGame } from '../../utils/connect-four';
 import { applyDotsAndBoxesMove, createDotsAndBoxesGame } from '../../utils/dots-and-boxes';
 import { applyRockPaperScissorsChoice, createRockPaperScissorsGame } from '../../utils/rock-paper-scissors';
+import { createCodeCommitment, createCodeGame, CodeSecret, evaluateCodeGuess, isValidCode, submitCodeGuess as applyCodeGuess } from '../../utils/code-game';
 
 interface ChatroomMessage {
   id: string;
@@ -125,6 +132,7 @@ interface ContactChatroomDialogData {
     ConnectFourBoardComponent,
     DotsAndBoxesBoardComponent,
     RockPaperScissorsBoardComponent,
+    CodeBoardComponent,
     TranslocoPipe
   ],
   templateUrl: './contact-chatroom.component.html',
@@ -143,6 +151,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   readonly help = inject(HelpDialogService);
   readonly gameFeedback = inject(GameFeedbackService);
   private readonly contactMessageService = inject(ContactMessageService);
+  private readonly cryptoService = inject(CryptoService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly matDialog = inject(MatDialog);
   private readonly dialogRef = inject(MatDialogRef<ContactChatroomComponent>);
@@ -512,7 +521,8 @@ export class ContactChatroomComponent implements AfterViewInit {
         connectFourStats: this.getConnectFourStats('standard'),
         vanishingConnectFourStats: this.getConnectFourStats('vanishing'),
         dotsAndBoxesStats: this.getDotsAndBoxesStats(),
-        rockPaperScissorsStats: this.getRockPaperScissorsStats()
+        rockPaperScissorsStats: this.getRockPaperScissorsStats(),
+        codeStats: this.getCodeStats()
       },
       width: 'min(760px, 94vw)',
       maxWidth: '94vw',
@@ -536,6 +546,8 @@ export class ContactChatroomComponent implements AfterViewInit {
         this.openNewDotsAndBoxesDialog(contact);
       } else if (gameType === 'rockPaperScissors') {
         this.openNewRockPaperScissorsDialog(contact);
+      } else if (gameType === 'code') {
+        this.openNewCodeDialog(contact);
       }
     });
   }
@@ -595,6 +607,32 @@ export class ContactChatroomComponent implements AfterViewInit {
     });
   }
 
+  private openNewCodeDialog(contact: Contact): void {
+    const dialogRef = this.matDialog.open(NewCodeDialogComponent, {
+      width: 'min(470px, 96vw)', maxWidth: '96vw', maxHeight: '90vh', hasBackdrop: true,
+      backdropClass: 'dialog-backdrop', disableClose: false, autoFocus: false
+    });
+    dialogRef.afterClosed().subscribe((code?: CodeSymbol[]) => {
+      if (!isValidCode(code)) return;
+      void this.startCodeGame(contact, code);
+    });
+  }
+
+  private async startCodeGame(contact: Contact, code: CodeSymbol[]): Promise<void> {
+    try {
+      const secret: CodeSecret = { code: [...code], nonce: crypto.randomUUID() };
+      const [encryptedSecret, commitment] = await Promise.all([
+        this.cryptoService.encrypt(this.userService.getUser().cryptoKeyPair.publicKey, JSON.stringify(secret)),
+        createCodeCommitment(secret)
+      ]);
+      const payload = this.createEmptyMessage();
+      payload.game = createCodeGame(contact.userId, contact.contactUserId, encryptedSecret, commitment);
+      await this.sendAsNewMessage(contact, payload, undefined, 'game_started');
+    } catch {
+      this.snackBar.open(this.translation.t('common.contact.chatroom.games.codeStartFailed'), '', { duration: 3000 });
+    }
+  }
+
   private openNewTicTacToeDialog(contact: Contact, variant: TicTacToeVariant): void {
     const dialogRef = this.matDialog.open(NewTicTacToeDialogComponent, {
       data: { variant },
@@ -636,13 +674,16 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getChatGameIcon(game: ChatGame): string {
+    if (game.type === 'code') return 'password';
     if (game.type === 'dotsAndBoxes') return 'border_outer';
     if (game.type === 'rockPaperScissors') return 'content_cut';
     return game.variant === 'vanishing' ? 'change_circle' : game.type === 'connectFour' ? 'view_column' : 'grid_3x3';
   }
 
   getChatGameTitle(game: ChatGame): string {
-    const key = game.type === 'connectFour'
+    const key = game.type === 'code'
+      ? 'common.contact.chatroom.games.code'
+      : game.type === 'connectFour'
       ? 'common.contact.chatroom.games.connectFour'
       : game.type === 'dotsAndBoxes'
         ? 'common.contact.chatroom.games.dotsAndBoxes'
@@ -653,7 +694,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getChatGameVariantLabel(game: ChatGame): string {
-    const key = game.type !== 'dotsAndBoxes' && game.type !== 'rockPaperScissors' && game.variant === 'vanishing'
+    const key = game.type !== 'dotsAndBoxes' && game.type !== 'rockPaperScissors' && game.type !== 'code' && game.variant === 'vanishing'
       ? 'common.contact.chatroom.games.vanishingVariant'
       : 'common.contact.chatroom.games.standardVariant';
     return this.translation.t(key);
@@ -677,7 +718,7 @@ export class ContactChatroomComponent implements AfterViewInit {
       const currentUserId = this.userService.getUser().id;
       return game.playerXUserId === currentUserId ? 'X' : game.playerOUserId === currentUserId ? 'O' : null;
     }
-    if (game.type === 'rockPaperScissors') return null;
+    if (game.type === 'rockPaperScissors' || game.type === 'code') return null;
     const currentUserId = this.userService.getUser().id;
     return game.playerRedUserId === currentUserId ? 'X' : game.playerYellowUserId === currentUserId ? 'O' : null;
   }
@@ -686,7 +727,7 @@ export class ContactChatroomComponent implements AfterViewInit {
     this.matDialog.open(GameRulesDialogComponent, {
       data: {
         gameType: game.type,
-        variant: game.type === 'dotsAndBoxes' || game.type === 'rockPaperScissors' ? 'standard' : game.variant ?? 'standard'
+        variant: game.type === 'dotsAndBoxes' || game.type === 'rockPaperScissors' || game.type === 'code' ? 'standard' : game.variant ?? 'standard'
       },
       width: 'min(440px, 94vw)',
       maxWidth: '94vw',
@@ -707,9 +748,65 @@ export class ContactChatroomComponent implements AfterViewInit {
       this.openNewConnectFourDialog(contact, game.variant ?? 'standard');
     } else if (game.type === 'dotsAndBoxes') {
       this.openNewDotsAndBoxesDialog(contact);
-    } else {
+    } else if (game.type === 'rockPaperScissors') {
       this.openNewRockPaperScissorsDialog(contact);
+    } else {
+      this.openNewCodeDialog(contact);
     }
+  }
+
+  canPlayCode(message: ChatroomMessage): boolean {
+    const game = message.payload?.game;
+    return !!game && game.type === 'code' && game.status === 'active'
+      && game.nextPlayerUserId === this.userService.getUser().id
+      && !this.gameMovesInFlight().has(game.gameId);
+  }
+
+  async submitCodeGuess(message: ChatroomMessage, symbols: CodeSymbol[]): Promise<void> {
+    const contact = this.contact();
+    const game = message.payload?.game;
+    if (!contact || !game || game.type !== 'code' || !this.canPlayCode(message)) return;
+    const nextGame = applyCodeGuess(game, this.userService.getUser().id, symbols);
+    if (!nextGame) return;
+    await this.sendGameRevision(contact, message, nextGame);
+  }
+
+  async evaluateCodeGuess(message: ChatroomMessage): Promise<void> {
+    const contact = this.contact();
+    const game = message.payload?.game;
+    if (!contact || !game || game.type !== 'code' || !this.canPlayCode(message)) return;
+    this.setGameMoveInFlight(game.gameId, true);
+    try {
+      const decrypted = await this.cryptoService.decrypt(
+        this.userService.getUser().cryptoKeyPair.privateKey,
+        JSON.parse(game.encryptedSecret) as CryptoData
+      );
+      const secret = JSON.parse(decrypted) as CodeSecret;
+      if (!isValidCode(secret.code) || await createCodeCommitment(secret) !== game.commitment) throw new Error('invalid_commitment');
+      const nextGame = evaluateCodeGuess(game, this.userService.getUser().id, secret);
+      if (!nextGame) return;
+      const payload = this.createEmptyMessage();
+      payload.game = nextGame;
+      await this.sendAsNewMessage(contact, payload, message.messageId, 'game_move');
+    } catch {
+      this.snackBar.open(this.translation.t('common.contact.chatroom.games.codeEvaluationFailed'), '', { duration: 3000 });
+    } finally {
+      this.setGameMoveInFlight(game.gameId, false);
+    }
+  }
+
+  getCodeTurnInstruction(game: CodeGame): string {
+    return game.nextPlayerUserId === game.codeMakerUserId
+      ? this.translation.t('common.contact.chatroom.games.evaluateTurn')
+      : this.translation.t('common.contact.chatroom.games.guessTurn');
+  }
+
+  private async sendGameRevision(contact: Contact, message: ChatroomMessage, game: ChatGame): Promise<void> {
+    this.setGameMoveInFlight(game.gameId, true);
+    const payload = this.createEmptyMessage();
+    payload.game = game;
+    await this.sendAsNewMessage(contact, payload, message.messageId, 'game_move');
+    this.setGameMoveInFlight(game.gameId, false);
   }
 
   canPlayConnectFour(message: ChatroomMessage): boolean {
@@ -941,6 +1038,21 @@ export class ContactChatroomComponent implements AfterViewInit {
     for (const game of latestGames.values()) {
       if (game.status === 'draw') stats.drawn += 1;
       else if (game.status === 'won' && game.winnerUserId === currentUserId) stats.won += 1;
+      else if (game.status === 'won') stats.lost += 1;
+    }
+    return stats;
+  }
+
+  private getCodeStats(): GameStats {
+    const currentUserId = this.userService.getUser().id;
+    const latestGames = new Map<string, CodeGame>();
+    for (const message of this.visibleMessages()) {
+      const game = message.payload?.game;
+      if (game?.type === 'code' && !latestGames.has(game.gameId)) latestGames.set(game.gameId, game);
+    }
+    const stats: GameStats = { played: latestGames.size, won: 0, lost: 0, drawn: 0 };
+    for (const game of latestGames.values()) {
+      if (game.status === 'won' && game.winnerUserId === currentUserId) stats.won += 1;
       else if (game.status === 'won') stats.lost += 1;
     }
     return stats;

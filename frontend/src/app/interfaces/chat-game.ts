@@ -101,7 +101,35 @@ export interface RockPaperScissorsGame {
   moveNumber: number;
 }
 
-export type ChatGame = TicTacToeGame | ConnectFourGame | DotsAndBoxesGame | RockPaperScissorsGame;
+export type CodeSymbol = 'star' | 'heart' | 'circle' | 'square' | 'triangle' | 'hexagon';
+
+export interface CodeGuess {
+  symbols: CodeSymbol[];
+  exact: number;
+  misplaced: number;
+}
+
+export interface CodeGame {
+  type: 'code';
+  version: 1;
+  gameId: string;
+  codeMakerUserId: string;
+  codeBreakerUserId: string;
+  /** The secret is encrypted exclusively with the code maker's public key. */
+  encryptedSecret: string;
+  /** SHA-256 of the original code and nonce, allowing verification after reveal. */
+  commitment: string;
+  guesses: CodeGuess[];
+  pendingGuess: CodeSymbol[] | null;
+  revealedCode: CodeSymbol[] | null;
+  revealNonce: string | null;
+  nextPlayerUserId: string | null;
+  status: 'active' | 'won';
+  winnerUserId: string | null;
+  moveNumber: number;
+}
+
+export type ChatGame = TicTacToeGame | ConnectFourGame | DotsAndBoxesGame | RockPaperScissorsGame | CodeGame;
 
 export interface GameStats {
   played: number;

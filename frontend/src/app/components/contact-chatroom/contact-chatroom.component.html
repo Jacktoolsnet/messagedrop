@@ -215,10 +215,13 @@
             <app-dots-and-boxes-board [game]="game" [disabled]="!canPlayDotsAndBoxes(msg)"
               [statusText]="getDotsAndBoxesStatusText(game)" [showStatus]="false"
               (move)="playDotsAndBoxesMove(msg, $event)"></app-dots-and-boxes-board>
-            } @else {
+            } @else if (game.type === 'rockPaperScissors') {
             <app-rock-paper-scissors-board [game]="game" [currentUserId]="getCurrentUserId()"
               [disabled]="!canPlayRockPaperScissors(msg)" [statusText]="getRockPaperScissorsStatusText(game)"
               [showStatus]="false" (choice)="playRockPaperScissorsChoice(msg, $event)"></app-rock-paper-scissors-board>
+            } @else {
+            <app-code-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayCode(msg)"
+              (guess)="submitCodeGuess(msg, $event)" (evaluate)="evaluateCodeGuess(msg)"></app-code-board>
             }
             @if (game.status === 'active') {
             <div class="game-turn-box" role="status" aria-live="polite">
@@ -248,7 +251,9 @@
                 <span class="game-turn-box__status">{{ isCurrentUserGameTurn(game)
                   ? (game.type === 'rockPaperScissors'
                     ? ('common.contact.chatroom.games.chooseNow' | transloco)
-                    : ('common.contact.chatroom.games.youPlayMark' | transloco:{ mark: getCurrentUserGamePieceLabel(game) }))
+                    : game.type === 'code'
+                      ? getCodeTurnInstruction(game)
+                      : ('common.contact.chatroom.games.youPlayMark' | transloco:{ mark: getCurrentUserGamePieceLabel(game) }))
                   : ('common.contact.chatroom.games.isTurn' | transloco) }}</span>
               </span>
             </div>
@@ -280,7 +285,9 @@
                 <span class="game-turn-box__status">{{ isCurrentUserGameWinner(game)
                   ? (game.type === 'rockPaperScissors'
                     ? ('common.contact.chatroom.games.youPlayedChoice' | transloco:{ choice: getRockPaperScissorsChoiceLabel(game) })
-                    : ('common.contact.chatroom.games.youPlayedMark' | transloco:{ mark: getCurrentUserGamePieceLabel(game) }))
+                    : game.type === 'code'
+                      ? ('common.contact.chatroom.games.codeWonSubtitle' | transloco)
+                      : ('common.contact.chatroom.games.youPlayedMark' | transloco:{ mark: getCurrentUserGamePieceLabel(game) }))
                   : ('common.contact.chatroom.games.hasWon' | transloco) }}</span>
               </span>
             </div>
@@ -516,10 +523,13 @@
             <app-dots-and-boxes-board [game]="game" [disabled]="!canPlayDotsAndBoxes(msg)"
               [statusText]="getDotsAndBoxesStatusText(game)" [showStatus]="false"
               (move)="playDotsAndBoxesMove(msg, $event)"></app-dots-and-boxes-board>
-            } @else {
+            } @else if (game.type === 'rockPaperScissors') {
             <app-rock-paper-scissors-board [game]="game" [currentUserId]="getCurrentUserId()"
               [disabled]="!canPlayRockPaperScissors(msg)" [statusText]="getRockPaperScissorsStatusText(game)"
               [showStatus]="false" (choice)="playRockPaperScissorsChoice(msg, $event)"></app-rock-paper-scissors-board>
+            } @else {
+            <app-code-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayCode(msg)"
+              (guess)="submitCodeGuess(msg, $event)" (evaluate)="evaluateCodeGuess(msg)"></app-code-board>
             }
             @if (game.status === 'active') {
             <div class="game-turn-box" role="status" aria-live="polite">
@@ -549,7 +559,9 @@
                 <span class="game-turn-box__status">{{ isCurrentUserGameTurn(game)
                   ? (game.type === 'rockPaperScissors'
                     ? ('common.contact.chatroom.games.chooseNow' | transloco)
-                    : ('common.contact.chatroom.games.youPlayMark' | transloco:{ mark: getCurrentUserGamePieceLabel(game) }))
+                    : game.type === 'code'
+                      ? getCodeTurnInstruction(game)
+                      : ('common.contact.chatroom.games.youPlayMark' | transloco:{ mark: getCurrentUserGamePieceLabel(game) }))
                   : ('common.contact.chatroom.games.isTurn' | transloco) }}</span>
               </span>
             </div>
@@ -581,7 +593,9 @@
                 <span class="game-turn-box__status">{{ isCurrentUserGameWinner(game)
                   ? (game.type === 'rockPaperScissors'
                     ? ('common.contact.chatroom.games.youPlayedChoice' | transloco:{ choice: getRockPaperScissorsChoiceLabel(game) })
-                    : ('common.contact.chatroom.games.youPlayedMark' | transloco:{ mark: getCurrentUserGamePieceLabel(game) }))
+                    : game.type === 'code'
+                      ? ('common.contact.chatroom.games.codeWonSubtitle' | transloco)
+                      : ('common.contact.chatroom.games.youPlayedMark' | transloco:{ mark: getCurrentUserGamePieceLabel(game) }))
                   : ('common.contact.chatroom.games.hasWon' | transloco) }}</span>
               </span>
             </div>
