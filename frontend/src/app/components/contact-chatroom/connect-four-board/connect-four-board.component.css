@@ -7,6 +7,13 @@
   --connect-four-primary: var(--mat-sys-primary, var(--mat-primary-color, #3f51b5));
   --connect-four-surface: var(--mat-sys-surface-container-high, var(--mat-card-filled-container-color, #fff));
   --connect-four-cell-color: color-mix(in srgb, var(--connect-four-primary) 22%, var(--connect-four-surface));
+  --game-x: #0057d9;
+  --game-o: #b0006f;
+}
+
+:host-context(.dark) {
+  --game-x: #4fd8ff;
+  --game-o: #ff66c4;
 }
 
 .connect-four {
@@ -51,12 +58,20 @@
   font: 700 clamp(1rem, 5vw, 2rem) / 1 sans-serif;
 }
 
-.connect-four__cell--red .connect-four__stone {
-  color: color-mix(in srgb, var(--connect-four-primary) 82%, var(--mat-sys-on-surface, var(--mat-app-text-color)));
+.connect-four__cell--red {
+  color: var(--game-x);
+  background: color-mix(in srgb, var(--game-x) 18%, var(--connect-four-cell-color));
 }
 
+.connect-four__cell--yellow {
+  color: var(--game-o);
+  background: color-mix(in srgb, var(--game-o) 18%, var(--connect-four-cell-color));
+}
+
+.connect-four__cell--red .connect-four__stone,
 .connect-four__cell--yellow .connect-four__stone {
-  color: var(--mat-sys-tertiary, var(--mat-sys-secondary, var(--mat-app-text-color)));
+  color: inherit;
+  text-shadow: 0 0 7px color-mix(in srgb, currentColor 62%, transparent);
 }
 
 .connect-four__cell--target {
@@ -68,13 +83,11 @@
 }
 
 .connect-four__cell--winning {
-  border: 2px solid var(--mat-sys-tertiary, var(--connect-four-primary));
-  background: color-mix(
-    in srgb,
-    var(--mat-sys-tertiary-container, var(--connect-four-primary)) 55%,
-    var(--connect-four-cell-color)
-  );
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--mat-sys-tertiary, var(--connect-four-primary)) 24%, transparent);
+  border: 2px solid currentColor;
+  background: color-mix(in srgb, currentColor 28%, var(--connect-four-cell-color));
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, currentColor 38%, transparent),
+    0 0 10px color-mix(in srgb, currentColor 58%, transparent);
 }
 
 .connect-four__cell--fading {
@@ -102,12 +115,8 @@
 
 .connect-four__cell--winning.connect-four__cell--fading {
   border-style: solid;
-  border-color: var(--mat-sys-tertiary, var(--connect-four-primary));
-  background: color-mix(
-    in srgb,
-    var(--mat-sys-tertiary-container, var(--connect-four-primary)) 55%,
-    var(--connect-four-cell-color)
-  );
+  border-color: currentColor;
+  background: color-mix(in srgb, currentColor 28%, var(--connect-four-cell-color));
 }
 
 .connect-four__controls {

@@ -24,6 +24,13 @@
     var(--tic-tac-toe-primary) 42%,
     var(--tic-tac-toe-surface)
   );
+  --game-x: #0057d9;
+  --game-o: #b0006f;
+}
+
+:host-context(.dark) {
+  --game-x: #4fd8ff;
+  --game-o: #ff66c4;
 }
 
 .tic-tac-toe {
@@ -48,7 +55,8 @@
 .tic-tac-toe__player-mark strong {
   font-size: 1.15rem;
   line-height: 1;
-  color: var(--tic-tac-toe-primary);
+  color: var(--game-x);
+  text-shadow: 0 0 6px color-mix(in srgb, var(--game-x) 55%, transparent);
 }
 
 .tic-tac-toe__player-mark span {
@@ -61,7 +69,8 @@
 }
 
 .tic-tac-toe__player-mark--o strong {
-  color: var(--mat-sys-tertiary, var(--mat-sys-secondary, var(--mat-app-text-color)));
+  color: var(--game-o);
+  text-shadow: 0 0 6px color-mix(in srgb, var(--game-o) 55%, transparent);
 }
 
 .tic-tac-toe__grid {
@@ -117,19 +126,18 @@
 }
 
 .tic-tac-toe__cell--x {
-  color: color-mix(
-    in srgb,
-    var(--tic-tac-toe-primary) 82%,
-    var(--mat-sys-on-surface, var(--mat-app-text-color))
-  );
+  color: var(--game-x);
+  background: color-mix(in srgb, var(--game-x) 18%, var(--tic-tac-toe-cell-color));
 }
 
 .tic-tac-toe__cell--o {
-  color: var(--mat-sys-tertiary, var(--mat-sys-secondary, var(--mat-app-text-color)));
+  color: var(--game-o);
+  background: color-mix(in srgb, var(--game-o) 18%, var(--tic-tac-toe-cell-color));
 }
 
 .tic-tac-toe__mark {
   transition: opacity 160ms ease;
+  text-shadow: 0 0 7px color-mix(in srgb, currentColor 62%, transparent);
 }
 
 .tic-tac-toe__cell--fading {
@@ -152,13 +160,11 @@
 }
 
 .tic-tac-toe__cell--winning {
-  border: 2px solid var(--mat-sys-tertiary, var(--tic-tac-toe-primary));
-  background: color-mix(
-    in srgb,
-    var(--mat-sys-tertiary-container, var(--tic-tac-toe-primary)) 55%,
-    var(--tic-tac-toe-cell-color)
-  );
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--mat-sys-tertiary, var(--tic-tac-toe-primary)) 24%, transparent);
+  border: 2px solid currentColor;
+  background: color-mix(in srgb, currentColor 28%, var(--tic-tac-toe-cell-color));
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, currentColor 38%, transparent),
+    0 0 10px color-mix(in srgb, currentColor 58%, transparent);
 }
 
 .tic-tac-toe__cell--winning .tic-tac-toe__mark {
