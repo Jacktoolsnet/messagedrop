@@ -1,4 +1,9 @@
-import { applyTicTacToeMove, createTicTacToeGame, getTicTacToeWinner } from './tic-tac-toe';
+import {
+  applyTicTacToeMove,
+  createTicTacToeGame,
+  getTicTacToeWinner,
+  getTicTacToeWinningCellIndexes
+} from './tic-tac-toe';
 
 describe('tic-tac-toe', () => {
   it('starts with the sender as X and the recipient next', () => {
@@ -17,6 +22,7 @@ describe('tic-tac-toe', () => {
 
   it('detects wins and draws', () => {
     expect(getTicTacToeWinner(['X', 'X', 'X', null, 'O', null, 'O', null, null])).toBe('X');
+    expect(getTicTacToeWinningCellIndexes(['X', 'X', 'X', null, 'O', null, 'O', null, null])).toEqual([0, 1, 2]);
 
     const game = createTicTacToeGame('sender', 'recipient', 0);
     game.board = ['X', 'O', 'X', 'X', 'O', 'O', 'O', 'X', null];

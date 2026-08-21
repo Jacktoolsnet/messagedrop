@@ -30,6 +30,20 @@ export function getTicTacToeWinner(board: readonly TicTacToeCell[]): TicTacToeMa
   return null;
 }
 
+export function getTicTacToeWinningCellIndexes(board: readonly TicTacToeCell[]): number[] {
+  const normalized = normalizeTicTacToeBoard(board);
+  const winner = getTicTacToeWinner(normalized);
+  if (!winner) return [];
+
+  const indexes = new Set<number>();
+  for (const line of WINNING_LINES) {
+    if (line.every(index => normalized[index] === winner)) {
+      line.forEach(index => indexes.add(index));
+    }
+  }
+  return [...indexes];
+}
+
 export function createTicTacToeGame(
   playerXUserId: string,
   playerOUserId: string,

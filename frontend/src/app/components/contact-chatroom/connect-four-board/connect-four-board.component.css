@@ -5,7 +5,8 @@
   min-width: min(15rem, calc(100vw - 7rem));
   margin: 0 auto 1.25rem;
   --connect-four-primary: var(--mat-sys-primary, var(--mat-primary-color, #3f51b5));
-  --connect-four-surface: var(--mat-sys-surface-container, var(--mat-card-filled-container-color, #fff));
+  --connect-four-surface: var(--mat-sys-surface-container-high, var(--mat-card-filled-container-color, #fff));
+  --connect-four-cell-color: color-mix(in srgb, var(--connect-four-primary) 22%, var(--connect-four-surface));
 }
 
 .connect-four {
@@ -23,10 +24,10 @@
   box-sizing: border-box;
   gap: 0.28rem;
   padding: 0.45rem;
-  border: 1px solid color-mix(in srgb, var(--connect-four-primary) 65%, var(--mat-card-outlined-outline-color));
+  border: 1px solid color-mix(in srgb, var(--connect-four-primary) 60%, var(--mat-sys-outline-variant, var(--mat-card-outlined-outline-color)));
   border-radius: 1rem;
-  background: color-mix(in srgb, var(--connect-four-primary) 72%, var(--connect-four-surface));
-  box-shadow: inset 0 1px 5px color-mix(in srgb, black 18%, transparent);
+  background: color-mix(in srgb, var(--connect-four-primary) 45%, var(--connect-four-surface));
+  box-shadow: inset 0 1px 5px color-mix(in srgb, black 12%, transparent);
 }
 
 .connect-four__cell {
@@ -34,33 +35,46 @@
   place-items: center;
   min-width: 0;
   min-height: 0;
+  box-sizing: border-box;
   overflow: hidden;
-  border-radius: 50%;
-  background: var(--mat-sys-surface-container-low, var(--connect-four-surface));
-  box-shadow: inset 0 2px 4px color-mix(in srgb, black 22%, transparent);
+  border: 1px solid var(--mat-sys-outline-variant, var(--mat-card-outlined-outline-color));
+  border-radius: 0.55rem;
+  background: var(--connect-four-cell-color);
+  box-shadow: 0 2px 5px color-mix(in srgb, black 12%, transparent);
 }
 
 .connect-four__stone {
+  display: grid;
+  place-items: center;
   width: 100%;
   height: 100%;
-  border-radius: inherit;
-  color: transparent;
+  font: 700 clamp(1rem, 5vw, 2rem) / 1 sans-serif;
 }
 
 .connect-four__cell--red .connect-four__stone {
-  background: var(--mat-sys-error, #ba1a1a);
-  box-shadow: inset 0 2px 3px color-mix(in srgb, white 30%, transparent), 0 2px 4px color-mix(in srgb, black 24%, transparent);
+  color: color-mix(in srgb, var(--connect-four-primary) 82%, var(--mat-sys-on-surface, var(--mat-app-text-color)));
 }
 
 .connect-four__cell--yellow .connect-four__stone {
-  background: #f2c94c;
-  box-shadow: inset 0 2px 3px color-mix(in srgb, white 45%, transparent), 0 2px 4px color-mix(in srgb, black 24%, transparent);
+  color: var(--mat-sys-tertiary, var(--mat-sys-secondary, var(--mat-app-text-color)));
 }
 
 .connect-four__cell--target {
-  outline: 2px solid var(--mat-sys-on-primary, white);
+  border-color: var(--connect-four-primary);
+  outline: 2px solid var(--connect-four-primary);
   outline-offset: -2px;
-  background: color-mix(in srgb, var(--mat-sys-primary-container, var(--connect-four-primary)) 60%, white);
+  background: color-mix(in srgb, var(--connect-four-primary) 42%, var(--connect-four-surface));
+  box-shadow: 0 3px 8px color-mix(in srgb, var(--connect-four-primary) 24%, transparent);
+}
+
+.connect-four__cell--winning {
+  border: 2px solid var(--mat-sys-tertiary, var(--connect-four-primary));
+  background: color-mix(
+    in srgb,
+    var(--mat-sys-tertiary-container, var(--connect-four-primary)) 55%,
+    var(--connect-four-cell-color)
+  );
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--mat-sys-tertiary, var(--connect-four-primary)) 24%, transparent);
 }
 
 .connect-four__controls {
@@ -81,7 +95,7 @@
 }
 
 .connect-four__column:focus-visible {
-  outline: 2px solid var(--mat-sys-on-primary, white);
+  outline: 2px solid var(--connect-four-primary);
   outline-offset: -2px;
 }
 

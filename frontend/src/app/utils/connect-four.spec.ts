@@ -1,4 +1,9 @@
-import { applyConnectFourMove, createConnectFourGame, getConnectFourWinner } from './connect-four';
+import {
+  applyConnectFourMove,
+  createConnectFourGame,
+  getConnectFourWinner,
+  getConnectFourWinningCellIndexes
+} from './connect-four';
 
 describe('connect-four', () => {
   it('drops the first red stone to the bottom of the selected column', () => {
@@ -16,6 +21,8 @@ describe('connect-four', () => {
 
   it('detects horizontal, vertical and diagonal wins', () => {
     expect(getConnectFourWinner(Array(35).fill(null).concat(['R', 'R', 'R', 'R', null, null, null]))).toBe('R');
+    expect(getConnectFourWinningCellIndexes(Array(35).fill(null).concat(['R', 'R', 'R', 'R', null, null, null])))
+      .toEqual([35, 36, 37, 38]);
     const vertical = Array(42).fill(null);
     [14, 21, 28, 35].forEach((index) => vertical[index] = 'Y');
     expect(getConnectFourWinner(vertical)).toBe('Y');

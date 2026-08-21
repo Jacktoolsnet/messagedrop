@@ -128,6 +128,33 @@
   color: var(--mat-sys-tertiary, var(--mat-sys-secondary, var(--mat-app-text-color)));
 }
 
+.tic-tac-toe__mark {
+  transition: opacity 160ms ease;
+}
+
+.tic-tac-toe__cell--fading {
+  border-style: dashed;
+  border-color: color-mix(in srgb, currentColor 62%, transparent);
+}
+
+.tic-tac-toe__cell--fading .tic-tac-toe__mark {
+  opacity: 0.6;
+}
+
+.tic-tac-toe__cell--winning {
+  border: 2px solid var(--mat-sys-tertiary, var(--tic-tac-toe-primary));
+  background: color-mix(
+    in srgb,
+    var(--mat-sys-tertiary-container, var(--tic-tac-toe-primary)) 55%,
+    var(--tic-tac-toe-cell-color)
+  );
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--mat-sys-tertiary, var(--tic-tac-toe-primary)) 24%, transparent);
+}
+
+.tic-tac-toe__cell--winning .tic-tac-toe__mark {
+  opacity: 1;
+}
+
 .tic-tac-toe__status {
   text-align: center;
   font-weight: 600;

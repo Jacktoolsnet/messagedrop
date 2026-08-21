@@ -603,10 +603,8 @@ export class ContactChatroomComponent implements AfterViewInit {
 
   getCurrentUserGamePieceLabel(game: ChatGame): string {
     if (game.type === 'ticTacToe') return this.getTicTacToePlayerMark(game) ?? '';
-    const isRed = game.playerRedUserId === this.userService.getUser().id;
-    return this.translation.t(isRed
-      ? 'common.contact.chatroom.games.redPiece'
-      : 'common.contact.chatroom.games.yellowPiece');
+    const currentUserId = this.userService.getUser().id;
+    return game.playerRedUserId === currentUserId ? 'X' : game.playerYellowUserId === currentUserId ? 'O' : '';
   }
 
   openGameRules(game: ChatGame): void {

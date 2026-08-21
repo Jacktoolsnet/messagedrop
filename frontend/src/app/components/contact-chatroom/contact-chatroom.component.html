@@ -202,6 +202,7 @@
             @if (game.type === 'ticTacToe') {
             <app-tic-tac-toe-board [board]="game.board"
               [variant]="game.variant ?? 'standard'"
+              [moves]="game.moves ?? []"
               [disabled]="!canPlayTicTacToe(msg)" [statusText]="getTicTacToeStatusText(game)" [showStatus]="false"
               (move)="playTicTacToeMove(msg, $event)"></app-tic-tac-toe-board>
             } @else {
@@ -481,6 +482,7 @@
             @if (game.type === 'ticTacToe') {
             <app-tic-tac-toe-board [board]="game.board"
               [variant]="game.variant ?? 'standard'"
+              [moves]="game.moves ?? []"
               [disabled]="!canPlayTicTacToe(msg)" [statusText]="getTicTacToeStatusText(game)" [showStatus]="false"
               (move)="playTicTacToeMove(msg, $event)"></app-tic-tac-toe-board>
             } @else {

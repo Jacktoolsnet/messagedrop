@@ -53,6 +53,34 @@ export function getConnectFourWinner(board: readonly ConnectFourCell[]): 'R' | '
   return null;
 }
 
+export function getConnectFourWinningCellIndexes(board: readonly ConnectFourCell[]): number[] {
+  const normalized = normalizeConnectFourBoard(board);
+  const winner = getConnectFourWinner(normalized);
+  if (!winner) return [];
+
+  const indexes = new Set<number>();
+  const directions: readonly (readonly [number, number])[] = [[0, 1], [1, 0], [1, 1], [1, -1]];
+  for (let row = 0; row < CONNECT_FOUR_ROWS; row += 1) {
+    for (let column = 0; column < CONNECT_FOUR_COLUMNS; column += 1) {
+      if (normalized[row * CONNECT_FOUR_COLUMNS + column] !== winner) continue;
+      for (const [rowStep, columnStep] of directions) {
+        const line = Array.from({ length: 4 }, (_, offset) => ({
+          row: row + rowStep * offset,
+          column: column + columnStep * offset
+        }));
+        if (line.every(cell =>
+          cell.row >= 0 && cell.row < CONNECT_FOUR_ROWS
+          && cell.column >= 0 && cell.column < CONNECT_FOUR_COLUMNS
+          && normalized[cell.row * CONNECT_FOUR_COLUMNS + cell.column] === winner
+        )) {
+          line.forEach(cell => indexes.add(cell.row * CONNECT_FOUR_COLUMNS + cell.column));
+        }
+      }
+    }
+  }
+  return [...indexes];
+}
+
 export function createConnectFourGame(
   playerRedUserId: string,
   playerYellowUserId: string,

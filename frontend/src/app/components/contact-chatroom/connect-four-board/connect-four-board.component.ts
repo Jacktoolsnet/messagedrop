@@ -4,6 +4,7 @@ import { GameFeedbackService } from '../../../services/game-feedback.service';
 import {
   CONNECT_FOUR_COLUMNS,
   getConnectFourDropIndex,
+  getConnectFourWinningCellIndexes,
   normalizeConnectFourBoard
 } from '../../../utils/connect-four';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
@@ -25,6 +26,7 @@ export class ConnectFourBoardComponent {
   readonly showStatus = input(true);
   readonly move = output<number>();
   readonly cells = computed(() => normalizeConnectFourBoard(this.board()));
+  readonly winningCellIndexes = computed(() => new Set(getConnectFourWinningCellIndexes(this.cells())));
   readonly columns = Array.from({ length: CONNECT_FOUR_COLUMNS }, (_, index) => index);
   readonly hoveredColumn = signal<number | null>(null);
   readonly hoveredDropIndex = computed(() => {
@@ -54,5 +56,9 @@ export class ConnectFourBoardComponent {
 
   getColumnAriaLabel(column: number): string {
     return this.translation.t('common.contact.chatroom.games.connectFourColumnAria', { column: column + 1 });
+  }
+
+  getCellMark(cell: ConnectFourCell): string {
+    return cell === 'R' ? 'X' : cell === 'Y' ? 'O' : '';
   }
 }
