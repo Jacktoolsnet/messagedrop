@@ -716,7 +716,7 @@
           "hideSeekRulesTitle": "Regeln für Minenfeld – Verstecken & Suchen",
           "hideSeekRulePlace": "Der erste Spieler versteckt auf einem Feld mit 6 × 6 Feldern sechs Minen. Minen dürfen weder waagerecht, senkrecht noch diagonal direkt nebeneinander liegen.",
           "hideSeekRuleSearch": "Der andere Spieler deckt Felder auf. Zahlen zeigen die Minen auf den acht angrenzenden Feldern. Die Suche läuft weiter, bis alle sicheren Felder gefunden wurden.",
-          "hideSeekRuleMistake": "Jede getroffene Mine zählt als Fehler. Der Minenleger kann die Suche live oder später verfolgen.",
+          "hideSeekRuleMistake": "Jede getroffene Mine zählt als Fehler. Werden alle sechs Minen gefunden, bevor alle sicheren Felder geöffnet sind, ist die Suchrunde sofort verloren und kann nicht fortgesetzt werden.",
           "hideSeekRuleSwap": "Danach werden die Rollen getauscht: Der bisherige Sucher versteckt sechs neue Minen und der andere Spieler sucht.",
           "hideSeekRuleWin": "Wer in seiner Suchrunde weniger Minen trifft, gewinnt. Bei gleich vielen Fehlern endet das Spiel unentschieden.",
           "hideSeekPlaceCount": "{{ selected }} von {{ total }} Minen platziert",

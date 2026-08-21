@@ -38,6 +38,16 @@ export class GameFeedbackService {
     if (!this.audioMuted()) void this.playIncorrectSound();
   }
 
+  notifyExplosion(step = 0): void {
+    this.tryVibrate([55, 25, 85]);
+    if (!this.audioMuted()) void this.playExplosionSound(step);
+  }
+
+  notifyDefused(step = 0): void {
+    this.tryVibrate([22, 18, 34]);
+    if (!this.audioMuted()) void this.playDefusedSound(step);
+  }
+
   toggleAudioMuted(): void {
     const muted = !this.audioMuted();
     this.audioMuted.set(muted);
@@ -86,6 +96,24 @@ export class GameFeedbackService {
     const now = context.currentTime;
     this.playTone(context, now, 260, 190, 0.2, 0.045, 'square');
     this.playTone(context, now + 0.13, 210, 145, 0.24, 0.035, 'sawtooth');
+  }
+
+  private async playExplosionSound(step: number): Promise<void> {
+    const context = await this.getReadyAudioContext();
+    if (!context) return;
+    const now = context.currentTime;
+    const variation = Math.min(Math.max(step, 0), 8) * 7;
+    this.playTone(context, now, 150 + variation, 48, 0.32, 0.055, 'sawtooth');
+    this.playTone(context, now + 0.025, 95 + variation, 36, 0.38, 0.045, 'square');
+  }
+
+  private async playDefusedSound(step: number): Promise<void> {
+    const context = await this.getReadyAudioContext();
+    if (!context) return;
+    const now = context.currentTime;
+    const base = 430 + Math.min(Math.max(step, 0), 8) * 28;
+    this.playTone(context, now, base, base + 150, 0.18, 0.03, 'triangle');
+    this.playTone(context, now + 0.075, base + 170, base + 260, 0.16, 0.022, 'sine');
   }
 
   private playTone(

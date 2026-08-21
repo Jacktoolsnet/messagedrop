@@ -14,12 +14,12 @@
         [attr.aria-label]="(isRevealed(index) ? 'common.contact.chatroom.games.minefieldCellRevealedAria' : 'common.contact.chatroom.games.minefieldCellHiddenAria') | transloco:{ cell:index+1 }">
         @if (isRevealed(index)) {
           @if (selectionMode()) { <mat-icon>touch_app</mat-icon> }
-          @else if (isMine(index)) { <mat-icon>emergency</mat-icon> }
+          @else if (isMine(index)) { <span class="minefield-cell__bomb" aria-hidden="true">💣</span> }
           @else { <strong>{{ adjacentMines(index) }}</strong> }
           @if (owner(index); as mark) {
             <span class="minefield-cell__owner" [class.minefield-cell__owner--x]="mark==='X'" [class.minefield-cell__owner--o]="mark==='O'">{{ mark }}</span>
           }
-        } @else { <mat-icon class="minefield-cell__hidden">crop_square</mat-icon> }
+        } @else { <span class="minefield-cell__ground" aria-hidden="true">🟫</span> }
       </button>
     }
   </div>
