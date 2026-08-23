@@ -13,9 +13,16 @@ export function createCheckersGame(x:string,o:string,firstMove:CheckersAction):C
 export function applyCheckersMove(game:CheckersGame,userId:string,action:CheckersAction):CheckersGame|null{
  if(game.status!=='active'||game.nextPlayerUserId!==userId)return null;const mark=markFor(game,userId);if(!mark)return null;
  const legal=legalMoves(game,mark).find(move=>move.from===action.from&&move.to===action.to);if(!legal)return null;
- const board=game.board.map(piece=>piece?{...piece}:null),piece=board[legal.from]!;board[legal.from]=null;if(legal.captured!==null)board[legal.captured]=null;
+ const board=game.board.map(piece=>piece?{...piece}:null),piece=board[legal.from]!;board[legal.from]=null;
+ const capturedPiece=legal.captured!==null&&board[legal.captured]?{...board[legal.captured]!}:null;
+ if(legal.captured!==null)board[legal.captured]=null;
  const row=Math.floor(legal.to/8);if(!piece.king&&((piece.mark==='X'&&row===0)||(piece.mark==='O'&&row===7)))piece.king=true;board[legal.to]=piece;
- const moveNumber=game.moveNumber+1,lastMove={playerUserId:userId,from:legal.from,to:legal.to,captured:legal.captured,moveNumber};
+ const moveNumber=game.moveNumber+1;
+ const continuingTurn=game.forcedPieceIndex!==null&&game.lastMove?.playerUserId===userId;
+ const turnPath=continuingTurn&&game.lastMove?.turnPath?[...game.lastMove.turnPath,legal.to]:[legal.from,legal.to];
+ const capturedPieces=continuingTurn?[...(game.lastMove?.capturedPieces??[])]:[];
+ if(legal.captured!==null&&capturedPiece)capturedPieces.push({index:legal.captured,piece:capturedPiece});
+ const lastMove={playerUserId:userId,from:legal.from,to:legal.to,captured:legal.captured,moveNumber,turnPath,capturedPieces};
  if(legal.captured!==null){const continuations=capturesFor(board,legal.to,piece);if(continuations.length)return{...game,board,forcedPieceIndex:legal.to,moveNumber,lastMove};}
  const opponent:TicTacToeMark=mark==='X'?'O':'X',next=other(game,userId);const probe={...game,board,forcedPieceIndex:null,nextPlayerUserId:next} as CheckersGame;
  const won=!board.some(value=>value?.mark===opponent)||legalMoves(probe,opponent).length===0;

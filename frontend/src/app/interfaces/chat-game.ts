@@ -219,7 +219,13 @@ export interface MorrisGame {
 }
 
 export interface CheckersPiece { mark:TicTacToeMark; king:boolean; }
-export interface CheckersLastMove { playerUserId:string; from:number; to:number; captured:number|null; moveNumber:number; }
+export interface CheckersLastMove {
+  playerUserId:string;from:number;to:number;captured:number|null;moveNumber:number;
+  /** Complete route of the turn; optional for compatibility with existing game messages. */
+  turnPath?:number[];
+  /** Pieces captured during the complete turn, retained for the opponent's preview. */
+  capturedPieces?:{index:number;piece:CheckersPiece}[];
+}
 export interface CheckersGame {
   type:'checkers';version:1;gameId:string;board:(CheckersPiece|null)[];
   playerXUserId:string;playerOUserId:string;nextPlayerUserId:string|null;
