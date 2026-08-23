@@ -32,18 +32,18 @@ button.code-symbol:disabled { cursor:default; opacity:.55; }
 .code-board__verification{display:flex;align-items:center;justify-content:center;gap:.35rem;color:var(--mat-sys-primary);font-size:.78rem;font-weight:700}.code-board__verification--invalid{color:var(--mat-sys-error)}
 @media (max-width:420px) { .code-symbol{width:2rem;height:2rem}.code-symbol mat-icon{font-size:1.2rem;width:1.2rem;height:1.2rem}.code-guess-row{grid-template-columns:1.1rem minmax(0,1fr) auto;padding:.3rem}.code-guess-row__symbols{gap:.2rem} }
 
-/* The code editor is deliberately roomier than the compact in-chat history. */
-.code-board--selection .code-board__composer { gap:1rem; }
-.code-board--selection .code-board__slots,
-.code-board--selection .code-board__palette { gap:.65rem; }
-.code-board--selection .code-symbol {
+/* The interactive code area is deliberately roomier than the compact history. */
+.code-board__composer { gap:1rem; }
+.code-board__composer .code-board__slots,
+.code-board__composer .code-board__palette { gap:.65rem; }
+.code-board__composer .code-symbol {
   width:clamp(3rem, 13vw, 3.5rem);
   height:clamp(3rem, 13vw, 3.5rem);
   border-radius:.9rem;
   touch-action:manipulation;
   -webkit-tap-highlight-color:transparent;
 }
-.code-board--selection .code-symbol mat-icon {
+.code-board__composer .code-symbol mat-icon {
   width:clamp(1.6rem, 7vw, 2rem);
   height:clamp(1.6rem, 7vw, 2rem);
   font-size:clamp(1.6rem, 7vw, 2rem);
