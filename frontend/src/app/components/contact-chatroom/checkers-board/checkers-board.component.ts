@@ -12,6 +12,11 @@ import{ChangeDetectionStrategy,Component,computed,inject,input,output,signal}fro
  }
  isLastMoveCell(i:number):boolean{const move=this.game()?.lastMove;if(!move)return false;return(move.turnPath??[move.from,move.to]).includes(i)||(move.capturedPieces?.some(value=>value.index===i)??move.captured===i)}
  ghostAt(i:number){if(this.lastMoveDismissed())return null;return this.game()?.lastMove?.capturedPieces?.find(value=>value.index===i)?.piece??null}
+ isUnavailableOwnPiece(i:number):boolean{
+  const piece=this.pieceAt(i);if(!piece)return false;
+  if(this.selectionMode())return piece.mark==='X'&&!this.isSelectable(i);
+  const game=this.game(),mark=this.currentMark();return !!game&&game.status==='active'&&game.nextPlayerUserId===this.currentUserId()&&piece.mark===mark&&!this.isSelectable(i);
+ }
  isDark(i:number){return(Math.floor(i/8)+i%8)%2===1}isSelectable(i:number){return this.selectionMode()?this.openingMoves.has(i):this.moves().some(m=>m.from===i)}isDestination(i:number){if(this.selectionMode()){const from=this.selected();return from!==null&&!!this.openingMoves.get(from)?.includes(i)}return this.destinations().has(i)}
  choose(i:number){if(this.disabled())return;if(this.selectionMode()){if(this.openingMoves.has(i)){this.feedback.notifySelection();this.selected.set(i);return}const from=this.selected();if(from!==null&&this.openingMoves.get(from)?.includes(i)){this.feedback.notifySelection();this.action.emit({from,to:i})}return}const g=this.game();if(!g||g.nextPlayerUserId!==this.currentUserId())return;if(this.isSelectable(i)){if(g.lastMove?.playerUserId!==this.currentUserId())this.lastMoveDismissed.set(true);this.feedback.notifySelection();this.selected.set(i);return}const from=this.selected()??g.forcedPieceIndex;if(from!==null&&this.isDestination(i)){this.feedback.notifySelection();this.action.emit({from,to:i});this.selected.set(null)}}
 }

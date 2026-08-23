@@ -35,7 +35,8 @@ export function legalMoves(game:CheckersGame,mark:TicTacToeMark):CheckersLegalMo
 }
 function capturesFor(board:CheckersGame['board'],from:number,piece:CheckersPiece):CheckersLegalMove[]{
  const result:CheckersLegalMove[]=[],row=Math.floor(from/8),col=from%8;
- for(const[dr,dc]of DIAGONALS){if(!piece.king){const mr=row+dr,mc=col+dc,tr=row+2*dr,tc=col+2*dc;if(inside(tr,tc)&&inside(mr,mc)){const middle=mr*8+mc,to=tr*8+tc;if(board[middle]&&board[middle]!.mark!==piece.mark&&!board[to])result.push({from,to,captured:middle})}continue}
+ const directions=piece.king?DIAGONALS:DIAGONALS.filter(([dr])=>dr===(piece.mark==='X'?-1:1));
+ for(const[dr,dc]of directions){if(!piece.king){const mr=row+dr,mc=col+dc,tr=row+2*dr,tc=col+2*dc;if(inside(tr,tc)&&inside(mr,mc)){const middle=mr*8+mc,to=tr*8+tc;if(board[middle]&&board[middle]!.mark!==piece.mark&&!board[to])result.push({from,to,captured:middle})}continue}
   let r=row+dr,c=col+dc,captured:number|null=null;while(inside(r,c)){const index=r*8+c,current=board[index];if(current){if(current.mark===piece.mark||captured!==null)break;captured=index}else if(captured!==null)result.push({from,to:index,captured});r+=dr;c+=dc}
  }
  return result;

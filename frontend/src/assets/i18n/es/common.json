@@ -742,7 +742,7 @@
           "checkersPreviewPrefix": "Damas",
           "checkersRulesTitle": "Reglas de Damas",
           "checkersRuleMove": "Las fichas normales avanzan una casilla en diagonal.",
-          "checkersRuleCapture": "Las fichas rivales se capturan saltando sobre ellas. Capturar es obligatorio y las fichas normales pueden hacerlo en ambas direcciones.",
+          "checkersRuleCapture": "Las fichas rivales se capturan saltando sobre ellas. Capturar es obligatorio; las fichas normales solo pueden capturar hacia delante.",
           "checkersRuleChain": "Si hay otra captura posible, la secuencia debe continuar con la misma ficha.",
           "checkersRuleKing": "Al llegar al extremo opuesto, una ficha se convierte en dama y puede moverse y capturar diagonalmente a cualquier distancia.",
           "checkersRuleWin": "Pierde quien no tenga fichas o movimientos válidos."

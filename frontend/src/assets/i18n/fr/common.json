@@ -742,7 +742,7 @@
           "checkersPreviewPrefix": "Dames",
           "checkersRulesTitle": "Règles des Dames",
           "checkersRuleMove": "Les pions ordinaires avancent d’une case en diagonale.",
-          "checkersRuleCapture": "Les pions adverses sont capturés en sautant par-dessus. La prise est obligatoire et les pions ordinaires peuvent prendre dans les deux directions.",
+          "checkersRuleCapture": "Les pions adverses sont capturés en sautant par-dessus. La prise est obligatoire ; les pions ordinaires ne peuvent prendre que vers l’avant.",
           "checkersRuleChain": "Si une autre prise est possible, la rafle doit continuer avec le même pion.",
           "checkersRuleKing": "Un pion atteignant le bord opposé devient une dame, qui se déplace et capture en diagonale sur toute distance libre.",
           "checkersRuleWin": "Un joueur perd s’il n’a plus de pion ou de coup valide."
