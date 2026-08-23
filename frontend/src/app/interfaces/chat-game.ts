@@ -233,7 +233,27 @@ export interface CheckersGame {
   moveNumber:number;lastMove:CheckersLastMove|null;
 }
 
-export type ChatGame = TicTacToeGame | ConnectFourGame | DotsAndBoxesGame | RockPaperScissorsGame | CodeGame | MemoryGame | MinefieldGame | MinefieldHideSeekGame | MorrisGame | CheckersGame;
+export type AsteroidDirection = 'up' | 'right' | 'down' | 'left';
+export type AsteroidDuelAction = { type:'move'; to:number } | { type:'fire'; direction:AsteroidDirection };
+export interface AsteroidDuelLastMove {
+  playerUserId:string;
+  action:AsteroidDuelAction;
+  from:number;
+  to:number;
+  path:number[];
+  destroyedAsteroid:number|null;
+  hitPlayer:boolean;
+  moveNumber:number;
+}
+export interface AsteroidDuelGame {
+  type:'asteroidDuel';version:1;gameId:string;rows:7;columns:7;
+  asteroids:boolean[];playerXUserId:string;playerOUserId:string;
+  playerXPosition:number;playerOPosition:number;playerXShield:number;playerOShield:number;
+  nextPlayerUserId:string|null;status:'active'|'won';winnerUserId:string|null;
+  moveNumber:number;lastMove:AsteroidDuelLastMove|null;
+}
+
+export type ChatGame = TicTacToeGame | ConnectFourGame | DotsAndBoxesGame | RockPaperScissorsGame | CodeGame | MemoryGame | MinefieldGame | MinefieldHideSeekGame | MorrisGame | CheckersGame | AsteroidDuelGame;
 
 export interface GameStats {
   played: number;

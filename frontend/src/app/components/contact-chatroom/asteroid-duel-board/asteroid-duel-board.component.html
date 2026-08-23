@@ -1,0 +1,26 @@
+@if(game();as currentGame){
+<div class="asteroid-hud" aria-label="Shield status">
+  <span class="asteroid-hud__pilot asteroid-hud__pilot--x"><b>X</b><span class="asteroid-hud__shield">{{'♥'.repeat(currentGame.playerXShield)}}{{'♡'.repeat(3-currentGame.playerXShield)}}</span></span>
+  <mat-icon>shield</mat-icon>
+  <span class="asteroid-hud__pilot asteroid-hud__pilot--o"><span class="asteroid-hud__shield">{{'♥'.repeat(currentGame.playerOShield)}}{{'♡'.repeat(3-currentGame.playerOShield)}}</span><b>O</b></span>
+</div>
+<div class="asteroid-board">
+  @for(index of displayedCells();track index){
+  <button type="button" class="asteroid-cell" [class.asteroid-cell--destination]="destinations().has(index)"
+    [class.asteroid-cell--laser]="isLaserPath(index)" [class.asteroid-cell--last]="isLastPosition(index)"
+    [disabled]="!canAct()||!destinations().has(index)" (click)="move(index)"
+    (pointerenter)="destinations().has(index)&&feedback.notifyHover()">
+    @if(currentGame.asteroids[index]){<span class="asteroid-rock" aria-hidden="true">☄</span>}
+    @if(shipAt(index);as mark){<span class="asteroid-ship" [class.asteroid-ship--x]="mark==='X'" [class.asteroid-ship--o]="mark==='O'"><mat-icon>rocket_launch</mat-icon><b>{{mark}}</b></span>}
+  </button>
+  }
+</div>
+<div class="asteroid-fire-controls">
+  <span class="asteroid-fire-controls__label"><mat-icon>flare</mat-icon>{{'common.contact.chatroom.games.asteroidFire'|transloco}}</span>
+  <button type="button" [disabled]="!canAct()" (click)="fire('left')" [attr.aria-label]="'common.contact.chatroom.games.asteroidFireLeft'|transloco"><mat-icon>west</mat-icon></button>
+  <button type="button" [disabled]="!canAct()" (click)="fire('up')" [attr.aria-label]="'common.contact.chatroom.games.asteroidFireUp'|transloco"><mat-icon>north</mat-icon></button>
+  <button type="button" [disabled]="!canAct()" (click)="fire('down')" [attr.aria-label]="'common.contact.chatroom.games.asteroidFireDown'|transloco"><mat-icon>south</mat-icon></button>
+  <button type="button" [disabled]="!canAct()" (click)="fire('right')" [attr.aria-label]="'common.contact.chatroom.games.asteroidFireRight'|transloco"><mat-icon>east</mat-icon></button>
+</div>
+<p class="asteroid-hint">{{'common.contact.chatroom.games.asteroidBoardHint'|transloco}}</p>
+}

@@ -1,0 +1,9 @@
+<app-dialog-header icon="rocket_launch" [title]="'common.contact.chatroom.games.newAsteroidDuelTitle'|transloco"></app-dialog-header>
+<mat-dialog-content class="new-game-content">
+  <p>{{'common.contact.chatroom.games.chooseFirstAsteroidAction'|transloco}}</p>
+  <app-asteroid-duel-board [game]="preview()" currentUserId="sender" (action)="select($event)"></app-asteroid-duel-board>
+</mat-dialog-content>
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-icon-button class="action-close" type="button" (click)="close()"><mat-icon>close</mat-icon></button>
+  <button mat-icon-button type="button" (click)="shuffle()" [attr.aria-label]="'common.contact.chatroom.games.asteroidShuffleAria'|transloco"><mat-icon>shuffle</mat-icon></button>
+</mat-dialog-actions>

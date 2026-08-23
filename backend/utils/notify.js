@@ -126,7 +126,7 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
                         const notificationBody = notificationType === 'game_move'
                             ? `@${contactName} hat den nächsten Zug gemacht.`
                             : notificationType === 'game_started'
-                                ? `@${contactName} hat ein Tic-Tac-Toe-Spiel gestartet.`
+                                ? `@${contactName} hat ein Spiel gestartet.`
                                 : message;
                         const payload = {
                             "notification": {

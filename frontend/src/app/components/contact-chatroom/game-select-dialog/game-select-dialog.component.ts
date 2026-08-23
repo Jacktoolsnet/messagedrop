@@ -7,7 +7,7 @@ import { ConnectFourVariant, GameStats, TicTacToeStats, TicTacToeVariant } from 
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
 import { GameRulesDialogComponent } from '../game-rules-dialog/game-rules-dialog.component';
 
-export type ChatGameType = 'ticTacToe' | 'ticTacToeVanishing' | 'connectFour' | 'connectFourVanishing' | 'dotsAndBoxes' | 'rockPaperScissors' | 'code' | 'memory' | 'minefield' | 'minefieldHideSeek'|'morris'|'checkers';
+export type ChatGameType = 'ticTacToe' | 'ticTacToeVanishing' | 'connectFour' | 'connectFourVanishing' | 'dotsAndBoxes' | 'rockPaperScissors' | 'code' | 'memory' | 'minefield' | 'minefieldHideSeek'|'morris'|'checkers'|'asteroidDuel';
 
 interface GameSelectDialogData {
   ticTacToeStats: TicTacToeStats;
@@ -22,6 +22,7 @@ interface GameSelectDialogData {
   minefieldHideSeekStats: GameStats;
   morrisStats:GameStats;
   checkersStats:GameStats;
+  asteroidDuelStats:GameStats;
 }
 
 @Component({
@@ -126,4 +127,5 @@ export class GameSelectDialogComponent {
   }
   openMorrisRules():void{this.dialog.open(GameRulesDialogComponent,{data:{gameType:'morris',variant:'standard'},width:'min(440px,94vw)',maxWidth:'94vw',maxHeight:'85vh',hasBackdrop:true,backdropClass:'dialog-backdrop',autoFocus:false})}
   openCheckersRules():void{this.dialog.open(GameRulesDialogComponent,{data:{gameType:'checkers',variant:'standard'},width:'min(440px,94vw)',maxWidth:'94vw',maxHeight:'85vh',hasBackdrop:true,backdropClass:'dialog-backdrop',autoFocus:false})}
+  openAsteroidDuelRules():void{this.dialog.open(GameRulesDialogComponent,{data:{gameType:'asteroidDuel',variant:'standard'},width:'min(440px,94vw)',maxWidth:'94vw',maxHeight:'85vh',hasBackdrop:true,backdropClass:'dialog-backdrop',autoFocus:false})}
 }

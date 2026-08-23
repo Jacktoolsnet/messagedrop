@@ -12,6 +12,8 @@ import { firstValueFrom } from 'rxjs';
 import { Contact } from '../../interfaces/contact';
 import {
   ChatGame,
+  AsteroidDuelAction,
+  AsteroidDuelGame,
   CheckersGame,
   CodeGame,
   CodeSymbol,
@@ -88,6 +90,8 @@ import { MorrisBoardComponent } from './morris-board/morris-board.component';
 import { NewMorrisDialogComponent } from './new-morris-dialog/new-morris-dialog.component';
 import { CheckersBoardComponent } from './checkers-board/checkers-board.component';
 import { NewCheckersDialogComponent } from './new-checkers-dialog/new-checkers-dialog.component';
+import { AsteroidDuelBoardComponent } from './asteroid-duel-board/asteroid-duel-board.component';
+import { NewAsteroidDuelDialogComponent, NewAsteroidDuelDialogResult } from './new-asteroid-duel-dialog/new-asteroid-duel-dialog.component';
 import { DeleteContactMessageComponent } from './delete-contact-message/delete-contact-message.component';
 import { DisplayMessageService } from '../../services/display-message.service';
 import { ProtectedStickerImageComponent } from '../utils/protected-sticker-image/protected-sticker-image.component';
@@ -106,6 +110,7 @@ import { applyMinefieldMove, createMinefieldGame } from '../../utils/minefield-g
 import { applyHideSeekSearch, applySecondMinePlacement, createMinefieldHideSeekGame, currentHideSeekRound } from '../../utils/minefield-hide-seek';
 import { applyMorrisAction, createMorrisGame, MorrisAction } from '../../utils/morris-game';
 import { applyCheckersMove, CheckersAction, createCheckersGame } from '../../utils/checkers-game';
+import { applyAsteroidDuelAction, createAsteroidDuelGame } from '../../utils/asteroid-duel-game';
 
 interface ChatroomMessage {
   id: string;
@@ -158,6 +163,7 @@ interface ContactChatroomDialogData {
     MinefieldHideSeekBoardComponent,
     MorrisBoardComponent,
     CheckersBoardComponent,
+    AsteroidDuelBoardComponent,
     TranslocoPipe
   ],
   templateUrl: './contact-chatroom.component.html',
@@ -558,7 +564,7 @@ export class ContactChatroomComponent implements AfterViewInit {
         memoryStats: this.getMemoryStats(),
         minefieldStats: this.getMinefieldStats(),
         minefieldHideSeekStats: this.getMinefieldHideSeekStats()
-        ,morrisStats:this.getMorrisStats(),checkersStats:this.getCheckersStats()
+        ,morrisStats:this.getMorrisStats(),checkersStats:this.getCheckersStats(),asteroidDuelStats:this.getAsteroidDuelStats()
       },
       width: 'min(760px, 94vw)',
       maxWidth: '94vw',
@@ -594,6 +600,8 @@ export class ContactChatroomComponent implements AfterViewInit {
         this.openNewMorrisDialog(contact);
       }else if(gameType==='checkers'){
         this.openNewCheckersDialog(contact);
+      }else if(gameType==='asteroidDuel'){
+        this.openNewAsteroidDuelDialog(contact);
       }
     });
   }
@@ -720,6 +728,7 @@ export class ContactChatroomComponent implements AfterViewInit {
     ref.afterClosed().subscribe((position?:number)=>{if(!Number.isInteger(position))return;const payload=this.createEmptyMessage();payload.game=createMorrisGame(contact.userId,contact.contactUserId,position!);void this.sendAsNewMessage(contact,payload,revisionOfMessageId,'game_started')});
   }
   private openNewCheckersDialog(contact:Contact,revisionOfMessageId?:string):void{const ref=this.matDialog.open(NewCheckersDialogComponent,{width:'min(500px,96vw)',maxWidth:'96vw',maxHeight:'90vh',hasBackdrop:true,backdropClass:'dialog-backdrop',autoFocus:false});ref.afterClosed().subscribe((move?:CheckersAction)=>{if(!move)return;const payload=this.createEmptyMessage();payload.game=createCheckersGame(contact.userId,contact.contactUserId,move);void this.sendAsNewMessage(contact,payload,revisionOfMessageId,'game_started')})}
+  private openNewAsteroidDuelDialog(contact:Contact,revisionOfMessageId?:string):void{const ref=this.matDialog.open(NewAsteroidDuelDialogComponent,{width:'min(520px,96vw)',maxWidth:'96vw',maxHeight:'90vh',hasBackdrop:true,backdropClass:'dialog-backdrop',autoFocus:false});ref.afterClosed().subscribe((result?:NewAsteroidDuelDialogResult)=>{if(!result)return;try{const payload=this.createEmptyMessage();payload.game=createAsteroidDuelGame(contact.userId,contact.contactUserId,result.asteroids,result.action);void this.sendAsNewMessage(contact,payload,revisionOfMessageId,'game_started')}catch{this.snackBar.open(this.translation.t('common.contact.chatroom.games.asteroidStartFailed'),'',{duration:3000})}})}
 
   private async startCodeGame(contact: Contact, code: CodeSymbol[], revisionOfMessageId?:string): Promise<void> {
     try {
@@ -778,6 +787,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getChatGameIcon(game: ChatGame): string {
+    if(game.type==='asteroidDuel')return'rocket_launch';
     if(game.type==='checkers')return'grid_view';
     if(game.type==='morris')return'hub';
     if (game.type === 'minefieldHideSeek') return 'radar';
@@ -790,7 +800,9 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getChatGameTitle(game: ChatGame): string {
-    const key = game.type === 'checkers'
+    const key = game.type === 'asteroidDuel'
+      ? 'common.contact.chatroom.games.asteroidDuel'
+      : game.type === 'checkers'
       ? 'common.contact.chatroom.games.checkers'
       : game.type === 'morris'
       ? 'common.contact.chatroom.games.morris'
@@ -813,6 +825,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getChatGameVariantLabel(game: ChatGame): string {
+    if(game.type==='asteroidDuel')return this.translation.t('common.contact.chatroom.games.standardVariant');
     if(game.type==='checkers')return this.translation.t('common.contact.chatroom.games.standardVariant');
     if(game.type==='morris')return this.translation.t('common.contact.chatroom.games.standardVariant');
     if (game.type === 'minefieldHideSeek') return this.translation.t('common.contact.chatroom.games.hideSeekVariant');
@@ -854,6 +867,7 @@ export class ContactChatroomComponent implements AfterViewInit {
       const id=this.userService.getUser().id;return game.playerXUserId===id?'X':game.playerOUserId===id?'O':null;
     }
     if(game.type==='checkers'){const id=this.userService.getUser().id;return game.playerXUserId===id?'X':game.playerOUserId===id?'O':null}
+    if(game.type==='asteroidDuel'){const id=this.userService.getUser().id;return game.playerXUserId===id?'X':game.playerOUserId===id?'O':null}
     if (game.type === 'minefield') {
       const currentUserId = this.userService.getUser().id;
       return game.playerXUserId === currentUserId ? 'X' : game.playerOUserId === currentUserId ? 'O' : null;
@@ -868,7 +882,7 @@ export class ContactChatroomComponent implements AfterViewInit {
     this.matDialog.open(GameRulesDialogComponent, {
       data: {
         gameType: game.type,
-        variant: game.type === 'dotsAndBoxes' || game.type === 'rockPaperScissors' || game.type === 'code' || game.type === 'memory' || game.type === 'minefield' || game.type === 'minefieldHideSeek'||game.type==='morris'||game.type==='checkers' ? 'standard' : game.variant ?? 'standard'
+        variant: game.type === 'dotsAndBoxes' || game.type === 'rockPaperScissors' || game.type === 'code' || game.type === 'memory' || game.type === 'minefield' || game.type === 'minefieldHideSeek'||game.type==='morris'||game.type==='checkers'||game.type==='asteroidDuel' ? 'standard' : game.variant ?? 'standard'
       },
       width: 'min(440px, 94vw)',
       maxWidth: '94vw',
@@ -901,6 +915,8 @@ export class ContactChatroomComponent implements AfterViewInit {
       this.openNewMorrisDialog(contact,message.messageId);
     }else if(game.type==='checkers'){
       this.openNewCheckersDialog(contact,message.messageId);
+    }else if(game.type==='asteroidDuel'){
+      this.openNewAsteroidDuelDialog(contact,message.messageId);
     } else {
       this.openNewCodeDialog(contact, message.messageId);
     }
@@ -918,6 +934,8 @@ export class ContactChatroomComponent implements AfterViewInit {
   async playMorris(message:ChatroomMessage,action:MorrisAction):Promise<void>{const contact=this.contact(),g=message.payload?.game;if(!contact||!g||g.type!=='morris'||!this.canPlayMorris(message))return;const next=applyMorrisAction(g,this.userService.getUser().id,action);if(!next)return;this.setGameMoveInFlight(g.gameId,true);try{const payload=this.createEmptyMessage();payload.game=next;await this.sendAsNewMessage(contact,payload,message.messageId,'game_move')}finally{this.setGameMoveInFlight(g.gameId,false)}}
   canPlayCheckers(message:ChatroomMessage):boolean{const g=message.payload?.game;return !!g&&g.type==='checkers'&&g.status==='active'&&g.nextPlayerUserId===this.userService.getUser().id&&!this.gameMovesInFlight().has(g.gameId)}
   async playCheckers(message:ChatroomMessage,action:CheckersAction):Promise<void>{const contact=this.contact(),g=message.payload?.game;if(!contact||!g||g.type!=='checkers'||!this.canPlayCheckers(message))return;const next=applyCheckersMove(g,this.userService.getUser().id,action);if(!next)return;this.setGameMoveInFlight(g.gameId,true);try{const payload=this.createEmptyMessage();payload.game=next;await this.sendAsNewMessage(contact,payload,message.messageId,'game_move')}finally{this.setGameMoveInFlight(g.gameId,false)}}
+  canPlayAsteroidDuel(message:ChatroomMessage):boolean{const g=message.payload?.game;return !!g&&g.type==='asteroidDuel'&&g.status==='active'&&g.nextPlayerUserId===this.userService.getUser().id&&!this.gameMovesInFlight().has(g.gameId)}
+  async playAsteroidDuel(message:ChatroomMessage,action:AsteroidDuelAction):Promise<void>{const contact=this.contact(),g=message.payload?.game;if(!contact||!g||g.type!=='asteroidDuel'||!this.canPlayAsteroidDuel(message))return;const next=applyAsteroidDuelAction(g,this.userService.getUser().id,action);if(!next)return;this.setGameMoveInFlight(g.gameId,true);try{if(next.lastMove?.hitPlayer)this.gameFeedback.notifyCorrect();else if(next.lastMove?.destroyedAsteroid!==null)this.gameFeedback.notifyExplosion();const payload=this.createEmptyMessage();payload.game=next;await this.sendAsNewMessage(contact,payload,message.messageId,'game_move')}finally{this.setGameMoveInFlight(g.gameId,false)}}
 
   canPlayCode(message: ChatroomMessage): boolean {
     const game = message.payload?.game;
@@ -1396,6 +1414,7 @@ export class ContactChatroomComponent implements AfterViewInit {
     for(const game of latest.values()){if(game.status==='draw')stats.drawn++;else if(game.status==='won'&&game.winnerUserId===current)stats.won++;else if(game.status==='won')stats.lost++}return stats;
   }
   private getCheckersStats():GameStats{const current=this.userService.getUser().id,latest=new Map<string,CheckersGame>();for(const message of this.messages()){const game=message.payload?.game;if(game?.type==='checkers'&&!latest.has(game.gameId))latest.set(game.gameId,game)}const stats:GameStats={played:latest.size,won:0,lost:0,drawn:0};for(const game of latest.values()){if(game.status==='draw')stats.drawn++;else if(game.status==='won'&&game.winnerUserId===current)stats.won++;else if(game.status==='won')stats.lost++}return stats}
+  private getAsteroidDuelStats():GameStats{const current=this.userService.getUser().id,latest=new Map<string,AsteroidDuelGame>();for(const message of this.messages()){const game=message.payload?.game;if(game?.type==='asteroidDuel'&&!latest.has(game.gameId))latest.set(game.gameId,game)}const stats:GameStats={played:latest.size,won:0,lost:0,drawn:0};for(const game of latest.values()){if(game.status==='won'&&game.winnerUserId===current)stats.won++;else if(game.status==='won')stats.lost++}return stats}
 
   openExperienceSearch(message?: ChatroomMessage): void {
     if (!this.externalContentConsent.isEnabled('viator')) {
