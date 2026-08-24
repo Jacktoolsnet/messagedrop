@@ -855,9 +855,9 @@
           "confirm": "This message will be permanently deleted. Are you sure?"
         },
         "decisions": {
-          "selectTitle": "Decision helper",
-          "categoryTitle": "Decision helper",
-          "addAria": "Add decision helper",
+          "selectTitle": "Randomizer",
+          "categoryTitle": "Randomizer",
+          "addAria": "Add randomizer",
           "coinToss": "Coin Toss",
           "coinTossDescription": "Enter two choices and let your contact decide.",
           "startCoinTossAria": "Create coin toss",
@@ -875,7 +875,21 @@
           "rulesTitle": "Coin Toss – How it works",
           "ruleCreate": "The creator enters two possible choices.",
           "ruleToss": "The recipient tosses the coin exactly once. A cryptographically secure random generator determines the result.",
-          "ruleResult": "The animation plays on both devices. The stored result cannot be changed afterwards."
+          "ruleResult": "The animation plays on both devices. The stored result cannot be changed afterwards.",
+          "diceRoll": "Dice",
+          "diceRollDescription": "Choose up to ten dice. The two chat participants then take turns rolling.",
+          "startDiceRollAria": "Create dice roll",
+          "newDiceRollTitle": "Create dice roll",
+          "diceCount": "Number of dice",
+          "diceCountHint": "1 to 10 dice",
+          "createDiceRoll": "Create",
+          "rollDice": "Roll dice",
+          "diceTotal": "Total: {{ total }}",
+          "diceStartFailed": "The dice roll could not be created.",
+          "diceRulesTitle": "Dice – How it works",
+          "diceRuleCreate": "The creator chooses how many dice to use, from one to ten.",
+          "diceRuleTurns": "The recipient rolls first. The two chat participants then alternate.",
+          "diceRuleResult": "Each roll uses a cryptographically secure random generator and is displayed with its total."
         }
       },
       "message": {

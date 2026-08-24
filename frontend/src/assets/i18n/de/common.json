@@ -855,9 +855,9 @@
           "confirm": "Diese Nachricht wird dauerhaft gelöscht. Bist du sicher?"
         },
         "decisions": {
-          "selectTitle": "Entscheidungshilfe",
-          "categoryTitle": "Entscheidungshilfe",
-          "addAria": "Entscheidungshilfe hinzufügen",
+          "selectTitle": "Zufallshelfer",
+          "categoryTitle": "Zufallshelfer",
+          "addAria": "Zufallshelfer hinzufügen",
           "coinToss": "Münzwurf",
           "coinTossDescription": "Zwei Möglichkeiten eintragen und den Kontakt entscheiden lassen.",
           "startCoinTossAria": "Münzwurf erstellen",
@@ -875,7 +875,21 @@
           "rulesTitle": "Münzwurf – Erklärung",
           "ruleCreate": "Der Ersteller trägt zwei mögliche Entscheidungen ein.",
           "ruleToss": "Der Empfänger wirft die Münze genau einmal. Das Ergebnis wird mit einem kryptografisch sicheren Zufallsgenerator bestimmt.",
-          "ruleResult": "Die Animation läuft auf beiden Geräten. Das gespeicherte Ergebnis kann anschließend nicht verändert werden."
+          "ruleResult": "Die Animation läuft auf beiden Geräten. Das gespeicherte Ergebnis kann anschließend nicht verändert werden.",
+          "diceRoll": "Würfeln",
+          "diceRollDescription": "Lege bis zu zehn Würfel fest. Danach würfeln beide Chatteilnehmer immer abwechselnd.",
+          "startDiceRollAria": "Würfeln erstellen",
+          "newDiceRollTitle": "Würfeln erstellen",
+          "diceCount": "Anzahl der Würfel",
+          "diceCountHint": "1 bis 10 Würfel",
+          "createDiceRoll": "Erstellen",
+          "rollDice": "Würfeln",
+          "diceTotal": "Summe: {{ total }}",
+          "diceStartFailed": "Das Würfeln konnte nicht erstellt werden.",
+          "diceRulesTitle": "Würfeln – Erklärung",
+          "diceRuleCreate": "Der Ersteller legt fest, mit wie vielen Würfeln gewürfelt wird – von einem bis zehn.",
+          "diceRuleTurns": "Der Empfänger beginnt. Danach würfeln beide Chatteilnehmer immer abwechselnd.",
+          "diceRuleResult": "Jeder Wurf wird mit einem kryptografisch sicheren Zufallsgenerator bestimmt und samt Summe angezeigt."
         }
       },
       "message": {

@@ -854,9 +854,9 @@
           "confirm": "Ce message sera supprimé définitivement. Êtes-vous sûr ?"
         },
         "decisions": {
-          "selectTitle": "Aide à la décision",
-          "categoryTitle": "Aide à la décision",
-          "addAria": "Ajouter une aide à la décision",
+          "selectTitle": "Générateur aléatoire",
+          "categoryTitle": "Générateur aléatoire",
+          "addAria": "Ajouter un générateur aléatoire",
           "coinToss": "Pile ou face",
           "coinTossDescription": "Saisissez deux choix et laissez votre contact décider.",
           "startCoinTossAria": "Créer un pile ou face",
@@ -874,7 +874,21 @@
           "rulesTitle": "Pile ou face – Explication",
           "ruleCreate": "Le créateur saisit deux choix possibles.",
           "ruleToss": "Le destinataire lance la pièce une seule fois. Un générateur aléatoire cryptographiquement sûr détermine le résultat.",
-          "ruleResult": "L’animation se joue sur les deux appareils. Le résultat enregistré ne peut ensuite plus être modifié."
+          "ruleResult": "L’animation se joue sur les deux appareils. Le résultat enregistré ne peut ensuite plus être modifié.",
+          "diceRoll": "Dés",
+          "diceRollDescription": "Choisissez jusqu’à dix dés. Les deux participants lancent ensuite les dés à tour de rôle.",
+          "startDiceRollAria": "Créer un lancer de dés",
+          "newDiceRollTitle": "Créer un lancer de dés",
+          "diceCount": "Nombre de dés",
+          "diceCountHint": "De 1 à 10 dés",
+          "createDiceRoll": "Créer",
+          "rollDice": "Lancer les dés",
+          "diceTotal": "Total : {{ total }}",
+          "diceStartFailed": "Le lancer de dés n’a pas pu être créé.",
+          "diceRulesTitle": "Dés – Explication",
+          "diceRuleCreate": "Le créateur choisit entre un et dix dés.",
+          "diceRuleTurns": "Le destinataire commence. Ensuite, les deux participants jouent à tour de rôle.",
+          "diceRuleResult": "Chaque lancer utilise un générateur aléatoire cryptographiquement sûr et affiche la somme."
         }
       },
       "message": {

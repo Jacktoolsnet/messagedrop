@@ -1,0 +1,21 @@
+@if (game(); as game) {
+  <section class="dice-board">
+    <div class="dice-grid" [class.dice-grid--rolling]="animating()">
+      @for (value of displayDice(); track $index) {
+        <span class="die" [style.--die-index]="$index" aria-hidden="true">{{ glyph(value) }}</span>
+      }
+    </div>
+    @if (game.lastRoll.length && !animating()) {
+      <div class="dice-total">
+        <mat-icon>functions</mat-icon>
+        {{ 'common.contact.chatroom.decisions.diceTotal' | transloco: { total: total() } }}
+      </div>
+    }
+    @if (!disabled()) {
+      <button mat-fab extended color="primary" type="button" (click)="requestRoll()">
+        <mat-icon>casino</mat-icon>
+        {{ 'common.contact.chatroom.decisions.rollDice' | transloco }}
+      </button>
+    }
+  </section>
+}

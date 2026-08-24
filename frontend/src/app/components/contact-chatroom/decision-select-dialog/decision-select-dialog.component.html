@@ -23,7 +23,7 @@
           mat-mini-fab
           color="primary"
           type="button"
-          (click)="select()"
+          (click)="select('coinToss')"
           [attr.aria-label]="'common.contact.chatroom.decisions.startCoinTossAria' | transloco"
         >
           <mat-icon>play_arrow</mat-icon>
@@ -31,9 +31,27 @@
         <button
           mat-mini-fab
           type="button"
-          (click)="openHelp()"
+          (click)="openHelp('coinToss')"
           [attr.aria-label]="'common.contact.chatroom.games.rulesAria' | transloco"
         >
+          <mat-icon>help</mat-icon>
+        </button>
+      </div>
+    </article>
+    <article class="decision-tile">
+      <div class="decision-avatar-box">
+        <span class="decision-avatar-box__avatar" aria-hidden="true"><mat-icon>casino</mat-icon></span>
+        <span class="decision-avatar-box__text">
+          <span class="decision-avatar-box__title">{{ 'common.contact.chatroom.decisions.diceRoll' | transloco }}</span>
+        </span>
+      </div>
+      <div class="decision-tile__actions">
+        <button mat-mini-fab color="primary" type="button" (click)="select('diceRoll')"
+          [attr.aria-label]="'common.contact.chatroom.decisions.startDiceRollAria' | transloco">
+          <mat-icon>play_arrow</mat-icon>
+        </button>
+        <button mat-mini-fab type="button" (click)="openHelp('diceRoll')"
+          [attr.aria-label]="'common.contact.chatroom.games.rulesAria' | transloco">
           <mat-icon>help</mat-icon>
         </button>
       </div>

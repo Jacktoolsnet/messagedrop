@@ -1,0 +1,19 @@
+<app-dialog-header icon="casino" [title]="'common.contact.chatroom.decisions.newDiceRollTitle' | transloco"></app-dialog-header>
+
+<mat-dialog-content>
+  <p>{{ 'common.contact.chatroom.decisions.diceRollDescription' | transloco }}</p>
+  <mat-form-field appearance="outline">
+    <mat-label>{{ 'common.contact.chatroom.decisions.diceCount' | transloco }}</mat-label>
+    <input matInput type="number" min="1" max="10" step="1" required
+      [ngModel]="diceCount()" (ngModelChange)="updateDiceCount($event)">
+    <mat-hint>{{ 'common.contact.chatroom.decisions.diceCountHint' | transloco }}</mat-hint>
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-icon-button type="button" (click)="close()"><mat-icon>close</mat-icon></button>
+  <button mat-fab extended color="primary" type="button" [disabled]="diceCount() < 1 || diceCount() > 10 || diceCount() % 1 !== 0" (click)="submit()">
+    <mat-icon>send</mat-icon>
+    {{ 'common.contact.chatroom.decisions.createDiceRoll' | transloco }}
+  </button>
+</mat-dialog-actions>

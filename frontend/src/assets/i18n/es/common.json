@@ -854,9 +854,9 @@
           "confirm": "Este mensaje se eliminará permanentemente. ¿Estás seguro?"
         },
         "decisions": {
-          "selectTitle": "Ayuda para decidir",
-          "categoryTitle": "Ayuda para decidir",
-          "addAria": "Añadir ayuda para decidir",
+          "selectTitle": "Generador aleatorio",
+          "categoryTitle": "Generador aleatorio",
+          "addAria": "Añadir generador aleatorio",
           "coinToss": "Lanzamiento de moneda",
           "coinTossDescription": "Introduce dos opciones y deja que tu contacto decida.",
           "startCoinTossAria": "Crear lanzamiento de moneda",
@@ -874,7 +874,21 @@
           "rulesTitle": "Lanzamiento de moneda – Explicación",
           "ruleCreate": "El creador introduce dos opciones posibles.",
           "ruleToss": "El destinatario lanza la moneda una sola vez. Un generador aleatorio criptográficamente seguro determina el resultado.",
-          "ruleResult": "La animación se reproduce en ambos dispositivos. El resultado guardado no puede modificarse."
+          "ruleResult": "La animación se reproduce en ambos dispositivos. El resultado guardado no puede modificarse.",
+          "diceRoll": "Dados",
+          "diceRollDescription": "Elige hasta diez dados. Después, los dos participantes del chat tiran por turnos.",
+          "startDiceRollAria": "Crear tirada de dados",
+          "newDiceRollTitle": "Crear tirada de dados",
+          "diceCount": "Número de dados",
+          "diceCountHint": "De 1 a 10 dados",
+          "createDiceRoll": "Crear",
+          "rollDice": "Tirar los dados",
+          "diceTotal": "Total: {{ total }}",
+          "diceStartFailed": "No se pudo crear la tirada de dados.",
+          "diceRulesTitle": "Dados – Cómo funciona",
+          "diceRuleCreate": "La persona que crea la tirada elige entre uno y diez dados.",
+          "diceRuleTurns": "El destinatario tira primero. Después, ambos participantes se alternan.",
+          "diceRuleResult": "Cada tirada usa un generador aleatorio criptográficamente seguro y muestra la suma."
         }
       },
       "message": {

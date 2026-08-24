@@ -243,6 +243,9 @@
             } @else if (game.type === 'coinToss') {
             <app-coin-toss-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canTossCoin(msg)"
               (toss)="tossCoin(msg)"></app-coin-toss-board>
+            } @else if (game.type === 'diceRoll') {
+            <app-dice-roll-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canRollDice(msg)"
+              (roll)="rollDiceForMessage(msg)"></app-dice-roll-board>
             } @else if (game.type === 'asteroidDuel') {
             <app-asteroid-duel-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayAsteroidDuel(msg)"
               [animateHit]="shouldAnimateAsteroidHit(game)" (action)="playAsteroidDuel(msg, $event)"></app-asteroid-duel-board>
@@ -526,6 +529,9 @@
             } @else if (game.type === 'coinToss') {
             <app-coin-toss-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canTossCoin(msg)"
               (toss)="tossCoin(msg)"></app-coin-toss-board>
+            } @else if (game.type === 'diceRoll') {
+            <app-dice-roll-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canRollDice(msg)"
+              (roll)="rollDiceForMessage(msg)"></app-dice-roll-board>
             } @else if (game.type === 'asteroidDuel') {
             <app-asteroid-duel-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayAsteroidDuel(msg)"
               [animateHit]="shouldAnimateAsteroidHit(game)" (action)="playAsteroidDuel(msg, $event)"></app-asteroid-duel-board>

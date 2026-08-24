@@ -297,7 +297,22 @@ export interface CoinTossGame{
   status:'active'|'decided';winnerUserId:null;moveNumber:number;
 }
 
-export type ChatGame = TicTacToeGame | ConnectFourGame | DotsAndBoxesGame | RockPaperScissorsGame | CodeGame | MemoryGame | MinefieldGame | MinefieldHideSeekGame | MorrisGame | CheckersGame | AsteroidDuelGame | TreasureMapGame | WordRescueGame | CoinTossGame;
+export interface DiceRollGame {
+  type: 'diceRoll';
+  version: 1;
+  gameId: string;
+  playerXUserId: string;
+  playerOUserId: string;
+  diceCount: number;
+  lastRoll: number[];
+  lastRollUserId: string | null;
+  nextPlayerUserId: string;
+  status: 'active';
+  winnerUserId: null;
+  moveNumber: number;
+}
+
+export type ChatGame = TicTacToeGame | ConnectFourGame | DotsAndBoxesGame | RockPaperScissorsGame | CodeGame | MemoryGame | MinefieldGame | MinefieldHideSeekGame | MorrisGame | CheckersGame | AsteroidDuelGame | TreasureMapGame | WordRescueGame | CoinTossGame | DiceRollGame;
 
 export interface GameStats {
   played: number;
