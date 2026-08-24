@@ -336,6 +336,13 @@
                 <mat-icon>{{ gameFeedback.arcadeMusicMuted() ? 'music_off' : 'music_note' }}</mat-icon>
               </button>
               }
+              @if (actionGame.type === 'treasureMap') {
+              <button mat-mini-fab color="primary"
+                [attr.aria-label]="(gameFeedback.treasureMusicMuted() ? 'common.contact.chatroom.games.unmuteTreasureMusicAria' : 'common.contact.chatroom.games.muteTreasureMusicAria') | transloco"
+                (click)="gameFeedback.toggleTreasureMusicMuted()">
+                <mat-icon>{{ gameFeedback.treasureMusicMuted() ? 'music_off' : 'music_note' }}</mat-icon>
+              </button>
+              }
               <button mat-mini-fab color="primary"
                 [attr.aria-label]="(gameFeedback.audioMuted() ? 'common.contact.chatroom.games.unmuteAria' : 'common.contact.chatroom.games.muteAria') | transloco"
                 (click)="gameFeedback.toggleAudioMuted()">
@@ -599,6 +606,13 @@
                 [attr.aria-label]="(gameFeedback.arcadeMusicMuted() ? 'common.contact.chatroom.games.unmuteArcadeMusicAria' : 'common.contact.chatroom.games.muteArcadeMusicAria') | transloco"
                 (click)="gameFeedback.toggleArcadeMusicMuted()">
                 <mat-icon>{{ gameFeedback.arcadeMusicMuted() ? 'music_off' : 'music_note' }}</mat-icon>
+              </button>
+              }
+              @if (actionGame.type === 'treasureMap') {
+              <button mat-mini-fab color="primary"
+                [attr.aria-label]="(gameFeedback.treasureMusicMuted() ? 'common.contact.chatroom.games.unmuteTreasureMusicAria' : 'common.contact.chatroom.games.muteTreasureMusicAria') | transloco"
+                (click)="gameFeedback.toggleTreasureMusicMuted()">
+                <mat-icon>{{ gameFeedback.treasureMusicMuted() ? 'music_off' : 'music_note' }}</mat-icon>
               </button>
               }
               <button mat-mini-fab color="primary"

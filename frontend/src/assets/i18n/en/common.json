@@ -768,6 +768,8 @@
           "asteroidDuelPreviewPrefix": "Asteroid Duel",
           "muteArcadeMusicAria": "Mute arcade music",
           "unmuteArcadeMusicAria": "Turn on arcade music",
+          "muteTreasureMusicAria": "Mute treasure music",
+          "unmuteTreasureMusicAria": "Turn on treasure music",
           "treasureMap": "Treasure Map",
           "newTreasureMapTitle": "Start Treasure Map",
           "placeTreasureItems": "Hide every item on your island. Tap an occupied cell to remove its item.",

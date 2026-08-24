@@ -767,6 +767,8 @@
           "asteroidDuelPreviewPrefix": "Duel d’astéroïdes",
           "muteArcadeMusicAria": "Couper la musique arcade",
           "unmuteArcadeMusicAria": "Activer la musique arcade",
+          "muteTreasureMusicAria": "Couper la musique du trésor",
+          "unmuteTreasureMusicAria": "Activer la musique du trésor",
           "treasureMap": "Carte au trésor",
           "newTreasureMapTitle": "Démarrer Carte au trésor",
           "placeTreasureItems": "Cachez tous les objets sur votre île. Touchez une case occupée pour retirer son objet.",

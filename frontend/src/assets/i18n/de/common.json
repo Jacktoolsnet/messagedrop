@@ -768,6 +768,8 @@
           "asteroidDuelPreviewPrefix": "Asteroiden-Duell",
           "muteArcadeMusicAria": "Arcade-Musik stummschalten",
           "unmuteArcadeMusicAria": "Arcade-Musik einschalten",
+          "muteTreasureMusicAria": "Schatzkarten-Musik stummschalten",
+          "unmuteTreasureMusicAria": "Schatzkarten-Musik einschalten",
           "treasureMap": "Schatzkarte",
           "newTreasureMapTitle": "Schatzkarte starten",
           "placeTreasureItems": "Verstecke alle Gegenstände auf deiner Insel. Antippen entfernt einen Gegenstand wieder.",

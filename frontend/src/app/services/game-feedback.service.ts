@@ -6,14 +6,20 @@ import { Injectable, signal } from '@angular/core';
 export class GameFeedbackService {
   private readonly audioMutedStorageKey = 'messagedrop.gameFeedback.audioMuted';
   private readonly arcadeMusicMutedStorageKey = 'messagedrop.gameFeedback.arcadeMusicMuted';
+  private readonly treasureMusicMutedStorageKey = 'messagedrop.gameFeedback.treasureMusicMuted';
   private audioContext: AudioContext | null = null;
   private lastHoverSoundAt = 0;
   private readonly arcadeMusicOwners = new Set<object>();
   private arcadeMusicTimer: number | null = null;
   private arcadeMusicStarting = false;
   private arcadeMusicStep = 0;
+  private readonly treasureMusicOwners = new Set<object>();
+  private treasureMusicTimer: number | null = null;
+  private treasureMusicStarting = false;
+  private treasureMusicStep = 0;
   readonly audioMuted = signal(this.readAudioMuted());
   readonly arcadeMusicMuted = signal(this.readBoolean(this.arcadeMusicMutedStorageKey));
+  readonly treasureMusicMuted = signal(this.readBoolean(this.treasureMusicMutedStorageKey));
 
   notifyHover(): void {
     if (this.audioMuted()) {
@@ -97,6 +103,7 @@ export class GameFeedbackService {
     const muted = !this.audioMuted();
     this.audioMuted.set(muted);
     void this.syncArcadeMusic();
+    void this.syncTreasureMusic();
     if (typeof localStorage === 'undefined') {
       return;
     }
@@ -105,6 +112,27 @@ export class GameFeedbackService {
     } catch {
       // Persisting the optional preference may be blocked by the browser.
     }
+  }
+
+  registerTreasureMusic(owner: object): void {
+    this.treasureMusicOwners.add(owner);
+    this.stopArcadeMusic();
+    void this.syncTreasureMusic();
+  }
+
+  unregisterTreasureMusic(owner: object): void {
+    this.treasureMusicOwners.delete(owner);
+    void this.syncTreasureMusic();
+    void this.syncArcadeMusic();
+  }
+
+  toggleTreasureMusicMuted(): void {
+    const muted = !this.treasureMusicMuted();
+    this.treasureMusicMuted.set(muted);
+    if (typeof localStorage !== 'undefined') {
+      try { localStorage.setItem(this.treasureMusicMutedStorageKey, String(muted)); } catch { /* Optional preference. */ }
+    }
+    void this.syncTreasureMusic();
   }
 
   registerArcadeMusic(owner: object): void {
@@ -127,7 +155,7 @@ export class GameFeedbackService {
   }
 
   private async syncArcadeMusic(): Promise<void> {
-    const shouldPlay = this.arcadeMusicOwners.size > 0 && !this.arcadeMusicMuted() && !this.audioMuted();
+    const shouldPlay = this.arcadeMusicOwners.size > 0 && this.treasureMusicOwners.size === 0 && !this.arcadeMusicMuted() && !this.audioMuted();
     if (!shouldPlay) { this.stopArcadeMusic(); return; }
     if (this.arcadeMusicTimer !== null || this.arcadeMusicStarting) return;
     this.arcadeMusicStarting = true;
@@ -146,6 +174,39 @@ export class GameFeedbackService {
     if (this.arcadeMusicTimer === null) return;
     window.clearInterval(this.arcadeMusicTimer);
     this.arcadeMusicTimer = null;
+  }
+
+  private async syncTreasureMusic(): Promise<void> {
+    const shouldPlay = this.treasureMusicOwners.size > 0 && !this.treasureMusicMuted() && !this.audioMuted();
+    if (!shouldPlay) { this.stopTreasureMusic(); return; }
+    if (this.treasureMusicTimer !== null || this.treasureMusicStarting) return;
+    this.treasureMusicStarting = true;
+    try {
+      const context = await this.getReadyAudioContext();
+      if (!context || this.treasureMusicOwners.size === 0 || this.treasureMusicMuted() || this.audioMuted()) return;
+      this.treasureMusicStep = 0;
+      this.playTreasureMusicStep(context);
+      this.treasureMusicTimer = window.setInterval(() => this.playTreasureMusicStep(context), 390);
+    } finally {
+      this.treasureMusicStarting = false;
+    }
+  }
+
+  private stopTreasureMusic(): void {
+    if (this.treasureMusicTimer === null) return;
+    window.clearInterval(this.treasureMusicTimer);
+    this.treasureMusicTimer = null;
+  }
+
+  private playTreasureMusicStep(context: AudioContext): void {
+    if (context.state !== 'running') return;
+    const step = this.treasureMusicStep++,sequenceStep=step%64,bar=Math.floor(sequenceStep/8),beat=sequenceStep%8,cycle=Math.floor(step/64);
+    const roots=[45,50,48,45,53,50,48,45],chords=[[0,3,7,10],[0,4,7,12],[0,4,7,11],[0,3,7,12]],patterns=[[12,null,15,19,17,null,15,12],[12,14,17,null,21,17,14,null],[12,null,16,19,23,19,16,null],[19,17,15,12,null,15,17,null],[12,15,19,22,19,null,15,null],[14,null,17,21,19,17,14,null],[12,16,19,null,23,21,19,16],[19,17,15,12,10,null,12,null]] as Array<Array<number|null>>;
+    const root=roots[bar],chord=chords[bar%chords.length],now=context.currentTime+.015;
+    if(beat===0||beat===4){const bass=this.midiFrequency(root-12);this.playTone(context,now,bass,bass*1.018,.5,.0055,'triangle')}
+    if(beat%2===0){const harmony=this.midiFrequency(root+chord[(beat/2)%chord.length]);this.playTone(context,now+.02,harmony,harmony*1.01,.34,.004,'sine')}
+    const interval=patterns[bar][beat];if(interval!==null){const variation=cycle%2===1&&beat===6?12:0,lead=this.midiFrequency(root+interval+variation);this.playTone(context,now+.035,lead,lead*(beat%2?1.012:.995),.3,.006,'triangle')}
+    if(beat===7&&(bar===3||bar===7)){const sparkle=this.midiFrequency(root+31);this.playTone(context,now+.04,sparkle,sparkle*1.08,.3,.0035,'sine')}
   }
 
   private playArcadeMusicStep(context: AudioContext): void {
