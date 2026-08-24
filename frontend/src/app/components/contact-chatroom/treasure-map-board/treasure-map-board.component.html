@@ -2,10 +2,17 @@
 @if(currentGame.phase==='placingO'){
 <div class="treasure-wait"><span>🏝️</span>@if(currentGame.nextPlayerUserId===currentUserId()){<button type="button" (click)="requestPlacement.emit()">{{'common.contact.chatroom.games.prepareIsland'|transloco}}</button>}@else{<b>{{'common.contact.chatroom.games.waitingForIsland'|transloco}}</b>}</div>
 }@else{
-<div class="treasure-hud"><span>🏴‍☠️ <b>{{pirates()}}</b></span>@if(drunk()>0){<span class="treasure-hud__drunk">🍷🥴 <b>-{{drunk()}}</b></span>}<span>🦜 <b>{{parrots()}}</b></span><span>💎 <b>{{treasures()}}/5</b></span></div>
-<div class="treasure-actions"><button type="button" [class.treasure-actions--active]="mode()==='raid'" [disabled]="!canAct()||raidCount()<=0" (click)="chooseMode('raid')"><span>🏴‍☠️</span><b>{{selectedCells().length}}/{{raidCount()}}</b></button><button type="button" [class.treasure-actions--active]="mode()==='parrot'" [disabled]="!canAct()||parrots()<=0" (click)="chooseMode('parrot')">🦜</button>@if(mode()==='raid'&&canAct()){<button type="button" class="treasure-actions__send" [disabled]="selectedCells().length!==raidCount()" (click)="sendRaid()"><mat-icon>check</mat-icon></button>}</div>
+<div class="treasure-hud"><span>🧔‍♂️ <b>{{pirates()}}</b></span>@if(drunk()>0){<span class="treasure-hud__drunk">🍷🥴 <b>-{{drunk()}}</b></span>}<span>🦜 <b>{{parrots()}}</b></span><span>💎 <b>{{treasures()}}/5</b></span></div>
+@if(canAct()&&mode()===null&&(raidCount()>0||parrots()>0)){
+<div class="treasure-action-choice"><strong>{{'common.contact.chatroom.games.chooseTreasureCrew'|transloco}}</strong><div>
+  @if(raidCount()>0){<button type="button" (click)="chooseMode('raid')"><span class="treasure-action-icon treasure-action-icon--pirate" [matBadge]="raidCount()" matBadgeSize="large">🧔‍♂️</span><b>{{'common.contact.chatroom.games.sendPirates'|transloco}}</b></button>}
+  @if(parrots()>0){<button type="button" (click)="chooseMode('parrot')"><span class="treasure-action-icon treasure-action-icon--parrot" [matBadge]="parrots()" matBadgeSize="large">🦜</span><b>{{'common.contact.chatroom.games.sendParrot'|transloco}}</b></button>}
+</div></div>
+}@else if(mode();as selectedMode){
+<div class="treasure-actions treasure-actions--locked"><span class="treasure-actions__lock"><mat-icon>lock</mat-icon>{{'common.contact.chatroom.games.decisionLocked'|transloco}}</span><span class="treasure-actions__choice">{{selectedMode==='raid'?'🧔‍♂️':'🦜'}}</span>@if(selectedMode==='raid'){<b>{{selectedCells().length}}/{{raidCount()}}</b><button type="button" class="treasure-actions__send" [disabled]="selectedCells().length!==raidCount()" (click)="sendRaid()"><mat-icon>check</mat-icon></button>}</div>
+}
 @if(showCompass();as direction){<div class="treasure-compass"><span>🧭</span><b>{{compassGlyph(direction)}}</b></div>}
-<div class="treasure-board">@for(index of cells;track index){<button type="button" [class.treasure-cell--open]="revealed()[index]" [class.treasure-cell--temporary]="temporary(index)" [class.treasure-cell--selected]="isSelected(index)" [disabled]="!canChoose(index)" (click)="choose(index)" (pointerenter)="canChoose(index)&&feedback.notifyHover()">@if(visible(index)){@if(itemAt(index);as item){<span>{{symbol(item)}}</span>}@else{<span class="treasure-empty">🌱</span>}}@else{<span class="treasure-covered">{{isSelected(index)?'🏴‍☠️':'✕'}}</span>}</button>}</div>
+<div class="treasure-board">@for(index of cells;track index){<button type="button" [class.treasure-cell--open]="revealed()[index]" [class.treasure-cell--temporary]="temporary(index)" [class.treasure-cell--selected]="isSelected(index)" [disabled]="!canChoose(index)" (click)="choose(index)" (pointerenter)="canChoose(index)&&feedback.notifyHover()">@if(visible(index)){@if(itemAt(index);as item){<span>{{symbol(item)}}</span>}@else{<span class="treasure-empty">🌱</span>}}@else{<span class="treasure-covered">{{isSelected(index)?'🧔‍♂️':'✕'}}</span>}</button>}</div>
 @if(canAct()&&pirates()===0&&parrots()===0){<button type="button" class="treasure-pass" (click)="pass()"><mat-icon>skip_next</mat-icon></button>}
 }
 }
