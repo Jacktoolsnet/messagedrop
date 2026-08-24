@@ -28,4 +28,12 @@ describe('asteroid duel',()=>{
     expect(legalMoveDestinations(game,'x')).toEqual([38,46,44]);
     expect(applyAsteroidDuelAction(game,'x',{type:'move',to:37})).toBeNull();
   });
+  it('lets asteroids drift without entering ships or the laser path',()=>{
+    const field=empty();field[20]=true;
+    const game=createAsteroidDuelPreview('x','o',field);
+    const next=applyAsteroidDuelAction(game,'x',{type:'fire',direction:'left'},()=>0)!;
+    expect(next.asteroids.filter(Boolean).length).toBe(1);
+    expect(next.asteroids[next.playerXPosition]).toBeFalse();expect(next.asteroids[next.playerOPosition]).toBeFalse();
+    expect(next.lastMove!.path.some(index=>next.asteroids[index])).toBeFalse();
+  });
 });

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { AsteroidDirection, AsteroidDuelAction, AsteroidDuelGame, TicTacToeMark } from '../../../interfaces/chat-game';
@@ -21,9 +21,20 @@ export class AsteroidDuelBoardComponent{
   readonly displayedCells=computed(()=>this.currentMark()==='O'?[...this.cells].reverse():this.cells);
   readonly destinations=computed(()=>{const game=this.game();return new Set(game?legalMoveDestinations(game,this.currentUserId()):[])});
   readonly canAct=computed(()=>{const game=this.game();return !!game&&!this.disabled()&&game.status==='active'&&game.nextPlayerUserId===this.currentUserId()});
+  private readonly visibleLaserMoveNumber=signal<number|null>(null);
+  private readonly laserVisibilityEffect=effect(onCleanup=>{
+    const move=this.game()?.lastMove;
+    if(!move||move.action.type!=='fire'){this.visibleLaserMoveNumber.set(null);return}
+    this.visibleLaserMoveNumber.set(move.moveNumber);
+    const timer=setTimeout(()=>this.visibleLaserMoveNumber.set(null),2400);
+    onCleanup(()=>clearTimeout(timer));
+  });
 
   shipAt(index:number):TicTacToeMark|null{const game=this.game();return !game?null:index===game.playerXPosition?'X':index===game.playerOPosition?'O':null}
-  isLaserPath(index:number):boolean{return this.game()?.lastMove?.action.type==='fire'&&(this.game()?.lastMove?.path.includes(index)??false)}
+  isLaserPath(index:number):boolean{const move=this.game()?.lastMove;return !!move&&this.visibleLaserMoveNumber()===move.moveNumber&&move.action.type==='fire'&&move.path.includes(index)}
+  isHorizontalLaser():boolean{const action=this.game()?.lastMove?.action;return action?.type==='fire'&&(action.direction==='left'||action.direction==='right')}
+  isLaserImpact(index:number):boolean{const move=this.game()?.lastMove;if(!move||this.visibleLaserMoveNumber()!==move.moveNumber||move.action.type!=='fire'||(!move.hitPlayer&&move.destroyedAsteroid===null))return false;return move.path.at(-1)===index}
+  shieldSlots(count:number):number[]{return Array.from({length:Math.max(0,count)},(_,index)=>index)}
   isLastPosition(index:number):boolean{const move=this.game()?.lastMove;return !!move&&(index===move.from||index===move.to)}
   move(index:number):void{if(!this.canAct()||!this.destinations().has(index))return;this.feedback.notifySelection();this.action.emit({type:'move',to:index})}
   fire(displayDirection:AsteroidDirection):void{if(!this.canAct())return;this.feedback.notifySelection();this.action.emit({type:'fire',direction:this.toBoardDirection(displayDirection)})}

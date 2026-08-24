@@ -761,8 +761,8 @@
           "asteroidBoardHint": "Tap a glowing cell to fly · Tap an arrow to fire",
           "asteroidRulesTitle": "Asteroid Duel – Rules",
           "asteroidRuleMove": "Take turns. Tap a glowing neighbouring cell to move your spacecraft.",
-          "asteroidRuleFire": "Instead of moving, fire in one of four directions. The laser hits the first obstacle in its path.",
-          "asteroidRuleRocks": "A hit asteroid is destroyed, opening the path for later shots.",
+          "asteroidRuleFire": "Instead of moving, fire in one of four directions. The laser travels to the first object or the edge of the arena.",
+          "asteroidRuleRocks": "A hit asteroid is destroyed. After every turn, some remaining asteroids may randomly drift to a free neighbouring cell.",
           "asteroidRuleShield": "A hit on the opposing ship removes one of its three shield points. The arena rotates so each pilot starts with their own ship at the bottom.",
           "asteroidRuleWin": "The first pilot to disable the opposing shield with a third hit wins.",
           "asteroidDuelPreviewPrefix": "Asteroid Duel"

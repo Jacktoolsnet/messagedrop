@@ -42,7 +42,7 @@ export function createAsteroidDuelPreview(x:string,o:string,asteroids:boolean[])
     nextPlayerUserId:x,status:'active',winnerUserId:null,moveNumber:0,lastMove:null};
 }
 
-export function applyAsteroidDuelAction(game:AsteroidDuelGame,userId:string,action:AsteroidDuelAction):AsteroidDuelGame|null{
+export function applyAsteroidDuelAction(game:AsteroidDuelGame,userId:string,action:AsteroidDuelAction,random:()=>number=Math.random):AsteroidDuelGame|null{
   if(game.status!=='active'||game.nextPlayerUserId!==userId)return null;
   const mark=markFor(game,userId);if(!mark)return null;
   const from=mark==='X'?game.playerXPosition:game.playerOPosition;
@@ -64,7 +64,9 @@ export function applyAsteroidDuelAction(game:AsteroidDuelGame,userId:string,acti
   if(hitPlayer){if(mark==='X')playerOShield--;else playerXShield--}
   const won=playerXShield<=0||playerOShield<=0;
   const moveNumber=game.moveNumber+1;
-  return{...game,asteroids,playerXPosition:mark==='X'?to:game.playerXPosition,playerOPosition:mark==='O'?to:game.playerOPosition,
+  const playerXPosition=mark==='X'?to:game.playerXPosition,playerOPosition=mark==='O'?to:game.playerOPosition;
+  const driftedAsteroids=driftAsteroids(asteroids,playerXPosition,playerOPosition,new Set(path),random);
+  return{...game,asteroids:driftedAsteroids,playerXPosition,playerOPosition,
     playerXShield,playerOShield,nextPlayerUserId:won?null:other(game,userId),status:won?'won':'active',winnerUserId:won?userId:null,
     moveNumber,lastMove:{playerUserId:userId,action:{...action},from,to,path,destroyedAsteroid,hitPlayer,moveNumber}};
 }
@@ -80,6 +82,17 @@ function neighbours(index:number):number[]{
   const row=Math.floor(index/SIZE),col=index%SIZE,result:number[]=[];
   for(const[dr,dc]of Object.values(STEP)){const r=row+dr,c=col+dc;if(inside(r,c))result.push(r*SIZE+c)}
   return result;
+}
+function driftAsteroids(field:boolean[],playerXPosition:number,playerOPosition:number,laserPath:Set<number>,random:()=>number):boolean[]{
+  const next=[...field],sources=field.flatMap((occupied,index)=>occupied?[index]:[]);
+  for(const source of sources){
+    if(!next[source]||laserPath.has(source)||random()>=.34)continue;
+    const destinations=neighbours(source).filter(index=>!next[index]&&index!==playerXPosition&&index!==playerOPosition&&!laserPath.has(index));
+    if(!destinations.length)continue;
+    const target=destinations[Math.min(destinations.length-1,Math.floor(random()*destinations.length))];
+    next[source]=false;next[target]=true;
+  }
+  return next;
 }
 function validField(field:boolean[]):boolean{return field.length===CELL_COUNT&&!field[X_START]&&!field[O_START]}
 function inside(row:number,col:number):boolean{return row>=0&&row<SIZE&&col>=0&&col<SIZE}

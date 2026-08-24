@@ -1,8 +1,8 @@
 @if(game();as currentGame){
 <div class="asteroid-hud" aria-label="Shield status">
-  <span class="asteroid-hud__pilot asteroid-hud__pilot--x"><b>X</b><span class="asteroid-hud__shield">{{'♥'.repeat(currentGame.playerXShield)}}{{'♡'.repeat(3-currentGame.playerXShield)}}</span></span>
-  <mat-icon>shield</mat-icon>
-  <span class="asteroid-hud__pilot asteroid-hud__pilot--o"><span class="asteroid-hud__shield">{{'♥'.repeat(currentGame.playerOShield)}}{{'♡'.repeat(3-currentGame.playerOShield)}}</span><b>O</b></span>
+  <span class="asteroid-hud__pilot asteroid-hud__pilot--x"><b>X</b><span class="asteroid-hud__shield">@for(slot of shieldSlots(currentGame.playerXShield);track slot){<mat-icon>shield</mat-icon>}</span></span>
+  <mat-icon class="asteroid-hud__duel">bolt</mat-icon>
+  <span class="asteroid-hud__pilot asteroid-hud__pilot--o"><span class="asteroid-hud__shield">@for(slot of shieldSlots(currentGame.playerOShield);track slot){<mat-icon>shield</mat-icon>}</span><b>O</b></span>
 </div>
 <div class="asteroid-board">
   @for(index of displayedCells();track index){
@@ -12,6 +12,8 @@
     (pointerenter)="destinations().has(index)&&feedback.notifyHover()">
     @if(currentGame.asteroids[index]){<span class="asteroid-rock" aria-hidden="true">☄</span>}
     @if(shipAt(index);as mark){<span class="asteroid-ship" [class.asteroid-ship--x]="mark==='X'" [class.asteroid-ship--o]="mark==='O'"><mat-icon>rocket_launch</mat-icon><b>{{mark}}</b></span>}
+    @if(isLaserPath(index)){<span class="asteroid-laser" [class.asteroid-laser--horizontal]="isHorizontalLaser()" aria-hidden="true">{{isHorizontalLaser()?'━':'┃'}}</span>}
+    @if(isLaserImpact(index)){<span class="asteroid-laser-impact" aria-hidden="true">✦</span>}
   </button>
   }
 </div>

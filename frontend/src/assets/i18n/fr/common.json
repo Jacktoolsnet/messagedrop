@@ -760,8 +760,8 @@
           "asteroidBoardHint": "Touchez une case lumineuse pour voler · Touchez une flèche pour tirer",
           "asteroidRulesTitle": "Duel d’astéroïdes – Règles",
           "asteroidRuleMove": "Jouez à tour de rôle. Touchez une case voisine lumineuse pour déplacer votre vaisseau.",
-          "asteroidRuleFire": "Au lieu de vous déplacer, tirez dans l’une des quatre directions. Le laser touche le premier obstacle.",
-          "asteroidRuleRocks": "Un astéroïde touché est détruit et libère la trajectoire des prochains tirs.",
+          "asteroidRuleFire": "Au lieu de vous déplacer, tirez dans l’une des quatre directions. Le laser avance jusqu’au premier objet ou au bord de l’arène.",
+          "asteroidRuleRocks": "Un astéroïde touché est détruit. Après chaque tour, certains astéroïdes restants peuvent dériver aléatoirement vers une case voisine libre.",
           "asteroidRuleShield": "Un tir sur le vaisseau adverse retire un de ses trois points de bouclier. L’arène pivote afin que chaque pilote voie son vaisseau en bas.",
           "asteroidRuleWin": "Le premier pilote qui désactive le bouclier adverse avec un troisième tir gagne.",
           "asteroidDuelPreviewPrefix": "Duel d’astéroïdes"
