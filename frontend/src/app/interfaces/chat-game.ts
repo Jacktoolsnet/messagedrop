@@ -255,6 +255,7 @@ export interface AsteroidDuelGame {
 
 export type TreasureIslandItem='treasure'|'bomb'|'prisoner'|'wine'|'bride'|'map'|'compass';
 export type TreasureCompassDirection='up'|'upRight'|'right'|'downRight'|'down'|'downLeft'|'left'|'upLeft'|'here';
+export interface TreasureCompassHint{cellIndex:number;direction:TreasureCompassDirection}
 export type TreasureMapAction={type:'raid';cellIndices:number[]}|{type:'parrot';cellIndex:number}|{type:'pass'};
 export interface TreasureMapLastMove{
   playerUserId:string;action:TreasureMapAction;foundItems:TreasureIslandItem[];
@@ -266,6 +267,7 @@ export interface TreasureMapGame{
   playerXRevealed:boolean[];playerORevealed:boolean[];playerXPirates:number;playerOPirates:number;
   playerXAttacked?:boolean[];playerOAttacked?:boolean[];
   playerXScouted?:boolean[];playerOScouted?:boolean[];
+  playerXCompassHint?:TreasureCompassHint|null;playerOCompassHint?:TreasureCompassHint|null;
   playerXParrots:number;playerOParrots:number;playerXDrunk:number;playerODrunk:number;
   playerXTreasures:number;playerOTreasures:number;phase:'placingO'|'active';nextPlayerUserId:string|null;
   planningPlayerUserId?:string|null;

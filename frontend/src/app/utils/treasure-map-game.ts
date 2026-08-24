@@ -34,7 +34,7 @@ export function randomTreasureLayout(random:()=>number=Math.random):(TreasureIsl
 export function createTreasureMapGame(x:string,o:string,layout:(TreasureIslandItem|null)[]):TreasureMapGame{
  if(!validTreasureLayout(layout))throw new Error('invalid_treasure_layout');
  return{type:'treasureMap',version:1,gameId:crypto.randomUUID(),rows:7,columns:7,playerXUserId:x,playerOUserId:o,playerXLayout:[...layout],playerOLayout:null,
-  playerXRevealed:Array(49).fill(false),playerORevealed:Array(49).fill(false),playerXAttacked:Array(49).fill(false),playerOAttacked:Array(49).fill(false),playerXScouted:Array(49).fill(false),playerOScouted:Array(49).fill(false),playerXPirates:4,playerOPirates:4,playerXParrots:4,playerOParrots:4,
+  playerXRevealed:Array(49).fill(false),playerORevealed:Array(49).fill(false),playerXAttacked:Array(49).fill(false),playerOAttacked:Array(49).fill(false),playerXScouted:Array(49).fill(false),playerOScouted:Array(49).fill(false),playerXCompassHint:null,playerOCompassHint:null,playerXPirates:4,playerOPirates:4,playerXParrots:4,playerOParrots:4,
   playerXDrunk:0,playerODrunk:0,playerXTreasures:0,playerOTreasures:0,phase:'placingO',nextPlayerUserId:o,planningPlayerUserId:null,status:'active',winnerUserId:null,moveNumber:0,lastMove:null};
 }
 export function placeTreasureMapOpponent(game:TreasureMapGame,userId:string,layout:(TreasureIslandItem|null)[]):TreasureMapGame|null{
@@ -73,7 +73,7 @@ export function applyTreasureMapAction(game:TreasureMapGame,userId:string,action
   else if(item==='wine'){if(isX)next.playerXDrunk++;else next.playerODrunk++}
   else if(item==='bride'){if(isX){next.playerXTreasures=0;hideTreasuresInPlace(revealed,defenderLayout)}else{next.playerOTreasures=0;hideTreasuresInPlace(revealed,defenderLayout)}}
   else if(item==='map'){const candidates=revealed.flatMap((value,i)=>!value?[i]:[]);if(candidates.length){mapRevealIndex=candidates[Math.min(candidates.length-1,Math.floor(random()*candidates.length))];temporary.push(mapRevealIndex)}}
-  else if(item==='compass')compassDirection=nearestTreasureDirection(index,defenderLayout,revealed);
+  else if(item==='compass'){compassDirection=nearestTreasureDirection(index,defenderLayout,revealed);if(compassDirection){if(isX)next.playerOCompassHint={cellIndex:index,direction:compassDirection};else next.playerXCompassHint={cellIndex:index,direction:compassDirection}}}
  }
  if(isX)next.playerORevealed=revealed;else next.playerXRevealed=revealed;
  const collected=isX?next.playerXTreasures:next.playerOTreasures,living=isX?next.playerXPirates:next.playerOPirates;
