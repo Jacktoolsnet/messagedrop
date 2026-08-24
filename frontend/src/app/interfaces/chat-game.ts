@@ -272,7 +272,7 @@ export interface TreasureMapGame{
   playerXParrots:number;playerOParrots:number;playerXDrunk:number;playerODrunk:number;
   playerXTreasures:number;playerOTreasures:number;phase:'placingO'|'active';nextPlayerUserId:string|null;
   planningPlayerUserId?:string|null;
-  status:'active'|'won';winnerUserId:string|null;moveNumber:number;lastMove:TreasureMapLastMove|null;
+  status:'active'|'won'|'draw';winnerUserId:string|null;moveNumber:number;lastMove:TreasureMapLastMove|null;
 }
 
 export type ChatGame = TicTacToeGame | ConnectFourGame | DotsAndBoxesGame | RockPaperScissorsGame | CodeGame | MemoryGame | MinefieldGame | MinefieldHideSeekGame | MorrisGame | CheckersGame | AsteroidDuelGame | TreasureMapGame;

@@ -801,10 +801,10 @@
           "treasureRuleSetup": "Both players hide five treasures, four bombs, three prisoners, three wine glasses, one crown, one treasure map and one compass on a 7×7 island.",
           "treasureRuleRaid": "Each turn, place all available pirates on covered cells. Alternatively, use one of your four parrots.",
           "treasureRuleFinds": "Treasures are collected, bombs kill the pirate, prisoners expand your crew, and wine makes that pirate unavailable for your next turn.",
-          "treasureRuleBride": "The Crown confiscates every treasure collected so far. They return to their original positions.",
+          "treasureRuleBride": "The Crown takes up to three treasures already found. The treasure score cannot become negative.",
           "treasureRuleParrot": "A parrot briefly reveals the target and neighbouring cells, but collects nothing and triggers no bombs.",
           "treasureRuleHints": "The telescope permanently reveals a random cell. The compass points toward the nearest hidden treasure.",
-          "treasureRuleWin": "The first player to find all five opposing treasures wins. If all your pirates die, the opponent wins immediately.",
+          "treasureRuleWin": "After both players have found all five opposing treasures, the higher treasure score wins; equal scores end in a draw. Finished players are skipped automatically. If all your pirates die, the opponent wins immediately.",
           "treasureItem": {
             "treasure": "Treasure",
             "bomb": "Bomb",

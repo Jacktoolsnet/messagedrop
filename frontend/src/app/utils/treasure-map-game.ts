@@ -64,31 +64,43 @@ export function applyTreasureMapAction(game:TreasureMapGame,userId:string,action
  if(raidCount<=0||action.cellIndices.length!==raidCount||new Set(action.cellIndices).size!==action.cellIndices.length||action.cellIndices.some(index=>!Number.isInteger(index)||index<0||index>=49||revealed[index]))return null;
  const attacked=[...(isX?game.playerOAttacked??game.playerORevealed:game.playerXAttacked??game.playerXRevealed)];action.cellIndices.forEach(index=>attacked[index]=true);
  let next:TreasureMapGame={...game,playerXAttacked:isX?game.playerXAttacked:attacked,playerOAttacked:isX?attacked:game.playerOAttacked};if(isX)next.playerXDrunk=0;else next.playerODrunk=0;
- let mapRevealIndex:number|null=null,compassDirection:TreasureCompassDirection|null=null;const temporary:number[]=[],foundItems:TreasureIslandItem[]=[],mapped=[...(isX?game.playerOMapped??Array(49).fill(false):game.playerXMapped??Array(49).fill(false))],foundCrown=action.cellIndices.some(index=>defenderLayout[index]==='bride');
+ let mapRevealIndex:number|null=null,compassDirection:TreasureCompassDirection|null=null;const temporary:number[]=[],foundItems:TreasureIslandItem[]=[],mapped=[...(isX?game.playerOMapped??Array(49).fill(false):game.playerXMapped??Array(49).fill(false))];
  for(const index of action.cellIndices){
   revealed[index]=true;const item=defenderLayout[index];if(!item)continue;foundItems.push(item);
-  if(item==='treasure'){if(!foundCrown){if(isX)next.playerXTreasures++;else next.playerOTreasures++}}
+  if(item==='treasure'||item==='bride')continue;
   else if(item==='bomb'){if(isX)next.playerXPirates--;else next.playerOPirates--}
   else if(item==='prisoner'){if(isX)next.playerXPirates++;else next.playerOPirates++}
   else if(item==='wine'){if(isX)next.playerXDrunk++;else next.playerODrunk++}
-  else if(item==='bride')continue;
   else if(item==='map'){const candidates=revealed.flatMap((value,i)=>!value&&!mapped[i]?[i]:[]);if(candidates.length){mapRevealIndex=candidates[Math.min(candidates.length-1,Math.floor(random()*candidates.length))];mapped[mapRevealIndex]=true}}
   else if(item==='compass'){compassDirection=nearestTreasureDirection(index,defenderLayout,revealed);if(compassDirection){if(isX)next.playerOCompassHint={cellIndex:index,direction:compassDirection};else next.playerXCompassHint={cellIndex:index,direction:compassDirection}}}
  }
- if(foundCrown){if(isX)next.playerXTreasures=0;else next.playerOTreasures=0;hideTreasuresInPlace(revealed,defenderLayout)}
  if(isX){next.playerORevealed=revealed;next.playerOMapped=mapped}else{next.playerXRevealed=revealed;next.playerXMapped=mapped}
- const collected=isX?next.playerXTreasures:next.playerOTreasures,living=isX?next.playerXPirates:next.playerOPirates;
- if(collected>=TREASURE_INVENTORY.treasure)return win(next,userId,action,foundItems,temporary,mapRevealIndex,compassDirection);
+ next.playerXTreasures=treasureScore(next,next.playerXUserId);next.playerOTreasures=treasureScore(next,next.playerOUserId);
+ const living=isX?next.playerXPirates:next.playerOPirates;
  if(living<=0)return win(next,isX?game.playerOUserId:game.playerXUserId,action,foundItems,temporary,mapRevealIndex,compassDirection);
+ if(treasureHuntComplete(next,next.playerXUserId)&&treasureHuntComplete(next,next.playerOUserId)){
+  if(next.playerXTreasures===next.playerOTreasures)return draw(next,action,foundItems,temporary,mapRevealIndex,compassDirection);
+  return win(next,next.playerXTreasures>next.playerOTreasures?next.playerXUserId:next.playerOUserId,action,foundItems,temporary,mapRevealIndex,compassDirection);
+ }
  return finishTurn(next,userId,action,foundItems,temporary,mapRevealIndex,compassDirection);
 }
 function finishTurn(game:TreasureMapGame,userId:string,action:TreasureMapAction,items:TreasureIslandItem[],temp:number[],map:number|null,compass:TreasureCompassDirection|null):TreasureMapGame{
- const isX=userId===game.playerXUserId,moveNumber=game.moveNumber+1;return{...game,nextPlayerUserId:isX?game.playerOUserId:game.playerXUserId,planningPlayerUserId:null,moveNumber,lastMove:{playerUserId:userId,action,foundItems:items,temporaryRevealIndices:temp,mapRevealIndex:map,compassDirection:compass,moveNumber}};
+ const isX=userId===game.playerXUserId,opponent=isX?game.playerOUserId:game.playerXUserId,nextPlayerUserId=treasureHuntComplete(game,opponent)&&!treasureHuntComplete(game,userId)?userId:opponent,moveNumber=game.moveNumber+1;return{...game,nextPlayerUserId,planningPlayerUserId:null,moveNumber,lastMove:{playerUserId:userId,action,foundItems:items,temporaryRevealIndices:temp,mapRevealIndex:map,compassDirection:compass,moveNumber}};
 }
 function win(game:TreasureMapGame,winner:string,action:TreasureMapAction,items:TreasureIslandItem[],temp:number[],map:number|null,compass:TreasureCompassDirection|null):TreasureMapGame{
  const moveNumber=game.moveNumber+1;return{...game,status:'won',winnerUserId:winner,nextPlayerUserId:null,planningPlayerUserId:null,moveNumber,lastMove:{playerUserId:action.type==='pass'?'':game.nextPlayerUserId!,action,foundItems:items,temporaryRevealIndices:temp,mapRevealIndex:map,compassDirection:compass,moveNumber}};
 }
-function hideTreasuresInPlace(revealed:boolean[],layout:(TreasureIslandItem|null)[]):void{revealed.forEach((_,index)=>{if(layout[index]==='treasure')revealed[index]=false})}
+function draw(game:TreasureMapGame,action:TreasureMapAction,items:TreasureIslandItem[],temp:number[],map:number|null,compass:TreasureCompassDirection|null):TreasureMapGame{
+ const moveNumber=game.moveNumber+1;return{...game,status:'draw',winnerUserId:null,nextPlayerUserId:null,planningPlayerUserId:null,moveNumber,lastMove:{playerUserId:action.type==='pass'?'':game.nextPlayerUserId!,action,foundItems:items,temporaryRevealIndices:temp,mapRevealIndex:map,compassDirection:compass,moveNumber}};
+}
+function treasureHuntComplete(game:TreasureMapGame,userId:string):boolean{
+ const isX=userId===game.playerXUserId,layout=isX?game.playerOLayout:game.playerXLayout,attacked=isX?game.playerOAttacked??game.playerORevealed:game.playerXAttacked??game.playerXRevealed;
+ return !!layout&&layout.reduce((count,item,index)=>count+(item==='treasure'&&attacked[index]?1:0),0)>=TREASURE_INVENTORY.treasure;
+}
+export function treasureScore(game:TreasureMapGame,userId:string):number{
+ const isX=userId===game.playerXUserId,layout=isX?game.playerOLayout:game.playerXLayout,attacked=isX?game.playerOAttacked??game.playerORevealed:game.playerXAttacked??game.playerXRevealed;if(!layout)return 0;
+ const found=layout.reduce((score,item,index)=>score+(attacked[index]&&item==='treasure'?1:0),0),crownFound=layout.some((item,index)=>item==='bride'&&attacked[index]);return Math.max(0,found-(crownFound?3:0));
+}
 function neighbourhood(index:number):number[]{const row=Math.floor(index/7),col=index%7,result:number[]=[];for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){const r=row+dr,c=col+dc;if(r>=0&&r<7&&c>=0&&c<7)result.push(r*7+c)}return result}
 function nearestTreasureDirection(from:number,layout:(TreasureIslandItem|null)[],revealed:boolean[]):TreasureCompassDirection|null{
  const targets=layout.flatMap((item,index)=>item==='treasure'&&!revealed[index]?[index]:[]);if(!targets.length)return null;const fr=Math.floor(from/7),fc=from%7;

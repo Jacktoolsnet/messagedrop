@@ -801,10 +801,10 @@
           "treasureRuleSetup": "Beide Spieler verstecken auf ihrer 7×7-Insel fünf Schätze, vier Bomben, drei Gefangene, drei Weingläser, eine Krone, eine Schatzkarte und einen Kompass.",
           "treasureRuleRaid": "Pro Zug verteilst du alle verfügbaren Piraten auf verdeckte Felder. Alternativ kannst du einen deiner vier Papageien einsetzen.",
           "treasureRuleFinds": "Schätze werden eingesammelt, Bomben töten den Piraten, Gefangene vergrößern deine Mannschaft und Wein macht diesen Piraten für deinen nächsten Zug unbrauchbar.",
-          "treasureRuleBride": "Die Krone beschlagnahmt alle bisher gefundenen Schätze. Sie liegen anschließend wieder an ihren ursprünglichen Positionen.",
+          "treasureRuleBride": "Die Krone nimmt bis zu drei bereits gefundene Schätze. Der Schatzstand kann nicht negativ werden.",
           "treasureRuleParrot": "Ein Papagei zeigt das Zielfeld und seine Nachbarfelder für kurze Zeit, sammelt aber nichts ein und löst keine Bomben aus.",
           "treasureRuleHints": "Das Fernrohr deckt ein zufälliges Feld dauerhaft auf. Der Kompass weist in Richtung des nächsten verborgenen Schatzes.",
-          "treasureRuleWin": "Wer alle fünf gegnerischen Schätze findet, gewinnt. Sterben alle eigenen Piraten, gewinnt sofort der Gegner.",
+          "treasureRuleWin": "Sobald beide alle fünf gegnerischen Schätze gefunden haben, gewinnt der höhere Schatzstand; bei Gleichstand endet das Spiel unentschieden. Fertige Spieler werden automatisch übersprungen. Sterben alle eigenen Piraten, gewinnt sofort der Gegner.",
           "treasureItem": {
             "treasure": "Schatz",
             "bomb": "Bombe",
