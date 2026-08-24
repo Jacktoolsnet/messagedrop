@@ -15,7 +15,7 @@ export function randomTreasureLayout(random:()=>number=Math.random):(TreasureIsl
 export function createTreasureMapGame(x:string,o:string,layout:(TreasureIslandItem|null)[]):TreasureMapGame{
  if(!validTreasureLayout(layout))throw new Error('invalid_treasure_layout');
  return{type:'treasureMap',version:1,gameId:crypto.randomUUID(),rows:7,columns:7,playerXUserId:x,playerOUserId:o,playerXLayout:[...layout],playerOLayout:null,
-  playerXRevealed:Array(49).fill(false),playerORevealed:Array(49).fill(false),playerXPirates:4,playerOPirates:4,playerXParrots:4,playerOParrots:4,
+  playerXRevealed:Array(49).fill(false),playerORevealed:Array(49).fill(false),playerXScouted:Array(49).fill(false),playerOScouted:Array(49).fill(false),playerXPirates:4,playerOPirates:4,playerXParrots:4,playerOParrots:4,
   playerXDrunk:0,playerODrunk:0,playerXTreasures:0,playerOTreasures:0,phase:'placingO',nextPlayerUserId:o,status:'active',winnerUserId:null,moveNumber:0,lastMove:null};
 }
 export function placeTreasureMapOpponent(game:TreasureMapGame,userId:string,layout:(TreasureIslandItem|null)[]):TreasureMapGame|null{
@@ -37,8 +37,8 @@ export function applyTreasureMapAction(game:TreasureMapGame,userId:string,action
  const defenderLayout=isX?game.playerOLayout:game.playerXLayout,revealed=[...(isX?game.playerORevealed:game.playerXRevealed)];
  if(action.type==='parrot'){
   if(!Number.isInteger(action.cellIndex)||action.cellIndex<0||action.cellIndex>=49)return null;
-  if(parrots<=0)return null;const indices=neighbourhood(action.cellIndex);
-  const next={...game,playerXParrots:isX?game.playerXParrots-1:game.playerXParrots,playerOParrots:isX?game.playerOParrots:game.playerOParrots-1,playerXDrunk:isX?0:game.playerXDrunk,playerODrunk:isX?game.playerODrunk:0};
+  if(parrots<=0)return null;const indices=neighbourhood(action.cellIndex),scouted=[...(isX?game.playerOScouted??Array(49).fill(false):game.playerXScouted??Array(49).fill(false))];indices.forEach(index=>scouted[index]=true);
+  const next={...game,playerXParrots:isX?game.playerXParrots-1:game.playerXParrots,playerOParrots:isX?game.playerOParrots:game.playerOParrots-1,playerXDrunk:isX?0:game.playerXDrunk,playerODrunk:isX?game.playerODrunk:0,playerXScouted:isX?game.playerXScouted:scouted,playerOScouted:isX?scouted:game.playerOScouted};
   return finishTurn(next,userId,action,[],indices,null,null);
  }
  const raidCount=Math.min(pirates,revealed.filter(value=>!value).length);
