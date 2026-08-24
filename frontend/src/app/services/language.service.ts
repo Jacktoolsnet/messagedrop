@@ -1,5 +1,6 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
+import { firstValueFrom } from 'rxjs';
 import { AppService } from './app.service';
 
 const LANGUAGE_STORAGE_KEY = 'messagedrop.language';
@@ -74,6 +75,19 @@ export class LanguageService {
 
       void this.appService.setAppSettings({ ...settings, languageMode: mode });
     });
+  }
+
+  async init(): Promise<void> {
+    const lang = this.effectiveLanguage();
+    this.transloco.setActiveLang(lang);
+    this.updateDocumentLang(lang);
+
+    try {
+      await firstValueFrom(this.transloco.load(lang));
+    } catch (error) {
+      // Do not prevent the app from starting when translations cannot be loaded.
+      console.warn(`Translations for '${lang}' could not be loaded`, error);
+    }
   }
 
   setLanguageMode(mode: LanguageMode): void {

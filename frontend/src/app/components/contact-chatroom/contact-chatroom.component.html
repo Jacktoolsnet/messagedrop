@@ -240,6 +240,9 @@
             } @else if (game.type === 'wordRescue') {
             <app-word-rescue-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayWordRescue(msg)"
               (action)="playWordRescue(msg, $event)"></app-word-rescue-board>
+            } @else if (game.type === 'coinToss') {
+            <app-coin-toss-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canTossCoin(msg)"
+              (toss)="tossCoin(msg)"></app-coin-toss-board>
             } @else if (game.type === 'asteroidDuel') {
             <app-asteroid-duel-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayAsteroidDuel(msg)"
               [animateHit]="shouldAnimateAsteroidHit(game)" (action)="playAsteroidDuel(msg, $event)"></app-asteroid-duel-board>
@@ -520,6 +523,9 @@
             } @else if (game.type === 'wordRescue') {
             <app-word-rescue-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayWordRescue(msg)"
               (action)="playWordRescue(msg, $event)"></app-word-rescue-board>
+            } @else if (game.type === 'coinToss') {
+            <app-coin-toss-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canTossCoin(msg)"
+              (toss)="tossCoin(msg)"></app-coin-toss-board>
             } @else if (game.type === 'asteroidDuel') {
             <app-asteroid-duel-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayAsteroidDuel(msg)"
               [animateHit]="shouldAnimateAsteroidHit(game)" (action)="playAsteroidDuel(msg, $event)"></app-asteroid-duel-board>
@@ -665,6 +671,10 @@
   <button mat-icon-button type="button" (click)="openGameSelection()"
     [attr.aria-label]="'common.contact.chatroom.games.addGameAria' | transloco" [disabled]="contactRemoved()">
     <mat-icon>sports_esports</mat-icon>
+  </button>
+  <button mat-icon-button type="button" (click)="openDecisionSelection()"
+    [attr.aria-label]="'common.contact.chatroom.decisions.addAria' | transloco" [disabled]="contactRemoved()">
+    <mat-icon>casino</mat-icon>
   </button>
   <button mat-icon-button type="button" [attr.aria-label]="'common.contact.chatroom.addExperienceAria' | transloco"
     [matMenuTriggerFor]="experienceMenu" [disabled]="contactRemoved()">

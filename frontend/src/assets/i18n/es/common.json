@@ -851,6 +851,29 @@
         "deleteMessage": {
           "title": "Eliminar mensaje",
           "confirm": "Este mensaje se eliminará permanentemente. ¿Estás seguro?"
+        },
+        "decisions": {
+          "selectTitle": "Ayuda para decidir",
+          "categoryTitle": "Ayuda para decidir",
+          "addAria": "Añadir ayuda para decidir",
+          "coinToss": "Lanzamiento de moneda",
+          "coinTossDescription": "Introduce dos opciones y deja que tu contacto decida.",
+          "startCoinTossAria": "Crear lanzamiento de moneda",
+          "newCoinTossTitle": "Crear lanzamiento de moneda",
+          "enterCoinOptions": "Introduce las dos opciones. Tu contacto podrá lanzar la moneda.",
+          "optionA": "Primera opción",
+          "optionB": "Segunda opción",
+          "or": "o",
+          "tossCoin": "Lanzar moneda",
+          "resultLabel": "La decisión es",
+          "resultValue": "Decisión: {{ value }}",
+          "yourToss": "Puedes lanzar la moneda.",
+          "waitingForToss": "Esperando el lanzamiento.",
+          "startFailed": "No se pudo crear el lanzamiento.",
+          "rulesTitle": "Lanzamiento de moneda – Explicación",
+          "ruleCreate": "El creador introduce dos opciones posibles.",
+          "ruleToss": "El destinatario lanza la moneda una sola vez. Un generador aleatorio criptográficamente seguro determina el resultado.",
+          "ruleResult": "La animación se reproduce en ambos dispositivos. El resultado guardado no puede modificarse."
         }
       },
       "message": {

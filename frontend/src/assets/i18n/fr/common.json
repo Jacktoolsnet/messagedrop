@@ -851,6 +851,29 @@
         "deleteMessage": {
           "title": "Supprimer le message",
           "confirm": "Ce message sera supprimé définitivement. Êtes-vous sûr ?"
+        },
+        "decisions": {
+          "selectTitle": "Aide à la décision",
+          "categoryTitle": "Aide à la décision",
+          "addAria": "Ajouter une aide à la décision",
+          "coinToss": "Pile ou face",
+          "coinTossDescription": "Saisissez deux choix et laissez votre contact décider.",
+          "startCoinTossAria": "Créer un pile ou face",
+          "newCoinTossTitle": "Créer un pile ou face",
+          "enterCoinOptions": "Saisissez les deux choix. Votre contact pourra ensuite lancer la pièce.",
+          "optionA": "Premier choix",
+          "optionB": "Deuxième choix",
+          "or": "ou",
+          "tossCoin": "Lancer la pièce",
+          "resultLabel": "La décision est",
+          "resultValue": "Décision : {{ value }}",
+          "yourToss": "Vous pouvez lancer la pièce.",
+          "waitingForToss": "En attente du lancer.",
+          "startFailed": "Impossible de créer le pile ou face.",
+          "rulesTitle": "Pile ou face – Explication",
+          "ruleCreate": "Le créateur saisit deux choix possibles.",
+          "ruleToss": "Le destinataire lance la pièce une seule fois. Un générateur aléatoire cryptographiquement sûr détermine le résultat.",
+          "ruleResult": "L’animation se joue sur les deux appareils. Le résultat enregistré ne peut ensuite plus être modifié."
         }
       },
       "message": {

@@ -289,7 +289,15 @@ export interface WordRescueGame {
   status:'active'|'won';winnerUserId:string|null;moveNumber:number;
 }
 
-export type ChatGame = TicTacToeGame | ConnectFourGame | DotsAndBoxesGame | RockPaperScissorsGame | CodeGame | MemoryGame | MinefieldGame | MinefieldHideSeekGame | MorrisGame | CheckersGame | AsteroidDuelGame | TreasureMapGame | WordRescueGame;
+export type CoinTossSide='A'|'B';
+export interface CoinTossGame{
+  type:'coinToss';version:1;gameId:string;
+  creatorUserId:string;flipperUserId:string;optionA:string;optionB:string;
+  result:CoinTossSide|null;nextPlayerUserId:string|null;
+  status:'active'|'decided';winnerUserId:null;moveNumber:number;
+}
+
+export type ChatGame = TicTacToeGame | ConnectFourGame | DotsAndBoxesGame | RockPaperScissorsGame | CodeGame | MemoryGame | MinefieldGame | MinefieldHideSeekGame | MorrisGame | CheckersGame | AsteroidDuelGame | TreasureMapGame | WordRescueGame | CoinTossGame;
 
 export interface GameStats {
   played: number;

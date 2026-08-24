@@ -1,0 +1,4 @@
+import{ChangeDetectionStrategy,Component,inject}from'@angular/core';import{MatButtonModule}from'@angular/material/button';import{MatDialogActions,MatDialogContent,MatDialogRef}from'@angular/material/dialog';import{MatIconModule}from'@angular/material/icon';import{TranslocoPipe}from'@jsverse/transloco';import{DialogHeaderComponent}from'../../utils/dialog-header/dialog-header.component';
+export type DecisionHelperType='coinToss';
+@Component({selector:'app-decision-select-dialog',standalone:true,imports:[DialogHeaderComponent,MatButtonModule,MatDialogActions,MatDialogContent,MatIconModule,TranslocoPipe],templateUrl:'./decision-select-dialog.component.html',styleUrl:'./decision-select-dialog.component.css',changeDetection:ChangeDetectionStrategy.OnPush})
+export class DecisionSelectDialogComponent{private readonly ref=inject(MatDialogRef<DecisionSelectDialogComponent,DecisionHelperType>);select(){this.ref.close('coinToss')}close(){this.ref.close()}}

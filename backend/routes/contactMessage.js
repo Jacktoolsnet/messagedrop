@@ -111,7 +111,7 @@ router.post('/send',
       notificationType
     } = req.body;
 
-    const normalizedNotificationType = ['game_started', 'game_move'].includes(notificationType)
+    const normalizedNotificationType = ['game_started', 'game_move', 'decision_started', 'decision_result'].includes(notificationType)
       ? notificationType
       : null;
 

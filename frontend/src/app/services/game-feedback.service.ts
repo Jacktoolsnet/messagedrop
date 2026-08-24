@@ -40,6 +40,16 @@ export class GameFeedbackService {
     }
   }
 
+  notifyCoinToss(): void {
+    this.tryVibrate([20, 35, 20]);
+    if (!this.audioMuted()) void this.playCoinTossSound();
+  }
+
+  notifyCoinLanding(): void {
+    this.tryVibrate([45, 25, 75]);
+    if (!this.audioMuted()) void this.playCoinLandingSound();
+  }
+
   notifyCorrect(): void {
     this.tryVibrate([35, 35, 55, 35, 80]);
     if (!this.audioMuted()) void this.playCorrectSound();
@@ -334,6 +344,22 @@ export class GameFeedbackService {
     const now = context.currentTime;
     this.playTone(context, now, 260, 190, 0.2, 0.045, 'square');
     this.playTone(context, now + 0.13, 210, 145, 0.24, 0.035, 'sawtooth');
+  }
+
+  private async playCoinTossSound(): Promise<void> {
+    const context = await this.getReadyAudioContext();
+    if (!context) return;
+    const now = context.currentTime;
+    this.playTone(context, now, 720, 1450, .18, .025, 'triangle');
+    this.playTone(context, now + .08, 1050, 1850, .16, .018, 'sine');
+  }
+
+  private async playCoinLandingSound(): Promise<void> {
+    const context = await this.getReadyAudioContext();
+    if (!context) return;
+    const now = context.currentTime;
+    this.playTone(context, now, 1280, 620, .12, .045, 'triangle');
+    this.playTone(context, now + .045, 540, 310, .2, .035, 'sine');
   }
 
   private async playExplosionSound(step: number): Promise<void> {

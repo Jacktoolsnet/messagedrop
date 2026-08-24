@@ -20,9 +20,10 @@ import { TranslocoHttpLoader } from '../transloco-loader';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideAppInitializer(() => {
-      inject(LanguageService);
+      const languageService = inject(LanguageService);
       inject(DiagnosticLoggerService).initGlobalHandlers();
       inject(NetworkService).init();
+      return languageService.init();
     }),
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
     { provide: LOCALE_ID, useFactory: () => inject(LanguageService).effectiveLanguage() },

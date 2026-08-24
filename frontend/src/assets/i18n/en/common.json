@@ -852,6 +852,29 @@
         "deleteMessage": {
           "title": "Delete message",
           "confirm": "This message will be permanently deleted. Are you sure?"
+        },
+        "decisions": {
+          "selectTitle": "Decision helper",
+          "categoryTitle": "Decision helper",
+          "addAria": "Add decision helper",
+          "coinToss": "Coin Toss",
+          "coinTossDescription": "Enter two choices and let your contact decide.",
+          "startCoinTossAria": "Create coin toss",
+          "newCoinTossTitle": "Create Coin Toss",
+          "enterCoinOptions": "Enter the two choices. Your contact can then toss the coin.",
+          "optionA": "First choice",
+          "optionB": "Second choice",
+          "or": "or",
+          "tossCoin": "Toss coin",
+          "resultLabel": "The decision is",
+          "resultValue": "Decision: {{ value }}",
+          "yourToss": "You can toss the coin.",
+          "waitingForToss": "Waiting for the coin toss.",
+          "startFailed": "The coin toss could not be created.",
+          "rulesTitle": "Coin Toss – How it works",
+          "ruleCreate": "The creator enters two possible choices.",
+          "ruleToss": "The recipient tosses the coin exactly once. A cryptographically secure random generator determines the result.",
+          "ruleResult": "The animation plays on both devices. The stored result cannot be changed afterwards."
         }
       },
       "message": {

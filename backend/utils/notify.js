@@ -123,7 +123,11 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
                         } catch (cryptoError) {
                             logger.warn('Failed to decrypt contact name', { error: cryptoError?.message });
                         }
-                        const notificationBody = notificationType === 'game_move'
+                        const notificationBody = notificationType === 'decision_result'
+                            ? `@${contactName} hat die Entscheidung ausgelost.`
+                            : notificationType === 'decision_started'
+                                ? `@${contactName} bittet dich um einen Münzwurf.`
+                            : notificationType === 'game_move'
                             ? `@${contactName} hat den nächsten Zug gemacht.`
                             : notificationType === 'game_started'
                                 ? `@${contactName} hat ein Spiel gestartet.`

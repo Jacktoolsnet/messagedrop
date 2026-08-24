@@ -12,6 +12,7 @@ import { firstValueFrom } from 'rxjs';
 import { Contact } from '../../interfaces/contact';
 import {
   ChatGame,
+  CoinTossGame,
   AsteroidDuelAction,
   AsteroidDuelGame,
   TreasureIslandItem,
@@ -101,6 +102,9 @@ import { TreasureMapBoardComponent } from './treasure-map-board/treasure-map-boa
 import { NewTreasureMapDialogComponent } from './new-treasure-map-dialog/new-treasure-map-dialog.component';
 import { WordRescueBoardComponent } from './word-rescue-board/word-rescue-board.component';
 import { NewWordRescueDialogComponent, NewWordRescueDialogResult } from './new-word-rescue-dialog/new-word-rescue-dialog.component';
+import { CoinTossBoardComponent } from './coin-toss-board/coin-toss-board.component';
+import { DecisionSelectDialogComponent, DecisionHelperType } from './decision-select-dialog/decision-select-dialog.component';
+import { NewCoinTossDialogComponent, NewCoinTossDialogResult } from './new-coin-toss-dialog/new-coin-toss-dialog.component';
 import { DeleteContactMessageComponent } from './delete-contact-message/delete-contact-message.component';
 import { DisplayMessageService } from '../../services/display-message.service';
 import { ProtectedStickerImageComponent } from '../utils/protected-sticker-image/protected-sticker-image.component';
@@ -122,6 +126,7 @@ import { applyCheckersMove, CheckersAction, createCheckersGame } from '../../uti
 import { applyAsteroidDuelAction, createAsteroidDuelGame } from '../../utils/asteroid-duel-game';
 import { applyTreasureMapAction, createTreasureMapGame, placeTreasureMapOpponent } from '../../utils/treasure-map-game';
 import { applyWordRescueAction, createWordRescueGame } from '../../utils/word-rescue-game';
+import { createCoinToss, flipCoin } from '../../utils/coin-toss';
 
 interface ChatroomMessage {
   id: string;
@@ -177,6 +182,7 @@ interface ContactChatroomDialogData {
     AsteroidDuelBoardComponent,
     TreasureMapBoardComponent,
     WordRescueBoardComponent,
+    CoinTossBoardComponent,
     TranslocoPipe
   ],
   templateUrl: './contact-chatroom.component.html',
@@ -637,6 +643,17 @@ export class ContactChatroomComponent implements AfterViewInit {
     });
   }
 
+  openDecisionSelection():void{
+    const contact=this.contact();if(!contact||contact.status==='removed_by_contact')return;
+    const ref=this.matDialog.open(DecisionSelectDialogComponent,{width:'min(440px,94vw)',maxWidth:'94vw',maxHeight:'85vh',hasBackdrop:true,backdropClass:'dialog-backdrop',autoFocus:false});
+    ref.afterClosed().subscribe((type?:DecisionHelperType)=>{if(type==='coinToss')this.openNewCoinTossDialog(contact)});
+  }
+
+  private openNewCoinTossDialog(contact:Contact,revisionOfMessageId?:string):void{
+    const ref=this.matDialog.open(NewCoinTossDialogComponent,{width:'min(470px,96vw)',maxWidth:'96vw',maxHeight:'90vh',hasBackdrop:true,backdropClass:'dialog-backdrop',autoFocus:false});
+    ref.afterClosed().subscribe((result?:NewCoinTossDialogResult)=>{if(!result)return;try{const payload=this.createEmptyMessage();payload.game=createCoinToss(contact.userId,contact.contactUserId,result.optionA,result.optionB);void this.sendAsNewMessage(contact,payload,revisionOfMessageId,'decision_started')}catch{this.snackBar.open(this.translation.t('common.contact.chatroom.decisions.startFailed'),'',{duration:3000})}})
+  }
+
   private openNewConnectFourDialog(contact: Contact, variant: ConnectFourVariant, revisionOfMessageId?:string): void {
     const dialogRef = this.matDialog.open(NewConnectFourDialogComponent, {
       data: { variant },
@@ -820,6 +837,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getChatGameIcon(game: ChatGame): string {
+    if(game.type==='coinToss')return'toll';
     if(game.type==='wordRescue')return'spellcheck';
     if(game.type==='treasureMap')return'map';
     if(game.type==='asteroidDuel')return'rocket_launch';
@@ -835,7 +853,9 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getChatGameTitle(game: ChatGame): string {
-    const key = game.type === 'treasureMap'
+    const key = game.type === 'coinToss'
+      ? 'common.contact.chatroom.decisions.coinToss'
+      : game.type === 'treasureMap'
       ? 'common.contact.chatroom.games.treasureMap'
       : game.type === 'wordRescue'
       ? 'common.contact.chatroom.games.wordRescue'
@@ -864,6 +884,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getChatGameVariantLabel(game: ChatGame): string {
+    if(game.type==='coinToss')return this.translation.t('common.contact.chatroom.decisions.categoryTitle');
     if(game.type==='wordRescue')return this.translation.t('common.contact.chatroom.games.standardVariant');
     if(game.type==='treasureMap')return this.translation.t('common.contact.chatroom.games.standardVariant');
     if(game.type==='asteroidDuel')return this.translation.t('common.contact.chatroom.games.standardVariant');
@@ -898,12 +919,16 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getGameStateEmoji(game: ChatGame): string {
+    if(game.type==='coinToss')return game.status==='active'?(this.isCurrentUserGameTurn(game)?'🫵':'⏳'):'🎯';
     if (game.status === 'active') return this.isCurrentUserGameTurn(game) ? '🫵' : '⏳';
     if (game.status === 'won') return this.isCurrentUserGameWinner(game) ? '🥳' : '😢';
     return '🤝';
   }
 
   getGameStateLabel(game: ChatGame): string {
+    if(game.type==='coinToss')return game.status==='decided'
+      ?this.translation.t('common.contact.chatroom.decisions.resultValue',{value:game.result==='A'?game.optionA:game.optionB})
+      :this.translation.t(this.isCurrentUserGameTurn(game)?'common.contact.chatroom.decisions.yourToss':'common.contact.chatroom.decisions.waitingForToss');
     if (game.status === 'active') {
       if (this.isCurrentUserGameTurn(game)) return this.translation.t('common.contact.chatroom.games.statusYourTurn');
       const name = this.contact()?.name || this.translation.t('common.contact.chatroom.contactLabel');
@@ -936,6 +961,7 @@ export class ContactChatroomComponent implements AfterViewInit {
     if(game.type==='asteroidDuel'){const id=this.userService.getUser().id;return game.playerXUserId===id?'X':game.playerOUserId===id?'O':null}
     if(game.type==='treasureMap')return null;
     if(game.type==='wordRescue')return null;
+    if(game.type==='coinToss')return null;
     if (game.type === 'minefield') {
       const currentUserId = this.userService.getUser().id;
       return game.playerXUserId === currentUserId ? 'X' : game.playerOUserId === currentUserId ? 'O' : null;
@@ -950,7 +976,7 @@ export class ContactChatroomComponent implements AfterViewInit {
     this.matDialog.open(GameRulesDialogComponent, {
       data: {
         gameType: game.type,
-        variant: game.type === 'dotsAndBoxes' || game.type === 'rockPaperScissors' || game.type === 'code' || game.type === 'memory' || game.type === 'minefield' || game.type === 'minefieldHideSeek'||game.type==='morris'||game.type==='checkers'||game.type==='asteroidDuel'||game.type==='treasureMap'||game.type==='wordRescue' ? 'standard' : game.variant ?? 'standard'
+        variant: game.type === 'dotsAndBoxes' || game.type === 'rockPaperScissors' || game.type === 'code' || game.type === 'memory' || game.type === 'minefield' || game.type === 'minefieldHideSeek'||game.type==='morris'||game.type==='checkers'||game.type==='asteroidDuel'||game.type==='treasureMap'||game.type==='wordRescue'||game.type==='coinToss' ? 'standard' : game.variant ?? 'standard'
       },
       width: 'min(440px, 94vw)',
       maxWidth: '94vw',
@@ -989,6 +1015,8 @@ export class ContactChatroomComponent implements AfterViewInit {
       this.openNewTreasureMapDialog(contact,message.messageId);
     }else if(game.type==='wordRescue'){
       this.openNewWordRescueDialog(contact,message.messageId);
+    }else if(game.type==='coinToss'){
+      this.openNewCoinTossDialog(contact,message.messageId);
     } else {
       this.openNewCodeDialog(contact, message.messageId);
     }
@@ -1012,6 +1040,8 @@ export class ContactChatroomComponent implements AfterViewInit {
   async playTreasureMap(message:ChatroomMessage,action:TreasureMapAction):Promise<void>{const contact=this.contact(),g=message.payload?.game;if(!contact||!g||g.type!=='treasureMap'||!this.canPlayTreasureMap(message))return;const next=applyTreasureMapAction(g,this.userService.getUser().id,action);if(!next)return;this.setGameMoveInFlight(g.gameId,true);try{const found=next.lastMove?.foundItems??[];if(found.includes('bomb'))this.gameFeedback.notifyExplosion();else if(found.includes('bride'))this.gameFeedback.notifyTreasureCrown();else if(found.includes('treasure'))this.gameFeedback.notifyTreasureFound();else if(found.includes('map')||found.includes('compass'))this.gameFeedback.notifyTreasureClue();else if(found.includes('wine'))this.gameFeedback.notifyIncorrect();else if(found.includes('prisoner'))this.gameFeedback.notifyCorrect();else this.gameFeedback.notifySelection();const payload=this.createEmptyMessage();payload.game=next;await this.sendAsNewMessage(contact,payload,message.messageId,'game_move')}finally{this.setGameMoveInFlight(g.gameId,false)}}
   canPlayWordRescue(message:ChatroomMessage):boolean{const g=message.payload?.game;return !!g&&g.type==='wordRescue'&&g.status==='active'&&g.nextPlayerUserId===this.userService.getUser().id&&!this.gameMovesInFlight().has(g.gameId)}
   async playWordRescue(message:ChatroomMessage,action:WordRescueAction):Promise<void>{const contact=this.contact(),g=message.payload?.game;if(!contact||!g||g.type!=='wordRescue'||!this.canPlayWordRescue(message))return;const next=applyWordRescueAction(g,this.userService.getUser().id,action);if(!next)return;this.setGameMoveInFlight(g.gameId,true);try{if(next.status==='won'&&next.winnerUserId===g.guesserUserId)this.gameFeedback.notifyCorrect();else if(next.wrongCount>g.wrongCount)this.gameFeedback.notifyIncorrect();else this.gameFeedback.notifyCorrect();const payload=this.createEmptyMessage();payload.game=next;await this.sendAsNewMessage(contact,payload,message.messageId,'game_move')}finally{this.setGameMoveInFlight(g.gameId,false)}}
+  canTossCoin(message:ChatroomMessage):boolean{const g=message.payload?.game;return !!g&&g.type==='coinToss'&&g.status==='active'&&g.nextPlayerUserId===this.userService.getUser().id&&!this.gameMovesInFlight().has(g.gameId)}
+  async tossCoin(message:ChatroomMessage):Promise<void>{const contact=this.contact(),g=message.payload?.game;if(!contact||!g||g.type!=='coinToss'||!this.canTossCoin(message))return;const next=flipCoin(g,this.userService.getUser().id);if(!next)return;this.setGameMoveInFlight(g.gameId,true);try{const payload=this.createEmptyMessage();payload.game=next;await this.sendAsNewMessage(contact,payload,message.messageId,'decision_result')}finally{this.setGameMoveInFlight(g.gameId,false)}}
   async startTreasureMapPlanning(message:ChatroomMessage):Promise<void>{const contact=this.contact(),currentPayload=message.payload,g=currentPayload?.game,userId=this.userService.getUser().id;if(!contact||!currentPayload||!g||g.type!=='treasureMap'||g.status!=='active'||g.phase!=='active'||g.nextPlayerUserId!==userId||g.planningPlayerUserId===userId||this.gameMovesInFlight().has(g.gameId))return;const next:TreasureMapGame={...g,planningPlayerUserId:userId},payload:ShortMessage={...currentPayload,game:next};this.setGameMoveInFlight(g.gameId,true);try{const encrypted=await this.contactMessageService.encryptMessageForContact(contact,payload);if(!this.isEncryptedMessageWithinLimit(encrypted.encryptedMessageForUser,encrypted.encryptedMessageForContact))throw new Error('message_too_large');await firstValueFrom(this.contactMessageService.updateMessage({messageId:message.messageId,contactId:contact.id,userId:contact.userId,contactUserId:contact.contactUserId,encryptedMessageForUser:encrypted.encryptedMessageForUser,encryptedMessageForContact:encrypted.encryptedMessageForContact,signature:encrypted.signature}));this.messages.update(messages=>messages.map(entry=>entry.messageId===message.messageId?{...entry,payload}:entry));void this.persistPayloadBatch(contact.id,[{messageId:message.messageId,payload}]);this.socketioService.sendUpdatedContactMessage({id:message.id,messageId:message.messageId,contactId:contact.id,userId:contact.userId,contactUserId:contact.contactUserId,messageSignature:encrypted.signature,userEncryptedMessage:encrypted.encryptedMessageForUser,contactUserEncryptedMessage:encrypted.encryptedMessageForContact,createdAt:new Date().toISOString()})}catch{this.snackBar.open(this.translation.t('common.contact.chatroom.sendFailed'),'',{duration:3000})}finally{this.setGameMoveInFlight(g.gameId,false)}}
   openTreasureMapPlacement(message:ChatroomMessage):void{const contact=this.contact(),g=message.payload?.game;if(!contact||!g||g.type!=='treasureMap'||g.phase!=='placingO'||g.nextPlayerUserId!==this.userService.getUser().id)return;const ref=this.matDialog.open(NewTreasureMapDialogComponent,{width:'min(520px,96vw)',maxWidth:'96vw',maxHeight:'90vh',hasBackdrop:true,backdropClass:'dialog-backdrop',autoFocus:false});ref.afterClosed().subscribe(async(layout?:(TreasureIslandItem|null)[])=>{if(!layout)return;const next=placeTreasureMapOpponent(g,this.userService.getUser().id,layout);if(!next)return;this.setGameMoveInFlight(g.gameId,true);try{const payload=this.createEmptyMessage();payload.game=next;await this.sendAsNewMessage(contact,payload,message.messageId,'game_move')}finally{this.setGameMoveInFlight(g.gameId,false)}})}
 

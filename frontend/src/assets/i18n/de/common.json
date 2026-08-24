@@ -852,6 +852,29 @@
         "deleteMessage": {
           "title": "Nachricht löschen",
           "confirm": "Diese Nachricht wird dauerhaft gelöscht. Bist du sicher?"
+        },
+        "decisions": {
+          "selectTitle": "Entscheidungshilfe",
+          "categoryTitle": "Entscheidungshilfe",
+          "addAria": "Entscheidungshilfe hinzufügen",
+          "coinToss": "Münzwurf",
+          "coinTossDescription": "Zwei Möglichkeiten eintragen und den Kontakt entscheiden lassen.",
+          "startCoinTossAria": "Münzwurf erstellen",
+          "newCoinTossTitle": "Münzwurf erstellen",
+          "enterCoinOptions": "Trage die beiden Möglichkeiten für den Münzwurf ein. Dein Kontakt darf anschließend die Münze werfen.",
+          "optionA": "Erste Möglichkeit",
+          "optionB": "Zweite Möglichkeit",
+          "or": "oder",
+          "tossCoin": "Münze werfen",
+          "resultLabel": "Die Entscheidung ist",
+          "resultValue": "Entscheidung: {{ value }}",
+          "yourToss": "Du darfst die Münze werfen.",
+          "waitingForToss": "Warten auf den Münzwurf.",
+          "startFailed": "Der Münzwurf konnte nicht erstellt werden.",
+          "rulesTitle": "Münzwurf – Erklärung",
+          "ruleCreate": "Der Ersteller trägt zwei mögliche Entscheidungen ein.",
+          "ruleToss": "Der Empfänger wirft die Münze genau einmal. Das Ergebnis wird mit einem kryptografisch sicheren Zufallsgenerator bestimmt.",
+          "ruleResult": "Die Animation läuft auf beiden Geräten. Das gespeicherte Ergebnis kann anschließend nicht verändert werden."
         }
       },
       "message": {
