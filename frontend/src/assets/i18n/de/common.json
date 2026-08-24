@@ -758,7 +758,6 @@
           "asteroidFireUp": "Laser nach oben abfeuern",
           "asteroidFireDown": "Laser nach unten abfeuern",
           "asteroidFireRight": "Laser nach rechts abfeuern",
-          "asteroidBoardHint": "Leuchtendes Feld antippen: fliegen · Blitz öffnen: Schussrichtung wählen",
           "asteroidRulesTitle": "Asteroiden-Duell – Regeln",
           "asteroidRuleMove": "Ihr spielt abwechselnd. Tippe auf ein leuchtendes Nachbarfeld, um dein Raumschiff zu bewegen.",
           "asteroidRuleFire": "Statt zu fliegen kannst du in eine der vier Richtungen feuern. Der Laser fliegt bis zum ersten Objekt oder bis zum Rand des Spielfelds.",

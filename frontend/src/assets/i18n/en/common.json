@@ -758,7 +758,6 @@
           "asteroidFireUp": "Fire laser upward",
           "asteroidFireDown": "Fire laser downward",
           "asteroidFireRight": "Fire laser right",
-          "asteroidBoardHint": "Tap a glowing cell to fly · Open the lightning button to choose a firing direction",
           "asteroidRulesTitle": "Asteroid Duel – Rules",
           "asteroidRuleMove": "Take turns. Tap a glowing neighbouring cell to move your spacecraft.",
           "asteroidRuleFire": "Instead of moving, fire in one of four directions. The laser travels to the first object or the edge of the arena.",

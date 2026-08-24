@@ -757,7 +757,6 @@
           "asteroidFireUp": "Tirer au laser vers le haut",
           "asteroidFireDown": "Tirer au laser vers le bas",
           "asteroidFireRight": "Tirer au laser vers la droite",
-          "asteroidBoardHint": "Touchez une case lumineuse pour voler · Ouvrez le bouton éclair pour choisir la direction du tir",
           "asteroidRulesTitle": "Duel d’astéroïdes – Règles",
           "asteroidRuleMove": "Jouez à tour de rôle. Touchez une case voisine lumineuse pour déplacer votre vaisseau.",
           "asteroidRuleFire": "Au lieu de vous déplacer, tirez dans l’une des quatre directions. Le laser avance jusqu’au premier objet ou au bord de l’arène.",

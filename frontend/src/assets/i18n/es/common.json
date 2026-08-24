@@ -757,7 +757,6 @@
           "asteroidFireUp": "Disparar láser hacia arriba",
           "asteroidFireDown": "Disparar láser hacia abajo",
           "asteroidFireRight": "Disparar láser a la derecha",
-          "asteroidBoardHint": "Toca una casilla brillante para volar · Abre el botón del rayo para elegir la dirección de disparo",
           "asteroidRulesTitle": "Duelo de asteroides – Reglas",
           "asteroidRuleMove": "Jugáis por turnos. Toca una casilla vecina brillante para mover tu nave.",
           "asteroidRuleFire": "En vez de moverte, dispara en una de las cuatro direcciones. El láser viaja hasta el primer objeto o el borde del campo.",
