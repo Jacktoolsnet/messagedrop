@@ -805,7 +805,7 @@
           "treasureRuleBride": "La Corona se lleva hasta tres tesoros ya encontrados. La puntuación no puede ser negativa.",
           "treasureRuleParrot": "Un loro muestra brevemente la casilla elegida y sus vecinas, sin recoger objetos ni activar bombas.",
           "treasureRuleHints": "El catalejo revela permanentemente una casilla al azar. La brújula apunta al tesoro oculto más cercano.",
-          "treasureRuleWin": "Cuando ambos jugadores hayan encontrado los cinco tesoros rivales, gana la puntuación más alta; si empatan, la partida termina en empate. Los jugadores que ya hayan terminado se omiten automáticamente. Si mueren todos tus piratas, gana el oponente.",
+          "treasureRuleWin": "La partida termina en cuanto un jugador descubre todas las casillas de la isla rival. Entonces gana quien tenga más tesoros; si las puntuaciones son iguales, la partida termina en empate. Si mueren todos tus piratas, gana el oponente.",
           "treasureItem": {
             "treasure": "Tesoro",
             "bomb": "Bomba",

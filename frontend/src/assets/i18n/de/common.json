@@ -806,7 +806,7 @@
           "treasureRuleBride": "Die Krone nimmt bis zu drei bereits gefundene Schätze. Der Schatzstand kann nicht negativ werden.",
           "treasureRuleParrot": "Ein Papagei zeigt das Zielfeld und seine Nachbarfelder für kurze Zeit, sammelt aber nichts ein und löst keine Bomben aus.",
           "treasureRuleHints": "Das Fernrohr deckt ein zufälliges Feld dauerhaft auf. Der Kompass weist in Richtung des nächsten verborgenen Schatzes.",
-          "treasureRuleWin": "Sobald beide alle fünf gegnerischen Schätze gefunden haben, gewinnt der höhere Schatzstand; bei Gleichstand endet das Spiel unentschieden. Fertige Spieler werden automatisch übersprungen. Sterben alle eigenen Piraten, gewinnt sofort der Gegner.",
+          "treasureRuleWin": "Das Spiel endet, sobald ein Spieler alle Felder der gegnerischen Insel aufgedeckt hat. Dann gewinnt der höhere Schatzstand; bei Gleichstand endet das Spiel unentschieden. Sterben alle eigenen Piraten, gewinnt sofort der Gegner.",
           "treasureItem": {
             "treasure": "Schatz",
             "bomb": "Bombe",

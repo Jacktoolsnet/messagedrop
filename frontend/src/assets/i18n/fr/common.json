@@ -805,7 +805,7 @@
           "treasureRuleBride": "La Couronne prend jusqu’à trois trésors déjà trouvés. Le score ne peut pas devenir négatif.",
           "treasureRuleParrot": "Un perroquet dévoile brièvement la cible et les cases voisines, sans ramasser d’objet ni déclencher de bombe.",
           "treasureRuleHints": "La longue-vue dévoile définitivement une case aléatoire. La boussole indique le trésor caché le plus proche.",
-          "treasureRuleWin": "Lorsque les deux joueurs ont trouvé les cinq trésors adverses, le score le plus élevé gagne ; à égalité, la partie se termine par un match nul. Les joueurs ayant terminé sont automatiquement passés. Si tous vos pirates meurent, l’adversaire gagne immédiatement.",
+          "treasureRuleWin": "La partie se termine dès qu’un joueur a révélé toutes les cases de l’île adverse. Le score de trésors le plus élevé l’emporte alors ; à égalité, la partie se termine par un match nul. Si tous vos pirates meurent, l’adversaire gagne immédiatement.",
           "treasureItem": {
             "treasure": "Trésor",
             "bomb": "Bombe",
