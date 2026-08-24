@@ -2,6 +2,9 @@
   [title]="(data.gameType==='coinToss'?'common.contact.chatroom.decisions.rulesTitle':data.gameType==='wordRescue'?'common.contact.chatroom.games.wordRescueRulesTitle':data.gameType==='treasureMap'?'common.contact.chatroom.games.treasureMapRulesTitle':data.gameType==='asteroidDuel'?'common.contact.chatroom.games.asteroidRulesTitle':data.gameType==='checkers'?'common.contact.chatroom.games.checkersRulesTitle':data.gameType==='morris'?'common.contact.chatroom.games.morrisRulesTitle':data.gameType === 'minefieldHideSeek' ? 'common.contact.chatroom.games.hideSeekRulesTitle' : data.gameType === 'minefield' ? 'common.contact.chatroom.games.minefieldRulesTitle' : data.gameType === 'memory' ? 'common.contact.chatroom.games.memoryRulesTitle' : data.gameType === 'code' ? 'common.contact.chatroom.games.codeRulesTitle' : data.gameType === 'rockPaperScissors' ? 'common.contact.chatroom.games.rockPaperScissorsRulesTitle' : data.gameType === 'dotsAndBoxes' ? 'common.contact.chatroom.games.dotsAndBoxesRulesTitle' : data.gameType === 'connectFour' ? (data.variant === 'vanishing' ? 'common.contact.chatroom.games.vanishingConnectFourRulesTitle' : 'common.contact.chatroom.games.connectFourRulesTitle') : data.variant === 'vanishing' ? 'common.contact.chatroom.games.vanishingRulesTitle' : 'common.contact.chatroom.games.rulesTitle') | transloco"></app-dialog-header>
 
 <mat-dialog-content class="rules-content">
+  @if (data.gameType === 'coinToss') {
+  <p class="rules-intro">{{ 'common.contact.chatroom.decisions.coinTossDescription' | transloco }}</p>
+  }
   <ol class="rules-list">
     @if(data.gameType==='coinToss'){
     <li>{{'common.contact.chatroom.decisions.ruleCreate'|transloco}}</li><li>{{'common.contact.chatroom.decisions.ruleToss'|transloco}}</li><li>{{'common.contact.chatroom.decisions.ruleResult'|transloco}}</li>

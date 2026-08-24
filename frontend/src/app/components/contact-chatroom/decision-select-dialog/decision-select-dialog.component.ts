@@ -1,4 +1,50 @@
-import{ChangeDetectionStrategy,Component,inject}from'@angular/core';import{MatButtonModule}from'@angular/material/button';import{MatDialogActions,MatDialogContent,MatDialogRef}from'@angular/material/dialog';import{MatIconModule}from'@angular/material/icon';import{TranslocoPipe}from'@jsverse/transloco';import{DialogHeaderComponent}from'../../utils/dialog-header/dialog-header.component';
-export type DecisionHelperType='coinToss';
-@Component({selector:'app-decision-select-dialog',standalone:true,imports:[DialogHeaderComponent,MatButtonModule,MatDialogActions,MatDialogContent,MatIconModule,TranslocoPipe],templateUrl:'./decision-select-dialog.component.html',styleUrl:'./decision-select-dialog.component.css',changeDetection:ChangeDetectionStrategy.OnPush})
-export class DecisionSelectDialogComponent{private readonly ref=inject(MatDialogRef<DecisionSelectDialogComponent,DecisionHelperType>);select(){this.ref.close('coinToss')}close(){this.ref.close()}}
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
+import { GameRulesDialogComponent } from '../game-rules-dialog/game-rules-dialog.component';
+
+export type DecisionHelperType = 'coinToss';
+
+@Component({
+  selector: 'app-decision-select-dialog',
+  standalone: true,
+  imports: [
+    DialogHeaderComponent,
+    MatButtonModule,
+    MatDialogActions,
+    MatDialogContent,
+    MatIconModule,
+    TranslocoPipe
+  ],
+  templateUrl: './decision-select-dialog.component.html',
+  styleUrl: './decision-select-dialog.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class DecisionSelectDialogComponent {
+  private readonly dialogRef = inject(MatDialogRef<DecisionSelectDialogComponent, DecisionHelperType>);
+  private readonly dialog = inject(MatDialog);
+
+  select(): void {
+    this.dialogRef.close('coinToss');
+  }
+
+  openHelp(): void {
+    this.dialog.open(GameRulesDialogComponent, {
+      data: { gameType: 'coinToss', variant: 'standard' },
+      width: 'min(440px, 94vw)',
+      maxWidth: '94vw',
+      maxHeight: '85vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+  }
+
+  close(): void {
+    this.dialogRef.close();
+  }
+}

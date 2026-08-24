@@ -1,1 +1,48 @@
-<app-dialog-header icon="casino" [title]="'common.contact.chatroom.decisions.selectTitle'|transloco"></app-dialog-header><mat-dialog-content class="decision-content"><article class="decision-tile"><div class="decision-avatar"><span><mat-icon>toll</mat-icon></span><strong>{{'common.contact.chatroom.decisions.coinToss'|transloco}}</strong></div><p>{{'common.contact.chatroom.decisions.coinTossDescription'|transloco}}</p><div class="decision-actions"><button mat-mini-fab color="primary" type="button" (click)="select()" [attr.aria-label]="'common.contact.chatroom.decisions.startCoinTossAria'|transloco"><mat-icon>play_arrow</mat-icon></button></div></article></mat-dialog-content><mat-dialog-actions class="sticky-actions"><button mat-icon-button class="action-close" (click)="close()"><mat-icon>close</mat-icon></button></mat-dialog-actions>
+<app-dialog-header
+  icon="casino"
+  [title]="'common.contact.chatroom.decisions.selectTitle' | transloco"
+></app-dialog-header>
+
+<mat-dialog-content class="decision-content">
+  <div class="decision-grid">
+    <article class="decision-tile">
+      <div class="decision-avatar-box">
+        <span class="decision-avatar-box__avatar" aria-hidden="true">
+          <mat-icon>toll</mat-icon>
+        </span>
+        <span class="decision-avatar-box__text">
+          <span class="decision-avatar-box__title">
+            {{ 'common.contact.chatroom.decisions.coinToss' | transloco }}
+          </span>
+        </span>
+      </div>
+
+
+      <div class="decision-tile__actions">
+        <button
+          mat-mini-fab
+          color="primary"
+          type="button"
+          (click)="select()"
+          [attr.aria-label]="'common.contact.chatroom.decisions.startCoinTossAria' | transloco"
+        >
+          <mat-icon>play_arrow</mat-icon>
+        </button>
+        <button
+          mat-mini-fab
+          type="button"
+          (click)="openHelp()"
+          [attr.aria-label]="'common.contact.chatroom.games.rulesAria' | transloco"
+        >
+          <mat-icon>help</mat-icon>
+        </button>
+      </div>
+    </article>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions">
+  <button mat-icon-button class="action-close" type="button" (click)="close()">
+    <mat-icon>close</mat-icon>
+  </button>
+</mat-dialog-actions>
