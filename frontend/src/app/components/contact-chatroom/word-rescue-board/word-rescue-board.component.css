@@ -72,6 +72,43 @@
 @keyframes rescue-hop { 0% { transform: translate(-50%, 0); } 42% { transform: translate(-50%, -1rem) rotate(-4deg); } 100% { transform: translate(-50%, 0); } }
 @keyframes rescue-fall { 0% { opacity: 1; transform: translate(-50%, 0); } 35% { transform: translate(-25%, -.65rem) rotate(8deg); } 100% { opacity: .25; transform: translate(-10%, 1.25rem) rotate(22deg); } }
 
+.flower-stage,
+.rocket-stage,
+.snowman-stage { position: relative; width: 100%; height: 6.4rem; }
+.motif-piece--lost { opacity: 0 !important; transform: translateY(1.35rem) rotate(35deg) scale(.35) !important; }
+.motif--finished { filter: grayscale(.45); }
+
+.flower-stage { width: 8rem; margin: 0 auto; }
+.flower__stem { position: absolute; left: calc(50% - .18rem); bottom: 0; width: .36rem; height: 3.8rem; border-radius: 1rem; background: linear-gradient(90deg,#198754,#62d884,#167642); box-shadow: 0 0 7px rgba(67,240,197,.48); }
+.flower__stem::after { content: ''; position: absolute; left: .15rem; bottom: 1rem; width: 1.5rem; height: .7rem; border-radius: 100% 0 100% 0; background: #43c879; transform: rotate(-22deg); }
+.flower__center { position: absolute; z-index: 3; left: 50%; top: 2.3rem; display: grid; place-items: center; width: 1.6rem; height: 1.6rem; border-radius: 50%; background: #ffd34f; color: #ca7d00; font-size: .8rem; transform: translate(-50%,-50%); box-shadow: 0 0 10px rgba(255,211,79,.8); }
+.flower__petal { --piece:0; position: absolute; z-index: 2; left: calc(50% - .72rem); top: 1.58rem; width: 1.44rem; height: 1rem; border-radius: 80% 20% 80% 20%; background: linear-gradient(135deg,#ff8ac8,#ee3f9a); transform-origin: .72rem .72rem; transform: rotate(calc(var(--piece) * 45deg)) translateY(-1.05rem); box-shadow: 0 0 8px rgba(255,102,196,.7); transition: opacity .3s,transform .42s; }
+
+.rocket-stage { display: grid; place-items: center; }
+.rocket-assembly { position: relative; width: 5.2rem; height: 6.4rem; filter: drop-shadow(0 0 8px color-mix(in srgb,var(--word-primary) 58%,transparent)); }
+.rocket-part { position: absolute; display: block; box-sizing: border-box; transition: opacity .3s,transform .42s; }
+/* Acht klar erkennbare Bauteile: Flamme, Triebwerk, zwei Flügel, Fenster, zwei Rumpfteile und Spitze. */
+.rocket-part--0 { z-index: 0; left: 2rem; bottom: 0; width: 1.2rem; height: 1.45rem; border-radius: 15% 15% 70% 70%; background: linear-gradient(#fff176,#ff9800 55%,#ff315f); box-shadow: 0 0 12px #ff9800; }
+.rocket-part--1 { z-index: 2; left: 1.65rem; bottom: 1.1rem; width: 1.9rem; height: .75rem; border: 2px solid #624bd7; border-radius: .25rem .25rem .55rem .55rem; background: #b8a7ff; }
+.rocket-part--2 { z-index: 1; left: .35rem; bottom: 1.45rem; width: 1.65rem; height: 2.15rem; border: 2px solid #c01852; border-radius: 80% 15% 25% 55%; background: #ff668f; transform: skewY(-18deg); }
+.rocket-part--3 { z-index: 1; right: .35rem; bottom: 1.45rem; width: 1.65rem; height: 2.15rem; border: 2px solid #c01852; border-radius: 15% 80% 55% 25%; background: #ff668f; transform: skewY(18deg); }
+.rocket-part--4 { z-index: 4; left: 1.86rem; top: 2.1rem; width: 1.5rem; height: 1.5rem; border: 3px solid #175b88; border-radius: 50%; background: radial-gradient(circle at 35% 30%,#e9ffff,#4fd8ff 48%,#087da6); box-shadow: inset 0 0 5px #fff,0 0 7px #4fd8ff; }
+.rocket-part--5 { z-index: 2; left: 1.25rem; bottom: 1.65rem; width: 2.7rem; height: 2.45rem; border: 2px solid #6554b5; border-radius: .35rem; background: linear-gradient(90deg,#a994ff,#eee8ff 48%,#9a83ee); }
+.rocket-part--6 { z-index: 2; left: 1.25rem; top: 1.25rem; width: 2.7rem; height: 2.55rem; border-inline: 2px solid #6554b5; background: linear-gradient(90deg,#a994ff,#f5f1ff 48%,#9a83ee); }
+.rocket-part--7 { z-index: 3; left: 1.25rem; top: 0; width: 2.7rem; height: 1.75rem; border: 2px solid #c01852; border-radius: 50% 50% 12% 12%; background: linear-gradient(90deg,#ff668f,#ffb2c8 48%,#eb4777); clip-path: polygon(50% 0,100% 100%,0 100%); }
+
+.snowman-stage { width: 8rem; margin: 0 auto; }
+.snowman-piece { position: absolute; display: block; transition: opacity .3s,transform .42s; filter: drop-shadow(0 0 5px rgba(150,225,255,.55)); }
+.snowman-piece--0,.snowman-piece--1,.snowman-piece--2,.snowman-piece--3,.snowman-piece--4 { z-index: 2; }
+.snowman-piece--0 { left: 2.55rem; bottom: 5.9rem; width: 3rem; height: .42rem; border-radius: .2rem; background: #312d48; }
+.snowman-piece--1 { left: 3rem; bottom: 6.15rem; width: 2.1rem; height: .8rem; border-radius: .3rem .3rem 0 0; background: #413b5d; }
+.snowman-piece--2 { left: 1rem; bottom: 3rem; width: 2rem; height: .22rem; border-radius: 1rem; background: #885a35; transform: rotate(24deg); }
+.snowman-piece--3 { right: 1rem; bottom: 3rem; width: 2rem; height: .22rem; border-radius: 1rem; background: #885a35; transform: rotate(-24deg); }
+.snowman-piece--4 { left: 3.9rem; bottom: 4.9rem; width: 1rem; height: .3rem; clip-path: polygon(0 0,100% 50%,0 100%); background: #ff8a32; }
+.snowman-piece--5 { left: 2.85rem; bottom: 4.25rem; width: 2.3rem; height: 2.15rem; border-radius: 50%; background: #f7fdff; }
+.snowman-piece--6 { left: 2.55rem; bottom: 2.25rem; width: 2.9rem; height: 2.6rem; border-radius: 50%; background: #f2fcff; }
+.snowman-piece--7 { left: 2.15rem; bottom: 0; width: 3.7rem; height: 3rem; border-radius: 50%; background: #e9faff; }
+
 /* Lösungswort und Tastatur verwenden dieselbe Spielfeldsprache wie die anderen Spiele. */
 .word,
 .keyboard {

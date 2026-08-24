@@ -828,13 +828,20 @@
           "wordRescuePreviewPrefix": "Wort retten",
           "wordRescueRulesTitle": "Wort retten – Regeln",
           "wordRescueRuleCreate": "Der Ersteller legt ein Wort und optional einen Hinweis fest. Der Ratende sieht das Wort nur als leere Stellen.",
-          "wordRescueRuleLetters": "Der Ratende wählt Buchstaben. Richtige Buchstaben werden überall aufgedeckt; ein falscher Buchstabe entfernt ein Brückenteil.",
-          "wordRescueRuleWord": "Das vollständige Wort darf jederzeit gelöst werden. Ein falscher Lösungsversuch kostet zwei der acht Brückenteile.",
+          "wordRescueRuleLetters": "Der Ratende wählt Buchstaben. Richtige Buchstaben werden überall aufgedeckt; ein falscher Buchstabe entfernt einen Teil des gewählten Rettungsmotivs.",
+          "wordRescueRuleWord": "Das vollständige Wort darf jederzeit gelöst werden. Ein falscher Lösungsversuch kostet zwei der acht Rettungsschritte.",
           "wordRescueRuleWin": "Wird das Wort gefunden, gewinnt der Ratende. Nach acht Fehlern gewinnt der Ersteller und das Wort wird aufgedeckt.",
-          "remainingAttempts": "Noch {{ count }} Brückenteile",
+          "remainingAttempts": "Noch {{ count }} Rettungsschritte",
           "wrongWordAttempts": "Falsche Lösungsversuche",
           "solveWholeWord": "Ganzes Wort lösen",
-          "checkWholeWordAria": "Ganzes Wort prüfen"
+          "checkWholeWordAria": "Ganzes Wort prüfen",
+          "chooseRescueTheme": "Wähle ein Rettungsmotiv",
+          "rescueTheme": {
+            "bridge": "Brücke",
+            "flower": "Blume",
+            "rocket": "Rakete",
+            "snowman": "Schneemann"
+          }
         },
         "revisionHistory": {
           "title": "Änderungshistorie",

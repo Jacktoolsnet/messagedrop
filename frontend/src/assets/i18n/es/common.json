@@ -827,13 +827,20 @@
           "wordRescuePreviewPrefix": "Rescata la palabra",
           "wordRescueRulesTitle": "Reglas de Rescata la palabra",
           "wordRescueRuleCreate": "El creador elige una palabra y puede añadir una pista. El jugador solo ve espacios vacíos.",
-          "wordRescueRuleLetters": "El jugador elige letras. Las correctas se muestran en todas sus posiciones; una incorrecta elimina una parte del puente.",
-          "wordRescueRuleWord": "Se puede intentar resolver la palabra completa en cualquier momento. Un fallo cuesta dos de las ocho partes del puente.",
+          "wordRescueRuleLetters": "El jugador elige letras. Las correctas se muestran en todas sus posiciones; una incorrecta elimina una parte de la escena de rescate elegida.",
+          "wordRescueRuleWord": "Se puede intentar resolver la palabra completa en cualquier momento. Un fallo cuesta dos de los ocho pasos de rescate.",
           "wordRescueRuleWin": "Si encuentra la palabra, gana el jugador. Tras ocho errores gana el creador y se revela la palabra.",
-          "remainingAttempts": "Quedan {{ count }} partes del puente",
+          "remainingAttempts": "Quedan {{ count }} pasos de rescate",
           "wrongWordAttempts": "Intentos de palabra fallidos",
           "solveWholeWord": "Resolver palabra completa",
-          "checkWholeWordAria": "Comprobar palabra completa"
+          "checkWholeWordAria": "Comprobar palabra completa",
+          "chooseRescueTheme": "Elige una escena de rescate",
+          "rescueTheme": {
+            "bridge": "Puente",
+            "flower": "Flor",
+            "rocket": "Cohete",
+            "snowman": "Muñeco de nieve"
+          }
         },
         "revisionHistory": {
           "title": "Historial de cambios",

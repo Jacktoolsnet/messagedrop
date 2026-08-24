@@ -276,11 +276,14 @@ export interface TreasureMapGame{
 }
 
 export type WordRescueAction = {type:'letter';letter:string}|{type:'word';word:string};
+export type WordRescueTheme = 'bridge'|'flower'|'rocket'|'snowman';
 export interface WordRescueGame {
   type:'wordRescue';version:1;gameId:string;
   creatorUserId:string;guesserUserId:string;
   /** The complete message is end-to-end encrypted. The UI only reveals this value to the creator or after game end. */
   solution:string;hint:string;
+  /** Missing on games created before selectable rescue scenes existed. */
+  rescueTheme?:WordRescueTheme;
   guessedLetters:string[];wrongLetters:string[];wrongWordAttempts:string[];
   wrongCount:number;maxWrong:8;nextPlayerUserId:string|null;
   status:'active'|'won';winnerUserId:string|null;moveNumber:number;

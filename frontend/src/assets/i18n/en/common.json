@@ -828,13 +828,20 @@
           "wordRescuePreviewPrefix": "Rescue the Word",
           "wordRescueRulesTitle": "Rescue the Word – Rules",
           "wordRescueRuleCreate": "The creator chooses a word and may add a hint. The guesser sees only blank spaces.",
-          "wordRescueRuleLetters": "The guesser selects letters. Correct letters are revealed everywhere; a wrong letter removes one bridge section.",
-          "wordRescueRuleWord": "The complete word may be guessed at any time. A wrong word costs two of the eight bridge sections.",
+          "wordRescueRuleLetters": "The guesser selects letters. Correct letters are revealed everywhere; a wrong letter removes one part of the selected rescue scene.",
+          "wordRescueRuleWord": "The complete word may be guessed at any time. A wrong word costs two of the eight rescue steps.",
           "wordRescueRuleWin": "The guesser wins by finding the word. After eight errors the creator wins and the word is revealed.",
-          "remainingAttempts": "{{ count }} bridge sections left",
+          "remainingAttempts": "{{ count }} rescue steps left",
           "wrongWordAttempts": "Wrong word guesses",
           "solveWholeWord": "Solve the whole word",
-          "checkWholeWordAria": "Check whole word"
+          "checkWholeWordAria": "Check whole word",
+          "chooseRescueTheme": "Choose a rescue scene",
+          "rescueTheme": {
+            "bridge": "Bridge",
+            "flower": "Flower",
+            "rocket": "Rocket",
+            "snowman": "Snowman"
+          }
         },
         "revisionHistory": {
           "title": "Change history",

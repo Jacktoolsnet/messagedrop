@@ -1,4 +1,4 @@
-import {WordRescueAction,WordRescueGame} from '../interfaces/chat-game';
+import {WordRescueAction,WordRescueGame,WordRescueTheme} from '../interfaces/chat-game';
 
 export const WORD_RESCUE_ALPHABET=[...'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜẞ'] as const;
 
@@ -11,10 +11,10 @@ export function isValidWordRescueSolution(value:string):boolean{
   return word.length>=2&&word.length<=32&&/^[A-ZÄÖÜẞ -]+$/u.test(word)&&/[A-ZÄÖÜẞ]/u.test(word);
 }
 
-export function createWordRescueGame(creatorUserId:string,guesserUserId:string,solution:string,hint=''):WordRescueGame{
+export function createWordRescueGame(creatorUserId:string,guesserUserId:string,solution:string,hint='',rescueTheme:WordRescueTheme='bridge'):WordRescueGame{
   if(!creatorUserId||!guesserUserId||creatorUserId===guesserUserId||!isValidWordRescueSolution(solution))throw new Error('invalid_word_rescue');
   return{type:'wordRescue',version:1,gameId:crypto.randomUUID(),creatorUserId,guesserUserId,
-    solution:normalizeWordRescueText(solution),hint:hint.trim().slice(0,120),
+    solution:normalizeWordRescueText(solution),hint:hint.trim().slice(0,120),rescueTheme,
     guessedLetters:[],wrongLetters:[],wrongWordAttempts:[],wrongCount:0,maxWrong:8,
     nextPlayerUserId:guesserUserId,status:'active',winnerUserId:null,moveNumber:0};
 }

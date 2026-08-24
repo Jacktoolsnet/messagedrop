@@ -827,13 +827,20 @@
           "wordRescuePreviewPrefix": "Sauve le mot",
           "wordRescueRulesTitle": "Règles de Sauve le mot",
           "wordRescueRuleCreate": "Le créateur choisit un mot et peut ajouter un indice. Le joueur ne voit que des emplacements vides.",
-          "wordRescueRuleLetters": "Le joueur choisit des lettres. Les bonnes lettres sont révélées partout ; une mauvaise retire une partie du pont.",
-          "wordRescueRuleWord": "Le mot complet peut être proposé à tout moment. Une mauvaise réponse coûte deux des huit parties du pont.",
+          "wordRescueRuleLetters": "Le joueur choisit des lettres. Les bonnes lettres sont révélées partout ; une mauvaise retire une partie de la scène choisie.",
+          "wordRescueRuleWord": "Le mot complet peut être proposé à tout moment. Une mauvaise réponse coûte deux des huit étapes de sauvetage.",
           "wordRescueRuleWin": "Le joueur gagne en trouvant le mot. Après huit erreurs, le créateur gagne et le mot est révélé.",
-          "remainingAttempts": "{{ count }} parties du pont restantes",
+          "remainingAttempts": "{{ count }} étapes de sauvetage restantes",
           "wrongWordAttempts": "Mauvaises propositions",
           "solveWholeWord": "Résoudre le mot entier",
-          "checkWholeWordAria": "Vérifier le mot entier"
+          "checkWholeWordAria": "Vérifier le mot entier",
+          "chooseRescueTheme": "Choisissez une scène de sauvetage",
+          "rescueTheme": {
+            "bridge": "Pont",
+            "flower": "Fleur",
+            "rocket": "Fusée",
+            "snowman": "Bonhomme de neige"
+          }
         },
         "revisionHistory": {
           "title": "Historique des modifications",
