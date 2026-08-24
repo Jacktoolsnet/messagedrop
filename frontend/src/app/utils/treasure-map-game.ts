@@ -6,10 +6,10 @@ const TREASURE_CHEST='\u{1FA8E}',TREASURE_FALLBACK='💰';let treasureGlyph:stri
 export function getTreasureSymbol():string{
  if(treasureGlyph)return treasureGlyph;
  if(typeof document==='undefined')return TREASURE_FALLBACK;
- const context=document.createElement('canvas').getContext('2d');if(!context)return TREASURE_FALLBACK;
- context.font='32px monospace';const fallbackWidth=context.measureText(TREASURE_CHEST).width;
- context.font='32px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji","Noto Emoji",monospace';const emojiWidth=context.measureText(TREASURE_CHEST).width;
- return treasureGlyph=Math.abs(emojiWidth-fallbackWidth)>.1?TREASURE_CHEST:TREASURE_FALLBACK;
+ const canvas=document.createElement('canvas');canvas.width=64;canvas.height=64;const context=canvas.getContext('2d');if(!context)return TREASURE_FALLBACK;
+ context.font='48px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji","Noto Emoji",sans-serif';context.textBaseline='top';context.fillStyle='#000';context.fillText(TREASURE_CHEST,4,4);
+ try{const pixels=context.getImageData(0,0,canvas.width,canvas.height).data;for(let i=0;i<pixels.length;i+=4){if(pixels[i+3]>20&&Math.max(pixels[i],pixels[i+1],pixels[i+2])-Math.min(pixels[i],pixels[i+1],pixels[i+2])>10)return treasureGlyph=TREASURE_CHEST}}catch{return treasureGlyph=TREASURE_FALLBACK}
+ return treasureGlyph=TREASURE_FALLBACK;
 }
 
 export function validTreasureLayout(layout:(TreasureIslandItem|null)[]):boolean{
