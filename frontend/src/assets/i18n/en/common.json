@@ -770,6 +770,7 @@
           "treasureMap": "Treasure Map",
           "newTreasureMapTitle": "Start Treasure Map",
           "placeTreasureItems": "Hide every item on your island. Tap an occupied cell to remove its item.",
+          "randomizeIslandAria": "Randomly redistribute items",
           "treasureMapStartFailed": "Treasure Map could not be started.",
           "prepareIsland": "Prepare island",
           "waitingForIsland": "The other island is being prepared.",

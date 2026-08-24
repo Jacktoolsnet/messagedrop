@@ -769,6 +769,7 @@
           "treasureMap": "Mapa del tesoro",
           "newTreasureMapTitle": "Iniciar Mapa del tesoro",
           "placeTreasureItems": "Esconde todos los objetos en tu isla. Toca una casilla ocupada para retirar el objeto.",
+          "randomizeIslandAria": "Redistribuir objetos al azar",
           "treasureMapStartFailed": "No se pudo iniciar Mapa del tesoro.",
           "prepareIsland": "Preparar isla",
           "waitingForIsland": "La otra isla se está preparando.",

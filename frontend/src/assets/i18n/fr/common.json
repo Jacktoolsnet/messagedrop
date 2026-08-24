@@ -769,6 +769,7 @@
           "treasureMap": "Carte au trésor",
           "newTreasureMapTitle": "Démarrer Carte au trésor",
           "placeTreasureItems": "Cachez tous les objets sur votre île. Touchez une case occupée pour retirer son objet.",
+          "randomizeIslandAria": "Répartir les objets aléatoirement",
           "treasureMapStartFailed": "Impossible de démarrer Carte au trésor.",
           "prepareIsland": "Préparer l’île",
           "waitingForIsland": "L’autre île est en préparation.",

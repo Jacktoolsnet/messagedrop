@@ -770,6 +770,7 @@
           "treasureMap": "Schatzkarte",
           "newTreasureMapTitle": "Schatzkarte starten",
           "placeTreasureItems": "Verstecke alle Gegenstände auf deiner Insel. Antippen entfernt einen Gegenstand wieder.",
+          "randomizeIslandAria": "Gegenstände zufällig neu verteilen",
           "treasureMapStartFailed": "Schatzkarte konnte nicht gestartet werden.",
           "prepareIsland": "Insel vorbereiten",
           "waitingForIsland": "Die andere Insel wird vorbereitet.",
