@@ -885,7 +885,7 @@
           "rollDice": "Würfeln",
           "diceStartFailed": "Das Würfeln konnte nicht erstellt werden.",
           "diceRulesTitle": "Würfeln – Erklärung",
-          "diceRuleCreate": "Vor dem eigenen Wurf lässt sich die Anzahl über den Einstellungsbutton auf einen bis zehn Würfel ändern.",
+          "diceRuleCreate": "Beide Chatteilnehmer können die Anzahl jederzeit über den Einstellungsbutton auf einen bis zehn Würfel ändern.",
           "diceRuleTurns": "Der Empfänger beginnt. Danach würfeln beide Chatteilnehmer immer abwechselnd.",
           "diceRuleResult": "Jeder Wurf wird mit einem kryptografisch sicheren Zufallsgenerator bestimmt und samt Summe angezeigt.",
           "diceSettingsTitle": "Würfel einstellen",

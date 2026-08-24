@@ -885,7 +885,7 @@
           "rollDice": "Roll dice",
           "diceStartFailed": "The dice roll could not be created.",
           "diceRulesTitle": "Dice – How it works",
-          "diceRuleCreate": "Before your turn, use the settings button to choose between one and ten dice.",
+          "diceRuleCreate": "Either chat participant can use the settings button at any time to choose between one and ten dice.",
           "diceRuleTurns": "The recipient rolls first. The two chat participants then alternate.",
           "diceRuleResult": "Each roll uses a cryptographically secure random generator and is displayed with its total.",
           "diceSettingsTitle": "Dice settings",

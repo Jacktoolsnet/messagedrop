@@ -884,7 +884,7 @@
           "rollDice": "Tirar los dados",
           "diceStartFailed": "No se pudo crear la tirada de dados.",
           "diceRulesTitle": "Dados – Cómo funciona",
-          "diceRuleCreate": "Antes de tu tirada, el botón de configuración permite elegir entre uno y diez dados.",
+          "diceRuleCreate": "Ambos participantes pueden usar el botón de configuración en cualquier momento para elegir entre uno y diez dados.",
           "diceRuleTurns": "El destinatario tira primero. Después, ambos participantes se alternan.",
           "diceRuleResult": "Cada tirada usa un generador aleatorio criptográficamente seguro y muestra la suma.",
           "diceSettingsTitle": "Configurar dados",

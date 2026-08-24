@@ -884,7 +884,7 @@
           "rollDice": "Lancer les dés",
           "diceStartFailed": "Le lancer de dés n’a pas pu être créé.",
           "diceRulesTitle": "Dés – Explication",
-          "diceRuleCreate": "Avant votre lancer, le bouton de réglage permet de choisir entre un et dix dés.",
+          "diceRuleCreate": "Les deux participants peuvent utiliser le bouton de réglage à tout moment pour choisir entre un et dix dés.",
           "diceRuleTurns": "Le destinataire commence. Ensuite, les deux participants jouent à tour de rôle.",
           "diceRuleResult": "Chaque lancer utilise un générateur aléatoire cryptographiquement sûr et affiche la somme.",
           "diceSettingsTitle": "Réglage des dés",
