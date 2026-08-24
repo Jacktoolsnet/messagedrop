@@ -12,7 +12,11 @@
     [disabled]="!canAct()||!destinations().has(index)" (click)="move(index)"
     (pointerenter)="destinations().has(index)&&feedback.notifyHover()">
     @if(currentGame.asteroids[index]){<span class="asteroid-rock" aria-hidden="true">☄</span>}
-    @if(shipAt(index);as mark){<span class="asteroid-ship" [class.asteroid-ship--x]="mark==='X'" [class.asteroid-ship--o]="mark==='O'"><mat-icon>rocket_launch</mat-icon><b>{{mark}}</b></span>}
+    @if(shipAt(index);as mark){
+      @if(isDestroyedShip(mark)){
+        @if(isExplodingShip(mark)){<span class="asteroid-ship-explosion" aria-hidden="true">💥</span>}
+      }@else{<span class="asteroid-ship" [class.asteroid-ship--x]="mark==='X'" [class.asteroid-ship--o]="mark==='O'"><mat-icon>rocket_launch</mat-icon><b>{{mark}}</b></span>}
+    }
     @if(isLaserPath(index)){<span class="asteroid-laser" [class.asteroid-laser--horizontal]="isHorizontalLaser()" aria-hidden="true">{{isHorizontalLaser()?'━':'┃'}}</span>}
     @if(isLaserImpact(index)){<span class="asteroid-laser-impact" aria-hidden="true">✦</span>}
   </button>

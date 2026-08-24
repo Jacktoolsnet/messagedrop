@@ -15,6 +15,7 @@ export class AsteroidDuelBoardComponent{
   readonly game=input<AsteroidDuelGame|null>(null);
   readonly currentUserId=input('');
   readonly disabled=input(false);
+  readonly animateHit=input(false);
   readonly action=output<AsteroidDuelAction>();
   readonly cells=Array.from({length:49},(_,index)=>index);
   readonly currentMark=computed<TicTacToeMark|null>(()=>{const game=this.game(),user=this.currentUserId();return !game?null:user===game.playerXUserId?'X':user===game.playerOUserId?'O':null});
@@ -39,6 +40,18 @@ export class AsteroidDuelBoardComponent{
     });
   });
   private readonly visibleLaserMoveNumber=signal<number|null>(null);
+  private readonly explodingMark=signal<TicTacToeMark|null>(null);
+  private animatedHitKey:string|null=null;
+  private readonly hitFeedbackEffect=effect(onCleanup=>{
+    const game=this.game(),animate=this.animateHit(),move=game?.lastMove;
+    if(!game||!animate||!move?.hitPlayer)return;
+    const key=`${game.gameId}:${move.moveNumber}`;if(this.animatedHitKey===key)return;this.animatedHitKey=key;
+    if(game.status==='won'){
+      const defeated:TicTacToeMark=game.winnerUserId===game.playerXUserId?'O':'X';
+      this.explodingMark.set(defeated);this.feedback.notifyShipDestroyed();
+      const timer=setTimeout(()=>this.explodingMark.set(null),2600);onCleanup(()=>clearTimeout(timer));
+    }else this.feedback.notifyLaserHit();
+  });
   private readonly laserVisibilityEffect=effect(onCleanup=>{
     const move=this.game()?.lastMove;
     if(!move||move.action.type!=='fire'){this.visibleLaserMoveNumber.set(null);return}
@@ -52,6 +65,8 @@ export class AsteroidDuelBoardComponent{
   isHorizontalLaser():boolean{const action=this.game()?.lastMove?.action;return action?.type==='fire'&&(action.direction==='left'||action.direction==='right')}
   isLaserImpact(index:number):boolean{const move=this.game()?.lastMove;if(!move||this.visibleLaserMoveNumber()!==move.moveNumber||move.action.type!=='fire'||(!move.hitPlayer&&move.destroyedAsteroid===null))return false;return move.path.at(-1)===index}
   shieldSlots(count:number):number[]{return Array.from({length:Math.max(0,count)},(_,index)=>index)}
+  isDestroyedShip(mark:TicTacToeMark):boolean{const game=this.game();return !!game&&game.status==='won'&&game.winnerUserId!==(mark==='X'?game.playerXUserId:game.playerOUserId)}
+  isExplodingShip(mark:TicTacToeMark):boolean{return this.explodingMark()===mark}
   isLastPosition(index:number):boolean{const move=this.game()?.lastMove;return !!move&&(index===move.from||index===move.to)}
   move(index:number):void{if(!this.canAct()||!this.destinations().has(index))return;this.fireMenuOpen.set(false);this.feedback.notifySelection();this.action.emit({type:'move',to:index})}
   toggleFireMenu():void{if(!this.canAct())return;this.feedback.notifySelection();this.fireMenuOpen.update(open=>!open)}

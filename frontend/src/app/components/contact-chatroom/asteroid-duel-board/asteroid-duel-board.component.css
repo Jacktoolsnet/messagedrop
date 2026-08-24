@@ -10,3 +10,5 @@
 @keyframes laser-flash{to{transform:scale(1.18);filter:drop-shadow(0 0 9px var(--laser))}}
 @keyframes laser-impact{to{transform:scale(1.28) rotate(20deg)}}
 @keyframes fire-menu-open{from{opacity:0;transform:translate(20%,20%) scale(.75)}}
+.asteroid-ship-explosion{position:relative;z-index:7;display:grid;place-items:center;font-size:clamp(1.5rem,7vw,2.7rem);filter:drop-shadow(0 0 7px #fff) drop-shadow(0 0 14px #ff5a00);animation:ship-explosion .42s ease-in-out infinite alternate}
+@keyframes ship-explosion{from{transform:scale(.82) rotate(-8deg)}to{transform:scale(1.22) rotate(12deg);filter:drop-shadow(0 0 11px #fff) drop-shadow(0 0 20px #ff2a00)}}

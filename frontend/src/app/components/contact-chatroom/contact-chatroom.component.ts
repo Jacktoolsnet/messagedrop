@@ -226,6 +226,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   );
   private readonly messageKeys = new Set<string>();
   private readonly liveMineAnimationMessageIds = new Set<string>();
+  private readonly liveAsteroidHitMoves = new Set<string>();
   private readonly payloadSyncInFlightContacts = new Set<string>();
   private readonly tabbedMessageIds = new Set<string>();
   private initialTabbedMessagesCaptured = false;
@@ -339,6 +340,9 @@ export class ContactChatroomComponent implements AfterViewInit {
         &&currentHideSeekRound(payload.game)?.lastMove?.hitMine){
         this.liveMineAnimationMessageIds.add(incoming.id);
         setTimeout(()=>this.liveMineAnimationMessageIds.delete(incoming.id),10_000);
+      }
+      if(incoming.direction==='contactUser'&&payload?.game?.type==='asteroidDuel'&&payload.game.lastMove?.hitPlayer){
+        this.rememberAsteroidHit(payload.game);
       }
       this.messages.update(msgs => [{
         id: incoming.id,
@@ -849,6 +853,9 @@ export class ContactChatroomComponent implements AfterViewInit {
       &&!!currentHideSeekRound(game)?.lastMove?.hitMine;
   }
 
+  shouldAnimateAsteroidHit(game:AsteroidDuelGame):boolean{return this.liveAsteroidHitMoves.has(`${game.gameId}:${game.moveNumber}`)}
+  private rememberAsteroidHit(game:AsteroidDuelGame):void{const key=`${game.gameId}:${game.moveNumber}`;this.liveAsteroidHitMoves.add(key);setTimeout(()=>this.liveAsteroidHitMoves.delete(key),10_000)}
+
   isCurrentUserGameWinner(game: ChatGame): boolean {
     return game.winnerUserId === this.userService.getUser().id;
   }
@@ -935,7 +942,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   canPlayCheckers(message:ChatroomMessage):boolean{const g=message.payload?.game;return !!g&&g.type==='checkers'&&g.status==='active'&&g.nextPlayerUserId===this.userService.getUser().id&&!this.gameMovesInFlight().has(g.gameId)}
   async playCheckers(message:ChatroomMessage,action:CheckersAction):Promise<void>{const contact=this.contact(),g=message.payload?.game;if(!contact||!g||g.type!=='checkers'||!this.canPlayCheckers(message))return;const next=applyCheckersMove(g,this.userService.getUser().id,action);if(!next)return;this.setGameMoveInFlight(g.gameId,true);try{const payload=this.createEmptyMessage();payload.game=next;await this.sendAsNewMessage(contact,payload,message.messageId,'game_move')}finally{this.setGameMoveInFlight(g.gameId,false)}}
   canPlayAsteroidDuel(message:ChatroomMessage):boolean{const g=message.payload?.game;return !!g&&g.type==='asteroidDuel'&&g.status==='active'&&g.nextPlayerUserId===this.userService.getUser().id&&!this.gameMovesInFlight().has(g.gameId)}
-  async playAsteroidDuel(message:ChatroomMessage,action:AsteroidDuelAction):Promise<void>{const contact=this.contact(),g=message.payload?.game;if(!contact||!g||g.type!=='asteroidDuel'||!this.canPlayAsteroidDuel(message))return;const next=applyAsteroidDuelAction(g,this.userService.getUser().id,action);if(!next)return;this.setGameMoveInFlight(g.gameId,true);try{if(next.lastMove?.hitPlayer)this.gameFeedback.notifyCorrect();else if(next.lastMove?.destroyedAsteroid!==null)this.gameFeedback.notifyExplosion();const payload=this.createEmptyMessage();payload.game=next;await this.sendAsNewMessage(contact,payload,message.messageId,'game_move')}finally{this.setGameMoveInFlight(g.gameId,false)}}
+  async playAsteroidDuel(message:ChatroomMessage,action:AsteroidDuelAction):Promise<void>{const contact=this.contact(),g=message.payload?.game;if(!contact||!g||g.type!=='asteroidDuel'||!this.canPlayAsteroidDuel(message))return;const next=applyAsteroidDuelAction(g,this.userService.getUser().id,action);if(!next)return;this.setGameMoveInFlight(g.gameId,true);try{if(next.lastMove?.hitPlayer)this.rememberAsteroidHit(next);else if(next.lastMove?.destroyedAsteroid!==null)this.gameFeedback.notifyExplosion();const payload=this.createEmptyMessage();payload.game=next;await this.sendAsNewMessage(contact,payload,message.messageId,'game_move')}finally{this.setGameMoveInFlight(g.gameId,false)}}
 
   canPlayCode(message: ChatroomMessage): boolean {
     const game = message.payload?.game;

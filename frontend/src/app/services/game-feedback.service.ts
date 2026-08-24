@@ -49,6 +49,16 @@ export class GameFeedbackService {
     if (!this.audioMuted()) void this.playExplosionSound(step);
   }
 
+  notifyLaserHit(): void {
+    this.tryVibrate([45, 25, 70]);
+    if (!this.audioMuted()) void this.playLaserHitSound();
+  }
+
+  notifyShipDestroyed(): void {
+    this.tryVibrate([70, 30, 110, 35, 150]);
+    if (!this.audioMuted()) void this.playShipDestroyedSound();
+  }
+
   async notifyMineCountdown(): Promise<void> {
     this.tryVibrate([18, 180, 18, 180, 24]);
     if (!this.audioMuted()) {
@@ -217,6 +227,24 @@ export class GameFeedbackService {
     const variation = Math.min(Math.max(step, 0), 8) * 7;
     this.playTone(context, now, 150 + variation, 48, 0.32, 0.055, 'sawtooth');
     this.playTone(context, now + 0.025, 95 + variation, 36, 0.38, 0.045, 'square');
+  }
+
+  private async playLaserHitSound(): Promise<void> {
+    const context = await this.getReadyAudioContext();
+    if (!context) return;
+    const now = context.currentTime;
+    this.playTone(context, now, 980, 310, .2, .045, 'sawtooth');
+    this.playTone(context, now + .055, 420, 135, .28, .04, 'square');
+  }
+
+  private async playShipDestroyedSound(): Promise<void> {
+    const context = await this.getReadyAudioContext();
+    if (!context) return;
+    const now = context.currentTime;
+    this.playTone(context, now, 1100, 240, .22, .045, 'sawtooth');
+    this.playTone(context, now + .12, 230, 42, .55, .065, 'sawtooth');
+    this.playTone(context, now + .2, 145, 34, .68, .055, 'square');
+    this.playTone(context, now + .42, 92, 28, .62, .04, 'triangle');
   }
 
   private async playMineCountdownSound(): Promise<void> {
