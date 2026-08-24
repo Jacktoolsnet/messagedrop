@@ -1,0 +1,3 @@
+<div class="treasure-palette">@for(item of items;track item){<button type="button" [class.treasure-palette__item--selected]="selected()===item" [disabled]="remaining(item)<=0" (click)="select(item)"><span>{{symbol(item)}}</span><b>{{remaining(item)}}</b></button>}</div>
+<div class="treasure-placement">@for(index of cells;track index){<button type="button" (click)="place(index)" (pointerenter)="feedback.notifyHover()">@if(layout()[index];as item){<span>{{symbol(item)}}</span>}</button>}</div>
+<button type="button" class="treasure-random" (click)="randomize()"><span>↻</span></button>

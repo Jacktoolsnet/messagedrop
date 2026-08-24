@@ -253,7 +253,23 @@ export interface AsteroidDuelGame {
   moveNumber:number;lastMove:AsteroidDuelLastMove|null;
 }
 
-export type ChatGame = TicTacToeGame | ConnectFourGame | DotsAndBoxesGame | RockPaperScissorsGame | CodeGame | MemoryGame | MinefieldGame | MinefieldHideSeekGame | MorrisGame | CheckersGame | AsteroidDuelGame;
+export type TreasureIslandItem='treasure'|'bomb'|'prisoner'|'wine'|'bride'|'map'|'compass';
+export type TreasureCompassDirection='up'|'upRight'|'right'|'downRight'|'down'|'downLeft'|'left'|'upLeft'|'here';
+export type TreasureMapAction={type:'raid';cellIndices:number[]}|{type:'parrot';cellIndex:number}|{type:'pass'};
+export interface TreasureMapLastMove{
+  playerUserId:string;action:TreasureMapAction;foundItems:TreasureIslandItem[];
+  temporaryRevealIndices:number[];mapRevealIndex:number|null;compassDirection:TreasureCompassDirection|null;moveNumber:number;
+}
+export interface TreasureMapGame{
+  type:'treasureMap';version:1;gameId:string;rows:7;columns:7;
+  playerXUserId:string;playerOUserId:string;playerXLayout:(TreasureIslandItem|null)[];playerOLayout:(TreasureIslandItem|null)[]|null;
+  playerXRevealed:boolean[];playerORevealed:boolean[];playerXPirates:number;playerOPirates:number;
+  playerXParrots:number;playerOParrots:number;playerXDrunk:number;playerODrunk:number;
+  playerXTreasures:number;playerOTreasures:number;phase:'placingO'|'active';nextPlayerUserId:string|null;
+  status:'active'|'won';winnerUserId:string|null;moveNumber:number;lastMove:TreasureMapLastMove|null;
+}
+
+export type ChatGame = TicTacToeGame | ConnectFourGame | DotsAndBoxesGame | RockPaperScissorsGame | CodeGame | MemoryGame | MinefieldGame | MinefieldHideSeekGame | MorrisGame | CheckersGame | AsteroidDuelGame | TreasureMapGame;
 
 export interface GameStats {
   played: number;
