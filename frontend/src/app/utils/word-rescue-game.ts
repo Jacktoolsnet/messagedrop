@@ -11,10 +11,10 @@ export function isValidWordRescueSolution(value:string):boolean{
   return word.length>=2&&word.length<=32&&/^[A-ZÄÖÜẞ -]+$/u.test(word)&&/[A-ZÄÖÜẞ]/u.test(word);
 }
 
-export function createWordRescueGame(creatorUserId:string,guesserUserId:string,solution:string,hint='',category=''):WordRescueGame{
+export function createWordRescueGame(creatorUserId:string,guesserUserId:string,solution:string,hint=''):WordRescueGame{
   if(!creatorUserId||!guesserUserId||creatorUserId===guesserUserId||!isValidWordRescueSolution(solution))throw new Error('invalid_word_rescue');
   return{type:'wordRescue',version:1,gameId:crypto.randomUUID(),creatorUserId,guesserUserId,
-    solution:normalizeWordRescueText(solution),hint:hint.trim().slice(0,120),category:category.trim().slice(0,60),
+    solution:normalizeWordRescueText(solution),hint:hint.trim().slice(0,120),
     guessedLetters:[],wrongLetters:[],wrongWordAttempts:[],wrongCount:0,maxWrong:8,
     nextPlayerUserId:guesserUserId,status:'active',winnerUserId:null,moveNumber:0};
 }

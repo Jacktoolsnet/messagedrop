@@ -280,7 +280,7 @@ export interface WordRescueGame {
   type:'wordRescue';version:1;gameId:string;
   creatorUserId:string;guesserUserId:string;
   /** The complete message is end-to-end encrypted. The UI only reveals this value to the creator or after game end. */
-  solution:string;hint:string;category:string;
+  solution:string;hint:string;
   guessedLetters:string[];wrongLetters:string[];wrongWordAttempts:string[];
   wrongCount:number;maxWrong:8;nextPlayerUserId:string|null;
   status:'active'|'won';winnerUserId:string|null;moveNumber:number;

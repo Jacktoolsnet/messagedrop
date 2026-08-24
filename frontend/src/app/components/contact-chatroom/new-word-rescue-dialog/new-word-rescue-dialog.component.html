@@ -1,8 +1,7 @@
 <app-dialog-header icon="spellcheck" [title]="'common.contact.chatroom.games.newWordRescueTitle'|transloco"></app-dialog-header>
 <mat-dialog-content class="word-dialog">
   <p>{{'common.contact.chatroom.games.chooseRescueWord'|transloco}}</p>
-  <mat-form-field appearance="outline"><mat-label>{{'common.contact.chatroom.games.solutionWord'|transloco}}</mat-label><input matInput [type]="show()?'text':'password'" maxlength="32" autocomplete="off" [ngModel]="solution()" (ngModelChange)="solution.set($event)" (keyup.enter)="submit()"><button mat-icon-button matSuffix type="button" (click)="show.set(!show())" [attr.aria-label]="(show()?'common.contact.chatroom.games.hideWordAria':'common.contact.chatroom.games.showWordAria')|transloco"><mat-icon>{{show()?'visibility_off':'visibility'}}</mat-icon></button></mat-form-field>
-  <mat-form-field appearance="outline"><mat-label>{{'common.contact.chatroom.games.categoryOptional'|transloco}}</mat-label><input matInput maxlength="60" [ngModel]="category()" (ngModelChange)="category.set($event)"></mat-form-field>
+  <mat-form-field appearance="outline"><mat-label>{{'common.contact.chatroom.games.solutionWord'|transloco}}</mat-label><input matInput type="text" maxlength="32" autocomplete="off" [ngModel]="solution()" (ngModelChange)="solution.set($event)" (keyup.enter)="submit()"></mat-form-field>
   <mat-form-field appearance="outline"><mat-label>{{'common.contact.chatroom.games.hintOptional'|transloco}}</mat-label><textarea matInput rows="2" maxlength="120" [ngModel]="hint()" (ngModelChange)="hint.set($event)"></textarea></mat-form-field>
 </mat-dialog-content>
 <mat-dialog-actions class="sticky-actions"><button mat-icon-button class="action-close" type="button" (click)="close()"><mat-icon>close</mat-icon></button><button mat-icon-button color="primary" type="button" [disabled]="!valid()" (click)="submit()"><mat-icon>send</mat-icon></button></mat-dialog-actions>
