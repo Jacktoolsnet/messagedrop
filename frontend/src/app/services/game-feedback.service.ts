@@ -44,6 +44,21 @@ export class GameFeedbackService {
     if (!this.audioMuted()) void this.playUnlockSound();
   }
 
+  notifyTreasureFound(): void {
+    this.tryVibrate([24, 25, 35, 25, 55]);
+    if (!this.audioMuted()) void this.playTreasureFoundSound();
+  }
+
+  notifyTreasureCrown(): void {
+    this.tryVibrate([55, 35, 75]);
+    if (!this.audioMuted()) void this.playTreasureCrownSound();
+  }
+
+  notifyTreasureClue(): void {
+    this.tryVibrate([16, 35, 24]);
+    if (!this.audioMuted()) void this.playTreasureClueSound();
+  }
+
   notifyIncorrect(): void {
     this.tryVibrate([70, 35, 70]);
     if (!this.audioMuted()) void this.playIncorrectSound();
@@ -224,6 +239,32 @@ export class GameFeedbackService {
     this.playTone(context, now, 170, 245, .1, .045, 'square');
     this.playTone(context, now + .1, 390, 720, .24, .035, 'triangle');
     this.playTone(context, now + .2, 720, 930, .18, .025, 'sine');
+  }
+
+  private async playTreasureFoundSound(): Promise<void> {
+    const context = await this.getReadyAudioContext();
+    if (!context) return;
+    const now = context.currentTime;
+    [523, 659, 784, 1047].forEach((frequency, index) => {
+      const start = now + index * .085;
+      this.playTone(context, start, frequency, frequency * 1.035, .24, .035, index < 2 ? 'triangle' : 'sine');
+    });
+    this.playTone(context, now + .12, 1450, 1850, .16, .018, 'sine');
+  }
+
+  private async playTreasureCrownSound(): Promise<void> {
+    const context = await this.getReadyAudioContext();
+    if (!context) return;
+    const now = context.currentTime;
+    [392, 330, 262, 196].forEach((frequency, index) => this.playTone(context, now + index * .11, frequency, frequency * .88, .25, .035, index % 2 ? 'triangle' : 'sawtooth'));
+    this.playTone(context, now + .18, 92, 58, .42, .025, 'square');
+  }
+
+  private async playTreasureClueSound(): Promise<void> {
+    const context = await this.getReadyAudioContext();
+    if (!context) return;
+    const now = context.currentTime;
+    [440, 554, 659, 880].forEach((frequency, index) => this.playTone(context, now + index * .1, frequency, frequency * 1.018, .27, .024, 'sine'));
   }
 
   private async playIncorrectSound(): Promise<void> {
