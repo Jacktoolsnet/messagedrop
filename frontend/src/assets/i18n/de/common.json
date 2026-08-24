@@ -803,7 +803,7 @@
           "treasureRuleFinds": "Schätze werden eingesammelt, Bomben töten den Piraten, Gefangene vergrößern deine Mannschaft und Wein macht diesen Piraten für deinen nächsten Zug unbrauchbar.",
           "treasureRuleBride": "Die Krone beschlagnahmt alle bisher gefundenen Schätze. Sie liegen anschließend wieder an ihren ursprünglichen Positionen.",
           "treasureRuleParrot": "Ein Papagei zeigt das Zielfeld und seine Nachbarfelder für kurze Zeit, sammelt aber nichts ein und löst keine Bomben aus.",
-          "treasureRuleHints": "Die Schatzkarte zeigt ein zufälliges Feld kurz an. Der Kompass weist in Richtung des nächsten verborgenen Schatzes.",
+          "treasureRuleHints": "Das Fernrohr deckt ein zufälliges Feld dauerhaft auf. Der Kompass weist in Richtung des nächsten verborgenen Schatzes.",
           "treasureRuleWin": "Wer alle fünf gegnerischen Schätze findet, gewinnt. Sterben alle eigenen Piraten, gewinnt sofort der Gegner.",
           "treasureItem": {
             "treasure": "Schatz",
@@ -811,7 +811,7 @@
             "prisoner": "Gefangener",
             "wine": "Weinglas",
             "bride": "Krone",
-            "map": "Schatzkarte",
+            "map": "Fernrohr",
             "compass": "Kompass"
           }
         },

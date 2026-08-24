@@ -802,7 +802,7 @@
           "treasureRuleFinds": "Les trésors sont récupérés, les bombes tuent le pirate, les prisonniers agrandissent l’équipage et le vin rend ce pirate indisponible au prochain tour.",
           "treasureRuleBride": "La Couronne confisque tous les trésors déjà récupérés, qui retournent à leur position initiale.",
           "treasureRuleParrot": "Un perroquet dévoile brièvement la cible et les cases voisines, sans ramasser d’objet ni déclencher de bombe.",
-          "treasureRuleHints": "La carte dévoile brièvement une case aléatoire. La boussole indique le trésor caché le plus proche.",
+          "treasureRuleHints": "La longue-vue dévoile définitivement une case aléatoire. La boussole indique le trésor caché le plus proche.",
           "treasureRuleWin": "Le premier à trouver les cinq trésors adverses gagne. Si tous vos pirates meurent, l’adversaire gagne immédiatement.",
           "treasureItem": {
             "treasure": "Trésor",
@@ -810,7 +810,7 @@
             "prisoner": "Prisonnier",
             "wine": "Verre de vin",
             "bride": "Couronne",
-            "map": "Carte au trésor",
+            "map": "Longue-vue",
             "compass": "Boussole"
           }
         },

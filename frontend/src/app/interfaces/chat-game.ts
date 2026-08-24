@@ -267,6 +267,7 @@ export interface TreasureMapGame{
   playerXRevealed:boolean[];playerORevealed:boolean[];playerXPirates:number;playerOPirates:number;
   playerXAttacked?:boolean[];playerOAttacked?:boolean[];
   playerXScouted?:boolean[];playerOScouted?:boolean[];
+  playerXMapped?:boolean[];playerOMapped?:boolean[];
   playerXCompassHint?:TreasureCompassHint|null;playerOCompassHint?:TreasureCompassHint|null;
   playerXParrots:number;playerOParrots:number;playerXDrunk:number;playerODrunk:number;
   playerXTreasures:number;playerOTreasures:number;phase:'placingO'|'active';nextPlayerUserId:string|null;

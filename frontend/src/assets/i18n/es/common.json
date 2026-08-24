@@ -802,7 +802,7 @@
           "treasureRuleFinds": "Los tesoros se recogen, las bombas matan al pirata, los prisioneros aumentan la tripulación y el vino inutiliza a ese pirata durante tu próximo turno.",
           "treasureRuleBride": "La Corona confisca todos los tesoros recogidos, que vuelven a sus posiciones originales.",
           "treasureRuleParrot": "Un loro muestra brevemente la casilla elegida y sus vecinas, sin recoger objetos ni activar bombas.",
-          "treasureRuleHints": "El mapa muestra brevemente una casilla al azar. La brújula apunta al tesoro oculto más cercano.",
+          "treasureRuleHints": "El catalejo revela permanentemente una casilla al azar. La brújula apunta al tesoro oculto más cercano.",
           "treasureRuleWin": "Gana quien encuentre primero los cinco tesoros rivales. Si mueren todos tus piratas, gana el oponente.",
           "treasureItem": {
             "treasure": "Tesoro",
@@ -810,7 +810,7 @@
             "prisoner": "Prisionero",
             "wine": "Copa de vino",
             "bride": "Corona",
-            "map": "Mapa del tesoro",
+            "map": "Catalejo",
             "compass": "Brújula"
           }
         },

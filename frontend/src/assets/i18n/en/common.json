@@ -803,7 +803,7 @@
           "treasureRuleFinds": "Treasures are collected, bombs kill the pirate, prisoners expand your crew, and wine makes that pirate unavailable for your next turn.",
           "treasureRuleBride": "The Crown confiscates every treasure collected so far. They return to their original positions.",
           "treasureRuleParrot": "A parrot briefly reveals the target and neighbouring cells, but collects nothing and triggers no bombs.",
-          "treasureRuleHints": "The treasure map briefly shows a random cell. The compass points toward the nearest hidden treasure.",
+          "treasureRuleHints": "The telescope permanently reveals a random cell. The compass points toward the nearest hidden treasure.",
           "treasureRuleWin": "The first player to find all five opposing treasures wins. If all your pirates die, the opponent wins immediately.",
           "treasureItem": {
             "treasure": "Treasure",
@@ -811,7 +811,7 @@
             "prisoner": "Prisoner",
             "wine": "Wine glass",
             "bride": "Crown",
-            "map": "Treasure map",
+            "map": "Telescope",
             "compass": "Compass"
           }
         },

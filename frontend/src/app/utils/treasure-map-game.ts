@@ -34,7 +34,7 @@ export function randomTreasureLayout(random:()=>number=Math.random):(TreasureIsl
 export function createTreasureMapGame(x:string,o:string,layout:(TreasureIslandItem|null)[]):TreasureMapGame{
  if(!validTreasureLayout(layout))throw new Error('invalid_treasure_layout');
  return{type:'treasureMap',version:1,gameId:crypto.randomUUID(),rows:7,columns:7,playerXUserId:x,playerOUserId:o,playerXLayout:[...layout],playerOLayout:null,
-  playerXRevealed:Array(49).fill(false),playerORevealed:Array(49).fill(false),playerXAttacked:Array(49).fill(false),playerOAttacked:Array(49).fill(false),playerXScouted:Array(49).fill(false),playerOScouted:Array(49).fill(false),playerXCompassHint:null,playerOCompassHint:null,playerXPirates:4,playerOPirates:4,playerXParrots:4,playerOParrots:4,
+  playerXRevealed:Array(49).fill(false),playerORevealed:Array(49).fill(false),playerXAttacked:Array(49).fill(false),playerOAttacked:Array(49).fill(false),playerXScouted:Array(49).fill(false),playerOScouted:Array(49).fill(false),playerXMapped:Array(49).fill(false),playerOMapped:Array(49).fill(false),playerXCompassHint:null,playerOCompassHint:null,playerXPirates:4,playerOPirates:4,playerXParrots:4,playerOParrots:4,
   playerXDrunk:0,playerODrunk:0,playerXTreasures:0,playerOTreasures:0,phase:'placingO',nextPlayerUserId:o,planningPlayerUserId:null,status:'active',winnerUserId:null,moveNumber:0,lastMove:null};
 }
 export function placeTreasureMapOpponent(game:TreasureMapGame,userId:string,layout:(TreasureIslandItem|null)[]):TreasureMapGame|null{
@@ -64,7 +64,7 @@ export function applyTreasureMapAction(game:TreasureMapGame,userId:string,action
  if(raidCount<=0||action.cellIndices.length!==raidCount||new Set(action.cellIndices).size!==action.cellIndices.length||action.cellIndices.some(index=>!Number.isInteger(index)||index<0||index>=49||revealed[index]))return null;
  const attacked=[...(isX?game.playerOAttacked??game.playerORevealed:game.playerXAttacked??game.playerXRevealed)];action.cellIndices.forEach(index=>attacked[index]=true);
  let next:TreasureMapGame={...game,playerXAttacked:isX?game.playerXAttacked:attacked,playerOAttacked:isX?attacked:game.playerOAttacked};if(isX)next.playerXDrunk=0;else next.playerODrunk=0;
- let mapRevealIndex:number|null=null,compassDirection:TreasureCompassDirection|null=null;const temporary:number[]=[],foundItems:TreasureIslandItem[]=[];
+ let mapRevealIndex:number|null=null,compassDirection:TreasureCompassDirection|null=null;const temporary:number[]=[],foundItems:TreasureIslandItem[]=[],mapped=[...(isX?game.playerOMapped??Array(49).fill(false):game.playerXMapped??Array(49).fill(false))];
  for(const index of action.cellIndices){
   revealed[index]=true;const item=defenderLayout[index];if(!item)continue;foundItems.push(item);
   if(item==='treasure'){if(isX)next.playerXTreasures++;else next.playerOTreasures++}
@@ -72,10 +72,10 @@ export function applyTreasureMapAction(game:TreasureMapGame,userId:string,action
   else if(item==='prisoner'){if(isX)next.playerXPirates++;else next.playerOPirates++}
   else if(item==='wine'){if(isX)next.playerXDrunk++;else next.playerODrunk++}
   else if(item==='bride'){if(isX){next.playerXTreasures=0;hideTreasuresInPlace(revealed,defenderLayout)}else{next.playerOTreasures=0;hideTreasuresInPlace(revealed,defenderLayout)}}
-  else if(item==='map'){const candidates=revealed.flatMap((value,i)=>!value?[i]:[]);if(candidates.length){mapRevealIndex=candidates[Math.min(candidates.length-1,Math.floor(random()*candidates.length))];temporary.push(mapRevealIndex)}}
+  else if(item==='map'){const candidates=revealed.flatMap((value,i)=>!value&&!mapped[i]?[i]:[]);if(candidates.length){mapRevealIndex=candidates[Math.min(candidates.length-1,Math.floor(random()*candidates.length))];mapped[mapRevealIndex]=true}}
   else if(item==='compass'){compassDirection=nearestTreasureDirection(index,defenderLayout,revealed);if(compassDirection){if(isX)next.playerOCompassHint={cellIndex:index,direction:compassDirection};else next.playerXCompassHint={cellIndex:index,direction:compassDirection}}}
  }
- if(isX)next.playerORevealed=revealed;else next.playerXRevealed=revealed;
+ if(isX){next.playerORevealed=revealed;next.playerOMapped=mapped}else{next.playerXRevealed=revealed;next.playerXMapped=mapped}
  const collected=isX?next.playerXTreasures:next.playerOTreasures,living=isX?next.playerXPirates:next.playerOPirates;
  if(collected>=TREASURE_INVENTORY.treasure)return win(next,userId,action,foundItems,temporary,mapRevealIndex,compassDirection);
  if(living<=0)return win(next,isX?game.playerOUserId:game.playerXUserId,action,foundItems,temporary,mapRevealIndex,compassDirection);
