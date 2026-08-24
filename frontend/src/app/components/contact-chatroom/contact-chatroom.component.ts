@@ -884,6 +884,28 @@ export class ContactChatroomComponent implements AfterViewInit {
     return game.winnerUserId === this.userService.getUser().id;
   }
 
+  getGameStateEmoji(game: ChatGame): string {
+    if (game.status === 'active') return this.isCurrentUserGameTurn(game) ? '🫵' : '⏳';
+    if (game.status === 'won') return this.isCurrentUserGameWinner(game) ? '🥳' : '😢';
+    return '🤝';
+  }
+
+  getGameStateLabel(game: ChatGame): string {
+    if (game.status === 'active') {
+      if (this.isCurrentUserGameTurn(game)) return this.translation.t('common.contact.chatroom.games.statusYourTurn');
+      const name = this.contact()?.name || this.translation.t('common.contact.chatroom.contactLabel');
+      return this.translation.t('common.contact.chatroom.games.statusContactTurn', { name });
+    }
+    if (game.status === 'won') return this.translation.t(this.isCurrentUserGameWinner(game)
+      ? 'common.contact.chatroom.games.iWon'
+      : 'common.contact.chatroom.games.iLost');
+    return this.translation.t('common.contact.chatroom.games.drawTitle');
+  }
+
+  showGameState(game: ChatGame): void {
+    this.snackBar.open(this.getGameStateLabel(game), '', { duration: 2200 });
+  }
+
   getCurrentUserGamePieceLabel(game: ChatGame): TicTacToeMark | null {
     if (game.type === 'ticTacToe') return this.getTicTacToePlayerMark(game);
     if (game.type === 'dotsAndBoxes') {

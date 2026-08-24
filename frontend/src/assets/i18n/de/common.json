@@ -623,6 +623,7 @@
           "yourTurnName": "Ich bin am Zug",
           "youPlayMark": "Ich spiele {{ mark }}",
           "iWon": "Ich habe gewonnen",
+          "iLost": "Ich habe verloren",
           "youPlayedMark": "Ich spielte {{ mark }}",
           "hasWon": "hat gewonnen",
           "drawTitle": "Unentschieden",

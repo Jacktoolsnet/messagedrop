@@ -244,83 +244,6 @@
             <app-code-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayCode(msg)"
               (guess)="submitCodeGuess(msg, $event)" (evaluate)="evaluateCodeGuess(msg)"></app-code-board>
             }
-            @if (game.type !== 'code' && game.type !== 'minefieldHideSeek' && game.status === 'active') {
-            <div class="game-turn-box" role="status" aria-live="polite">
-              @if (isCurrentUserGameTurn(game)) {
-                @if (profile().avatarStickerId) {
-                <app-protected-sticker-image class="game-turn-box__avatar" [stickerId]="profile().avatarStickerId"
-                  [alt]="profile().name"></app-protected-sticker-image>
-                } @else if (profile().base64Avatar) {
-                <img class="game-turn-box__avatar" [src]="profile().base64Avatar" [alt]="profile().name" />
-                } @else {
-                <mat-icon class="game-turn-box__avatar-icon">person</mat-icon>
-                }
-              } @else {
-                @if (activeContact.avatarStickerId) {
-                <app-protected-sticker-image class="game-turn-box__avatar" [stickerId]="activeContact.avatarStickerId"
-                  [alt]="activeContact.name || ''"></app-protected-sticker-image>
-                } @else if (activeContact.base64Avatar) {
-                <img class="game-turn-box__avatar" [src]="activeContact.base64Avatar" [alt]="activeContact.name || ''" />
-                } @else {
-                <mat-icon class="game-turn-box__avatar-icon">person</mat-icon>
-                }
-              }
-              <span class="game-turn-box__text">
-                <span class="game-turn-box__name">{{ isCurrentUserGameTurn(game)
-                  ? ('common.contact.chatroom.games.yourTurnName' | transloco)
-                  : (activeContact.name || ('common.contact.chatroom.contactLabel' | transloco)) }}</span>
-                <span class="game-turn-box__status">{{ isCurrentUserGameTurn(game)
-                  ? (game.type === 'treasureMap'
-                    ? ((game.phase === 'placingO' ? 'common.contact.chatroom.games.prepareIslandStatus' : 'common.contact.chatroom.games.chooseTreasureAction') | transloco)
-                    : game.type === 'rockPaperScissors'
-                    ? ('common.contact.chatroom.games.chooseNow' | transloco)
-                    : ('common.contact.chatroom.games.youPlayMark' | transloco:{ mark: getCurrentUserGamePieceLabel(game) }))
-                  : ('common.contact.chatroom.games.isTurn' | transloco) }}</span>
-              </span>
-            </div>
-            } @else if (game.type !== 'code' && game.type !== 'minefieldHideSeek' && game.status === 'won') {
-            <div class="game-turn-box" role="status" aria-live="polite">
-              @if (isCurrentUserGameWinner(game)) {
-                @if (profile().avatarStickerId) {
-                <app-protected-sticker-image class="game-turn-box__avatar" [stickerId]="profile().avatarStickerId"
-                  [alt]="profile().name"></app-protected-sticker-image>
-                } @else if (profile().base64Avatar) {
-                <img class="game-turn-box__avatar" [src]="profile().base64Avatar" [alt]="profile().name" />
-                } @else {
-                <mat-icon class="game-turn-box__avatar-icon">person</mat-icon>
-                }
-              } @else {
-                @if (activeContact.avatarStickerId) {
-                <app-protected-sticker-image class="game-turn-box__avatar" [stickerId]="activeContact.avatarStickerId"
-                  [alt]="activeContact.name || ''"></app-protected-sticker-image>
-                } @else if (activeContact.base64Avatar) {
-                <img class="game-turn-box__avatar" [src]="activeContact.base64Avatar" [alt]="activeContact.name || ''" />
-                } @else {
-                <mat-icon class="game-turn-box__avatar-icon">person</mat-icon>
-                }
-              }
-              <span class="game-turn-box__text">
-                <span class="game-turn-box__name">{{ isCurrentUserGameWinner(game)
-                  ? ('common.contact.chatroom.games.iWon' | transloco)
-                  : (activeContact.name || ('common.contact.chatroom.contactLabel' | transloco)) }}</span>
-                <span class="game-turn-box__status">{{ isCurrentUserGameWinner(game)
-                  ? (game.type === 'treasureMap'
-                    ? ('common.contact.chatroom.games.treasureVictorySubtitle' | transloco)
-                    : game.type === 'rockPaperScissors'
-                    ? ('common.contact.chatroom.games.youPlayedChoice' | transloco:{ choice: getRockPaperScissorsChoiceLabel(game) })
-                    : ('common.contact.chatroom.games.youPlayedMark' | transloco:{ mark: getCurrentUserGamePieceLabel(game) }))
-                  : ('common.contact.chatroom.games.hasWon' | transloco) }}</span>
-              </span>
-            </div>
-            } @else if (game.type !== 'code' && game.type !== 'minefieldHideSeek') {
-            <div class="game-turn-box" role="status" aria-live="polite">
-              <mat-icon class="game-turn-box__avatar-icon game-result-box__draw-icon">handshake</mat-icon>
-              <span class="game-turn-box__text">
-                <span class="game-turn-box__name">{{ 'common.contact.chatroom.games.drawTitle' | transloco }}</span>
-                <span class="game-turn-box__status">{{ 'common.contact.chatroom.games.drawSubtitle' | transloco }}</span>
-              </span>
-            </div>
-            }
             }
             }
             @if (msg.reaction) {
@@ -383,6 +306,10 @@
               </button>
               }
               @if (msg.payload?.game; as actionGame) {
+              <button mat-mini-fab color="primary" class="game-state-button"
+                [attr.aria-label]="getGameStateLabel(actionGame)" (click)="showGameState(actionGame)">
+                <span class="game-state-button__emoji" style="font-size:1.4rem;line-height:1" aria-hidden="true">{{ getGameStateEmoji(actionGame) }}</span>
+              </button>
               @if (canToggleMinefieldLayout(actionGame)) {
               <button mat-mini-fab color="primary"
                 [attr.aria-label]="(isMinefieldLayoutVisible(actionGame.gameId) ? 'common.contact.chatroom.games.hideMinesAria' : 'common.contact.chatroom.games.showMinesAria') | transloco"
@@ -587,83 +514,6 @@
             <app-code-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayCode(msg)"
               (guess)="submitCodeGuess(msg, $event)" (evaluate)="evaluateCodeGuess(msg)"></app-code-board>
             }
-            @if (game.type !== 'code' && game.type !== 'minefieldHideSeek' && game.status === 'active') {
-            <div class="game-turn-box" role="status" aria-live="polite">
-              @if (isCurrentUserGameTurn(game)) {
-                @if (profile().avatarStickerId) {
-                <app-protected-sticker-image class="game-turn-box__avatar" [stickerId]="profile().avatarStickerId"
-                  [alt]="profile().name"></app-protected-sticker-image>
-                } @else if (profile().base64Avatar) {
-                <img class="game-turn-box__avatar" [src]="profile().base64Avatar" [alt]="profile().name" />
-                } @else {
-                <mat-icon class="game-turn-box__avatar-icon">person</mat-icon>
-                }
-              } @else {
-                @if (activeContact.avatarStickerId) {
-                <app-protected-sticker-image class="game-turn-box__avatar" [stickerId]="activeContact.avatarStickerId"
-                  [alt]="activeContact.name || ''"></app-protected-sticker-image>
-                } @else if (activeContact.base64Avatar) {
-                <img class="game-turn-box__avatar" [src]="activeContact.base64Avatar" [alt]="activeContact.name || ''" />
-                } @else {
-                <mat-icon class="game-turn-box__avatar-icon">person</mat-icon>
-                }
-              }
-              <span class="game-turn-box__text">
-                <span class="game-turn-box__name">{{ isCurrentUserGameTurn(game)
-                  ? ('common.contact.chatroom.games.yourTurnName' | transloco)
-                  : (activeContact.name || ('common.contact.chatroom.contactLabel' | transloco)) }}</span>
-                <span class="game-turn-box__status">{{ isCurrentUserGameTurn(game)
-                  ? (game.type === 'treasureMap'
-                    ? ((game.phase === 'placingO' ? 'common.contact.chatroom.games.prepareIslandStatus' : 'common.contact.chatroom.games.chooseTreasureAction') | transloco)
-                    : game.type === 'rockPaperScissors'
-                    ? ('common.contact.chatroom.games.chooseNow' | transloco)
-                    : ('common.contact.chatroom.games.youPlayMark' | transloco:{ mark: getCurrentUserGamePieceLabel(game) }))
-                  : ('common.contact.chatroom.games.isTurn' | transloco) }}</span>
-              </span>
-            </div>
-            } @else if (game.type !== 'code' && game.type !== 'minefieldHideSeek' && game.status === 'won') {
-            <div class="game-turn-box" role="status" aria-live="polite">
-              @if (isCurrentUserGameWinner(game)) {
-                @if (profile().avatarStickerId) {
-                <app-protected-sticker-image class="game-turn-box__avatar" [stickerId]="profile().avatarStickerId"
-                  [alt]="profile().name"></app-protected-sticker-image>
-                } @else if (profile().base64Avatar) {
-                <img class="game-turn-box__avatar" [src]="profile().base64Avatar" [alt]="profile().name" />
-                } @else {
-                <mat-icon class="game-turn-box__avatar-icon">person</mat-icon>
-                }
-              } @else {
-                @if (activeContact.avatarStickerId) {
-                <app-protected-sticker-image class="game-turn-box__avatar" [stickerId]="activeContact.avatarStickerId"
-                  [alt]="activeContact.name || ''"></app-protected-sticker-image>
-                } @else if (activeContact.base64Avatar) {
-                <img class="game-turn-box__avatar" [src]="activeContact.base64Avatar" [alt]="activeContact.name || ''" />
-                } @else {
-                <mat-icon class="game-turn-box__avatar-icon">person</mat-icon>
-                }
-              }
-              <span class="game-turn-box__text">
-                <span class="game-turn-box__name">{{ isCurrentUserGameWinner(game)
-                  ? ('common.contact.chatroom.games.iWon' | transloco)
-                  : (activeContact.name || ('common.contact.chatroom.contactLabel' | transloco)) }}</span>
-                <span class="game-turn-box__status">{{ isCurrentUserGameWinner(game)
-                  ? (game.type === 'treasureMap'
-                    ? ('common.contact.chatroom.games.treasureVictorySubtitle' | transloco)
-                    : game.type === 'rockPaperScissors'
-                    ? ('common.contact.chatroom.games.youPlayedChoice' | transloco:{ choice: getRockPaperScissorsChoiceLabel(game) })
-                    : ('common.contact.chatroom.games.youPlayedMark' | transloco:{ mark: getCurrentUserGamePieceLabel(game) }))
-                  : ('common.contact.chatroom.games.hasWon' | transloco) }}</span>
-              </span>
-            </div>
-            } @else if (game.type !== 'code' && game.type !== 'minefieldHideSeek') {
-            <div class="game-turn-box" role="status" aria-live="polite">
-              <mat-icon class="game-turn-box__avatar-icon game-result-box__draw-icon">handshake</mat-icon>
-              <span class="game-turn-box__text">
-                <span class="game-turn-box__name">{{ 'common.contact.chatroom.games.drawTitle' | transloco }}</span>
-                <span class="game-turn-box__status">{{ 'common.contact.chatroom.games.drawSubtitle' | transloco }}</span>
-              </span>
-            </div>
-            }
             }
             }
             <div class="reaction-chip reaction-chip--them" role="button" tabindex="0"
@@ -721,6 +571,10 @@
               </button>
               }
               @if (msg.payload?.game; as actionGame) {
+              <button mat-mini-fab color="primary" class="game-state-button"
+                [attr.aria-label]="getGameStateLabel(actionGame)" (click)="showGameState(actionGame)">
+                <span class="game-state-button__emoji" style="font-size:1.4rem;line-height:1" aria-hidden="true">{{ getGameStateEmoji(actionGame) }}</span>
+              </button>
               @if (canToggleMinefieldLayout(actionGame)) {
               <button mat-mini-fab color="primary"
                 [attr.aria-label]="(isMinefieldLayoutVisible(actionGame.gameId) ? 'common.contact.chatroom.games.hideMinesAria' : 'common.contact.chatroom.games.showMinesAria') | transloco"

@@ -622,6 +622,7 @@
           "yourTurnName": "C'est mon tour",
           "youPlayMark": "Je joue avec {{ mark }}",
           "iWon": "J'ai gagné",
+          "iLost": "J’ai perdu",
           "youPlayedMark": "J'ai joué avec {{ mark }}",
           "hasWon": "a gagné",
           "drawTitle": "Égalité",

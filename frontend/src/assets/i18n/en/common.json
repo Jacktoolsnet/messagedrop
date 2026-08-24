@@ -623,6 +623,7 @@
           "yourTurnName": "It is my turn",
           "youPlayMark": "I play {{ mark }}",
           "iWon": "I won",
+          "iLost": "I lost",
           "youPlayedMark": "I played {{ mark }}",
           "hasWon": "won",
           "drawTitle": "Draw",

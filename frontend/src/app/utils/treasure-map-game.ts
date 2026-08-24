@@ -1,7 +1,7 @@
 import{TreasureCompassDirection,TreasureIslandItem,TreasureMapAction,TreasureMapGame}from'../interfaces/chat-game';
 export const TREASURE_ROWS=7,TREASURE_COLUMNS=7,TREASURE_CELL_COUNT=49;
 export const TREASURE_INVENTORY:Readonly<Record<TreasureIslandItem,number>>={treasure:5,bomb:4,prisoner:3,wine:3,bride:1,map:1,compass:1};
-const TREASURE_CHEST='\u{1FA8E}',TREASURE_FALLBACK='💰';let treasureGlyph:string|undefined;
+const TREASURE_CHEST='\u{1FA8E}',TREASURE_FALLBACK='💰',BROKEN_CHAIN='⛓️‍💥',PRISONER_FALLBACK='🔓';let treasureGlyph:string|undefined,prisonerGlyph:string|undefined;
 
 export function getTreasureSymbol():string{
  if(treasureGlyph)return treasureGlyph;
@@ -10,6 +10,15 @@ export function getTreasureSymbol():string{
  context.font='48px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji","Noto Emoji",sans-serif';context.textBaseline='top';context.fillStyle='#000';context.fillText(TREASURE_CHEST,4,4);
  try{const pixels=context.getImageData(0,0,canvas.width,canvas.height).data;for(let i=0;i<pixels.length;i+=4){if(pixels[i+3]>20&&Math.max(pixels[i],pixels[i+1],pixels[i+2])-Math.min(pixels[i],pixels[i+1],pixels[i+2])>10)return treasureGlyph=TREASURE_CHEST}}catch{return treasureGlyph=TREASURE_FALLBACK}
  return treasureGlyph=TREASURE_FALLBACK;
+}
+
+export function getPrisonerSymbol():string{
+ if(prisonerGlyph)return prisonerGlyph;
+ if(typeof document==='undefined')return PRISONER_FALLBACK;
+ const context=document.createElement('canvas').getContext('2d');if(!context)return PRISONER_FALLBACK;
+ context.font='48px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji","Noto Emoji",sans-serif';
+ const combinedWidth=context.measureText(BROKEN_CHAIN).width,separateWidth=context.measureText('⛓️💥').width;
+ return prisonerGlyph=combinedWidth<separateWidth*.8?BROKEN_CHAIN:PRISONER_FALLBACK;
 }
 
 export function validTreasureLayout(layout:(TreasureIslandItem|null)[]):boolean{

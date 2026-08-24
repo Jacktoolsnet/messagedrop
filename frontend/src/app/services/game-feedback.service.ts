@@ -39,6 +39,11 @@ export class GameFeedbackService {
     if (!this.audioMuted()) void this.playCorrectSound();
   }
 
+  notifyUnlock(): void {
+    this.tryVibrate([22, 35, 42]);
+    if (!this.audioMuted()) void this.playUnlockSound();
+  }
+
   notifyIncorrect(): void {
     this.tryVibrate([70, 35, 70]);
     if (!this.audioMuted()) void this.playIncorrectSound();
@@ -210,6 +215,15 @@ export class GameFeedbackService {
     this.playTone(context, now, 520, 660, 0.16, 0.04, 'triangle');
     this.playTone(context, now + 0.09, 660, 840, 0.18, 0.04, 'triangle');
     this.playTone(context, now + 0.19, 840, 1040, 0.24, 0.035, 'sine');
+  }
+
+  private async playUnlockSound(): Promise<void> {
+    const context = await this.getReadyAudioContext();
+    if (!context) return;
+    const now = context.currentTime;
+    this.playTone(context, now, 170, 245, .1, .045, 'square');
+    this.playTone(context, now + .1, 390, 720, .24, .035, 'triangle');
+    this.playTone(context, now + .2, 720, 930, .18, .025, 'sine');
   }
 
   private async playIncorrectSound(): Promise<void> {
