@@ -832,6 +832,7 @@
           "wordRescueRuleWin": "Si encuentra la palabra, gana el jugador. Tras ocho errores gana el creador y se revela la palabra.",
           "remainingAttempts": "Quedan {{ count }} pasos de rescate",
           "wrongWordAttempts": "Intentos de palabra fallidos",
+          "wrongLetters": "Letras incorrectas",
           "solveWholeWord": "Resolver palabra completa",
           "checkWholeWordAria": "Comprobar palabra completa",
           "chooseRescueTheme": "Elige una escena de rescate",

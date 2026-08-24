@@ -833,6 +833,7 @@
           "wordRescueRuleWin": "The guesser wins by finding the word. After eight errors the creator wins and the word is revealed.",
           "remainingAttempts": "{{ count }} rescue steps left",
           "wrongWordAttempts": "Wrong word guesses",
+          "wrongLetters": "Incorrect letters",
           "solveWholeWord": "Solve the whole word",
           "checkWholeWordAria": "Check whole word",
           "chooseRescueTheme": "Choose a rescue scene",

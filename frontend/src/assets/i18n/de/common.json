@@ -833,6 +833,7 @@
           "wordRescueRuleWin": "Wird das Wort gefunden, gewinnt der Ratende. Nach acht Fehlern gewinnt der Ersteller und das Wort wird aufgedeckt.",
           "remainingAttempts": "Noch {{ count }} Rettungsschritte",
           "wrongWordAttempts": "Falsche Lösungsversuche",
+          "wrongLetters": "Falsch geratene Buchstaben",
           "solveWholeWord": "Ganzes Wort lösen",
           "checkWholeWordAria": "Ganzes Wort prüfen",
           "chooseRescueTheme": "Wähle ein Rettungsmotiv",

@@ -832,6 +832,7 @@
           "wordRescueRuleWin": "Le joueur gagne en trouvant le mot. Après huit erreurs, le créateur gagne et le mot est révélé.",
           "remainingAttempts": "{{ count }} étapes de sauvetage restantes",
           "wrongWordAttempts": "Mauvaises propositions",
+          "wrongLetters": "Lettres incorrectes",
           "solveWholeWord": "Résoudre le mot entier",
           "checkWholeWordAria": "Vérifier le mot entier",
           "chooseRescueTheme": "Choisissez une scène de sauvetage",

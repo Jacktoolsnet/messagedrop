@@ -213,6 +213,10 @@
 .wrong-words { display: grid; gap: .15rem; text-align: center; font-size: .78rem; }
 .wrong-words span { opacity: .7; }
 .wrong-words strong { color: var(--word-wrong); overflow-wrap: anywhere; }
+.wrong-letters { display: grid; justify-items: center; gap: .4rem; font-size: .78rem; }
+.wrong-letters > span { opacity: .7; }
+.wrong-letters__list { display: flex; flex-wrap: wrap; justify-content: center; gap: .35rem; }
+.wrong-letters__list strong { display: grid; place-items: center; width: 2rem; height: 2rem; box-sizing: border-box; border: 1px solid var(--word-wrong); border-radius: .55rem; background: color-mix(in srgb, var(--word-wrong) 25%, var(--word-cell)); color: var(--word-wrong); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--word-wrong) 35%, transparent), 0 0 7px color-mix(in srgb, var(--word-wrong) 42%, transparent); }
 
 @media (max-width: 520px) {
   .keyboard { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: .3rem; padding: .45rem; }

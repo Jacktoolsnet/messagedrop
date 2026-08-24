@@ -16,6 +16,7 @@
   </div>
   <div class="word" [class.word--solution]="showSolution()">@for(char of chars();track $index){<span class="word__slot" [class.word__slot--space]="g.solution[$index]===' '" [class.word__slot--hyphen]="g.solution[$index]==='-'">{{showSolution()?g.solution[$index]:char}}</span>}</div>
   @if(isCreator()&&g.status==='active'){<button mat-icon-button class="reveal" type="button" (click)="revealSecret.set(!revealSecret())" [attr.aria-label]="(revealSecret()?'common.contact.chatroom.games.hideWordAria':'common.contact.chatroom.games.showWordAria')|transloco"><mat-icon>{{revealSecret()?'visibility_off':'visibility'}}</mat-icon></button>}
+  @if(isCreator()&&g.wrongLetters.length){<div class="wrong-letters"><span>{{'common.contact.chatroom.games.wrongLetters'|transloco}}</span><div class="wrong-letters__list">@for(letter of g.wrongLetters;track letter){<strong>{{letter}}</strong>}</div></div>}
   @if(g.wrongWordAttempts.length){<div class="wrong-words"><span>{{'common.contact.chatroom.games.wrongWordAttempts'|transloco}}</span><strong>{{g.wrongWordAttempts.join(', ')}}</strong></div>}
   @if(g.status==='active'&&!isCreator()){
     <div class="keyboard">@for(letter of alphabet;track letter){<button type="button" class="key" [class.key--correct]="correct(letter)" [class.key--wrong]="g.wrongLetters.includes(letter)" [disabled]="disabled()||used(letter)" (click)="choose(letter)">{{letter}}</button>}</div>
