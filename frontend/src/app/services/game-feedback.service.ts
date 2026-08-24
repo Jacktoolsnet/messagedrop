@@ -5,9 +5,15 @@ import { Injectable, signal } from '@angular/core';
 })
 export class GameFeedbackService {
   private readonly audioMutedStorageKey = 'messagedrop.gameFeedback.audioMuted';
+  private readonly arcadeMusicMutedStorageKey = 'messagedrop.gameFeedback.arcadeMusicMuted';
   private audioContext: AudioContext | null = null;
   private lastHoverSoundAt = 0;
+  private readonly arcadeMusicOwners = new Set<object>();
+  private arcadeMusicTimer: number | null = null;
+  private arcadeMusicStarting = false;
+  private arcadeMusicStep = 0;
   readonly audioMuted = signal(this.readAudioMuted());
+  readonly arcadeMusicMuted = signal(this.readBoolean(this.arcadeMusicMutedStorageKey));
 
   notifyHover(): void {
     if (this.audioMuted()) {
@@ -60,6 +66,7 @@ export class GameFeedbackService {
   toggleAudioMuted(): void {
     const muted = !this.audioMuted();
     this.audioMuted.set(muted);
+    void this.syncArcadeMusic();
     if (typeof localStorage === 'undefined') {
       return;
     }
@@ -68,6 +75,102 @@ export class GameFeedbackService {
     } catch {
       // Persisting the optional preference may be blocked by the browser.
     }
+  }
+
+  registerArcadeMusic(owner: object): void {
+    this.arcadeMusicOwners.add(owner);
+    void this.syncArcadeMusic();
+  }
+
+  unregisterArcadeMusic(owner: object): void {
+    this.arcadeMusicOwners.delete(owner);
+    void this.syncArcadeMusic();
+  }
+
+  toggleArcadeMusicMuted(): void {
+    const muted = !this.arcadeMusicMuted();
+    this.arcadeMusicMuted.set(muted);
+    if (typeof localStorage !== 'undefined') {
+      try { localStorage.setItem(this.arcadeMusicMutedStorageKey, String(muted)); } catch { /* Optional preference. */ }
+    }
+    void this.syncArcadeMusic();
+  }
+
+  private async syncArcadeMusic(): Promise<void> {
+    const shouldPlay = this.arcadeMusicOwners.size > 0 && !this.arcadeMusicMuted() && !this.audioMuted();
+    if (!shouldPlay) { this.stopArcadeMusic(); return; }
+    if (this.arcadeMusicTimer !== null || this.arcadeMusicStarting) return;
+    this.arcadeMusicStarting = true;
+    try {
+      const context = await this.getReadyAudioContext();
+      if (!context || this.arcadeMusicOwners.size === 0 || this.arcadeMusicMuted() || this.audioMuted()) return;
+      this.arcadeMusicStep = 0;
+      this.playArcadeMusicStep(context);
+      this.arcadeMusicTimer = window.setInterval(() => this.playArcadeMusicStep(context), 285);
+    } finally {
+      this.arcadeMusicStarting = false;
+    }
+  }
+
+  private stopArcadeMusic(): void {
+    if (this.arcadeMusicTimer === null) return;
+    window.clearInterval(this.arcadeMusicTimer);
+    this.arcadeMusicTimer = null;
+  }
+
+  private playArcadeMusicStep(context: AudioContext): void {
+    if (context.state !== 'running') return;
+    const step = this.arcadeMusicStep++;
+    const sequenceStep = step % 64;
+    const bar = Math.floor(sequenceStep / 8);
+    const beat = sequenceStep % 8;
+    const cycle = Math.floor(step / 64);
+    const roots = [45, 41, 43, 40, 45, 48, 43, 40];
+    const minorBars = new Set([0, 3, 4, 7]);
+    const arpeggioPattern = [0, 2, 1, 2, 0, 2, 1, 3];
+    const chord = minorBars.has(bar) ? [0, 3, 7, 12] : [0, 4, 7, 12];
+    const leadPatterns:Array<Array<number|null>> = [
+      [12, null, 15, 19, 17, null, 15, null],
+      [12, 16, 19, null, 21, 19, 16, null],
+      [14, null, 19, 21, 19, 16, 14, null],
+      [12, 15, 19, null, 22, null, 19, 15],
+      [12, null, 19, 24, 22, 19, 15, null],
+      [12, 16, 19, 24, null, 21, 19, 16],
+      [14, 19, 21, null, 26, 21, 19, null],
+      [19, 15, 12, null, 10, 12, 15, null]
+    ];
+    const now = context.currentTime + .015;
+    const root = roots[bar];
+
+    // A quiet arpeggio keeps the soundtrack moving without the old short-loop effect.
+    if (beat !== 7 || cycle % 2 === 0) {
+      const note = root + 12 + chord[arpeggioPattern[beat]];
+      const frequency = this.midiFrequency(note);
+      this.playTone(context, now, frequency, frequency * 1.006, .2, .0045, 'triangle');
+    }
+
+    // The lead spans eight different bars. Every second pass adds small octave answers.
+    const leadInterval = leadPatterns[bar][beat];
+    if (leadInterval !== null) {
+      const octaveAnswer = cycle % 2 === 1 && (beat === 3 || beat === 6) ? 12 : 0;
+      const frequency = this.midiFrequency(root + leadInterval + octaveAnswer);
+      this.playTone(context, now + .025, frequency, frequency * (beat % 2 ? .995 : 1.008), .24, .0065, 'square');
+    }
+
+    // Bass pulses and a tiny high-score sparkle give the eight bars more structure.
+    if (beat === 0 || beat === 4) {
+      const bass = this.midiFrequency(root - 12);
+      this.playTone(context, now, bass, bass * 1.03, beat === 0 ? .42 : .28, .007, 'triangle');
+      this.playTone(context, now, 92, 48, .12, .0035, 'sine');
+    }
+    if (beat === 7 && (bar === 3 || bar === 7)) {
+      const sparkle = this.midiFrequency(root + 31 + (cycle % 2 ? 2 : 0));
+      this.playTone(context, now + .035, sparkle, sparkle * 1.12, .26, .0035, 'sine');
+    }
+  }
+
+  private midiFrequency(note: number): number {
+    return 440 * Math.pow(2, (note - 69) / 12);
   }
 
   private async playHoverSound(): Promise<void> {
@@ -217,13 +320,11 @@ export class GameFeedbackService {
   }
 
   private readAudioMuted(): boolean {
-    if (typeof localStorage === 'undefined') {
-      return false;
-    }
-    try {
-      return localStorage.getItem(this.audioMutedStorageKey) === 'true';
-    } catch {
-      return false;
-    }
+    return this.readBoolean(this.audioMutedStorageKey);
+  }
+
+  private readBoolean(key: string): boolean {
+    if (typeof localStorage === 'undefined') return false;
+    try { return localStorage.getItem(key) === 'true'; } catch { return false; }
   }
 }

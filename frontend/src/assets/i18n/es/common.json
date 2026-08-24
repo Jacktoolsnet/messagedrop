@@ -757,14 +757,16 @@
           "asteroidFireUp": "Disparar láser hacia arriba",
           "asteroidFireDown": "Disparar láser hacia abajo",
           "asteroidFireRight": "Disparar láser a la derecha",
-          "asteroidBoardHint": "Toca una casilla brillante para volar · Toca una flecha para disparar",
+          "asteroidBoardHint": "Toca una casilla brillante para volar · Abre el botón del rayo para elegir la dirección de disparo",
           "asteroidRulesTitle": "Duelo de asteroides – Reglas",
           "asteroidRuleMove": "Jugáis por turnos. Toca una casilla vecina brillante para mover tu nave.",
           "asteroidRuleFire": "En vez de moverte, dispara en una de las cuatro direcciones. El láser viaja hasta el primer objeto o el borde del campo.",
           "asteroidRuleRocks": "Un asteroide alcanzado se destruye. Después de cada turno, algunos asteroides restantes pueden desplazarse al azar a una casilla vecina libre.",
           "asteroidRuleShield": "Un impacto en la nave rival elimina uno de sus tres puntos de escudo. El campo gira para que la nave propia empiece abajo.",
           "asteroidRuleWin": "Gana quien desactive el escudo rival con el tercer impacto.",
-          "asteroidDuelPreviewPrefix": "Duelo de asteroides"
+          "asteroidDuelPreviewPrefix": "Duelo de asteroides",
+          "muteArcadeMusicAria": "Silenciar la música arcade",
+          "unmuteArcadeMusicAria": "Activar la música arcade"
         },
         "revisionHistory": {
           "title": "Historial de cambios",

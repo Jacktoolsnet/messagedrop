@@ -395,6 +395,13 @@
                 (click)="openGameRules(actionGame)">
                 <mat-icon>help</mat-icon>
               </button>
+              @if (actionGame.type === 'asteroidDuel') {
+              <button mat-mini-fab color="primary"
+                [attr.aria-label]="(gameFeedback.arcadeMusicMuted() ? 'common.contact.chatroom.games.unmuteArcadeMusicAria' : 'common.contact.chatroom.games.muteArcadeMusicAria') | transloco"
+                (click)="gameFeedback.toggleArcadeMusicMuted()">
+                <mat-icon>{{ gameFeedback.arcadeMusicMuted() ? 'music_off' : 'music_note' }}</mat-icon>
+              </button>
+              }
               <button mat-mini-fab color="primary"
                 [attr.aria-label]="(gameFeedback.audioMuted() ? 'common.contact.chatroom.games.unmuteAria' : 'common.contact.chatroom.games.muteAria') | transloco"
                 (click)="gameFeedback.toggleAudioMuted()">
@@ -719,6 +726,13 @@
                 (click)="openGameRules(actionGame)">
                 <mat-icon>help</mat-icon>
               </button>
+              @if (actionGame.type === 'asteroidDuel') {
+              <button mat-mini-fab color="primary"
+                [attr.aria-label]="(gameFeedback.arcadeMusicMuted() ? 'common.contact.chatroom.games.unmuteArcadeMusicAria' : 'common.contact.chatroom.games.muteArcadeMusicAria') | transloco"
+                (click)="gameFeedback.toggleArcadeMusicMuted()">
+                <mat-icon>{{ gameFeedback.arcadeMusicMuted() ? 'music_off' : 'music_note' }}</mat-icon>
+              </button>
+              }
               <button mat-mini-fab color="primary"
                 [attr.aria-label]="(gameFeedback.audioMuted() ? 'common.contact.chatroom.games.unmuteAria' : 'common.contact.chatroom.games.muteAria') | transloco"
                 (click)="gameFeedback.toggleAudioMuted()">

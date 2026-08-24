@@ -4,6 +4,7 @@
   <mat-icon class="asteroid-hud__duel">bolt</mat-icon>
   <span class="asteroid-hud__pilot asteroid-hud__pilot--o"><span class="asteroid-hud__shield">@for(slot of shieldSlots(currentGame.playerOShield);track slot){<mat-icon>shield</mat-icon>}</span><b>O</b></span>
 </div>
+<div class="asteroid-board-shell">
 <div class="asteroid-board">
   @for(index of displayedCells();track index){
   <button type="button" class="asteroid-cell" [class.asteroid-cell--destination]="destinations().has(index)"
@@ -17,12 +18,15 @@
   </button>
   }
 </div>
-<div class="asteroid-fire-controls">
-  <span class="asteroid-fire-controls__label"><mat-icon>flare</mat-icon>{{'common.contact.chatroom.games.asteroidFire'|transloco}}</span>
-  <button type="button" [disabled]="!canAct()" (click)="fire('left')" [attr.aria-label]="'common.contact.chatroom.games.asteroidFireLeft'|transloco"><mat-icon>west</mat-icon></button>
-  <button type="button" [disabled]="!canAct()" (click)="fire('up')" [attr.aria-label]="'common.contact.chatroom.games.asteroidFireUp'|transloco"><mat-icon>north</mat-icon></button>
-  <button type="button" [disabled]="!canAct()" (click)="fire('down')" [attr.aria-label]="'common.contact.chatroom.games.asteroidFireDown'|transloco"><mat-icon>south</mat-icon></button>
-  <button type="button" [disabled]="!canAct()" (click)="fire('right')" [attr.aria-label]="'common.contact.chatroom.games.asteroidFireRight'|transloco"><mat-icon>east</mat-icon></button>
+@if(fireMenuOpen()&&canAct()){
+<div class="asteroid-fire-menu">
+  @for(direction of availableFireDirections();track direction){
+  <button type="button" (click)="fire(direction)" (pointerenter)="feedback.notifyHover()" [attr.aria-label]="fireLabelKey(direction)|transloco"><mat-icon>{{directionIcon(direction)}}</mat-icon></button>
+  }
+</div>
+}
+<button type="button" class="asteroid-fire-trigger" [class.asteroid-fire-trigger--open]="fireMenuOpen()" [disabled]="!canAct()"
+  (click)="toggleFireMenu()" [attr.aria-label]="'common.contact.chatroom.games.asteroidFire'|transloco"><span aria-hidden="true">⚡</span></button>
 </div>
 <p class="asteroid-hint">{{'common.contact.chatroom.games.asteroidBoardHint'|transloco}}</p>
 }

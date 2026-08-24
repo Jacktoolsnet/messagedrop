@@ -758,14 +758,16 @@
           "asteroidFireUp": "Laser nach oben abfeuern",
           "asteroidFireDown": "Laser nach unten abfeuern",
           "asteroidFireRight": "Laser nach rechts abfeuern",
-          "asteroidBoardHint": "Leuchtendes Feld antippen: fliegen · Pfeil antippen: Laser abfeuern",
+          "asteroidBoardHint": "Leuchtendes Feld antippen: fliegen · Blitz öffnen: Schussrichtung wählen",
           "asteroidRulesTitle": "Asteroiden-Duell – Regeln",
           "asteroidRuleMove": "Ihr spielt abwechselnd. Tippe auf ein leuchtendes Nachbarfeld, um dein Raumschiff zu bewegen.",
           "asteroidRuleFire": "Statt zu fliegen kannst du in eine der vier Richtungen feuern. Der Laser fliegt bis zum ersten Objekt oder bis zum Rand des Spielfelds.",
           "asteroidRuleRocks": "Ein getroffener Asteroid wird zerstört. Nach jedem Zug können einige der übrigen Asteroiden zufällig auf ein freies Nachbarfeld driften.",
           "asteroidRuleShield": "Ein Treffer am gegnerischen Raumschiff kostet einen von drei Schildpunkten. Das Spielfeld wird für beide Piloten so gedreht, dass das eigene Schiff unten startet.",
           "asteroidRuleWin": "Wer den gegnerischen Schild mit dem dritten Treffer ausschaltet, gewinnt.",
-          "asteroidDuelPreviewPrefix": "Asteroiden-Duell"
+          "asteroidDuelPreviewPrefix": "Asteroiden-Duell",
+          "muteArcadeMusicAria": "Arcade-Musik stummschalten",
+          "unmuteArcadeMusicAria": "Arcade-Musik einschalten"
         },
         "revisionHistory": {
           "title": "Änderungshistorie",

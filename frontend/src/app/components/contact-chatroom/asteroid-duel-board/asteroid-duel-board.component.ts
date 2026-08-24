@@ -21,6 +21,23 @@ export class AsteroidDuelBoardComponent{
   readonly displayedCells=computed(()=>this.currentMark()==='O'?[...this.cells].reverse():this.cells);
   readonly destinations=computed(()=>{const game=this.game();return new Set(game?legalMoveDestinations(game,this.currentUserId()):[])});
   readonly canAct=computed(()=>{const game=this.game();return !!game&&!this.disabled()&&game.status==='active'&&game.nextPlayerUserId===this.currentUserId()});
+  private readonly arcadeMusicOwner={};
+  private readonly arcadeMusicGameId=computed(()=>{const game=this.game();return game?.status==='active'&&game.gameId!=='preview'?game.gameId:null});
+  private readonly arcadeMusicEffect=effect(onCleanup=>{
+    if(!this.arcadeMusicGameId())return;
+    this.feedback.registerArcadeMusic(this.arcadeMusicOwner);
+    onCleanup(()=>this.feedback.unregisterArcadeMusic(this.arcadeMusicOwner));
+  });
+  readonly fireMenuOpen=signal(false);
+  readonly availableFireDirections=computed<AsteroidDirection[]>(()=>{
+    const game=this.game(),mark=this.currentMark();if(!game||!mark||!this.canAct())return[];
+    const position=mark==='X'?game.playerXPosition:game.playerOPosition;
+    return(['left','up','right','down'] as AsteroidDirection[]).filter(direction=>{
+      const boardDirection=this.toBoardDirection(direction),[dr,dc]=this.directionStep(boardDirection);
+      const row=Math.floor(position/game.columns)+dr,col=position%game.columns+dc;
+      return row>=0&&row<game.rows&&col>=0&&col<game.columns;
+    });
+  });
   private readonly visibleLaserMoveNumber=signal<number|null>(null);
   private readonly laserVisibilityEffect=effect(onCleanup=>{
     const move=this.game()?.lastMove;
@@ -36,10 +53,14 @@ export class AsteroidDuelBoardComponent{
   isLaserImpact(index:number):boolean{const move=this.game()?.lastMove;if(!move||this.visibleLaserMoveNumber()!==move.moveNumber||move.action.type!=='fire'||(!move.hitPlayer&&move.destroyedAsteroid===null))return false;return move.path.at(-1)===index}
   shieldSlots(count:number):number[]{return Array.from({length:Math.max(0,count)},(_,index)=>index)}
   isLastPosition(index:number):boolean{const move=this.game()?.lastMove;return !!move&&(index===move.from||index===move.to)}
-  move(index:number):void{if(!this.canAct()||!this.destinations().has(index))return;this.feedback.notifySelection();this.action.emit({type:'move',to:index})}
-  fire(displayDirection:AsteroidDirection):void{if(!this.canAct())return;this.feedback.notifySelection();this.action.emit({type:'fire',direction:this.toBoardDirection(displayDirection)})}
+  move(index:number):void{if(!this.canAct()||!this.destinations().has(index))return;this.fireMenuOpen.set(false);this.feedback.notifySelection();this.action.emit({type:'move',to:index})}
+  toggleFireMenu():void{if(!this.canAct())return;this.feedback.notifySelection();this.fireMenuOpen.update(open=>!open)}
+  fire(displayDirection:AsteroidDirection):void{if(!this.canAct()||!this.availableFireDirections().includes(displayDirection))return;this.fireMenuOpen.set(false);this.feedback.notifySelection();this.action.emit({type:'fire',direction:this.toBoardDirection(displayDirection)})}
+  directionIcon(direction:AsteroidDirection):string{return({left:'west',up:'north',right:'east',down:'south'} as const)[direction]}
+  fireLabelKey(direction:AsteroidDirection):string{return `common.contact.chatroom.games.asteroidFire${direction[0].toUpperCase()}${direction.slice(1)}`}
   private toBoardDirection(direction:AsteroidDirection):AsteroidDirection{
     if(this.currentMark()!=='O')return direction;
     return({up:'down',right:'left',down:'up',left:'right'} as const)[direction];
   }
+  private directionStep(direction:AsteroidDirection):readonly[number,number]{return({up:[-1,0],right:[0,1],down:[1,0],left:[0,-1]} as const)[direction]}
 }
