@@ -1,13 +1,13 @@
 @if(game();as currentGame){
 @if(currentGame.phase==='placingO'){
 @if(currentGame.nextPlayerUserId===currentUserId()){
-<div class="treasure-wait"><span>🏝️</span><button type="button" (click)="requestPlacement.emit()">{{'common.contact.chatroom.games.prepareIsland'|transloco}}</button></div>
+<div class="treasure-wait"><span>🏝️</span><button mat-flat-button type="button" class="treasure-prepare-button" (click)="requestPlacement.emit()"><mat-icon>edit_location_alt</mat-icon><span>{{'common.contact.chatroom.games.prepareIsland'|transloco}}</span></button></div>
 }@else{
 <div class="treasure-wait treasure-wait--preparing"><span>🏝️</span><b>{{'common.contact.chatroom.games.waitingForIsland'|transloco}}</b></div>
 <div class="treasure-board treasure-board--review treasure-board--setup-wait">@for(index of cells;track index){<button type="button" disabled>@if(ownLayout()?.[index];as item){<span>{{symbol(item)}}</span>}@else{<span class="treasure-empty">🌱</span>}</button>}</div>
 }
 }@else{
-<div class="treasure-hud"><span>🧔‍♂️ <b>{{pirates()}}</b></span>@if(drunk()>0){<span class="treasure-hud__drunk">🍷🥴 <b>-{{drunk()}}</b></span>}<span>🦜 <b>{{parrots()}}</b></span><span>💎 <b>{{treasures()}}/5</b></span></div>
+@if(!reviewing()){<div class="treasure-hud"><span>🧔‍♂️ <b>{{pirates()}}</b></span>@if(drunk()>0){<span class="treasure-hud__drunk">🍷🥴 <b>-{{drunk()}}</b></span>}<span>🦜 <b>{{parrots()}}</b></span><span>💎 <b>{{treasures()}}/5</b></span></div>}
 @if(reviewing()){
 <div class="treasure-review"><strong>{{'common.contact.chatroom.games.opponentMoveReview'|transloco}}</strong><div class="treasure-review__action">@switch(lastMoveAction()){@case('raid'){<span>🧔‍♂️</span><b>{{lastRaidCount()}}</b><span>{{'common.contact.chatroom.games.attackedFields'|transloco}}</span>}@case('parrot'){<span>🦜</span><span>{{'common.contact.chatroom.games.opponentParrotFlight'|transloco}}</span>}@case('pass'){<mat-icon>skip_next</mat-icon><span>{{'common.contact.chatroom.games.opponentPassed'|transloco}}</span>}}</div>@if(reviewRevealReady()){@if(foundItemSummary().length){<div class="treasure-review__finds">@for(entry of foundItemSummary();track entry.item){<span>{{symbol(entry.item)}} <b>{{entry.count}}</b> {{('common.contact.chatroom.games.treasureItem.'+entry.item)|transloco}}</span>}</div>}@else if(lastMoveAction()==='raid'){<small>{{'common.contact.chatroom.games.nothingFound'|transloco}}</small>}}@else{<small class="treasure-review__replay">{{'common.contact.chatroom.games.replayingOpponentMove'|transloco}}</small>}</div>
 }@else if(defending()){
@@ -15,7 +15,6 @@
 }@else if(showingOwnResult()){
 <div class="treasure-defense"><strong>{{'common.contact.chatroom.games.ownMoveResult'|transloco}}</strong><small>{{'common.contact.chatroom.games.switchingToOwnIsland'|transloco}}</small></div>
 }
-@if(showingOwnIsland()){<div class="treasure-island-legend"><span><i class="treasure-island-legend__found">🧔‍♂️</i>{{'common.contact.chatroom.games.alreadyAttacked'|transloco}}</span><span><i class="treasure-island-legend__scouted">🦜</i>{{'common.contact.chatroom.games.alreadyScouted'|transloco}}</span></div>}
 @if(canAct()&&!reviewing()&&mode()===null&&(raidCount()>0||parrots()>0)){
 <div class="treasure-action-choice"><strong>{{'common.contact.chatroom.games.chooseTreasureCrew'|transloco}}</strong><div>
   @if(raidCount()>0){<button type="button" (click)="chooseMode('raid')"><span class="treasure-action-icon treasure-action-icon--pirate" [matBadge]="raidCount()" matBadgeSize="large">🧔‍♂️</span><b>{{'common.contact.chatroom.games.sendPirates'|transloco}}</b></button>}

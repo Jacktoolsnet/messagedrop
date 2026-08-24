@@ -264,9 +264,11 @@ export interface TreasureMapGame{
   type:'treasureMap';version:1;gameId:string;rows:7;columns:7;
   playerXUserId:string;playerOUserId:string;playerXLayout:(TreasureIslandItem|null)[];playerOLayout:(TreasureIslandItem|null)[]|null;
   playerXRevealed:boolean[];playerORevealed:boolean[];playerXPirates:number;playerOPirates:number;
+  playerXAttacked?:boolean[];playerOAttacked?:boolean[];
   playerXScouted?:boolean[];playerOScouted?:boolean[];
   playerXParrots:number;playerOParrots:number;playerXDrunk:number;playerODrunk:number;
   playerXTreasures:number;playerOTreasures:number;phase:'placingO'|'active';nextPlayerUserId:string|null;
+  planningPlayerUserId?:string|null;
   status:'active'|'won';winnerUserId:string|null;moveNumber:number;lastMove:TreasureMapLastMove|null;
 }
 

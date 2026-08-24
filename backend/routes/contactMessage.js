@@ -211,7 +211,7 @@ router.post('/update',
       encryptedMessageForUser,
       encryptedMessageForContact,
       signature,
-      status = 'sent',
+      status,
       userId,
       contactUserId
     } = req.body ?? {};

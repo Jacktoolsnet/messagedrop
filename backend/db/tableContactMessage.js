@@ -109,7 +109,7 @@ const createMessage = function (db, {
     direction,     // 'user' | 'contactUser'
     message,
     signature,
-    status = 'sent',
+    status,
     createdAt, // optional ISO, else default
     readAt, // optional ISO, else default (only used for sender to avoid unread)
     reaction // optional
@@ -210,7 +210,7 @@ const updateMessageByMessageId = function (db, messageId, {
 const updateMessageForContact = function (db, contactId, messageId, {
     message,
     signature,
-    status = 'sent',
+    status,
     reaction
 }, callback) {
     const sql = `

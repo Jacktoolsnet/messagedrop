@@ -15,12 +15,12 @@ export function randomTreasureLayout(random:()=>number=Math.random):(TreasureIsl
 export function createTreasureMapGame(x:string,o:string,layout:(TreasureIslandItem|null)[]):TreasureMapGame{
  if(!validTreasureLayout(layout))throw new Error('invalid_treasure_layout');
  return{type:'treasureMap',version:1,gameId:crypto.randomUUID(),rows:7,columns:7,playerXUserId:x,playerOUserId:o,playerXLayout:[...layout],playerOLayout:null,
-  playerXRevealed:Array(49).fill(false),playerORevealed:Array(49).fill(false),playerXScouted:Array(49).fill(false),playerOScouted:Array(49).fill(false),playerXPirates:4,playerOPirates:4,playerXParrots:4,playerOParrots:4,
-  playerXDrunk:0,playerODrunk:0,playerXTreasures:0,playerOTreasures:0,phase:'placingO',nextPlayerUserId:o,status:'active',winnerUserId:null,moveNumber:0,lastMove:null};
+  playerXRevealed:Array(49).fill(false),playerORevealed:Array(49).fill(false),playerXAttacked:Array(49).fill(false),playerOAttacked:Array(49).fill(false),playerXScouted:Array(49).fill(false),playerOScouted:Array(49).fill(false),playerXPirates:4,playerOPirates:4,playerXParrots:4,playerOParrots:4,
+  playerXDrunk:0,playerODrunk:0,playerXTreasures:0,playerOTreasures:0,phase:'placingO',nextPlayerUserId:o,planningPlayerUserId:null,status:'active',winnerUserId:null,moveNumber:0,lastMove:null};
 }
 export function placeTreasureMapOpponent(game:TreasureMapGame,userId:string,layout:(TreasureIslandItem|null)[]):TreasureMapGame|null{
  if(game.status!=='active'||game.phase!=='placingO'||game.playerOUserId!==userId||game.nextPlayerUserId!==userId||!validTreasureLayout(layout))return null;
- return{...game,playerOLayout:[...layout],phase:'active',nextPlayerUserId:game.playerXUserId};
+ return{...game,playerOLayout:[...layout],phase:'active',nextPlayerUserId:game.playerXUserId,planningPlayerUserId:game.playerXUserId};
 }
 export function availableTreasurePirates(game:TreasureMapGame,userId:string):number{
  if(userId===game.playerXUserId)return Math.max(0,game.playerXPirates-game.playerXDrunk);
@@ -43,7 +43,8 @@ export function applyTreasureMapAction(game:TreasureMapGame,userId:string,action
  }
  const raidCount=Math.min(pirates,revealed.filter(value=>!value).length);
  if(raidCount<=0||action.cellIndices.length!==raidCount||new Set(action.cellIndices).size!==action.cellIndices.length||action.cellIndices.some(index=>!Number.isInteger(index)||index<0||index>=49||revealed[index]))return null;
- let next:TreasureMapGame={...game};if(isX)next.playerXDrunk=0;else next.playerODrunk=0;
+ const attacked=[...(isX?game.playerOAttacked??game.playerORevealed:game.playerXAttacked??game.playerXRevealed)];action.cellIndices.forEach(index=>attacked[index]=true);
+ let next:TreasureMapGame={...game,playerXAttacked:isX?game.playerXAttacked:attacked,playerOAttacked:isX?attacked:game.playerOAttacked};if(isX)next.playerXDrunk=0;else next.playerODrunk=0;
  let mapRevealIndex:number|null=null,compassDirection:TreasureCompassDirection|null=null;const temporary:number[]=[],foundItems:TreasureIslandItem[]=[];
  for(const index of action.cellIndices){
   revealed[index]=true;const item=defenderLayout[index];if(!item)continue;foundItems.push(item);
@@ -62,10 +63,10 @@ export function applyTreasureMapAction(game:TreasureMapGame,userId:string,action
  return finishTurn(next,userId,action,foundItems,temporary,mapRevealIndex,compassDirection);
 }
 function finishTurn(game:TreasureMapGame,userId:string,action:TreasureMapAction,items:TreasureIslandItem[],temp:number[],map:number|null,compass:TreasureCompassDirection|null):TreasureMapGame{
- const isX=userId===game.playerXUserId,moveNumber=game.moveNumber+1;return{...game,nextPlayerUserId:isX?game.playerOUserId:game.playerXUserId,moveNumber,lastMove:{playerUserId:userId,action,foundItems:items,temporaryRevealIndices:temp,mapRevealIndex:map,compassDirection:compass,moveNumber}};
+ const isX=userId===game.playerXUserId,moveNumber=game.moveNumber+1;return{...game,nextPlayerUserId:isX?game.playerOUserId:game.playerXUserId,planningPlayerUserId:null,moveNumber,lastMove:{playerUserId:userId,action,foundItems:items,temporaryRevealIndices:temp,mapRevealIndex:map,compassDirection:compass,moveNumber}};
 }
 function win(game:TreasureMapGame,winner:string,action:TreasureMapAction,items:TreasureIslandItem[],temp:number[],map:number|null,compass:TreasureCompassDirection|null):TreasureMapGame{
- const moveNumber=game.moveNumber+1;return{...game,status:'won',winnerUserId:winner,nextPlayerUserId:null,moveNumber,lastMove:{playerUserId:action.type==='pass'?'':game.nextPlayerUserId!,action,foundItems:items,temporaryRevealIndices:temp,mapRevealIndex:map,compassDirection:compass,moveNumber}};
+ const moveNumber=game.moveNumber+1;return{...game,status:'won',winnerUserId:winner,nextPlayerUserId:null,planningPlayerUserId:null,moveNumber,lastMove:{playerUserId:action.type==='pass'?'':game.nextPlayerUserId!,action,foundItems:items,temporaryRevealIndices:temp,mapRevealIndex:map,compassDirection:compass,moveNumber}};
 }
 function hideTreasuresInPlace(revealed:boolean[],layout:(TreasureIslandItem|null)[]):void{revealed.forEach((_,index)=>{if(layout[index]==='treasure')revealed[index]=false})}
 function neighbourhood(index:number):number[]{const row=Math.floor(index/7),col=index%7,result:number[]=[];for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){const r=row+dr,c=col+dc;if(r>=0&&r<7&&c>=0&&c<7)result.push(r*7+c)}return result}

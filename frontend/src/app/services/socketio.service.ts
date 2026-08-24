@@ -381,6 +381,10 @@ export class SocketioService {
     this.socket.emit('contact:newContactMessage', envelope);
   }
 
+  public sendUpdatedContactMessage(envelope: Envelope) {
+    this.socket.emit('contact:updateContactMessage', envelope);
+  }
+
   // Legacy receiveContactMessage is unused; live messaging handled by ContactMessageService
 
   public sendDeletedContactMessage(payload: { contactId: string; userId: string; contactUserId: string; messageId: string; remove?: boolean }) {
