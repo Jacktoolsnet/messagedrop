@@ -796,10 +796,10 @@
           "playTreasureMapAria": "Jouer à Carte au trésor",
           "treasureMapPreviewPrefix": "Carte au trésor",
           "treasureMapRulesTitle": "Carte au trésor – Règles",
-          "treasureRuleSetup": "Chaque joueur cache cinq trésors, quatre bombes, trois prisonniers, trois verres de vin, une mariée pirate, une carte et une boussole sur une île de 7×7.",
+          "treasureRuleSetup": "Chaque joueur cache cinq trésors, quatre bombes, trois prisonniers, trois verres de vin, une couronne, une carte et une boussole sur une île de 7×7.",
           "treasureRuleRaid": "À chaque tour, placez tous les pirates disponibles sur des cases couvertes. Vous pouvez sinon utiliser l’un de vos quatre perroquets.",
           "treasureRuleFinds": "Les trésors sont récupérés, les bombes tuent le pirate, les prisonniers agrandissent l’équipage et le vin rend ce pirate indisponible au prochain tour.",
-          "treasureRuleBride": "La mariée pirate emporte tous les trésors déjà récupérés, qui retournent à leur position initiale.",
+          "treasureRuleBride": "La Couronne confisque tous les trésors déjà récupérés, qui retournent à leur position initiale.",
           "treasureRuleParrot": "Un perroquet dévoile brièvement la cible et les cases voisines, sans ramasser d’objet ni déclencher de bombe.",
           "treasureRuleHints": "La carte dévoile brièvement une case aléatoire. La boussole indique le trésor caché le plus proche.",
           "treasureRuleWin": "Le premier à trouver les cinq trésors adverses gagne. Si tous vos pirates meurent, l’adversaire gagne immédiatement.",
@@ -808,7 +808,7 @@
             "bomb": "Bombe",
             "prisoner": "Prisonnier",
             "wine": "Verre de vin",
-            "bride": "Mariée pirate",
+            "bride": "Couronne",
             "map": "Carte au trésor",
             "compass": "Boussole"
           }

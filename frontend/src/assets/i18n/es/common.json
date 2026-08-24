@@ -796,10 +796,10 @@
           "playTreasureMapAria": "Jugar a Mapa del tesoro",
           "treasureMapPreviewPrefix": "Mapa del tesoro",
           "treasureMapRulesTitle": "Mapa del tesoro – Reglas",
-          "treasureRuleSetup": "Cada jugador esconde cinco tesoros, cuatro bombas, tres prisioneros, tres copas de vino, una novia pirata, un mapa y una brújula en una isla de 7×7.",
+          "treasureRuleSetup": "Cada jugador esconde cinco tesoros, cuatro bombas, tres prisioneros, tres copas de vino, una corona, un mapa y una brújula en una isla de 7×7.",
           "treasureRuleRaid": "En cada turno colocas a todos los piratas disponibles en casillas cubiertas. Como alternativa, utiliza uno de tus cuatro loros.",
           "treasureRuleFinds": "Los tesoros se recogen, las bombas matan al pirata, los prisioneros aumentan la tripulación y el vino inutiliza a ese pirata durante tu próximo turno.",
-          "treasureRuleBride": "La novia pirata se lleva todos los tesoros recogidos, que vuelven a sus posiciones originales.",
+          "treasureRuleBride": "La Corona confisca todos los tesoros recogidos, que vuelven a sus posiciones originales.",
           "treasureRuleParrot": "Un loro muestra brevemente la casilla elegida y sus vecinas, sin recoger objetos ni activar bombas.",
           "treasureRuleHints": "El mapa muestra brevemente una casilla al azar. La brújula apunta al tesoro oculto más cercano.",
           "treasureRuleWin": "Gana quien encuentre primero los cinco tesoros rivales. Si mueren todos tus piratas, gana el oponente.",
@@ -808,7 +808,7 @@
             "bomb": "Bomba",
             "prisoner": "Prisionero",
             "wine": "Copa de vino",
-            "bride": "Novia pirata",
+            "bride": "Corona",
             "map": "Mapa del tesoro",
             "compass": "Brújula"
           }

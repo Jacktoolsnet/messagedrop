@@ -1,6 +1,16 @@
 import{TreasureCompassDirection,TreasureIslandItem,TreasureMapAction,TreasureMapGame}from'../interfaces/chat-game';
 export const TREASURE_ROWS=7,TREASURE_COLUMNS=7,TREASURE_CELL_COUNT=49;
 export const TREASURE_INVENTORY:Readonly<Record<TreasureIslandItem,number>>={treasure:5,bomb:4,prisoner:3,wine:3,bride:1,map:1,compass:1};
+const TREASURE_CHEST='\u{1FA8E}',TREASURE_FALLBACK='💰';let treasureGlyph:string|undefined;
+
+export function getTreasureSymbol():string{
+ if(treasureGlyph)return treasureGlyph;
+ if(typeof document==='undefined')return TREASURE_FALLBACK;
+ const context=document.createElement('canvas').getContext('2d');if(!context)return TREASURE_FALLBACK;
+ context.font='32px monospace';const fallbackWidth=context.measureText(TREASURE_CHEST).width;
+ context.font='32px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji","Noto Emoji",monospace';const emojiWidth=context.measureText(TREASURE_CHEST).width;
+ return treasureGlyph=Math.abs(emojiWidth-fallbackWidth)>.1?TREASURE_CHEST:TREASURE_FALLBACK;
+}
 
 export function validTreasureLayout(layout:(TreasureIslandItem|null)[]):boolean{
  if(layout.length!==TREASURE_CELL_COUNT||!layout.every(value=>value===null||Object.hasOwn(TREASURE_INVENTORY,value)))return false;
