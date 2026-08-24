@@ -7,7 +7,7 @@ import { ConnectFourVariant, GameStats, TicTacToeStats, TicTacToeVariant } from 
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
 import { GameRulesDialogComponent } from '../game-rules-dialog/game-rules-dialog.component';
 
-export type ChatGameType = 'ticTacToe' | 'ticTacToeVanishing' | 'connectFour' | 'connectFourVanishing' | 'dotsAndBoxes' | 'rockPaperScissors' | 'code' | 'memory' | 'minefield' | 'minefieldHideSeek'|'morris'|'checkers'|'asteroidDuel'|'treasureMap';
+export type ChatGameType = 'ticTacToe' | 'ticTacToeVanishing' | 'connectFour' | 'connectFourVanishing' | 'dotsAndBoxes' | 'rockPaperScissors' | 'code' | 'memory' | 'minefield' | 'minefieldHideSeek'|'morris'|'checkers'|'asteroidDuel'|'treasureMap'|'wordRescue';
 
 interface GameSelectDialogData {
   ticTacToeStats: TicTacToeStats;
@@ -24,6 +24,7 @@ interface GameSelectDialogData {
   checkersStats:GameStats;
   asteroidDuelStats:GameStats;
   treasureMapStats:GameStats;
+  wordRescueStats:GameStats;
 }
 
 @Component({
@@ -130,4 +131,5 @@ export class GameSelectDialogComponent {
   openCheckersRules():void{this.dialog.open(GameRulesDialogComponent,{data:{gameType:'checkers',variant:'standard'},width:'min(440px,94vw)',maxWidth:'94vw',maxHeight:'85vh',hasBackdrop:true,backdropClass:'dialog-backdrop',autoFocus:false})}
   openAsteroidDuelRules():void{this.dialog.open(GameRulesDialogComponent,{data:{gameType:'asteroidDuel',variant:'standard'},width:'min(440px,94vw)',maxWidth:'94vw',maxHeight:'85vh',hasBackdrop:true,backdropClass:'dialog-backdrop',autoFocus:false})}
   openTreasureMapRules():void{this.dialog.open(GameRulesDialogComponent,{data:{gameType:'treasureMap',variant:'standard'},width:'min(440px,94vw)',maxWidth:'94vw',maxHeight:'85vh',hasBackdrop:true,backdropClass:'dialog-backdrop',autoFocus:false})}
+  openWordRescueRules():void{this.dialog.open(GameRulesDialogComponent,{data:{gameType:'wordRescue',variant:'standard'},width:'min(440px,94vw)',maxWidth:'94vw',maxHeight:'85vh',hasBackdrop:true,backdropClass:'dialog-backdrop',autoFocus:false})}
 }

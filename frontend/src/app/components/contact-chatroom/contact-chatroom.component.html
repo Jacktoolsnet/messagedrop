@@ -237,6 +237,9 @@
             } @else if (game.type === 'treasureMap') {
             <app-treasure-map-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayTreasureMap(msg)"
               (action)="playTreasureMap(msg, $event)" (requestPlacement)="openTreasureMapPlacement(msg)" (planningStarted)="startTreasureMapPlanning(msg)"></app-treasure-map-board>
+            } @else if (game.type === 'wordRescue') {
+            <app-word-rescue-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayWordRescue(msg)"
+              (action)="playWordRescue(msg, $event)"></app-word-rescue-board>
             } @else if (game.type === 'asteroidDuel') {
             <app-asteroid-duel-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayAsteroidDuel(msg)"
               [animateHit]="shouldAnimateAsteroidHit(game)" (action)="playAsteroidDuel(msg, $event)"></app-asteroid-duel-board>
@@ -514,6 +517,9 @@
             } @else if (game.type === 'treasureMap') {
             <app-treasure-map-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayTreasureMap(msg)"
               (action)="playTreasureMap(msg, $event)" (requestPlacement)="openTreasureMapPlacement(msg)" (planningStarted)="startTreasureMapPlanning(msg)"></app-treasure-map-board>
+            } @else if (game.type === 'wordRescue') {
+            <app-word-rescue-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayWordRescue(msg)"
+              (action)="playWordRescue(msg, $event)"></app-word-rescue-board>
             } @else if (game.type === 'asteroidDuel') {
             <app-asteroid-duel-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayAsteroidDuel(msg)"
               [animateHit]="shouldAnimateAsteroidHit(game)" (action)="playAsteroidDuel(msg, $event)"></app-asteroid-duel-board>

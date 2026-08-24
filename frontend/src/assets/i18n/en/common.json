@@ -815,7 +815,27 @@
             "bride": "Crown",
             "map": "Telescope",
             "compass": "Compass"
-          }
+          },
+          "wordRescue": "Rescue the Word",
+          "newWordRescueTitle": "Start Rescue the Word",
+          "chooseRescueWord": "Choose the secret word and optionally add a category and a hint.",
+          "solutionWord": "Secret word",
+          "categoryOptional": "Category (optional)",
+          "hintOptional": "Hint (optional)",
+          "showWordAria": "Show secret word",
+          "hideWordAria": "Hide secret word",
+          "wordRescueStartFailed": "Rescue the Word could not be started.",
+          "playWordRescueAria": "Play Rescue the Word",
+          "wordRescuePreviewPrefix": "Rescue the Word",
+          "wordRescueRulesTitle": "Rescue the Word – Rules",
+          "wordRescueRuleCreate": "The creator chooses a word and may add a category and hint. The guesser sees only blank spaces.",
+          "wordRescueRuleLetters": "The guesser selects letters. Correct letters are revealed everywhere; a wrong letter removes one bridge section.",
+          "wordRescueRuleWord": "The complete word may be guessed at any time. A wrong word costs two of the eight bridge sections.",
+          "wordRescueRuleWin": "The guesser wins by finding the word. After eight errors the creator wins and the word is revealed.",
+          "remainingAttempts": "{{ count }} bridge sections left",
+          "wrongWordAttempts": "Wrong word guesses",
+          "solveWholeWord": "Solve the whole word",
+          "checkWholeWordAria": "Check whole word"
         },
         "revisionHistory": {
           "title": "Change history",

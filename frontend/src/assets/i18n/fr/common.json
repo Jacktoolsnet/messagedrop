@@ -814,7 +814,27 @@
             "bride": "Couronne",
             "map": "Longue-vue",
             "compass": "Boussole"
-          }
+          },
+          "wordRescue": "Sauve le mot",
+          "newWordRescueTitle": "Lancer Sauve le mot",
+          "chooseRescueWord": "Choisissez le mot secret et, si vous le souhaitez, une catégorie et un indice.",
+          "solutionWord": "Mot secret",
+          "categoryOptional": "Catégorie (facultatif)",
+          "hintOptional": "Indice (facultatif)",
+          "showWordAria": "Afficher le mot secret",
+          "hideWordAria": "Masquer le mot secret",
+          "wordRescueStartFailed": "Impossible de lancer Sauve le mot.",
+          "playWordRescueAria": "Jouer à Sauve le mot",
+          "wordRescuePreviewPrefix": "Sauve le mot",
+          "wordRescueRulesTitle": "Règles de Sauve le mot",
+          "wordRescueRuleCreate": "Le créateur choisit un mot et peut ajouter une catégorie et un indice. Le joueur ne voit que des emplacements vides.",
+          "wordRescueRuleLetters": "Le joueur choisit des lettres. Les bonnes lettres sont révélées partout ; une mauvaise retire une partie du pont.",
+          "wordRescueRuleWord": "Le mot complet peut être proposé à tout moment. Une mauvaise réponse coûte deux des huit parties du pont.",
+          "wordRescueRuleWin": "Le joueur gagne en trouvant le mot. Après huit erreurs, le créateur gagne et le mot est révélé.",
+          "remainingAttempts": "{{ count }} parties du pont restantes",
+          "wrongWordAttempts": "Mauvaises propositions",
+          "solveWholeWord": "Résoudre le mot entier",
+          "checkWholeWordAria": "Vérifier le mot entier"
         },
         "revisionHistory": {
           "title": "Historique des modifications",

@@ -722,7 +722,9 @@ export class ContactlistComponent {
   getPreviewIcon(preview: ContactMessagePreview): string {
     if (preview.kind === 'game') {
       const gameType = preview.payload?.game?.type;
-      return gameType==='treasureMap'
+      return gameType==='wordRescue'
+        ?'spellcheck'
+        :gameType==='treasureMap'
         ?'map'
         :gameType==='asteroidDuel'
         ?'rocket_launch'
@@ -796,7 +798,9 @@ export class ContactlistComponent {
 
     if (payload.game) {
       const currentUserId = this.userService.getUser().id;
-      const prefixKey = payload.game.type === 'treasureMap'
+      const prefixKey = payload.game.type === 'wordRescue'
+        ? 'common.contact.chatroom.games.wordRescuePreviewPrefix'
+        : payload.game.type === 'treasureMap'
         ? 'common.contact.chatroom.games.treasureMapPreviewPrefix'
         : payload.game.type === 'asteroidDuel'
         ? 'common.contact.chatroom.games.asteroidDuelPreviewPrefix'

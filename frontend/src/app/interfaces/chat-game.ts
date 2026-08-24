@@ -275,7 +275,18 @@ export interface TreasureMapGame{
   status:'active'|'won'|'draw';winnerUserId:string|null;moveNumber:number;lastMove:TreasureMapLastMove|null;
 }
 
-export type ChatGame = TicTacToeGame | ConnectFourGame | DotsAndBoxesGame | RockPaperScissorsGame | CodeGame | MemoryGame | MinefieldGame | MinefieldHideSeekGame | MorrisGame | CheckersGame | AsteroidDuelGame | TreasureMapGame;
+export type WordRescueAction = {type:'letter';letter:string}|{type:'word';word:string};
+export interface WordRescueGame {
+  type:'wordRescue';version:1;gameId:string;
+  creatorUserId:string;guesserUserId:string;
+  /** The complete message is end-to-end encrypted. The UI only reveals this value to the creator or after game end. */
+  solution:string;hint:string;category:string;
+  guessedLetters:string[];wrongLetters:string[];wrongWordAttempts:string[];
+  wrongCount:number;maxWrong:8;nextPlayerUserId:string|null;
+  status:'active'|'won';winnerUserId:string|null;moveNumber:number;
+}
+
+export type ChatGame = TicTacToeGame | ConnectFourGame | DotsAndBoxesGame | RockPaperScissorsGame | CodeGame | MemoryGame | MinefieldGame | MinefieldHideSeekGame | MorrisGame | CheckersGame | AsteroidDuelGame | TreasureMapGame | WordRescueGame;
 
 export interface GameStats {
   played: number;

@@ -1,0 +1,15 @@
+@if(game();as g){<section class="word-rescue">
+  @if(g.category||g.hint){<div class="clue-card">@if(g.category){<span class="category"><mat-icon>category</mat-icon>{{g.category}}</span>}@if(g.hint){<span class="hint"><mat-icon>lightbulb</mat-icon>{{g.hint}}</span>}</div>}
+  <div class="rescue-scene" [attr.aria-label]="('common.contact.chatroom.games.remainingAttempts'|transloco:{count:remaining()})">
+    <span class="rescued-person" [class.rescued-person--falling]="g.status==='won'&&g.winnerUserId===g.creatorUserId">🧍</span>
+    <div class="bridge">@for(segment of [0,1,2,3,4,5,6,7];track segment){<span class="bridge__segment" [class.bridge__segment--lost]="segment<g.wrongCount"></span>}</div>
+    <strong>{{'common.contact.chatroom.games.remainingAttempts'|transloco:{count:remaining()} }}</strong>
+  </div>
+  <div class="word" [class.word--solution]="showSolution()">@for(char of chars();track $index){<span class="word__slot" [class.word__slot--space]="g.solution[$index]===' '" [class.word__slot--hyphen]="g.solution[$index]==='-'">{{showSolution()?g.solution[$index]:char}}</span>}</div>
+  @if(isCreator()&&g.status==='active'){<button mat-icon-button class="reveal" type="button" (click)="revealSecret.set(!revealSecret())" [attr.aria-label]="(revealSecret()?'common.contact.chatroom.games.hideWordAria':'common.contact.chatroom.games.showWordAria')|transloco"><mat-icon>{{revealSecret()?'visibility_off':'visibility'}}</mat-icon></button>}
+  @if(g.wrongWordAttempts.length){<div class="wrong-words"><span>{{'common.contact.chatroom.games.wrongWordAttempts'|transloco}}</span><strong>{{g.wrongWordAttempts.join(', ')}}</strong></div>}
+  @if(g.status==='active'&&!isCreator()){
+    <div class="keyboard">@for(letter of alphabet;track letter){<button type="button" class="key" [class.key--correct]="correct(letter)" [class.key--wrong]="g.wrongLetters.includes(letter)" [disabled]="disabled()||used(letter)" (click)="choose(letter)">{{letter}}</button>}</div>
+    <div class="solve-row"><input maxlength="32" autocomplete="off" [placeholder]="'common.contact.chatroom.games.solveWholeWord'|transloco" [ngModel]="wordAttempt()" (ngModelChange)="wordAttempt.set($event)" (keyup.enter)="submitWord()"><button mat-mini-fab color="primary" type="button" [disabled]="disabled()||wordAttempt().trim().length<2" (click)="submitWord()" [attr.aria-label]="'common.contact.chatroom.games.checkWholeWordAria'|transloco"><mat-icon>spellcheck</mat-icon></button></div>
+  }
+</section>}
