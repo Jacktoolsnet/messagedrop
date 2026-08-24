@@ -881,15 +881,16 @@
           "startDiceRollAria": "Würfeln erstellen",
           "newDiceRollTitle": "Würfeln erstellen",
           "diceCount": "Anzahl der Würfel",
-          "diceCountHint": "1 bis 10 Würfel",
           "createDiceRoll": "Erstellen",
           "rollDice": "Würfeln",
-          "diceTotal": "Summe: {{ total }}",
           "diceStartFailed": "Das Würfeln konnte nicht erstellt werden.",
           "diceRulesTitle": "Würfeln – Erklärung",
-          "diceRuleCreate": "Der Ersteller legt fest, mit wie vielen Würfeln gewürfelt wird – von einem bis zehn.",
+          "diceRuleCreate": "Vor dem eigenen Wurf lässt sich die Anzahl über den Einstellungsbutton auf einen bis zehn Würfel ändern.",
           "diceRuleTurns": "Der Empfänger beginnt. Danach würfeln beide Chatteilnehmer immer abwechselnd.",
-          "diceRuleResult": "Jeder Wurf wird mit einem kryptografisch sicheren Zufallsgenerator bestimmt und samt Summe angezeigt."
+          "diceRuleResult": "Jeder Wurf wird mit einem kryptografisch sicheren Zufallsgenerator bestimmt und samt Summe angezeigt.",
+          "diceSettingsTitle": "Würfel einstellen",
+          "diceSettingsAria": "Anzahl der Würfel ändern",
+          "saveDiceSettingsAria": "Würfeleinstellungen übernehmen"
         }
       },
       "message": {

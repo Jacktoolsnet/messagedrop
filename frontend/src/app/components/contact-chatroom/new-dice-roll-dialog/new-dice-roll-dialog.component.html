@@ -1,19 +1,22 @@
-<app-dialog-header icon="casino" [title]="'common.contact.chatroom.decisions.newDiceRollTitle' | transloco"></app-dialog-header>
+<app-dialog-header icon="casino"
+  [title]="(settings ? 'common.contact.chatroom.decisions.diceSettingsTitle' : 'common.contact.chatroom.decisions.newDiceRollTitle') | transloco">
+</app-dialog-header>
 
 <mat-dialog-content>
-  <p>{{ 'common.contact.chatroom.decisions.diceRollDescription' | transloco }}</p>
-  <mat-form-field appearance="outline">
-    <mat-label>{{ 'common.contact.chatroom.decisions.diceCount' | transloco }}</mat-label>
-    <input matInput type="number" min="1" max="10" step="1" required
-      [ngModel]="diceCount()" (ngModelChange)="updateDiceCount($event)">
-    <mat-hint>{{ 'common.contact.chatroom.decisions.diceCountHint' | transloco }}</mat-hint>
-  </mat-form-field>
+  <div class="dice-count-setting">
+    <span class="dice-count-setting__label">{{ 'common.contact.chatroom.decisions.diceCount' | transloco }}</span>
+    <mat-slider min="1" max="10" step="1" discrete showTickMarks>
+      <input matSliderThumb [ngModel]="diceCount()" (ngModelChange)="updateDiceCount($event)"
+        [attr.aria-label]="'common.contact.chatroom.decisions.diceCount' | transloco">
+    </mat-slider>
+  </div>
 </mat-dialog-content>
 
-<mat-dialog-actions>
-  <button mat-icon-button type="button" (click)="close()"><mat-icon>close</mat-icon></button>
-  <button mat-fab extended color="primary" type="button" [disabled]="diceCount() < 1 || diceCount() > 10 || diceCount() % 1 !== 0" (click)="submit()">
-    <mat-icon>send</mat-icon>
-    {{ 'common.contact.chatroom.decisions.createDiceRoll' | transloco }}
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-icon-button class="action-close" type="button" (click)="close()"><mat-icon>close</mat-icon></button>
+  <button mat-icon-button color="primary" type="button" [disabled]="diceCount() < 1 || diceCount() > 10 || diceCount() % 1 !== 0"
+    (click)="submit()"
+    [attr.aria-label]="(settings ? 'common.contact.chatroom.decisions.saveDiceSettingsAria' : 'common.contact.chatroom.decisions.startDiceRollAria') | transloco">
+    <mat-icon>{{ settings ? 'check' : 'play_arrow' }}</mat-icon>
   </button>
 </mat-dialog-actions>

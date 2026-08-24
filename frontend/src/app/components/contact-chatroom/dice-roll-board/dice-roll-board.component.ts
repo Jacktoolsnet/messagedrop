@@ -19,28 +19,39 @@ export class DiceRollBoardComponent {
   readonly disabled = input(false);
   readonly roll = output<void>();
   readonly animating = signal(false);
+  readonly rollingFaces = signal<number[]>([]);
   readonly displayDice = computed(() => {
     const game = this.game();
+    if (this.animating() && this.rollingFaces().length === game?.diceCount) return this.rollingFaces();
     return game?.lastRoll.length ? game.lastRoll : Array.from({ length: game?.diceCount ?? 0 }, () => 0);
   });
-  readonly total = computed(() => this.game()?.lastRoll.reduce((sum, value) => sum + value, 0) ?? 0);
   private animationTimer?: ReturnType<typeof setTimeout>;
   private readonly feedback = inject(GameFeedbackService);
 
   constructor() {
     effect(onCleanup => {
       const game = this.game();
-      if (!game || game.moveNumber === 0) return;
+      if (!game || game.moveNumber === 0 || game.lastRoll.length !== game.diceCount) return;
       const key = `dice-roll-animation:${this.currentUserId()}:${game.gameId}:${game.moveNumber}`;
       if (this.wasSeen(key)) return;
       clearTimeout(this.animationTimer);
       this.animating.set(true);
+      const changeFaces = () => this.rollingFaces.set(
+        Array.from({ length: game.diceCount }, () => Math.floor(Math.random() * 6) + 1)
+      );
+      changeFaces();
+      const faceTimer = setInterval(changeFaces, 85);
       this.animationTimer = setTimeout(() => {
+        clearInterval(faceTimer);
         this.animating.set(false);
+        this.rollingFaces.set([]);
         this.markSeen(key);
         this.feedback.notifyCorrect();
       }, 900);
-      onCleanup(() => clearTimeout(this.animationTimer));
+      onCleanup(() => {
+        clearInterval(faceTimer);
+        clearTimeout(this.animationTimer);
+      });
     });
   }
 

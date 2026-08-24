@@ -333,6 +333,13 @@
                 <mat-icon>{{ actionGame.type === 'minefieldHideSeek' ? 'refresh' : 'replay' }}</mat-icon>
               </button>
               }
+              @if (actionGame.type === 'diceRoll') {
+              <button mat-mini-fab color="primary"
+                [attr.aria-label]="'common.contact.chatroom.decisions.diceSettingsAria' | transloco"
+                (click)="openDiceRollSettings(msg)">
+                <mat-icon>tune</mat-icon>
+              </button>
+              }
               <button mat-mini-fab color="primary"
                 [attr.aria-label]="'common.contact.chatroom.games.rulesAria' | transloco"
                 (click)="openGameRules(actionGame)">
@@ -612,6 +619,13 @@
                 [attr.aria-label]="'common.contact.chatroom.games.rematchAria' | transloco"
                 (click)="startGameRematch(actionGame, msg)">
                 <mat-icon>{{ actionGame.type === 'minefieldHideSeek' ? 'refresh' : 'replay' }}</mat-icon>
+              </button>
+              }
+              @if (actionGame.type === 'diceRoll') {
+              <button mat-mini-fab color="primary"
+                [attr.aria-label]="'common.contact.chatroom.decisions.diceSettingsAria' | transloco"
+                (click)="openDiceRollSettings(msg)">
+                <mat-icon>tune</mat-icon>
               </button>
               }
               <button mat-mini-fab color="primary"

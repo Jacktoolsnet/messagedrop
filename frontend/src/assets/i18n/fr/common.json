@@ -880,15 +880,16 @@
           "startDiceRollAria": "Créer un lancer de dés",
           "newDiceRollTitle": "Créer un lancer de dés",
           "diceCount": "Nombre de dés",
-          "diceCountHint": "De 1 à 10 dés",
           "createDiceRoll": "Créer",
           "rollDice": "Lancer les dés",
-          "diceTotal": "Total : {{ total }}",
           "diceStartFailed": "Le lancer de dés n’a pas pu être créé.",
           "diceRulesTitle": "Dés – Explication",
-          "diceRuleCreate": "Le créateur choisit entre un et dix dés.",
+          "diceRuleCreate": "Avant votre lancer, le bouton de réglage permet de choisir entre un et dix dés.",
           "diceRuleTurns": "Le destinataire commence. Ensuite, les deux participants jouent à tour de rôle.",
-          "diceRuleResult": "Chaque lancer utilise un générateur aléatoire cryptographiquement sûr et affiche la somme."
+          "diceRuleResult": "Chaque lancer utilise un générateur aléatoire cryptographiquement sûr et affiche la somme.",
+          "diceSettingsTitle": "Réglage des dés",
+          "diceSettingsAria": "Modifier le nombre de dés",
+          "saveDiceSettingsAria": "Appliquer le réglage des dés"
         }
       },
       "message": {
