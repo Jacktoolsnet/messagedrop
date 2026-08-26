@@ -54,17 +54,11 @@
       </div>
     </div>
 
-    @if (game.status === 'active' && game.nextPlayerUserId === currentUserId() && (game.phase === 'setupO' || game.phase === 'revealX')) {
+    @if (game.status === 'active' && game.nextPlayerUserId === currentUserId() && game.phase === 'setupO') {
       <div class="blackjack-actions">
-        @if (game.phase === 'setupO') {
-          <button mat-fab extended type="button" (click)="emit('setup')">
-            <mat-icon>style</mat-icon>{{ 'common.contact.chatroom.games.prepareBlackjack' | transloco }}
-          </button>
-        } @else if (game.phase === 'revealX') {
-          <button mat-fab extended type="button" (click)="emit('reveal')">
-            <mat-icon>visibility</mat-icon>{{ 'common.contact.chatroom.games.revealBlackjack' | transloco }}
-          </button>
-        }
+        <button mat-fab extended type="button" (click)="emit('setup')">
+          <mat-icon>style</mat-icon>{{ 'common.contact.chatroom.games.prepareBlackjack' | transloco }}
+        </button>
       </div>
     }
 

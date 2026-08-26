@@ -54,9 +54,14 @@ export function applyBlackjackAction(game:BlackjackGame,userId:string,action:Bla
     playerXDrawCount:isX?nextCount:game.playerXDrawCount,playerODrawCount:isO?nextCount:game.playerODrawCount,
     playerXDone:isX?done:game.playerXDone,playerODone:isO?done:game.playerODone,moveNumber:game.moveNumber+1};
   if(!done)return updated;
-  if(isX)return {...updated,phase:'turnO',nextPlayerUserId:game.playerOUserId};
-  return {...updated,revealedPlayerOHand:secret.deck.slice(0,nextCount),playerORevealNonce:secret.nonce,revealedPlayerODeck:secret.deck,
+  if(isX)return {...updated,revealedPlayerXHand:secret.deck.slice(0,nextCount),playerXRevealNonce:secret.nonce,revealedPlayerXDeck:secret.deck,
+    phase:'turnO',nextPlayerUserId:game.playerOUserId};
+  const oHand=secret.deck.slice(0,nextCount),xHand=game.revealedPlayerXHand;
+  if(!xHand)return {...updated,revealedPlayerOHand:oHand,playerORevealNonce:secret.nonce,revealedPlayerODeck:secret.deck,
     phase:'revealX',nextPlayerUserId:game.playerXUserId};
+  const winner=blackjackWinner(xHand,oHand,game.playerXUserId,game.playerOUserId);
+  return {...updated,revealedPlayerOHand:oHand,playerORevealNonce:secret.nonce,revealedPlayerODeck:secret.deck,
+    phase:'finished',nextPlayerUserId:null,status:winner==='draw'?'draw':'won',winnerUserId:winner==='draw'?null:winner};
 }
 export function blackjackValue(hand:readonly BlackjackCard[]):number{
   let value=0,aces=0;for(const card of hand){if(card.rank==='A'){value+=11;aces++}else if(['J','Q','K'].includes(card.rank))value+=10;else value+=Number(card.rank)}
