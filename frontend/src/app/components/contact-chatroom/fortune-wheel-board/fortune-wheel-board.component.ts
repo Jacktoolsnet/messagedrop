@@ -38,7 +38,7 @@ export class FortuneWheelBoardComponent {
     return `conic-gradient(${Array.from({ length: count }, (_, index) => {
       const start = index * angle;
       const end = (index + 1) * angle;
-      return `${WHEEL_COLORS[index]} ${start}deg ${Math.max(start, end - .8)}deg, #182536 ${Math.max(start, end - .8)}deg ${end}deg`;
+      return `${WHEEL_COLORS[index]} ${start}deg ${end}deg`;
     }).join(',')})`;
   });
   private readonly feedback = inject(GameFeedbackService);
