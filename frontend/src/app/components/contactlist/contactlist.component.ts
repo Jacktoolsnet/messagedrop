@@ -34,6 +34,7 @@ import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.comp
 import { DisplayMessageRef, DisplayMessageService } from '../../services/display-message.service';
 import { NetworkService } from '../../services/network.service';
 import { ProtectedStickerImageComponent } from '../utils/protected-sticker-image/protected-sticker-image.component';
+import { ClearChatHistoryDialogComponent } from '../contact/clear-chat-history-dialog/clear-chat-history-dialog.component';
 
 interface ConnectDialogResult {
   connectId?: string;
@@ -101,6 +102,7 @@ export class ContactlistComponent {
   private autoOpenHandled = false;
 
   private contactToDelete?: Contact;
+  private readonly clearingChatHistory = new Set<string>();
   public mode: typeof Mode = Mode;
   public subscriptionError = false;
 
@@ -381,6 +383,49 @@ export class ContactlistComponent {
     dialogRef.afterClosed().subscribe(() => {
       this.contactService.updateContactName(contact);
       this.contactService.saveAditionalContactInfos();
+    });
+  }
+
+  clearChatHistory(contact: Contact): void {
+    const confirmation = this.matDialog.open(ClearChatHistoryDialogComponent, {
+      closeOnNavigation: true,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+
+    confirmation.afterClosed().subscribe((confirmed?: boolean) => {
+      if (!confirmed || this.clearingChatHistory.has(contact.id)) {
+        return;
+      }
+      this.clearingChatHistory.add(contact.id);
+      void firstValueFrom(this.contactMessageService.clearChatHistory({
+        contactId: contact.id,
+        userId: contact.userId
+      })).then(async response => {
+        await Promise.all(response.messageIds.map(messageId =>
+          this.contactMessageService.deleteLocalPayload(messageId).catch(() => undefined)
+        ));
+        this.contactMessageService.emitUnreadCountUpdate(contact.id);
+        contact.lastMessageFrom = '';
+        contact.lastMessageAt = null;
+        this.latestMessagePreviews.update(previews => ({ ...previews, [contact.id]: [] }));
+        this.previewRequestKeys.delete(contact.id);
+        this.contactService.refreshContact(contact.id);
+        this.contactService.emitContactResetForContactUser(contact.contactUserId);
+        this.snackBar.open(
+          this.translation.t('common.contact.list.clearChatHistorySuccess'),
+          undefined,
+          { duration: 2000, panelClass: 'snack-success' }
+        );
+      }).catch(() => {
+        this.snackBar.open(
+          this.translation.t('common.contact.list.clearChatHistoryFailed'),
+          undefined,
+          { duration: 3000, panelClass: 'snack-error' }
+        );
+      }).finally(() => this.clearingChatHistory.delete(contact.id));
     });
   }
 

@@ -141,6 +141,12 @@
                             <mat-icon>more_horiz</mat-icon>
                         </button>
                         <mat-menu #contactMenu="matMenu" panelClass="accent-menu">
+                            @if (backendActionsAvailable()) {
+                            <button mat-menu-item (click)="clearChatHistory(contact)">
+                                <mat-icon>delete_sweep</mat-icon>
+                                <span>{{ 'common.contact.list.clearChatHistory' | transloco }}</span>
+                            </button>
+                            }
                             <button mat-menu-item (click)="editContact(contact)">
                                 <mat-icon>settings_account_box</mat-icon>
                                 <span>{{ 'common.contact.list.editAria' | transloco }}</span>

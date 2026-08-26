@@ -119,14 +119,6 @@
     </mat-slider>
   </div>
 
-  <div class="avatar-area chat-history-area">
-    <button mat-flat-button class="clear-chat-button" [disabled]="clearingChatHistory()"
-      (click)="clearChatHistory()">
-      <mat-icon>delete_sweep</mat-icon>
-      <span>{{ 'common.contact.profile.clearChatHistory' | transloco }}</span>
-    </button>
-  </div>
-
   @if (joinedUserRoom()) {
   <div class="avatar-area">
     <div class="buttonarea">

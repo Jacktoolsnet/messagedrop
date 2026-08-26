@@ -1176,11 +1176,6 @@ const HELP_TOPICS = {
         descriptionKey: 'myContactSettings.items.transparency.desc'
       },
       {
-        icon: 'delete_sweep',
-        titleKey: 'myContactSettings.items.clearChatHistory.title',
-        descriptionKey: 'myContactSettings.items.clearChatHistory.desc'
-      },
-      {
         icon: 'connect_without_contact',
         titleKey: 'myContactSettings.items.syncProfile.title',
         descriptionKey: 'myContactSettings.items.syncProfile.desc'
@@ -1240,6 +1235,11 @@ const HELP_TOPICS = {
         icon: 'more_horiz',
         titleKey: 'myContactList.items.more.title',
         descriptionKey: 'myContactList.items.more.desc'
+      },
+      {
+        icon: 'delete_sweep',
+        titleKey: 'myContactList.items.clearChatHistory.title',
+        descriptionKey: 'myContactList.items.clearChatHistory.desc'
       },
       {
         icon: 'bookmark_add',

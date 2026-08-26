@@ -726,10 +726,6 @@
         "title": "Adjust background transparency",
         "desc": "This action changes the chat background transparency percentage."
       },
-      "clearChatHistory": {
-        "title": "Delete chat history",
-        "desc": "Permanently deletes every message in this chat from your history. The history is deleted only for you and remains available to your contact."
-      },
       "syncProfile": {
         "title": "Request profile update",
         "desc": "This action requests the current profile data from the contact when this option is available."
@@ -778,6 +774,10 @@
       "more": {
         "title": "Open more actions",
         "desc": "This action opens the submenu with additional actions for the selected contact."
+      },
+      "clearChatHistory": {
+        "title": "Delete chat history",
+        "desc": "Permanently deletes every message in this chat from your history. The history is deleted only for you and remains available to your contact."
       },
       "subscribe": {
         "title": "Subscribe contact",
