@@ -465,6 +465,7 @@ export class ContactChatroomComponent implements AfterViewInit {
     }
     const contact = deleted.contactId ? this.contactService.sortedContactsSignal().find((c) => c.id === deleted.contactId) : this.contact();
     let removed = false;
+    let deletedGame = false;
     if (deleted.remove) {
       this.messages.update((msgs) => {
         const next = msgs.filter((msg) => msg.messageId !== deleted.messageId);
@@ -477,6 +478,7 @@ export class ContactChatroomComponent implements AfterViewInit {
         const next = msgs.map((msg) => {
           if (msg.messageId === deleted.messageId) {
             changed = true;
+            deletedGame = !!msg.payload?.game;
             return { ...msg, status: 'deleted' };
           }
           return msg;
@@ -490,6 +492,9 @@ export class ContactChatroomComponent implements AfterViewInit {
     }
     if (removed) {
       void this.contactMessageService.deleteLocalPayload(deleted.messageId);
+    }
+    if (deletedGame) {
+      this.gameFeedback.stopCurrentSounds();
     }
     this.contactMessageService.deletedMessage.set(null);
   });
@@ -854,6 +859,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   canPlayTicTacToe(message: ChatroomMessage): boolean {
+    if (message.status === 'deleted') return false;
     const game = message.payload?.game;
     if (!game || game.type !== 'ticTacToe' || this.gameMovesInFlight().has(game.gameId)) {
       return false;
@@ -1092,58 +1098,58 @@ export class ContactChatroomComponent implements AfterViewInit {
     return game.status!=='active';
   }
 
-  canPlayMorris(message:ChatroomMessage):boolean{const g=message.payload?.game;return !!g&&g.type==='morris'&&g.status==='active'&&g.nextPlayerUserId===this.userService.getUser().id&&!this.gameMovesInFlight().has(g.gameId)}
+  canPlayMorris(message:ChatroomMessage):boolean{const g=message.payload?.game;return message.status!=='deleted'&&!!g&&g.type==='morris'&&g.status==='active'&&g.nextPlayerUserId===this.userService.getUser().id&&!this.gameMovesInFlight().has(g.gameId)}
   async playMorris(message:ChatroomMessage,action:MorrisAction):Promise<void>{const contact=this.contact(),g=message.payload?.game;if(!contact||!g||g.type!=='morris'||!this.canPlayMorris(message))return;const next=applyMorrisAction(g,this.userService.getUser().id,action);if(!next)return;this.setGameMoveInFlight(g.gameId,true);try{const payload=this.createEmptyMessage();payload.game=next;await this.sendAsNewMessage(contact,payload,message.messageId,'game_move')}finally{this.setGameMoveInFlight(g.gameId,false)}}
-  canPlayCheckers(message:ChatroomMessage):boolean{const g=message.payload?.game;return !!g&&g.type==='checkers'&&g.status==='active'&&g.nextPlayerUserId===this.userService.getUser().id&&!this.gameMovesInFlight().has(g.gameId)}
+  canPlayCheckers(message:ChatroomMessage):boolean{const g=message.payload?.game;return message.status!=='deleted'&&!!g&&g.type==='checkers'&&g.status==='active'&&g.nextPlayerUserId===this.userService.getUser().id&&!this.gameMovesInFlight().has(g.gameId)}
   async playCheckers(message:ChatroomMessage,action:CheckersAction):Promise<void>{const contact=this.contact(),g=message.payload?.game;if(!contact||!g||g.type!=='checkers'||!this.canPlayCheckers(message))return;const next=applyCheckersMove(g,this.userService.getUser().id,action);if(!next)return;this.setGameMoveInFlight(g.gameId,true);try{const payload=this.createEmptyMessage();payload.game=next;await this.sendAsNewMessage(contact,payload,message.messageId,'game_move')}finally{this.setGameMoveInFlight(g.gameId,false)}}
-  canPlayAsteroidDuel(message:ChatroomMessage):boolean{const g=message.payload?.game;return !!g&&g.type==='asteroidDuel'&&g.status==='active'&&g.nextPlayerUserId===this.userService.getUser().id&&!this.gameMovesInFlight().has(g.gameId)}
+  canPlayAsteroidDuel(message:ChatroomMessage):boolean{const g=message.payload?.game;return message.status!=='deleted'&&!!g&&g.type==='asteroidDuel'&&g.status==='active'&&g.nextPlayerUserId===this.userService.getUser().id&&!this.gameMovesInFlight().has(g.gameId)}
   async playAsteroidDuel(message:ChatroomMessage,action:AsteroidDuelAction):Promise<void>{const contact=this.contact(),g=message.payload?.game;if(!contact||!g||g.type!=='asteroidDuel'||!this.canPlayAsteroidDuel(message))return;const next=applyAsteroidDuelAction(g,this.userService.getUser().id,action);if(!next)return;this.setGameMoveInFlight(g.gameId,true);try{if(next.lastMove?.hitPlayer)this.rememberAsteroidHit(next);else if(next.lastMove?.destroyedAsteroid!==null)this.gameFeedback.notifyExplosion();const payload=this.createEmptyMessage();payload.game=next;await this.sendAsNewMessage(contact,payload,message.messageId,'game_move')}finally{this.setGameMoveInFlight(g.gameId,false)}}
-  canPlayTreasureMap(message:ChatroomMessage):boolean{const g=message.payload?.game;return !!g&&g.type==='treasureMap'&&g.status==='active'&&g.phase==='active'&&g.nextPlayerUserId===this.userService.getUser().id&&!this.gameMovesInFlight().has(g.gameId)}
+  canPlayTreasureMap(message:ChatroomMessage):boolean{const g=message.payload?.game;return message.status!=='deleted'&&!!g&&g.type==='treasureMap'&&g.status==='active'&&g.phase==='active'&&g.nextPlayerUserId===this.userService.getUser().id&&!this.gameMovesInFlight().has(g.gameId)}
   async playTreasureMap(message:ChatroomMessage,action:TreasureMapAction):Promise<void>{const contact=this.contact(),g=message.payload?.game;if(!contact||!g||g.type!=='treasureMap'||!this.canPlayTreasureMap(message))return;const next=applyTreasureMapAction(g,this.userService.getUser().id,action);if(!next)return;this.setGameMoveInFlight(g.gameId,true);try{const found=next.lastMove?.foundItems??[];if(found.includes('bomb'))this.gameFeedback.notifyExplosion();else if(found.includes('bride'))this.gameFeedback.notifyTreasureCrown();else if(found.includes('treasure'))this.gameFeedback.notifyTreasureFound();else if(found.includes('map')||found.includes('compass'))this.gameFeedback.notifyTreasureClue();else if(found.includes('wine'))this.gameFeedback.notifyIncorrect();else if(found.includes('prisoner'))this.gameFeedback.notifyCorrect();else this.gameFeedback.notifySelection();const payload=this.createEmptyMessage();payload.game=next;await this.sendAsNewMessage(contact,payload,message.messageId,'game_move')}finally{this.setGameMoveInFlight(g.gameId,false)}}
-  canPlayWordRescue(message:ChatroomMessage):boolean{const g=message.payload?.game;return !!g&&g.type==='wordRescue'&&g.status==='active'&&g.nextPlayerUserId===this.userService.getUser().id&&!this.gameMovesInFlight().has(g.gameId)}
+  canPlayWordRescue(message:ChatroomMessage):boolean{const g=message.payload?.game;return message.status!=='deleted'&&!!g&&g.type==='wordRescue'&&g.status==='active'&&g.nextPlayerUserId===this.userService.getUser().id&&!this.gameMovesInFlight().has(g.gameId)}
   async playWordRescue(message:ChatroomMessage,action:WordRescueAction):Promise<void>{const contact=this.contact(),g=message.payload?.game;if(!contact||!g||g.type!=='wordRescue'||!this.canPlayWordRescue(message))return;const next=applyWordRescueAction(g,this.userService.getUser().id,action);if(!next)return;this.setGameMoveInFlight(g.gameId,true);try{if(next.status==='won'&&next.winnerUserId===g.guesserUserId)this.gameFeedback.notifyCorrect();else if(next.wrongCount>g.wrongCount)this.gameFeedback.notifyIncorrect();else this.gameFeedback.notifyCorrect();const payload=this.createEmptyMessage();payload.game=next;await this.sendAsNewMessage(contact,payload,message.messageId,'game_move')}finally{this.setGameMoveInFlight(g.gameId,false)}}
-  canTossCoin(message:ChatroomMessage):boolean{const g=message.payload?.game;return !!g&&g.type==='coinToss'&&g.status==='active'&&g.nextPlayerUserId===this.userService.getUser().id&&!this.gameMovesInFlight().has(g.gameId)}
+  canTossCoin(message:ChatroomMessage):boolean{const g=message.payload?.game;return message.status!=='deleted'&&!!g&&g.type==='coinToss'&&g.status==='active'&&g.nextPlayerUserId===this.userService.getUser().id&&!this.gameMovesInFlight().has(g.gameId)}
   async tossCoin(message:ChatroomMessage):Promise<void>{const contact=this.contact(),g=message.payload?.game;if(!contact||!g||g.type!=='coinToss'||!this.canTossCoin(message))return;const next=flipCoin(g,this.userService.getUser().id);if(!next)return;this.setGameMoveInFlight(g.gameId,true);try{const payload=this.createEmptyMessage();payload.game=next;await this.sendAsNewMessage(contact,payload,message.messageId,'decision_result')}finally{this.setGameMoveInFlight(g.gameId,false)}}
-  canRollDice(message:ChatroomMessage):boolean{const g=message.payload?.game;return !!g&&g.type==='diceRoll'&&g.nextPlayerUserId===this.userService.getUser().id&&!this.gameMovesInFlight().has(g.gameId)}
+  canRollDice(message:ChatroomMessage):boolean{const g=message.payload?.game;return message.status!=='deleted'&&!!g&&g.type==='diceRoll'&&g.nextPlayerUserId===this.userService.getUser().id&&!this.gameMovesInFlight().has(g.gameId)}
   async rollDiceForMessage(message:ChatroomMessage):Promise<void>{const contact=this.contact(),g=message.payload?.game;if(!contact||!g||g.type!=='diceRoll'||!this.canRollDice(message))return;const next=rollDice(g,this.userService.getUser().id);if(!next)return;this.setGameMoveInFlight(g.gameId,true);try{const payload=this.createEmptyMessage();payload.game=next;await this.sendAsNewMessage(contact,payload,message.messageId,'decision_result')}finally{this.setGameMoveInFlight(g.gameId,false)}}
-  canConfigureDice(message:ChatroomMessage):boolean{const g=message.payload?.game;return !!g&&g.type==='diceRoll'}
+  canConfigureDice(message:ChatroomMessage):boolean{const g=message.payload?.game;return message.status!=='deleted'&&!!g&&g.type==='diceRoll'}
   openDiceRollSettings(message:ChatroomMessage):void{const contact=this.contact(),g=message.payload?.game;if(!contact||!g||g.type!=='diceRoll'||!this.canConfigureDice(message))return;const ref=this.matDialog.open(NewDiceRollDialogComponent,{data:{diceCount:g.diceCount,settings:true},width:'min(470px,96vw)',maxWidth:'96vw',maxHeight:'90vh',hasBackdrop:true,backdropClass:'dialog-backdrop',autoFocus:false});ref.afterClosed().subscribe((result?:NewDiceRollDialogResult)=>{if(!result||result.diceCount===g.diceCount)return;void this.updateDiceRollSettings(contact,message,g,result.diceCount)})}
   private async updateDiceRollSettings(contact:Contact,message:ChatroomMessage,game:Extract<ChatGame,{type:'diceRoll'}>,diceCount:number):Promise<void>{if(!this.canConfigureDice(message))return;this.setGameMoveInFlight(game.gameId,true);try{const payload=this.createEmptyMessage();payload.game={...game,diceCount,lastRoll:[],lastRollUserId:null};await this.sendAsNewMessage(contact,payload,message.messageId,'decision_result')}finally{this.setGameMoveInFlight(game.gameId,false)}}
-  canSpinFortuneWheel(message:ChatroomMessage):boolean{const g=message.payload?.game;return !!g&&g.type==='fortuneWheel'&&g.nextPlayerUserId===this.userService.getUser().id&&!this.gameMovesInFlight().has(g.gameId)}
+  canSpinFortuneWheel(message:ChatroomMessage):boolean{const g=message.payload?.game;return message.status!=='deleted'&&!!g&&g.type==='fortuneWheel'&&g.nextPlayerUserId===this.userService.getUser().id&&!this.gameMovesInFlight().has(g.gameId)}
   async spinFortuneWheelForMessage(message:ChatroomMessage):Promise<void>{const contact=this.contact(),g=message.payload?.game;if(!contact||!g||g.type!=='fortuneWheel'||!this.canSpinFortuneWheel(message))return;const next=spinFortuneWheel(g,this.userService.getUser().id);if(!next)return;this.setGameMoveInFlight(g.gameId,true);try{const payload=this.createEmptyMessage();payload.game=next;await this.sendAsNewMessage(contact,payload,message.messageId,'decision_result')}finally{this.setGameMoveInFlight(g.gameId,false)}}
-  openFortuneWheelSettings(message:ChatroomMessage):void{const contact=this.contact(),g=message.payload?.game;if(!contact||!g||g.type!=='fortuneWheel')return;const ref=this.matDialog.open(FortuneWheelDialogComponent,{data:{entries:g.entries,settings:true},width:'min(500px,96vw)',maxWidth:'96vw',maxHeight:'90vh',hasBackdrop:true,backdropClass:'dialog-backdrop',autoFocus:false});ref.afterClosed().subscribe((result?:FortuneWheelDialogResult)=>{if(!result||result.entries.join('\u0000')===g.entries.join('\u0000'))return;void this.updateFortuneWheelSettings(contact,message,g,result.entries)})}
+  openFortuneWheelSettings(message:ChatroomMessage):void{const contact=this.contact(),g=message.payload?.game;if(message.status==='deleted'||!contact||!g||g.type!=='fortuneWheel')return;const ref=this.matDialog.open(FortuneWheelDialogComponent,{data:{entries:g.entries,settings:true},width:'min(500px,96vw)',maxWidth:'96vw',maxHeight:'90vh',hasBackdrop:true,backdropClass:'dialog-backdrop',autoFocus:false});ref.afterClosed().subscribe((result?:FortuneWheelDialogResult)=>{if(!result||result.entries.join('\u0000')===g.entries.join('\u0000'))return;void this.updateFortuneWheelSettings(contact,message,g,result.entries)})}
   private async updateFortuneWheelSettings(contact:Contact,message:ChatroomMessage,game:FortuneWheelGame,entries:string[]):Promise<void>{const normalized=normalizeWheelEntries(entries);if(!normalized)return;this.setGameMoveInFlight(game.gameId,true);try{const payload=this.createEmptyMessage();payload.game={...game,entries:normalized,resultIndex:null,lastSpinUserId:null};await this.sendAsNewMessage(contact,payload,message.messageId,'decision_result')}finally{this.setGameMoveInFlight(game.gameId,false)}}
-  canPlayBlackjack(message:ChatroomMessage):boolean{const g=message.payload?.game;return !!g&&g.type==='blackjack'&&g.status==='active'&&g.nextPlayerUserId===this.userService.getUser().id&&!this.gameMovesInFlight().has(g.gameId)}
+  canPlayBlackjack(message:ChatroomMessage):boolean{const g=message.payload?.game;return message.status!=='deleted'&&!!g&&g.type==='blackjack'&&g.status==='active'&&g.nextPlayerUserId===this.userService.getUser().id&&!this.gameMovesInFlight().has(g.gameId)}
   async playBlackjack(message:ChatroomMessage,action:BlackjackUiAction):Promise<void>{const contact=this.contact(),game=message.payload?.game,userId=this.userService.getUser().id;if(!contact||!game||game.type!=='blackjack'||!this.canPlayBlackjack(message))return;this.setGameMoveInFlight(game.gameId,true);try{let next:BlackjackGame|null;if(action==='setup'){const secret=createBlackjackSecret();const [encrypted,commitment]=await Promise.all([this.cryptoService.encrypt(this.userService.getUser().cryptoKeyPair.publicKey,JSON.stringify(secret)),createBlackjackCommitment(secret)]);next=setupBlackjackOpponent(game,userId,encrypted,commitment)}else{const encrypted=userId===game.playerXUserId?game.encryptedPlayerXDeck:game.encryptedPlayerODeck,commitment=userId===game.playerXUserId?game.playerXCommitment:game.playerOCommitment;if(!encrypted||!commitment)throw new Error('missing_secret');const plain=await this.cryptoService.decrypt(this.userService.getUser().cryptoKeyPair.privateKey,JSON.parse(encrypted) as CryptoData),secret=JSON.parse(plain);if(!isValidBlackjackSecret(secret)||await createBlackjackCommitment(secret)!==commitment)throw new Error('invalid_secret');if(userId===game.playerOUserId&&game.phase==='turnO'){if(!game.revealedPlayerXDeck||!game.playerXRevealNonce)throw new Error('missing_opponent_reveal');const xSecret={deck:game.revealedPlayerXDeck,nonce:game.playerXRevealNonce};if(!isValidBlackjackSecret(xSecret)||await createBlackjackCommitment(xSecret)!==game.playerXCommitment)throw new Error('invalid_opponent_reveal')}if(action==='reveal'){if(!game.revealedPlayerODeck||!game.playerORevealNonce||!game.playerOCommitment)throw new Error('missing_opponent_reveal');const oSecret={deck:game.revealedPlayerODeck,nonce:game.playerORevealNonce};if(!isValidBlackjackSecret(oSecret)||await createBlackjackCommitment(oSecret)!==game.playerOCommitment)throw new Error('invalid_opponent_reveal')}next=applyBlackjackAction(game,userId,action,secret)}if(!next)return;const payload=this.createEmptyMessage();payload.game=next;await this.sendAsNewMessage(contact,payload,message.messageId,'game_move')}catch{this.snackBar.open(this.translation.t('common.contact.chatroom.games.blackjackActionFailed'),'',{duration:3000})}finally{this.setGameMoveInFlight(game.gameId,false)}}
-  canPlayTrickDuel(message:ChatroomMessage):boolean{const g=message.payload?.game;return !!g&&g.type==='trickDuel'&&g.status==='active'&&g.nextPlayerUserId===this.userService.getUser().id&&!this.gameMovesInFlight().has(g.gameId)}
+  canPlayTrickDuel(message:ChatroomMessage):boolean{const g=message.payload?.game;return message.status!=='deleted'&&!!g&&g.type==='trickDuel'&&g.status==='active'&&g.nextPlayerUserId===this.userService.getUser().id&&!this.gameMovesInFlight().has(g.gameId)}
   async playTrickDuelCard(message:ChatroomMessage,card:BlackjackCard):Promise<void>{const contact=this.contact(),game=message.payload?.game,userId=this.userService.getUser().id;if(!contact||!game||game.type!=='trickDuel'||!this.canPlayTrickDuel(message))return;this.setGameMoveInFlight(game.gameId,true);try{const isX=userId===game.playerXUserId,encrypted=isX?game.encryptedPlayerXHand:game.encryptedPlayerOHand,commitment=isX?game.playerXCommitment:game.playerOCommitment,plain=await this.cryptoService.decrypt(this.userService.getUser().cryptoKeyPair.privateKey,JSON.parse(encrypted) as CryptoData),hand=JSON.parse(plain);if(!isValidTrickDuelHand(hand)||await createTrickDuelCommitment(hand)!==commitment||!hand.some(entry=>trickDuelCardKey(entry)===trickDuelCardKey(card)))throw new Error('invalid_hand');const next=applyTrickDuelCard(game,userId,card);if(!next)return;const payload=this.createEmptyMessage();payload.game=next;await this.sendAsNewMessage(contact,payload,message.messageId,'game_move')}catch{this.snackBar.open(this.translation.t('common.contact.chatroom.games.trickDuelActionFailed'),'',{duration:3000})}finally{this.setGameMoveInFlight(game.gameId,false)}}
-  async startTreasureMapPlanning(message:ChatroomMessage):Promise<void>{const contact=this.contact(),currentPayload=message.payload,g=currentPayload?.game,userId=this.userService.getUser().id;if(!contact||!currentPayload||!g||g.type!=='treasureMap'||g.status!=='active'||g.phase!=='active'||g.nextPlayerUserId!==userId||g.planningPlayerUserId===userId||this.gameMovesInFlight().has(g.gameId))return;const next:TreasureMapGame={...g,planningPlayerUserId:userId},payload:ShortMessage={...currentPayload,game:next};this.setGameMoveInFlight(g.gameId,true);try{const encrypted=await this.contactMessageService.encryptMessageForContact(contact,payload);if(!this.isEncryptedMessageWithinLimit(encrypted.encryptedMessageForUser,encrypted.encryptedMessageForContact))throw new Error('message_too_large');await firstValueFrom(this.contactMessageService.updateMessage({messageId:message.messageId,contactId:contact.id,userId:contact.userId,contactUserId:contact.contactUserId,encryptedMessageForUser:encrypted.encryptedMessageForUser,encryptedMessageForContact:encrypted.encryptedMessageForContact,signature:encrypted.signature}));this.messages.update(messages=>messages.map(entry=>entry.messageId===message.messageId?{...entry,payload}:entry));void this.persistPayloadBatch(contact.id,[{messageId:message.messageId,payload}]);this.socketioService.sendUpdatedContactMessage({id:message.id,messageId:message.messageId,contactId:contact.id,userId:contact.userId,contactUserId:contact.contactUserId,messageSignature:encrypted.signature,userEncryptedMessage:encrypted.encryptedMessageForUser,contactUserEncryptedMessage:encrypted.encryptedMessageForContact,createdAt:new Date().toISOString()})}catch{this.snackBar.open(this.translation.t('common.contact.chatroom.sendFailed'),'',{duration:3000})}finally{this.setGameMoveInFlight(g.gameId,false)}}
-  openTreasureMapPlacement(message:ChatroomMessage):void{const contact=this.contact(),g=message.payload?.game;if(!contact||!g||g.type!=='treasureMap'||g.phase!=='placingO'||g.nextPlayerUserId!==this.userService.getUser().id)return;const ref=this.matDialog.open(NewTreasureMapDialogComponent,{width:'min(520px,96vw)',maxWidth:'96vw',maxHeight:'90vh',hasBackdrop:true,backdropClass:'dialog-backdrop',autoFocus:false});ref.afterClosed().subscribe(async(layout?:(TreasureIslandItem|null)[])=>{if(!layout)return;const next=placeTreasureMapOpponent(g,this.userService.getUser().id,layout);if(!next)return;this.setGameMoveInFlight(g.gameId,true);try{const payload=this.createEmptyMessage();payload.game=next;await this.sendAsNewMessage(contact,payload,message.messageId,'game_move')}finally{this.setGameMoveInFlight(g.gameId,false)}})}
+  async startTreasureMapPlanning(message:ChatroomMessage):Promise<void>{const contact=this.contact(),currentPayload=message.payload,g=currentPayload?.game,userId=this.userService.getUser().id;if(message.status==='deleted'||!contact||!currentPayload||!g||g.type!=='treasureMap'||g.status!=='active'||g.phase!=='active'||g.nextPlayerUserId!==userId||g.planningPlayerUserId===userId||this.gameMovesInFlight().has(g.gameId))return;const next:TreasureMapGame={...g,planningPlayerUserId:userId},payload:ShortMessage={...currentPayload,game:next};this.setGameMoveInFlight(g.gameId,true);try{const encrypted=await this.contactMessageService.encryptMessageForContact(contact,payload);if(!this.isEncryptedMessageWithinLimit(encrypted.encryptedMessageForUser,encrypted.encryptedMessageForContact))throw new Error('message_too_large');await firstValueFrom(this.contactMessageService.updateMessage({messageId:message.messageId,contactId:contact.id,userId:contact.userId,contactUserId:contact.contactUserId,encryptedMessageForUser:encrypted.encryptedMessageForUser,encryptedMessageForContact:encrypted.encryptedMessageForContact,signature:encrypted.signature}));this.messages.update(messages=>messages.map(entry=>entry.messageId===message.messageId?{...entry,payload}:entry));void this.persistPayloadBatch(contact.id,[{messageId:message.messageId,payload}]);this.socketioService.sendUpdatedContactMessage({id:message.id,messageId:message.messageId,contactId:contact.id,userId:contact.userId,contactUserId:contact.contactUserId,messageSignature:encrypted.signature,userEncryptedMessage:encrypted.encryptedMessageForUser,contactUserEncryptedMessage:encrypted.encryptedMessageForContact,createdAt:new Date().toISOString()})}catch{this.snackBar.open(this.translation.t('common.contact.chatroom.sendFailed'),'',{duration:3000})}finally{this.setGameMoveInFlight(g.gameId,false)}}
+  openTreasureMapPlacement(message:ChatroomMessage):void{const contact=this.contact(),g=message.payload?.game;if(message.status==='deleted'||!contact||!g||g.type!=='treasureMap'||g.phase!=='placingO'||g.nextPlayerUserId!==this.userService.getUser().id)return;const ref=this.matDialog.open(NewTreasureMapDialogComponent,{width:'min(520px,96vw)',maxWidth:'96vw',maxHeight:'90vh',hasBackdrop:true,backdropClass:'dialog-backdrop',autoFocus:false});ref.afterClosed().subscribe(async(layout?:(TreasureIslandItem|null)[])=>{if(!layout)return;const next=placeTreasureMapOpponent(g,this.userService.getUser().id,layout);if(!next)return;this.setGameMoveInFlight(g.gameId,true);try{const payload=this.createEmptyMessage();payload.game=next;await this.sendAsNewMessage(contact,payload,message.messageId,'game_move')}finally{this.setGameMoveInFlight(g.gameId,false)}})}
 
   canPlayCode(message: ChatroomMessage): boolean {
     const game = message.payload?.game;
-    return !!game && game.type === 'code' && game.status === 'active'
+    return message.status !== 'deleted' && !!game && game.type === 'code' && game.status === 'active'
       && game.nextPlayerUserId === this.userService.getUser().id
       && !this.gameMovesInFlight().has(game.gameId);
   }
 
   canPlayMemory(message: ChatroomMessage): boolean {
     const game = message.payload?.game;
-    return !!game && game.type === 'memory' && game.status === 'active'
+    return message.status !== 'deleted' && !!game && game.type === 'memory' && game.status === 'active'
       && game.nextPlayerUserId === this.userService.getUser().id
       && !this.gameMovesInFlight().has(game.gameId);
   }
 
   canPlayMinefield(message: ChatroomMessage): boolean {
     const game = message.payload?.game;
-    return !!game && game.type === 'minefield' && game.status === 'active'
+    return message.status !== 'deleted' && !!game && game.type === 'minefield' && game.status === 'active'
       && game.nextPlayerUserId === this.userService.getUser().id
       && !this.gameMovesInFlight().has(game.gameId);
   }
 
   canPlayMinefieldHideSeek(message: ChatroomMessage): boolean {
     const game = message.payload?.game;
-    return !!game && game.type === 'minefieldHideSeek' && game.status === 'active'
+    return message.status !== 'deleted' && !!game && game.type === 'minefieldHideSeek' && game.status === 'active'
       && game.nextPlayerUserId === this.userService.getUser().id
       && !this.gameMovesInFlight().has(game.gameId);
   }
@@ -1296,7 +1302,7 @@ export class ContactChatroomComponent implements AfterViewInit {
 
   canPlayConnectFour(message: ChatroomMessage): boolean {
     const game = message.payload?.game;
-    return !!game
+    return message.status !== 'deleted' && !!game
       && game.type === 'connectFour'
       && !this.gameMovesInFlight().has(game.gameId)
       && game.status === 'active'
@@ -1305,7 +1311,7 @@ export class ContactChatroomComponent implements AfterViewInit {
 
   canPlayDotsAndBoxes(message: ChatroomMessage): boolean {
     const game = message.payload?.game;
-    return !!game
+    return message.status !== 'deleted' && !!game
       && game.type === 'dotsAndBoxes'
       && !this.gameMovesInFlight().has(game.gameId)
       && game.status === 'active'
@@ -1314,7 +1320,7 @@ export class ContactChatroomComponent implements AfterViewInit {
 
   canPlayRockPaperScissors(message: ChatroomMessage): boolean {
     const game = message.payload?.game;
-    return !!game
+    return message.status !== 'deleted' && !!game
       && game.type === 'rockPaperScissors'
       && !this.gameMovesInFlight().has(game.gameId)
       && game.status === 'active'

@@ -53,7 +53,7 @@ export class MinefieldBoardComponent {
   private async animateMineAndEmit(index:number):Promise<void>{
     this.detonatingMine.set(index);
     await this.feedback.notifyMineCountdown();
-    if(this.detonatingMine()!==index)return;
+    if(this.disabled()||this.detonatingMine()!==index)return;
     this.detonatingMine.set(null);
     this.explodingMines.set(new Set([index]));
     this.feedback.notifyExplosion();

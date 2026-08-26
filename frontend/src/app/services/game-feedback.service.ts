@@ -8,6 +8,7 @@ export class GameFeedbackService {
   private readonly arcadeMusicMutedStorageKey = 'messagedrop.gameFeedback.arcadeMusicMuted';
   private readonly treasureMusicMutedStorageKey = 'messagedrop.gameFeedback.treasureMusicMuted';
   private audioContext: AudioContext | null = null;
+  private readonly activeToneGains = new Set<GainNode>();
   private lastHoverSoundAt = 0;
   private readonly arcadeMusicOwners = new Set<object>();
   private arcadeMusicTimer: number | null = null;
@@ -20,6 +21,19 @@ export class GameFeedbackService {
   readonly audioMuted = signal(this.readAudioMuted());
   readonly arcadeMusicMuted = signal(this.readBoolean(this.arcadeMusicMutedStorageKey));
   readonly treasureMusicMuted = signal(this.readBoolean(this.treasureMusicMutedStorageKey));
+
+  stopCurrentSounds(): void {
+    const now = this.audioContext?.currentTime ?? 0;
+    for (const gain of this.activeToneGains) {
+      try {
+        gain.gain.cancelScheduledValues(now);
+        gain.gain.setValueAtTime(0.0001, now);
+      } catch {
+        // The audio node may already have finished in the meantime.
+      }
+    }
+    this.tryVibrate(0);
+  }
 
   notifyHover(): void {
     if (this.audioMuted()) {
@@ -439,9 +453,11 @@ export class GameFeedbackService {
 
     oscillator.connect(gain);
     gain.connect(context.destination);
+    this.activeToneGains.add(gain);
     oscillator.start(startTime);
     oscillator.stop(endTime);
     oscillator.addEventListener('ended', () => {
+      this.activeToneGains.delete(gain);
       oscillator.disconnect();
       gain.disconnect();
     }, { once: true });

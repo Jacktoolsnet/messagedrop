@@ -31,7 +31,8 @@ export class DiceRollBoardComponent {
   constructor() {
     effect(onCleanup => {
       const game = this.game();
-      if (!game || game.moveNumber === 0 || game.lastRoll.length !== game.diceCount) return;
+      const disabled = this.disabled();
+      if (disabled || !game || game.moveNumber === 0 || game.lastRoll.length !== game.diceCount) return;
       const key = `dice-roll-animation:${this.currentUserId()}:${game.gameId}:${game.moveNumber}`;
       if (this.wasSeen(key)) return;
       clearTimeout(this.animationTimer);

@@ -272,6 +272,7 @@
           </div>
           <div class="message-actions-row button-me">
             <div class="message-actions">
+              @if (!(msg.payload?.game && msg.status === 'deleted')) {
               @if (msg.payload?.audio) {
               <button mat-mini-fab color="primary" [attr.aria-label]="'common.audioRecorder.play' | transloco"
                 (click)="toggleAudioPlayback(msg)">
@@ -335,21 +336,21 @@
                 <mat-icon>{{ isMinefieldLayoutVisible(actionGame.gameId) ? 'visibility_off' : 'visibility' }}</mat-icon>
               </button>
               }
-              @if (canShowGameRematch(actionGame)) {
+              @if (msg.status !== 'deleted' && canShowGameRematch(actionGame)) {
               <button mat-mini-fab color="primary"
                 [attr.aria-label]="'common.contact.chatroom.games.rematchAria' | transloco"
                 (click)="startGameRematch(actionGame, msg)">
                 <mat-icon>{{ actionGame.type === 'minefieldHideSeek' ? 'refresh' : 'replay' }}</mat-icon>
               </button>
               }
-              @if (actionGame.type === 'diceRoll') {
+              @if (msg.status !== 'deleted' && actionGame.type === 'diceRoll') {
               <button mat-mini-fab color="primary"
                 [attr.aria-label]="'common.contact.chatroom.decisions.diceSettingsAria' | transloco"
                 (click)="openDiceRollSettings(msg)">
                 <mat-icon>tune</mat-icon>
               </button>
               }
-              @if (actionGame.type === 'fortuneWheel') {
+              @if (msg.status !== 'deleted' && actionGame.type === 'fortuneWheel') {
               <button mat-mini-fab color="primary"
                 [attr.aria-label]="'common.contact.chatroom.decisions.wheelSettingsAria' | transloco"
                 (click)="openFortuneWheelSettings(msg)">
@@ -380,6 +381,7 @@
                 (click)="gameFeedback.toggleAudioMuted()">
                 <mat-icon>{{ gameFeedback.audioMuted() ? 'volume_off' : 'volume_up' }}</mat-icon>
               </button>
+              }
               }
               <button mat-mini-fab color="warn" [attr.aria-label]="'common.contact.chatroom.deleteAria' | transloco"
                 (click)="deleteMessage(msg)">
@@ -581,6 +583,7 @@
           </div>
           <div class="message-actions-row button-them">
             <div class="message-actions">
+              @if (!(msg.payload?.game && msg.status === 'deleted')) {
               @if (msg.payload?.audio) {
               <button mat-mini-fab color="primary" [attr.aria-label]="'common.audioRecorder.play' | transloco"
                 (click)="toggleAudioPlayback(msg)">
@@ -639,21 +642,21 @@
                 <mat-icon>{{ isMinefieldLayoutVisible(actionGame.gameId) ? 'visibility_off' : 'visibility' }}</mat-icon>
               </button>
               }
-              @if (canShowGameRematch(actionGame)) {
+              @if (msg.status !== 'deleted' && canShowGameRematch(actionGame)) {
               <button mat-mini-fab color="primary"
                 [attr.aria-label]="'common.contact.chatroom.games.rematchAria' | transloco"
                 (click)="startGameRematch(actionGame, msg)">
                 <mat-icon>{{ actionGame.type === 'minefieldHideSeek' ? 'refresh' : 'replay' }}</mat-icon>
               </button>
               }
-              @if (actionGame.type === 'diceRoll') {
+              @if (msg.status !== 'deleted' && actionGame.type === 'diceRoll') {
               <button mat-mini-fab color="primary"
                 [attr.aria-label]="'common.contact.chatroom.decisions.diceSettingsAria' | transloco"
                 (click)="openDiceRollSettings(msg)">
                 <mat-icon>tune</mat-icon>
               </button>
               }
-              @if (actionGame.type === 'fortuneWheel') {
+              @if (msg.status !== 'deleted' && actionGame.type === 'fortuneWheel') {
               <button mat-mini-fab color="primary"
                 [attr.aria-label]="'common.contact.chatroom.decisions.wheelSettingsAria' | transloco"
                 (click)="openFortuneWheelSettings(msg)">
@@ -684,6 +687,7 @@
                 (click)="gameFeedback.toggleAudioMuted()">
                 <mat-icon>{{ gameFeedback.audioMuted() ? 'volume_off' : 'volume_up' }}</mat-icon>
               </button>
+              }
               }
               <button mat-mini-fab color="warn" [attr.aria-label]="'common.contact.chatroom.deleteAria' | transloco"
                 (click)="deleteMessage(msg)">

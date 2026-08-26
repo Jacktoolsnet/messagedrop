@@ -45,7 +45,8 @@ export class FortuneWheelBoardComponent {
   constructor() {
     effect(onCleanup => {
       const game = this.game();
-      if (!game || game.resultIndex === null || game.resultIndex >= game.entries.length) return;
+      const disabled = this.disabled();
+      if (disabled || !game || game.resultIndex === null || game.resultIndex >= game.entries.length) return;
       const finalAngle = this.finalAngle(game.resultIndex, game.entries.length);
       const key = `fortune-wheel-animation:${this.currentUserId()}:${game.gameId}:${game.moveNumber}`;
       if (this.wasSeen(key)) {
