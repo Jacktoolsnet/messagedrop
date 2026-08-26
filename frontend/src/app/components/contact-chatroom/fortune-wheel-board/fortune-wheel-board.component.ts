@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -54,7 +54,7 @@ export class FortuneWheelBoardComponent {
         this.animating.set(false);
         return;
       }
-      const current = this.rotation();
+      const current = untracked(() => this.rotation());
       const currentNormalized = ((current % 360) + 360) % 360;
       const delta = ((finalAngle - currentNormalized) + 360) % 360;
       const reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;

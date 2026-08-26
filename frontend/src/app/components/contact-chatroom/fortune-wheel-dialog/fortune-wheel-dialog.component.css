@@ -1,6 +1,6 @@
 :host { display: block; color: var(--mat-app-text-color); }
-.wheel-dialog-content { display: grid; gap: .65rem; padding-top: 1.1rem !important; }
-.wheel-entry-list { display: grid; gap: .15rem; }
-.wheel-entry-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: .35rem; }
+.wheel-dialog-content { display: grid; gap: .65rem; padding-top: 1.1rem !important; padding-bottom: 1.35rem !important; scroll-padding-bottom: 4rem; }
+.wheel-entry-list { display: grid; gap: .7rem; }
+.wheel-entry-row { display: grid; grid-template-columns: minmax(0, 1fr) 3.5rem; align-items: start; gap: .5rem; }
 .wheel-entry-row mat-form-field { width: 100%; }
-.add-entry { justify-self: start; }
+.wheel-entry-remove { width: 3.5rem; height: 3.5rem; }
