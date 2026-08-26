@@ -10,11 +10,11 @@
 .wheel-label b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .wheel-label mat-icon { flex: 0 0 auto; width: .9rem; height: .9rem; color: #ffe46a; font-size: .9rem; filter: drop-shadow(0 0 .3rem #ffc400); }
 .wheel-label > .wheel-label--winner { border: 2px solid #e8fbff; background: #073956; color: #fff; box-shadow: 0 0 .8rem #4fd8ff, inset 0 0 .45rem rgba(79,216,255,.55); transform: translateX(-50%) scale(1.08); }
-.wheel-spin,.wheel-hub { position: absolute; top: 50%; left: 50%; z-index: 4; display: grid; place-items: center; width: 4rem; height: 4rem; box-sizing: border-box; border: .3rem solid #bcedff; border-radius: 50%; box-shadow: 0 0 1rem #4fd8ff; transform: translate(-50%,-50%); }
-.wheel-spin.mat-mdc-fab-base::before { position: static; content: none; }
-.wheel-spin mat-icon,.wheel-hub mat-icon { width: 1.8rem; height: 1.8rem; font-size: 1.8rem; }
-.wheel-spin mat-icon { display: flex; align-items: center; justify-content: center; margin: 0; line-height: 1; }
-.wheel-hub { background: #102a3d; color: #4fd8ff; }
+.wheel-hub { position: absolute; top: 50%; left: 50%; z-index: 4; display: grid; place-items: center; width: 4rem; height: 4rem; box-sizing: border-box; padding: 0; border: .3rem solid #bcedff; border-radius: 50%; background: #102a3d; color: #4fd8ff; box-shadow: 0 0 1rem #4fd8ff; transform: translate(-50%,-50%); }
+.wheel-hub mat-icon { display: block; width: 1.8rem; height: 1.8rem; margin: 0; font-size: 1.8rem; line-height: 1; }
+.wheel-hub--button { font: inherit; cursor: pointer; }
+.wheel-hub--button:hover,.wheel-hub--button:focus-visible { background: #16415d; box-shadow: 0 0 1.35rem #4fd8ff; outline: none; }
+.wheel-hub--button:disabled { cursor: default; }
 @keyframes winner-segment-glow { to { opacity: .62; filter: drop-shadow(0 0 1rem #4fd8ff); } }
-@media(max-width:420px){.wheel-label>span{top:7%;width:42%;font-size:.55rem}.wheel-spin,.wheel-hub{width:3.5rem;height:3.5rem}}
+@media(max-width:420px){.wheel-label>span{top:7%;width:42%;font-size:.55rem}.wheel-hub{width:3.5rem;height:3.5rem}}
 @media(prefers-reduced-motion:reduce){.wheel--spinning{transition-duration:.25s}}

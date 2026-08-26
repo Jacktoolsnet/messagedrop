@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { FortuneWheelGame } from '../../../interfaces/chat-game';
@@ -11,7 +10,7 @@ const WHEEL_COLORS = ['#21b6e8', '#8b6cff', '#f455a8', '#ff7355', '#ffb52e', '#4
 @Component({
   selector: 'app-fortune-wheel-board',
   standalone: true,
-  imports: [MatButtonModule, MatIconModule, TranslocoPipe],
+  imports: [MatIconModule, TranslocoPipe],
   templateUrl: './fortune-wheel-board.component.html',
   styleUrl: './fortune-wheel-board.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush

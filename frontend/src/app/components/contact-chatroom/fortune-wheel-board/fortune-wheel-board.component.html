@@ -18,7 +18,7 @@
         }
       </div>
       @if (!disabled()) {
-        <button mat-fab color="primary" type="button" class="wheel-spin" [disabled]="animating()"
+        <button type="button" class="wheel-hub wheel-hub--button" [disabled]="animating()"
           (click)="requestSpin()" [attr.aria-label]="'common.contact.chatroom.decisions.spinWheel' | transloco">
           <mat-icon>rotate_right</mat-icon>
         </button>
