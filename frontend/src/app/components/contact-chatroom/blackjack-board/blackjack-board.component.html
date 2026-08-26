@@ -1,22 +1,73 @@
-@if(game();as game){<section class="blackjack">
-  <div class="blackjack-hand" [class.blackjack-hand--winner]="game.status==='won'&&game.winnerUserId===game.playerOUserId">
-    <header><strong>{{currentUserId()===game.playerOUserId?('common.contact.chatroom.games.yourBlackjackHand'|transloco):('common.contact.chatroom.games.opponentBlackjackHand'|transloco)}}</strong>@if(value(shownOHand(game));as score){<b>{{score}}</b>}</header>
-    <div class="cards">@if(shownOHand(game);as hand){@for(card of hand;track $index){<span class="card" [class.card--red]="isRed(card)" [style.--card-index]="$index"><b>{{card.rank}}</b><i>{{suit(card)}}</i></span>}}@else{@for(back of [0,1];track back){<span class="card card--back" [style.--card-index]="$index"><mat-icon>lock</mat-icon></span>}}</div>
-  </div>
-  <div class="blackjack-divider"><span>21</span></div>
-  <div class="blackjack-hand" [class.blackjack-hand--winner]="game.status==='won'&&game.winnerUserId===game.playerXUserId">
-    <header><strong>{{currentUserId()===game.playerXUserId?('common.contact.chatroom.games.yourBlackjackHand'|transloco):('common.contact.chatroom.games.opponentBlackjackHand'|transloco)}}</strong>@if(value(shownXHand(game));as score){<b>{{score}}</b>}</header>
-    <div class="cards">@if(shownXHand(game);as hand){@for(card of hand;track $index){<span class="card" [class.card--red]="isRed(card)" [style.--card-index]="$index"><b>{{card.rank}}</b><i>{{suit(card)}}</i></span>}}@else{@for(back of [0,1];track back){<span class="card card--back" [style.--card-index]="$index"><mat-icon>lock</mat-icon></span>}}</div>
-  </div>
-  @if(game.status!=='active'){<div class="blackjack-result" [class.blackjack-result--won]="game.winnerUserId===currentUserId()"><mat-icon>{{game.status==='draw'?'handshake':game.winnerUserId===currentUserId()?'emoji_events':'sentiment_dissatisfied'}}</mat-icon><strong>{{(game.status==='draw'?'common.contact.chatroom.games.drawTitle':game.winnerUserId===currentUserId()?'common.contact.chatroom.games.iWon':'common.contact.chatroom.games.iLost')|transloco}}</strong></div>}
-  @if(game.status==='active'&&game.nextPlayerUserId===currentUserId()){
-    <div class="blackjack-actions">
-      @if(game.phase==='setupO'){<button mat-fab extended type="button" (click)="emit('setup')"><mat-icon>style</mat-icon>{{'common.contact.chatroom.games.prepareBlackjack'|transloco}}</button>}
-      @else if(game.phase==='revealX'){<button mat-fab extended type="button" (click)="emit('reveal')"><mat-icon>visibility</mat-icon>{{'common.contact.chatroom.games.revealBlackjack'|transloco}}</button>}
-      @else if(!loading()&&!invalidSecret()){
-        <button mat-fab extended type="button" (click)="emit('hit')"><mat-icon>add</mat-icon>{{'common.contact.chatroom.games.blackjackHit'|transloco}}</button>
-        <button mat-fab extended type="button" (click)="emit('stand')"><mat-icon>pan_tool</mat-icon>{{'common.contact.chatroom.games.blackjackStand'|transloco}}</button>
-      }
+@if (game(); as game) {
+  <section class="blackjack">
+    <div class="blackjack-hand" [class.blackjack-hand--winner]="isOpponentWinner(game)">
+      <header>
+        <strong>{{ 'common.contact.chatroom.games.opponentBlackjackHand' | transloco }}</strong>
+        @if (value(shownOpponentHand(game)); as score) { <b>{{ score }}</b> }
+      </header>
+      <div class="cards">
+        @if (shownOpponentHand(game); as hand) {
+          @for (card of hand; track $index) {
+            <span class="card" [class.card--red]="isRed(card)" [style.--card-index]="$index">
+              <b class="card-rank card-rank--top">{{ card.rank }}</b>
+              <i class="card-suit">{{ suit(card) }}</i>
+              <b class="card-rank card-rank--bottom">{{ card.rank }}</b>
+            </span>
+          }
+        } @else {
+          @for (back of [0, 1]; track back) {
+            <span class="card card--back" [style.--card-index]="$index"><mat-icon>lock</mat-icon></span>
+          }
+        }
+      </div>
     </div>
-  }
-</section>}
+
+    <div class="blackjack-divider"><span>21</span></div>
+
+    <div class="blackjack-hand" [class.blackjack-hand--winner]="isOwnWinner(game)">
+      <header>
+        <strong>{{ 'common.contact.chatroom.games.yourBlackjackHand' | transloco }}</strong>
+        @if (value(shownOwnHand(game)); as score) { <b>{{ score }}</b> }
+      </header>
+      <div class="cards">
+        @if (shownOwnHand(game); as hand) {
+          @for (card of hand; track $index) {
+            <span class="card" [class.card--red]="isRed(card)" [style.--card-index]="$index">
+              <b class="card-rank card-rank--top">{{ card.rank }}</b>
+              <i class="card-suit">{{ suit(card) }}</i>
+              <b class="card-rank card-rank--bottom">{{ card.rank }}</b>
+            </span>
+          }
+        }
+      </div>
+    </div>
+
+    @if (game.status === 'active' && game.nextPlayerUserId === currentUserId()) {
+      <div class="blackjack-actions">
+        @if (game.phase === 'setupO') {
+          <button mat-fab extended type="button" (click)="emit('setup')">
+            <mat-icon>style</mat-icon>{{ 'common.contact.chatroom.games.prepareBlackjack' | transloco }}
+          </button>
+        } @else if (game.phase === 'revealX') {
+          <button mat-fab extended type="button" (click)="emit('reveal')">
+            <mat-icon>visibility</mat-icon>{{ 'common.contact.chatroom.games.revealBlackjack' | transloco }}
+          </button>
+        } @else if (!loading() && !invalidSecret()) {
+          <button mat-fab extended type="button" (click)="emit('hit')">
+            <mat-icon>add</mat-icon>{{ 'common.contact.chatroom.games.blackjackHit' | transloco }}
+          </button>
+          <button mat-fab extended type="button" (click)="emit('stand')">
+            <mat-icon>pan_tool</mat-icon>{{ 'common.contact.chatroom.games.blackjackStand' | transloco }}
+          </button>
+        }
+      </div>
+    }
+
+    @if (game.status !== 'active') {
+      <div class="blackjack-result" [class.blackjack-result--won]="game.winnerUserId === currentUserId()">
+        <mat-icon>{{ game.status === 'draw' ? 'handshake' : game.winnerUserId === currentUserId() ? 'emoji_events' : 'sentiment_dissatisfied' }}</mat-icon>
+        <strong>{{ (game.status === 'draw' ? 'common.contact.chatroom.games.drawTitle' : game.winnerUserId === currentUserId() ? 'common.contact.chatroom.games.iWon' : 'common.contact.chatroom.games.iLost') | transloco }}</strong>
+      </div>
+    }
+  </section>
+}

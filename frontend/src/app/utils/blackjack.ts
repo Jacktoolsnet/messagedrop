@@ -21,13 +21,13 @@ export function isValidBlackjackSecret(secret:BlackjackSecret):boolean{
   const cards=new Set(secret.deck.map(card=>`${card.suit}:${card.rank}`));
   return cards.size===52&&secret.deck.every(card=>SUITS.includes(card.suit)&&RANKS.includes(card.rank));
 }
-export function createBlackjackGame(x:string,o:string,encryptedDeck:string,commitment:string):BlackjackGame{
+export function createBlackjackGame(x:string,o:string,encryptedDeck:string,commitment:string,encryptedOpponentDeck?:string,opponentCommitment?:string):BlackjackGame{
   if(!x||!o||x===o||!encryptedDeck||!commitment)throw new Error('invalid_blackjack');
   return {type:'blackjack',version:1,gameId:crypto.randomUUID(),playerXUserId:x,playerOUserId:o,
-    encryptedPlayerXDeck:encryptedDeck,playerXCommitment:commitment,encryptedPlayerODeck:null,playerOCommitment:null,
+    encryptedPlayerXDeck:encryptedDeck,playerXCommitment:commitment,encryptedPlayerODeck:encryptedOpponentDeck??null,playerOCommitment:opponentCommitment??null,
     playerXDrawCount:2,playerODrawCount:2,playerXDone:false,playerODone:false,
     revealedPlayerXHand:null,playerXRevealNonce:null,revealedPlayerOHand:null,playerORevealNonce:null,revealedPlayerXDeck:null,revealedPlayerODeck:null,
-    phase:'setupO',nextPlayerUserId:o,status:'active',winnerUserId:null,moveNumber:0};
+    phase:encryptedOpponentDeck&&opponentCommitment?'turnX':'setupO',nextPlayerUserId:encryptedOpponentDeck&&opponentCommitment?x:o,status:'active',winnerUserId:null,moveNumber:0};
 }
 export function setupBlackjackOpponent(game:BlackjackGame,userId:string,encryptedDeck:string,commitment:string):BlackjackGame|null{
   if(game.phase!=='setupO'||game.nextPlayerUserId!==userId||userId!==game.playerOUserId||!encryptedDeck||!commitment)return null;

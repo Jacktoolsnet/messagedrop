@@ -16,8 +16,16 @@ export class BlackjackBoardComponent{
   readonly ownHand=signal<BlackjackCard[]>([]);readonly loading=signal(false);readonly invalidSecret=signal(false);
   private readonly cryptoService=inject(CryptoService);private readonly userService=inject(UserService);private readonly feedback=inject(GameFeedbackService);private loadId=0;private readonly autoStandKeys=new Set<string>();
   constructor(){effect(()=>{const game=this.game(),userId=this.currentUserId();void this.loadOwnHand(game,userId)})}
-  shownXHand(game:BlackjackGame):BlackjackCard[]|null{return game.status==='active'?(this.currentUserId()===game.playerXUserId?this.ownHand():null):game.revealedPlayerXHand}
-  shownOHand(game:BlackjackGame):BlackjackCard[]|null{return game.status==='active'?(this.currentUserId()===game.playerOUserId?this.ownHand():null):game.revealedPlayerOHand}
+  shownOwnHand(game:BlackjackGame):BlackjackCard[]|null{
+    if(game.status==='active')return this.ownHand();
+    return this.currentUserId()===game.playerXUserId?game.revealedPlayerXHand:game.revealedPlayerOHand;
+  }
+  shownOpponentHand(game:BlackjackGame):BlackjackCard[]|null{
+    if(game.status==='active')return null;
+    return this.currentUserId()===game.playerXUserId?game.revealedPlayerOHand:game.revealedPlayerXHand;
+  }
+  isOwnWinner(game:BlackjackGame):boolean{return game.status==='won'&&game.winnerUserId===this.currentUserId()}
+  isOpponentWinner(game:BlackjackGame):boolean{return game.status==='won'&&game.winnerUserId!==this.currentUserId()}
   value(hand:BlackjackCard[]|null):number|null{return hand?.length?blackjackValue(hand):null}
   suit(card:BlackjackCard):string{return card.suit==='hearts'?'♥':card.suit==='diamonds'?'♦':card.suit==='clubs'?'♣':'♠'}
   isRed(card:BlackjackCard):boolean{return card.suit==='hearts'||card.suit==='diamonds'}
