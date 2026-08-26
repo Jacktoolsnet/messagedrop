@@ -58,13 +58,23 @@ export class FortuneWheelBoardComponent {
       const delta = ((finalAngle - currentNormalized) + 360) % 360;
       const reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
       this.animating.set(true);
-      const startTimer = setTimeout(() => this.rotation.set(current + 5 * 360 + delta), 30);
-      const finishTimer = setTimeout(() => {
-        this.animating.set(false);
-        this.markSeen(key);
-        this.feedback.notifyCorrect();
-      }, reducedMotion ? 330 : 3550);
-      onCleanup(() => { clearTimeout(startTimer); clearTimeout(finishTimer); });
+      let secondFrame = 0;
+      let finishTimer: ReturnType<typeof setTimeout> | undefined;
+      const firstFrame = requestAnimationFrame(() => {
+        secondFrame = requestAnimationFrame(() => {
+          this.rotation.set(current + 5 * 360 + delta);
+          finishTimer = setTimeout(() => {
+            this.animating.set(false);
+            this.markSeen(key);
+            this.feedback.notifyCorrect();
+          }, reducedMotion ? 280 : 3500);
+        });
+      });
+      onCleanup(() => {
+        cancelAnimationFrame(firstFrame);
+        if (secondFrame) cancelAnimationFrame(secondFrame);
+        if (finishTimer) clearTimeout(finishTimer);
+      });
     });
   }
 

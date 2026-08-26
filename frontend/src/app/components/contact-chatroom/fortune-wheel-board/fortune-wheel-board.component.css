@@ -1,8 +1,7 @@
 :host { display: block; width: min(25rem, calc(100vw - 5rem)); max-width: 100%; margin: 0 auto; }
 .fortune-wheel-board { display: grid; place-items: center; padding: .8rem 0 2.75rem; }
 .wheel-stage { position: relative; display: grid; place-items: center; width: min(100%, 22rem); aspect-ratio: 1; }
-.wheel { position: absolute; inset: .45rem; overflow: hidden; border: .38rem solid #253b55; border-radius: 50%; box-shadow: inset 0 0 1.4rem rgba(2,9,18,.55), 0 0 1rem color-mix(in srgb,#4fd8ff 58%,transparent); will-change: transform; }
-.wheel--spinning { transition: transform 3.45s cubic-bezier(.12,.72,.08,1); }
+.wheel { position: absolute; inset: .45rem; overflow: hidden; border: .38rem solid #253b55; border-radius: 50%; box-shadow: inset 0 0 1.4rem rgba(2,9,18,.55), 0 0 1rem color-mix(in srgb,#4fd8ff 58%,transparent); transition: transform 3.45s cubic-bezier(.12,.72,.08,1); will-change: transform; }
 .wheel-winner-segment { position: absolute; inset: 0; z-index: 0; border-radius: 50%; mix-blend-mode: screen; filter: drop-shadow(0 0 .65rem #bff1ff); animation: winner-segment-glow 1.2s ease-in-out infinite alternate; }
 .wheel-pointer { position: absolute; top: -.12rem; left: 50%; z-index: 5; width: 0; height: 0; border-right: .8rem solid transparent; border-left: .8rem solid transparent; border-top: 1.55rem solid #dffaff; filter: drop-shadow(0 0 .4rem #4fd8ff); transform: translateX(-50%); }
 .wheel-label { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
@@ -17,4 +16,4 @@
 .wheel-hub--button:disabled { cursor: default; }
 @keyframes winner-segment-glow { to { opacity: .62; filter: drop-shadow(0 0 1rem #4fd8ff); } }
 @media(max-width:420px){.wheel-label>span{top:7%;width:42%;font-size:.55rem}.wheel-hub{width:3.5rem;height:3.5rem}}
-@media(prefers-reduced-motion:reduce){.wheel--spinning{transition-duration:.25s}}
+@media(prefers-reduced-motion:reduce){.wheel{transition-duration:.25s}}
