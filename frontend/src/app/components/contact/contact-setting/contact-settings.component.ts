@@ -293,14 +293,14 @@ export class ContactSettingsComponent {
         this.contactService.emitContactResetForContactUser(this.contact.contactUserId);
         this.snackBar.open(
           this.translation.t('common.contact.profile.clearChatHistorySuccess'),
-          this.translation.t('common.actions.ok'),
-          { duration: 2000 }
+          undefined,
+          { duration: 2000, panelClass: 'snack-success' }
         );
       }).catch(() => {
         this.snackBar.open(
           this.translation.t('common.contact.profile.clearChatHistoryFailed'),
-          this.translation.t('common.actions.ok'),
-          { duration: 3000 }
+          undefined,
+          { duration: 3000, panelClass: 'snack-error' }
         );
       }).finally(() => this.clearingChatHistory.set(false));
     });
