@@ -2226,7 +2226,7 @@ export class ContactChatroomComponent implements AfterViewInit {
     });
   }
 
-  deleteMessage(_message: ChatroomMessage): void {
+  deleteMessage(message: ChatroomMessage): void {
     const contact = this.contact();
     if (!contact) {
       return;
@@ -2243,31 +2243,25 @@ export class ContactChatroomComponent implements AfterViewInit {
       if (!confirm) {
         return;
       }
-      const scope = _message.direction === 'user' ? 'both' : 'single';
-      this.contactMessageService.deleteMessage({
-        messageId: _message.messageId,
-        contactId: contact.id,
-        scope,
-        userId: contact.userId,
-        contactUserId: contact.contactUserId
-      }).subscribe({
-        next: () => {
-          this.messages.update((msgs) => msgs.filter((msg) => msg.messageId !== _message.messageId));
-          void this.contactMessageService.deleteLocalPayload(_message.messageId);
-          this.contactMessageService.emitUnreadCountUpdate(contact.id);
-          const remove = scope === 'both';
-          if (scope === 'both' || scope === 'single') {
-            this.socketioService.sendDeletedContactMessage({
-              contactId: contact.id,
-              userId: contact.userId,
-              contactUserId: contact.contactUserId,
-              messageId: _message.messageId,
-              remove
-            });
-          }
-        }
-      });
+      void this.deleteMessageWithRevisions(contact,message);
     });
+  }
+
+  private async deleteMessageWithRevisions(contact:Contact,message:ChatroomMessage):Promise<void>{
+    const scope=message.direction==='user'?'both':'single',revisions=message.payload?.game?[...this.getRevisionHistory(message)].reverse():[message],deletedIds=new Set<string>();
+    try{
+      for(const revision of revisions){
+        await firstValueFrom(this.contactMessageService.deleteMessage({messageId:revision.messageId,contactId:contact.id,scope,userId:contact.userId,contactUserId:contact.contactUserId}));
+        deletedIds.add(revision.messageId);
+        this.socketioService.sendDeletedContactMessage({contactId:contact.id,userId:contact.userId,contactUserId:contact.contactUserId,messageId:revision.messageId,remove:scope==='both'});
+      }
+    }catch{
+      this.snackBar.open(this.translation.t('common.message.deleteFailed'),'',{duration:3000});
+    }
+    if(!deletedIds.size)return;
+    this.messages.update(messages=>messages.filter(entry=>!deletedIds.has(entry.messageId)));
+    for(const messageId of deletedIds)void this.contactMessageService.deleteLocalPayload(messageId);
+    this.contactMessageService.emitUnreadCountUpdate(contact.id);
   }
 
   addOptimisticMessage(message: ShortMessage): string | undefined {
