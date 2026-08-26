@@ -26,6 +26,7 @@ export class BlackjackBoardComponent{
   }
   isOwnWinner(game:BlackjackGame):boolean{return game.status==='won'&&game.winnerUserId===this.currentUserId()}
   isOpponentWinner(game:BlackjackGame):boolean{return game.status==='won'&&game.winnerUserId!==this.currentUserId()}
+  canChooseAction(game:BlackjackGame):boolean{return game.status==='active'&&game.nextPlayerUserId===this.currentUserId()&&(game.phase==='turnX'||game.phase==='turnO')&&!this.loading()&&!this.invalidSecret()}
   value(hand:BlackjackCard[]|null):number|null{return hand?.length?blackjackValue(hand):null}
   suit(card:BlackjackCard):string{return card.suit==='hearts'?'♥':card.suit==='diamonds'?'♦':card.suit==='clubs'?'♣':'♠'}
   isRed(card:BlackjackCard):boolean{return card.suit==='hearts'||card.suit==='diamonds'}

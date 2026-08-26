@@ -27,7 +27,6 @@
     <div class="blackjack-hand" [class.blackjack-hand--winner]="isOwnWinner(game)">
       <header>
         <strong>{{ 'common.contact.chatroom.games.yourBlackjackHand' | transloco }}</strong>
-        @if (value(shownOwnHand(game)); as score) { <b>{{ score }}</b> }
       </header>
       <div class="cards">
         @if (shownOwnHand(game); as hand) {
@@ -40,9 +39,22 @@
           }
         }
       </div>
+      <div class="blackjack-controls" [class.blackjack-controls--score-only]="!canChooseAction(game)">
+        @if (canChooseAction(game)) {
+          <button mat-mini-fab type="button" [disabled]="disabled()" [attr.aria-label]="'common.contact.chatroom.games.blackjackHit' | transloco" [title]="'common.contact.chatroom.games.blackjackHit' | transloco" (click)="emit('hit')">
+            <mat-icon>add</mat-icon>
+          </button>
+        }
+        @if (value(shownOwnHand(game)); as score) { <b class="blackjack-score">{{ score }}</b> }
+        @if (canChooseAction(game)) {
+          <button mat-mini-fab type="button" [disabled]="disabled()" [attr.aria-label]="'common.contact.chatroom.games.blackjackStand' | transloco" [title]="'common.contact.chatroom.games.blackjackStand' | transloco" (click)="emit('stand')">
+            <mat-icon>pan_tool</mat-icon>
+          </button>
+        }
+      </div>
     </div>
 
-    @if (game.status === 'active' && game.nextPlayerUserId === currentUserId()) {
+    @if (game.status === 'active' && game.nextPlayerUserId === currentUserId() && (game.phase === 'setupO' || game.phase === 'revealX')) {
       <div class="blackjack-actions">
         @if (game.phase === 'setupO') {
           <button mat-fab extended type="button" (click)="emit('setup')">
@@ -51,13 +63,6 @@
         } @else if (game.phase === 'revealX') {
           <button mat-fab extended type="button" (click)="emit('reveal')">
             <mat-icon>visibility</mat-icon>{{ 'common.contact.chatroom.games.revealBlackjack' | transloco }}
-          </button>
-        } @else if (!loading() && !invalidSecret()) {
-          <button mat-fab extended type="button" (click)="emit('hit')">
-            <mat-icon>add</mat-icon>{{ 'common.contact.chatroom.games.blackjackHit' | transloco }}
-          </button>
-          <button mat-fab extended type="button" (click)="emit('stand')">
-            <mat-icon>pan_tool</mat-icon>{{ 'common.contact.chatroom.games.blackjackStand' | transloco }}
           </button>
         }
       </div>
