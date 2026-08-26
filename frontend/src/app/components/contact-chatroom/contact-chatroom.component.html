@@ -222,6 +222,9 @@
             } @else if (game.type === 'blackjack') {
             <app-blackjack-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayBlackjack(msg)"
               (action)="playBlackjack(msg,$event)"></app-blackjack-board>
+            } @else if (game.type === 'trickDuel') {
+            <app-trick-duel-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayTrickDuel(msg)"
+              (cardPlayed)="playTrickDuelCard(msg,$event)"></app-trick-duel-board>
             } @else if (game.type === 'memory') {
             <app-memory-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayMemory(msg)"
               (turn)="playMemoryTurn(msg, $event)"></app-memory-board>
@@ -528,6 +531,9 @@
             } @else if (game.type === 'blackjack') {
             <app-blackjack-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayBlackjack(msg)"
               (action)="playBlackjack(msg,$event)"></app-blackjack-board>
+            } @else if (game.type === 'trickDuel') {
+            <app-trick-duel-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayTrickDuel(msg)"
+              (cardPlayed)="playTrickDuelCard(msg,$event)"></app-trick-duel-board>
             } @else if (game.type === 'memory') {
             <app-memory-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayMemory(msg)"
               (turn)="playMemoryTurn(msg, $event)"></app-memory-board>

@@ -859,7 +859,18 @@
           "prepareBlackjack": "Prepare cards",
           "revealBlackjack": "Reveal hands",
           "blackjackHit": "Hit",
-          "blackjackStand": "Stand"
+          "blackjackStand": "Stand",
+          "trickDuel": "Trick Duel",
+          "playTrickDuelAria": "Start trick duel",
+          "trickDuelDescription": "Play seven hidden tricks and use your cards tactically.",
+          "trickDuelStartFailed": "The trick duel could not be started.",
+          "trickDuelActionFailed": "The card could not be played.",
+          "trickDuelRulesTitle": "Trick Duel – Rules",
+          "trickDuelRuleDeal": "Each player receives seven hidden cards. Only your own hand is visible.",
+          "trickDuelRuleChoose": "Both players choose a card in turn. The first card stays hidden from the opponent until both have chosen.",
+          "trickDuelRuleRank": "The higher card wins the trick. The ace is highest; equal ranks make the trick a draw.",
+          "trickDuelRuleTurns": "The player who chooses first alternates after every trick.",
+          "trickDuelRuleWin": "After seven tricks, the player with more tricks wins. Equal scores result in a draw."
         },
         "revisionHistory": {
           "title": "Change history",

@@ -858,7 +858,18 @@
           "prepareBlackjack": "Préparer les cartes",
           "revealBlackjack": "Révéler les mains",
           "blackjackHit": "Tirer",
-          "blackjackStand": "Rester"
+          "blackjackStand": "Rester",
+          "trickDuel": "Duel de plis",
+          "playTrickDuelAria": "Démarrer le duel de plis",
+          "trickDuelDescription": "Jouez sept plis cachés et utilisez vos cartes avec stratégie.",
+          "trickDuelStartFailed": "Le duel de plis n’a pas pu démarrer.",
+          "trickDuelActionFailed": "La carte n’a pas pu être jouée.",
+          "trickDuelRulesTitle": "Duel de plis – Règles",
+          "trickDuelRuleDeal": "Chaque joueur reçoit sept cartes cachées. Seule votre propre main est visible.",
+          "trickDuelRuleChoose": "Les deux joueurs choisissent une carte à tour de rôle. La première reste cachée jusqu’à ce que les deux aient choisi.",
+          "trickDuelRuleRank": "La carte la plus forte gagne le pli. L’as est la plus forte ; deux valeurs identiques donnent un pli nul.",
+          "trickDuelRuleTurns": "Après chaque pli, le joueur qui choisit en premier change.",
+          "trickDuelRuleWin": "Après sept plis, le joueur qui en a remporté le plus gagne. Des scores égaux donnent un match nul."
         },
         "revisionHistory": {
           "title": "Historique des modifications",

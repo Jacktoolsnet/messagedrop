@@ -858,7 +858,18 @@
           "prepareBlackjack": "Preparar cartas",
           "revealBlackjack": "Revelar manos",
           "blackjackHit": "Pedir carta",
-          "blackjackStand": "Plantarse"
+          "blackjackStand": "Plantarse",
+          "trickDuel": "Duelo de bazas",
+          "playTrickDuelAria": "Iniciar duelo de bazas",
+          "trickDuelDescription": "Jugad siete bazas ocultas y utilizad vuestras cartas con estrategia.",
+          "trickDuelStartFailed": "No se pudo iniciar el duelo de bazas.",
+          "trickDuelActionFailed": "No se pudo jugar la carta.",
+          "trickDuelRulesTitle": "Duelo de bazas – Reglas",
+          "trickDuelRuleDeal": "Cada jugador recibe siete cartas ocultas. Solo se ve la propia mano.",
+          "trickDuelRuleChoose": "Ambos eligen una carta por turnos. La primera carta permanece oculta hasta que ambos hayan elegido.",
+          "trickDuelRuleRank": "La carta más alta gana la baza. El as es la carta más alta; los valores iguales empatan la baza.",
+          "trickDuelRuleTurns": "Después de cada baza cambia el jugador que elige primero.",
+          "trickDuelRuleWin": "Tras siete bazas gana quien haya conseguido más. Si las puntuaciones son iguales, la partida termina en empate."
         },
         "revisionHistory": {
           "title": "Historial de cambios",

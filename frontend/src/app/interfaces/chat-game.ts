@@ -345,7 +345,26 @@ export interface BlackjackGame {
   status: 'active'|'won'|'draw'; winnerUserId: string | null; moveNumber: number;
 }
 
-export type ChatGame = TicTacToeGame | ConnectFourGame | DotsAndBoxesGame | RockPaperScissorsGame | CodeGame | MemoryGame | MinefieldGame | MinefieldHideSeekGame | MorrisGame | CheckersGame | AsteroidDuelGame | TreasureMapGame | WordRescueGame | CoinTossGame | DiceRollGame | FortuneWheelGame | BlackjackGame;
+export interface TrickDuelRound {
+  playerXCard: BlackjackCard;
+  playerOCard: BlackjackCard;
+  winnerUserId: string | null;
+}
+
+export interface TrickDuelGame {
+  type: 'trickDuel'; version: 1; gameId: string;
+  playerXUserId: string; playerOUserId: string;
+  encryptedPlayerXHand: string; encryptedPlayerOHand: string;
+  playerXCommitment: string; playerOCommitment: string;
+  playerXCard: BlackjackCard | null; playerOCard: BlackjackCard | null;
+  rounds: TrickDuelRound[];
+  playerXScore: number; playerOScore: number;
+  roundFirstPlayerUserId: string;
+  nextPlayerUserId: string | null;
+  status: 'active'|'won'|'draw'; winnerUserId: string | null; moveNumber: number;
+}
+
+export type ChatGame = TicTacToeGame | ConnectFourGame | DotsAndBoxesGame | RockPaperScissorsGame | CodeGame | MemoryGame | MinefieldGame | MinefieldHideSeekGame | MorrisGame | CheckersGame | AsteroidDuelGame | TreasureMapGame | WordRescueGame | CoinTossGame | DiceRollGame | FortuneWheelGame | BlackjackGame | TrickDuelGame;
 
 export interface GameStats {
   played: number;

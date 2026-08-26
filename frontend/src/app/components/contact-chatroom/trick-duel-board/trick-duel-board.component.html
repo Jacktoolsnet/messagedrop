@@ -1,0 +1,29 @@
+@if(game();as game){
+<section class="duel">
+  <div class="table table--opponent" [class.table--winner]="game.status==='won'&&game.winnerUserId!==currentUserId()">
+    <b class="score">{{opponentScore(game)}}</b>
+    <div class="opponent-hand">
+      @for(slot of opponentCardSlots(game);track slot){<span class="card card--back"><mat-icon>playing_cards</mat-icon></span>}
+    </div>
+  </div>
+
+  <div class="trick">
+    @if(opponentHasPlayed(game)){<span class="card card--back card--played card--opponent-played"><mat-icon>lock</mat-icon></span>}
+    @else if(lastOpponentCard(game);as card){<span class="card card--played card--opponent-played" [class.card--red]="isRed(card)" [class.card--round-winner]="lastRoundWinner(game)!==null&&lastRoundWinner(game)!==currentUserId()"><b class="rank rank--top">{{card.rank}}</b><i>{{suit(card)}}</i><b class="rank rank--bottom">{{card.rank}}</b></span>}
+    <div class="trick-count"><mat-icon>military_tech</mat-icon><span>{{game.rounds.length}} / 7</span></div>
+    @if(ownCurrentCard(game);as card){<span class="card card--played card--own-played" [class.card--red]="isRed(card)"><b class="rank rank--top">{{card.rank}}</b><i>{{suit(card)}}</i><b class="rank rank--bottom">{{card.rank}}</b></span>}
+    @else if(lastOwnCard(game);as card){<span class="card card--played card--own-played" [class.card--red]="isRed(card)" [class.card--round-winner]="lastRoundWinner(game)===currentUserId()"><b class="rank rank--top">{{card.rank}}</b><i>{{suit(card)}}</i><b class="rank rank--bottom">{{card.rank}}</b></span>}
+  </div>
+
+  <div class="table table--own" [class.table--winner]="game.status==='won'&&game.winnerUserId===currentUserId()">
+    <div class="own-hand">
+      @for(card of availableCards(game);track key(card)){
+        <button type="button" class="card card--selectable" [class.card--red]="isRed(card)" [disabled]="!canPlay(game)" (click)="play(game,card)" [attr.aria-label]="card.rank+' '+suit(card)">
+          <b class="rank rank--top">{{card.rank}}</b><i>{{suit(card)}}</i><b class="rank rank--bottom">{{card.rank}}</b>
+        </button>
+      }
+    </div>
+    <div class="own-footer"><b class="score">{{ownScore(game)}}</b>@if(canPlay(game)){<mat-icon class="turn-indicator" [attr.aria-label]="'common.contact.chatroom.games.yourTurnName'|transloco">touch_app</mat-icon>}</div>
+  </div>
+</section>
+}

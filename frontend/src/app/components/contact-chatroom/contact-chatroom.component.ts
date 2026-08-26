@@ -12,7 +12,9 @@ import { firstValueFrom } from 'rxjs';
 import { Contact } from '../../interfaces/contact';
 import {
   ChatGame,
+  BlackjackCard,
   BlackjackGame,
+  TrickDuelGame,
   FortuneWheelGame,
   AsteroidDuelAction,
   AsteroidDuelGame,
@@ -111,6 +113,7 @@ import { NewDiceRollDialogComponent, NewDiceRollDialogResult } from './new-dice-
 import { FortuneWheelBoardComponent } from './fortune-wheel-board/fortune-wheel-board.component';
 import { FortuneWheelDialogComponent, FortuneWheelDialogResult } from './fortune-wheel-dialog/fortune-wheel-dialog.component';
 import { BlackjackBoardComponent, BlackjackUiAction } from './blackjack-board/blackjack-board.component';
+import { TrickDuelBoardComponent } from './trick-duel-board/trick-duel-board.component';
 import { DeleteContactMessageComponent } from './delete-contact-message/delete-contact-message.component';
 import { DisplayMessageService } from '../../services/display-message.service';
 import { ProtectedStickerImageComponent } from '../utils/protected-sticker-image/protected-sticker-image.component';
@@ -136,6 +139,7 @@ import { createCoinToss, flipCoin } from '../../utils/coin-toss';
 import { createDiceRollGame, rollDice } from '../../utils/dice-roll';
 import { createFortuneWheelGame, normalizeWheelEntries, spinFortuneWheel } from '../../utils/fortune-wheel';
 import { applyBlackjackAction, createBlackjackCommitment, createBlackjackGame, createBlackjackSecret, isValidBlackjackSecret, setupBlackjackOpponent } from '../../utils/blackjack';
+import { applyTrickDuelCard, createTrickDuelCommitment, createTrickDuelGame, createTrickDuelHands, isValidTrickDuelHand, trickDuelCardKey } from '../../utils/trick-duel';
 
 interface ChatroomMessage {
   id: string;
@@ -195,6 +199,7 @@ interface ContactChatroomDialogData {
     DiceRollBoardComponent,
     FortuneWheelBoardComponent,
     BlackjackBoardComponent,
+    TrickDuelBoardComponent,
     TranslocoPipe
   ],
   templateUrl: './contact-chatroom.component.html',
@@ -609,7 +614,7 @@ export class ContactChatroomComponent implements AfterViewInit {
         memoryStats: this.getMemoryStats(),
         minefieldStats: this.getMinefieldStats(),
         minefieldHideSeekStats: this.getMinefieldHideSeekStats()
-        ,morrisStats:this.getMorrisStats(),checkersStats:this.getCheckersStats(),asteroidDuelStats:this.getAsteroidDuelStats(),treasureMapStats:this.getTreasureMapStats(),wordRescueStats:this.getWordRescueStats(),blackjackStats:this.getBlackjackStats()
+        ,morrisStats:this.getMorrisStats(),checkersStats:this.getCheckersStats(),asteroidDuelStats:this.getAsteroidDuelStats(),treasureMapStats:this.getTreasureMapStats(),wordRescueStats:this.getWordRescueStats(),blackjackStats:this.getBlackjackStats(),trickDuelStats:this.getTrickDuelStats()
       },
       width: 'min(760px, 94vw)',
       maxWidth: '94vw',
@@ -621,7 +626,9 @@ export class ContactChatroomComponent implements AfterViewInit {
     });
 
     dialogRef.afterClosed().subscribe((gameType?: ChatGameType) => {
-      if (gameType === 'blackjack') {
+      if (gameType === 'trickDuel') {
+        void this.startTrickDuelGame(contact);
+      } else if (gameType === 'blackjack') {
         void this.startBlackjackGame(contact);
       } else if (gameType === 'ticTacToe') {
         this.openNewTicTacToeDialog(contact, 'standard');
@@ -805,6 +812,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   private openNewWordRescueDialog(contact:Contact,revisionOfMessageId?:string):void{const ref=this.matDialog.open(NewWordRescueDialogComponent,{width:'min(500px,96vw)',maxWidth:'96vw',maxHeight:'90vh',hasBackdrop:true,backdropClass:'dialog-backdrop',autoFocus:false});ref.afterClosed().subscribe((result?:NewWordRescueDialogResult)=>{if(!result)return;try{const payload=this.createEmptyMessage();payload.game=createWordRescueGame(contact.userId,contact.contactUserId,result.solution,result.hint,result.rescueTheme);void this.sendAsNewMessage(contact,payload,revisionOfMessageId,'game_started')}catch{this.snackBar.open(this.translation.t('common.contact.chatroom.games.wordRescueStartFailed'),'',{duration:3000})}})}
 
   private async startBlackjackGame(contact:Contact,revisionOfMessageId?:string):Promise<void>{try{const xSecret=createBlackjackSecret(),oSecret=createBlackjackSecret();const [encryptedX,commitmentX,encryptedO,commitmentO]=await Promise.all([this.cryptoService.encrypt(this.userService.getUser().cryptoKeyPair.publicKey,JSON.stringify(xSecret)),createBlackjackCommitment(xSecret),this.cryptoService.encrypt(contact.contactUserEncryptionPublicKey!,JSON.stringify(oSecret)),createBlackjackCommitment(oSecret)]);const payload=this.createEmptyMessage();payload.game=createBlackjackGame(contact.userId,contact.contactUserId,encryptedX,commitmentX,encryptedO,commitmentO);await this.sendAsNewMessage(contact,payload,revisionOfMessageId,'game_started')}catch{this.snackBar.open(this.translation.t('common.contact.chatroom.games.blackjackStartFailed'),'',{duration:3000})}}
+  private async startTrickDuelGame(contact:Contact,revisionOfMessageId?:string):Promise<void>{try{const{playerXHand,playerOHand}=createTrickDuelHands(),[encryptedX,commitmentX,encryptedO,commitmentO]=await Promise.all([this.cryptoService.encrypt(this.userService.getUser().cryptoKeyPair.publicKey,JSON.stringify(playerXHand)),createTrickDuelCommitment(playerXHand),this.cryptoService.encrypt(contact.contactUserEncryptionPublicKey!,JSON.stringify(playerOHand)),createTrickDuelCommitment(playerOHand)]),payload=this.createEmptyMessage();payload.game=createTrickDuelGame(contact.userId,contact.contactUserId,encryptedX,commitmentX,encryptedO,commitmentO);await this.sendAsNewMessage(contact,payload,revisionOfMessageId,'game_started')}catch{this.snackBar.open(this.translation.t('common.contact.chatroom.games.trickDuelStartFailed'),'',{duration:3000})}}
 
   private async startCodeGame(contact: Contact, code: CodeSymbol[], revisionOfMessageId?:string): Promise<void> {
     try {
@@ -863,6 +871,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getChatGameIcon(game: ChatGame): string {
+    if(game.type==='trickDuel')return'filter_7';
     if(game.type==='blackjack')return'playing_cards';
     if(game.type==='fortuneWheel')return'data_usage';
     if(game.type==='diceRoll')return'casino';
@@ -882,7 +891,9 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getChatGameTitle(game: ChatGame): string {
-    const key = game.type === 'blackjack'
+    const key = game.type === 'trickDuel'
+      ? 'common.contact.chatroom.games.trickDuel'
+      : game.type === 'blackjack'
       ? 'common.contact.chatroom.games.blackjack'
       : game.type === 'fortuneWheel'
       ? 'common.contact.chatroom.decisions.fortuneWheel'
@@ -919,6 +930,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getChatGameVariantLabel(game: ChatGame): string {
+    if(game.type==='trickDuel')return this.translation.t('common.contact.chatroom.games.standardVariant');
     if(game.type==='blackjack')return this.translation.t('common.contact.chatroom.games.standardVariant');
     if(game.type==='fortuneWheel')return this.translation.t('common.contact.chatroom.decisions.categoryTitle');
     if(game.type==='diceRoll')return this.translation.t('common.contact.chatroom.decisions.categoryTitle');
@@ -1008,7 +1020,7 @@ export class ContactChatroomComponent implements AfterViewInit {
       return game.playerXUserId === currentUserId ? 'X' : game.playerOUserId === currentUserId ? 'O' : null;
     }
     if (game.type === 'minefieldHideSeek') return null;
-    if (game.type === 'rockPaperScissors' || game.type === 'code') return null;
+    if (game.type === 'rockPaperScissors' || game.type === 'code' || game.type === 'trickDuel') return null;
     const currentUserId = this.userService.getUser().id;
     return game.playerRedUserId === currentUserId ? 'X' : game.playerYellowUserId === currentUserId ? 'O' : null;
   }
@@ -1017,7 +1029,7 @@ export class ContactChatroomComponent implements AfterViewInit {
     this.matDialog.open(GameRulesDialogComponent, {
       data: {
         gameType: game.type,
-        variant: game.type === 'blackjack' || game.type === 'fortuneWheel' || game.type === 'diceRoll' || game.type === 'dotsAndBoxes' || game.type === 'rockPaperScissors' || game.type === 'code' || game.type === 'memory' || game.type === 'minefield' || game.type === 'minefieldHideSeek'||game.type==='morris'||game.type==='checkers'||game.type==='asteroidDuel'||game.type==='treasureMap'||game.type==='wordRescue'||game.type==='coinToss' ? 'standard' : game.variant ?? 'standard'
+        variant: game.type === 'trickDuel' || game.type === 'blackjack' || game.type === 'fortuneWheel' || game.type === 'diceRoll' || game.type === 'dotsAndBoxes' || game.type === 'rockPaperScissors' || game.type === 'code' || game.type === 'memory' || game.type === 'minefield' || game.type === 'minefieldHideSeek'||game.type==='morris'||game.type==='checkers'||game.type==='asteroidDuel'||game.type==='treasureMap'||game.type==='wordRescue'||game.type==='coinToss' ? 'standard' : game.variant ?? 'standard'
       },
       width: 'min(440px, 94vw)',
       maxWidth: '94vw',
@@ -1032,7 +1044,9 @@ export class ContactChatroomComponent implements AfterViewInit {
   startGameRematch(game: ChatGame, message:ChatroomMessage): void {
     const contact = this.contact();
     if (!contact || contact.status === 'removed_by_contact') return;
-    if (game.type === 'blackjack') {
+    if (game.type === 'trickDuel') {
+      void this.startTrickDuelGame(contact,message.messageId);
+    } else if (game.type === 'blackjack') {
       void this.startBlackjackGame(contact,message.messageId);
     } else if (game.type === 'ticTacToe') {
       this.openNewTicTacToeDialog(contact, game.variant ?? 'standard', message.messageId);
@@ -1101,6 +1115,8 @@ export class ContactChatroomComponent implements AfterViewInit {
   private async updateFortuneWheelSettings(contact:Contact,message:ChatroomMessage,game:FortuneWheelGame,entries:string[]):Promise<void>{const normalized=normalizeWheelEntries(entries);if(!normalized)return;this.setGameMoveInFlight(game.gameId,true);try{const payload=this.createEmptyMessage();payload.game={...game,entries:normalized,resultIndex:null,lastSpinUserId:null};await this.sendAsNewMessage(contact,payload,message.messageId,'decision_result')}finally{this.setGameMoveInFlight(game.gameId,false)}}
   canPlayBlackjack(message:ChatroomMessage):boolean{const g=message.payload?.game;return !!g&&g.type==='blackjack'&&g.status==='active'&&g.nextPlayerUserId===this.userService.getUser().id&&!this.gameMovesInFlight().has(g.gameId)}
   async playBlackjack(message:ChatroomMessage,action:BlackjackUiAction):Promise<void>{const contact=this.contact(),game=message.payload?.game,userId=this.userService.getUser().id;if(!contact||!game||game.type!=='blackjack'||!this.canPlayBlackjack(message))return;this.setGameMoveInFlight(game.gameId,true);try{let next:BlackjackGame|null;if(action==='setup'){const secret=createBlackjackSecret();const [encrypted,commitment]=await Promise.all([this.cryptoService.encrypt(this.userService.getUser().cryptoKeyPair.publicKey,JSON.stringify(secret)),createBlackjackCommitment(secret)]);next=setupBlackjackOpponent(game,userId,encrypted,commitment)}else{const encrypted=userId===game.playerXUserId?game.encryptedPlayerXDeck:game.encryptedPlayerODeck,commitment=userId===game.playerXUserId?game.playerXCommitment:game.playerOCommitment;if(!encrypted||!commitment)throw new Error('missing_secret');const plain=await this.cryptoService.decrypt(this.userService.getUser().cryptoKeyPair.privateKey,JSON.parse(encrypted) as CryptoData),secret=JSON.parse(plain);if(!isValidBlackjackSecret(secret)||await createBlackjackCommitment(secret)!==commitment)throw new Error('invalid_secret');if(userId===game.playerOUserId&&game.phase==='turnO'){if(!game.revealedPlayerXDeck||!game.playerXRevealNonce)throw new Error('missing_opponent_reveal');const xSecret={deck:game.revealedPlayerXDeck,nonce:game.playerXRevealNonce};if(!isValidBlackjackSecret(xSecret)||await createBlackjackCommitment(xSecret)!==game.playerXCommitment)throw new Error('invalid_opponent_reveal')}if(action==='reveal'){if(!game.revealedPlayerODeck||!game.playerORevealNonce||!game.playerOCommitment)throw new Error('missing_opponent_reveal');const oSecret={deck:game.revealedPlayerODeck,nonce:game.playerORevealNonce};if(!isValidBlackjackSecret(oSecret)||await createBlackjackCommitment(oSecret)!==game.playerOCommitment)throw new Error('invalid_opponent_reveal')}next=applyBlackjackAction(game,userId,action,secret)}if(!next)return;const payload=this.createEmptyMessage();payload.game=next;await this.sendAsNewMessage(contact,payload,message.messageId,'game_move')}catch{this.snackBar.open(this.translation.t('common.contact.chatroom.games.blackjackActionFailed'),'',{duration:3000})}finally{this.setGameMoveInFlight(game.gameId,false)}}
+  canPlayTrickDuel(message:ChatroomMessage):boolean{const g=message.payload?.game;return !!g&&g.type==='trickDuel'&&g.status==='active'&&g.nextPlayerUserId===this.userService.getUser().id&&!this.gameMovesInFlight().has(g.gameId)}
+  async playTrickDuelCard(message:ChatroomMessage,card:BlackjackCard):Promise<void>{const contact=this.contact(),game=message.payload?.game,userId=this.userService.getUser().id;if(!contact||!game||game.type!=='trickDuel'||!this.canPlayTrickDuel(message))return;this.setGameMoveInFlight(game.gameId,true);try{const isX=userId===game.playerXUserId,encrypted=isX?game.encryptedPlayerXHand:game.encryptedPlayerOHand,commitment=isX?game.playerXCommitment:game.playerOCommitment,plain=await this.cryptoService.decrypt(this.userService.getUser().cryptoKeyPair.privateKey,JSON.parse(encrypted) as CryptoData),hand=JSON.parse(plain);if(!isValidTrickDuelHand(hand)||await createTrickDuelCommitment(hand)!==commitment||!hand.some(entry=>trickDuelCardKey(entry)===trickDuelCardKey(card)))throw new Error('invalid_hand');const next=applyTrickDuelCard(game,userId,card);if(!next)return;const payload=this.createEmptyMessage();payload.game=next;await this.sendAsNewMessage(contact,payload,message.messageId,'game_move')}catch{this.snackBar.open(this.translation.t('common.contact.chatroom.games.trickDuelActionFailed'),'',{duration:3000})}finally{this.setGameMoveInFlight(game.gameId,false)}}
   async startTreasureMapPlanning(message:ChatroomMessage):Promise<void>{const contact=this.contact(),currentPayload=message.payload,g=currentPayload?.game,userId=this.userService.getUser().id;if(!contact||!currentPayload||!g||g.type!=='treasureMap'||g.status!=='active'||g.phase!=='active'||g.nextPlayerUserId!==userId||g.planningPlayerUserId===userId||this.gameMovesInFlight().has(g.gameId))return;const next:TreasureMapGame={...g,planningPlayerUserId:userId},payload:ShortMessage={...currentPayload,game:next};this.setGameMoveInFlight(g.gameId,true);try{const encrypted=await this.contactMessageService.encryptMessageForContact(contact,payload);if(!this.isEncryptedMessageWithinLimit(encrypted.encryptedMessageForUser,encrypted.encryptedMessageForContact))throw new Error('message_too_large');await firstValueFrom(this.contactMessageService.updateMessage({messageId:message.messageId,contactId:contact.id,userId:contact.userId,contactUserId:contact.contactUserId,encryptedMessageForUser:encrypted.encryptedMessageForUser,encryptedMessageForContact:encrypted.encryptedMessageForContact,signature:encrypted.signature}));this.messages.update(messages=>messages.map(entry=>entry.messageId===message.messageId?{...entry,payload}:entry));void this.persistPayloadBatch(contact.id,[{messageId:message.messageId,payload}]);this.socketioService.sendUpdatedContactMessage({id:message.id,messageId:message.messageId,contactId:contact.id,userId:contact.userId,contactUserId:contact.contactUserId,messageSignature:encrypted.signature,userEncryptedMessage:encrypted.encryptedMessageForUser,contactUserEncryptedMessage:encrypted.encryptedMessageForContact,createdAt:new Date().toISOString()})}catch{this.snackBar.open(this.translation.t('common.contact.chatroom.sendFailed'),'',{duration:3000})}finally{this.setGameMoveInFlight(g.gameId,false)}}
   openTreasureMapPlacement(message:ChatroomMessage):void{const contact=this.contact(),g=message.payload?.game;if(!contact||!g||g.type!=='treasureMap'||g.phase!=='placingO'||g.nextPlayerUserId!==this.userService.getUser().id)return;const ref=this.matDialog.open(NewTreasureMapDialogComponent,{width:'min(520px,96vw)',maxWidth:'96vw',maxHeight:'90vh',hasBackdrop:true,backdropClass:'dialog-backdrop',autoFocus:false});ref.afterClosed().subscribe(async(layout?:(TreasureIslandItem|null)[])=>{if(!layout)return;const next=placeTreasureMapOpponent(g,this.userService.getUser().id,layout);if(!next)return;this.setGameMoveInFlight(g.gameId,true);try{const payload=this.createEmptyMessage();payload.game=next;await this.sendAsNewMessage(contact,payload,message.messageId,'game_move')}finally{this.setGameMoveInFlight(g.gameId,false)}})}
 
@@ -1585,6 +1601,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   private getTreasureMapStats():GameStats{const current=this.userService.getUser().id,latest=new Map<string,TreasureMapGame>();for(const message of this.messages()){const game=message.payload?.game;if(game?.type==='treasureMap'&&!latest.has(game.gameId))latest.set(game.gameId,game)}const stats:GameStats={played:latest.size,won:0,lost:0,drawn:0};for(const game of latest.values()){if(game.status==='draw')stats.drawn++;else if(game.status==='won'&&game.winnerUserId===current)stats.won++;else if(game.status==='won')stats.lost++}return stats}
   private getWordRescueStats():GameStats{const current=this.userService.getUser().id,latest=new Map<string,WordRescueGame>();for(const message of this.messages()){const game=message.payload?.game;if(game?.type==='wordRescue'&&!latest.has(game.gameId))latest.set(game.gameId,game)}const stats:GameStats={played:latest.size,won:0,lost:0,drawn:0};for(const game of latest.values()){if(game.status==='won'&&game.winnerUserId===current)stats.won++;else if(game.status==='won')stats.lost++}return stats}
   private getBlackjackStats():GameStats{const current=this.userService.getUser().id,latest=new Map<string,BlackjackGame>();for(const message of this.messages()){const game=message.payload?.game;if(game?.type==='blackjack'&&!latest.has(game.gameId))latest.set(game.gameId,game)}const stats:GameStats={played:latest.size,won:0,lost:0,drawn:0};for(const game of latest.values()){if(game.status==='draw')stats.drawn++;else if(game.status==='won'&&game.winnerUserId===current)stats.won++;else if(game.status==='won')stats.lost++}return stats}
+  private getTrickDuelStats():GameStats{const current=this.userService.getUser().id,latest=new Map<string,TrickDuelGame>();for(const message of this.messages()){const game=message.payload?.game;if(game?.type==='trickDuel'&&!latest.has(game.gameId))latest.set(game.gameId,game)}const stats:GameStats={played:latest.size,won:0,lost:0,drawn:0};for(const game of latest.values()){if(game.status==='draw')stats.drawn++;else if(game.status==='won'&&game.winnerUserId===current)stats.won++;else if(game.status==='won')stats.lost++}return stats}
 
   openExperienceSearch(message?: ChatroomMessage): void {
     if (!this.externalContentConsent.isEnabled('viator')) {

@@ -859,7 +859,18 @@
           "prepareBlackjack": "Karten vorbereiten",
           "revealBlackjack": "Blätter aufdecken",
           "blackjackHit": "Karte ziehen",
-          "blackjackStand": "Halten"
+          "blackjackStand": "Halten",
+          "trickDuel": "Stichduell",
+          "playTrickDuelAria": "Stichduell starten",
+          "trickDuelDescription": "Spielt sieben verdeckte Stiche gegeneinander und setzt eure Karten taktisch ein.",
+          "trickDuelStartFailed": "Das Stichduell konnte nicht gestartet werden.",
+          "trickDuelActionFailed": "Die Karte konnte nicht gespielt werden.",
+          "trickDuelRulesTitle": "Stichduell – Regeln",
+          "trickDuelRuleDeal": "Jeder Spieler erhält sieben verdeckte Karten. Nur das eigene Blatt ist sichtbar.",
+          "trickDuelRuleChoose": "Beide wählen nacheinander eine Karte. Die zuerst gewählte Karte bleibt für den Gegner verdeckt, bis beide gewählt haben.",
+          "trickDuelRuleRank": "Die höhere Karte gewinnt den Stich. Das Ass ist am höchsten; bei gleichem Wert endet der Stich unentschieden.",
+          "trickDuelRuleTurns": "Nach jedem Stich wechselt, wer zuerst eine Karte auswählt.",
+          "trickDuelRuleWin": "Nach sieben Stichen gewinnt, wer mehr Stiche gesammelt hat. Bei Gleichstand endet die Partie unentschieden."
         },
         "revisionHistory": {
           "title": "Änderungshistorie",
