@@ -7,7 +7,7 @@
       <div class="cards">
         @if (shownOpponentHand(game); as hand) {
           @for (card of hand; track card.suit + ':' + card.rank) {
-            <span class="card" [class.card--red]="isRed(card)" [style.--card-index]="$index">
+            <span class="card" [class.card--red]="isRed(card)">
               <b class="card-rank card-rank--top">{{ card.rank }}</b>
               <i class="card-suit">{{ suit(card) }}</i>
               <b class="card-rank card-rank--bottom">{{ card.rank }}</b>
@@ -27,7 +27,7 @@
       <div class="cards">
         @if (shownOwnHand(game); as hand) {
           @for (card of hand; track card.suit + ':' + card.rank) {
-            <span class="card" [class.card--red]="isRed(card)" [style.--card-index]="$index">
+            <span class="card" [class.card--red]="isRed(card)" [class.card--dealt]="isNewlyDealt(card)">
               <b class="card-rank card-rank--top">{{ card.rank }}</b>
               <i class="card-suit">{{ suit(card) }}</i>
               <b class="card-rank card-rank--bottom">{{ card.rank }}</b>
