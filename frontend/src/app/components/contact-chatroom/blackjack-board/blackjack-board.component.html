@@ -1,10 +1,9 @@
 @if (game(); as game) {
   <section class="blackjack">
-    <div class="blackjack-hand" [class.blackjack-hand--winner]="isOpponentWinner(game)">
-      <header>
-        <strong>{{ 'common.contact.chatroom.games.opponentBlackjackHand' | transloco }}</strong>
-        @if (value(shownOpponentHand(game)); as score) { <b>{{ score }}</b> }
-      </header>
+    <div class="blackjack-hand blackjack-hand--opponent" [class.blackjack-hand--winner]="isOpponentWinner(game)" [attr.aria-label]="'common.contact.chatroom.games.opponentBlackjackHand' | transloco">
+      @if (value(shownOpponentHand(game)); as score) {
+        <div class="blackjack-controls blackjack-controls--score-only"><b class="blackjack-score">{{ score }}</b></div>
+      }
       <div class="cards">
         @if (shownOpponentHand(game); as hand) {
           @for (card of hand; track $index) {
@@ -24,10 +23,7 @@
 
     <div class="blackjack-divider"><span>21</span></div>
 
-    <div class="blackjack-hand" [class.blackjack-hand--winner]="isOwnWinner(game)">
-      <header>
-        <strong>{{ 'common.contact.chatroom.games.yourBlackjackHand' | transloco }}</strong>
-      </header>
+    <div class="blackjack-hand blackjack-hand--own" [class.blackjack-hand--winner]="isOwnWinner(game)" [attr.aria-label]="'common.contact.chatroom.games.yourBlackjackHand' | transloco">
       <div class="cards">
         @if (shownOwnHand(game); as hand) {
           @for (card of hand; track $index) {
@@ -62,11 +58,5 @@
       </div>
     }
 
-    @if (game.status !== 'active') {
-      <div class="blackjack-result" [class.blackjack-result--won]="game.winnerUserId === currentUserId()">
-        <mat-icon>{{ game.status === 'draw' ? 'handshake' : game.winnerUserId === currentUserId() ? 'emoji_events' : 'sentiment_dissatisfied' }}</mat-icon>
-        <strong>{{ (game.status === 'draw' ? 'common.contact.chatroom.games.drawTitle' : game.winnerUserId === currentUserId() ? 'common.contact.chatroom.games.iWon' : 'common.contact.chatroom.games.iLost') | transloco }}</strong>
-      </div>
-    }
   </section>
 }
