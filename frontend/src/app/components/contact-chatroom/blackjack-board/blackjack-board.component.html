@@ -6,7 +6,7 @@
       }
       <div class="cards">
         @if (shownOpponentHand(game); as hand) {
-          @for (card of hand; track $index) {
+          @for (card of hand; track card.suit + ':' + card.rank) {
             <span class="card" [class.card--red]="isRed(card)" [style.--card-index]="$index">
               <b class="card-rank card-rank--top">{{ card.rank }}</b>
               <i class="card-suit">{{ suit(card) }}</i>
@@ -26,7 +26,7 @@
     <div class="blackjack-hand blackjack-hand--own" [class.blackjack-hand--winner]="isOwnWinner(game)" [attr.aria-label]="'common.contact.chatroom.games.yourBlackjackHand' | transloco">
       <div class="cards">
         @if (shownOwnHand(game); as hand) {
-          @for (card of hand; track $index) {
+          @for (card of hand; track card.suit + ':' + card.rank) {
             <span class="card" [class.card--red]="isRed(card)" [style.--card-index]="$index">
               <b class="card-rank card-rank--top">{{ card.rank }}</b>
               <i class="card-suit">{{ suit(card) }}</i>

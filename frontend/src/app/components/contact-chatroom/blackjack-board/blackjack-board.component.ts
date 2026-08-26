@@ -14,7 +14,7 @@ export type BlackjackUiAction='setup'|BlackjackAction;
 export class BlackjackBoardComponent{
   readonly game=input<BlackjackGame|null>(null);readonly currentUserId=input('');readonly disabled=input(false);readonly action=output<BlackjackUiAction>();
   readonly ownHand=signal<BlackjackCard[]>([]);readonly loading=signal(false);readonly invalidSecret=signal(false);
-  private readonly cryptoService=inject(CryptoService);private readonly userService=inject(UserService);private readonly feedback=inject(GameFeedbackService);private loadId=0;private readonly automaticActionKeys=new Set<string>();
+  private readonly cryptoService=inject(CryptoService);private readonly userService=inject(UserService);private readonly feedback=inject(GameFeedbackService);private loadId=0;private loadedGameId='';private loadedUserId='';private readonly automaticActionKeys=new Set<string>();
   constructor(){effect(()=>{const game=this.game(),userId=this.currentUserId();void this.loadOwnHand(game,userId)})}
   shownOwnHand(game:BlackjackGame):BlackjackCard[]|null{
     if(game.status==='active')return this.ownHand();
@@ -32,7 +32,7 @@ export class BlackjackBoardComponent{
   isRed(card:BlackjackCard):boolean{return card.suit==='hearts'||card.suit==='diamonds'}
   emit(action:BlackjackUiAction):void{if(this.disabled())return;this.feedback.notifySelection();this.action.emit(action)}
   private async loadOwnHand(game:BlackjackGame|null,userId:string):Promise<void>{
-    const id=++this.loadId;this.ownHand.set([]);this.invalidSecret.set(false);if(!game||!userId||game.status!=='active')return;
+    const id=++this.loadId,newGame=!game||game.gameId!==this.loadedGameId||userId!==this.loadedUserId;if(newGame){this.ownHand.set([]);this.loadedGameId=game?.gameId??'';this.loadedUserId=userId}this.invalidSecret.set(false);if(!game||!userId||game.status!=='active')return;
     const isX=userId===game.playerXUserId,encrypted=isX?game.encryptedPlayerXDeck:userId===game.playerOUserId?game.encryptedPlayerODeck:null;
     const commitment=isX?game.playerXCommitment:game.playerOCommitment,count=isX?game.playerXDrawCount:game.playerODrawCount;if(!encrypted||!commitment)return;
     this.loading.set(true);try{const plain=await this.cryptoService.decrypt(this.userService.getUser().cryptoKeyPair.privateKey,JSON.parse(encrypted) as CryptoData);const secret=JSON.parse(plain);if(!isValidBlackjackSecret(secret)||await createBlackjackCommitment(secret)!==commitment)throw new Error('invalid');if(id===this.loadId){const hand=secret.deck.slice(0,count);this.ownHand.set(hand);const ownTurn=game.nextPlayerUserId===userId&&((isX&&game.phase==='turnX')||(!isX&&game.phase==='turnO')),action:BlackjackAction|null=game.nextPlayerUserId===userId&&isX&&game.phase==='revealX'?'reveal':ownTurn&&blackjackValue(hand)>=21?'stand':null,key=`${game.gameId}:${game.moveNumber}:${action}`;if(action&&!this.automaticActionKeys.has(key)){this.automaticActionKeys.add(key);queueMicrotask(()=>this.action.emit(action))}}}catch{if(id===this.loadId)this.invalidSecret.set(true)}finally{if(id===this.loadId)this.loading.set(false)}
