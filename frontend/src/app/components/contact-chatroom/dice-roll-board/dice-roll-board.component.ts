@@ -17,6 +17,7 @@ export class DiceRollBoardComponent {
   readonly game = input<DiceRollGame | null>(null);
   readonly currentUserId = input('');
   readonly disabled = input(false);
+  readonly deleted = input(false);
   readonly roll = output<void>();
   readonly animating = signal(false);
   readonly rollingFaces = signal<number[]>([]);
@@ -31,8 +32,8 @@ export class DiceRollBoardComponent {
   constructor() {
     effect(onCleanup => {
       const game = this.game();
-      const disabled = this.disabled();
-      if (disabled || !game || game.moveNumber === 0 || game.lastRoll.length !== game.diceCount) return;
+      const deleted = this.deleted();
+      if (deleted || !game || game.moveNumber === 0 || game.lastRoll.length !== game.diceCount) return;
       const key = `dice-roll-animation:${this.currentUserId()}:${game.gameId}:${game.moveNumber}`;
       if (this.wasSeen(key)) return;
       clearTimeout(this.animationTimer);

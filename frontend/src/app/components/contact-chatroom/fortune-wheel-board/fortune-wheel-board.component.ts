@@ -19,6 +19,7 @@ export class FortuneWheelBoardComponent {
   readonly game = input<FortuneWheelGame | null>(null);
   readonly currentUserId = input('');
   readonly disabled = input(false);
+  readonly deleted = input(false);
   readonly spin = output<void>();
   readonly animating = signal(false);
   readonly rotation = signal(0);
@@ -45,8 +46,8 @@ export class FortuneWheelBoardComponent {
   constructor() {
     effect(onCleanup => {
       const game = this.game();
-      const disabled = this.disabled();
-      if (disabled || !game || game.resultIndex === null || game.resultIndex >= game.entries.length) return;
+      const deleted = this.deleted();
+      if (deleted || !game || game.resultIndex === null || game.resultIndex >= game.entries.length) return;
       const finalAngle = this.finalAngle(game.resultIndex, game.entries.length);
       const key = `fortune-wheel-animation:${this.currentUserId()}:${game.gameId}:${game.moveNumber}`;
       if (this.wasSeen(key)) {

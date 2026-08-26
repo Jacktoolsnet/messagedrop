@@ -15,6 +15,7 @@ export class AsteroidDuelBoardComponent{
   readonly game=input<AsteroidDuelGame|null>(null);
   readonly currentUserId=input('');
   readonly disabled=input(false);
+  readonly deleted=input(false);
   readonly animateHit=input(false);
   readonly action=output<AsteroidDuelAction>();
   readonly cells=Array.from({length:49},(_,index)=>index);
@@ -23,7 +24,7 @@ export class AsteroidDuelBoardComponent{
   readonly destinations=computed(()=>{const game=this.game();return new Set(game?legalMoveDestinations(game,this.currentUserId()):[])});
   readonly canAct=computed(()=>{const game=this.game();return !!game&&!this.disabled()&&game.status==='active'&&game.nextPlayerUserId===this.currentUserId()});
   private readonly arcadeMusicOwner={};
-  private readonly arcadeMusicGameId=computed(()=>{const game=this.game();return !this.disabled()&&game?.status==='active'&&game.gameId!=='preview'?game.gameId:null});
+  private readonly arcadeMusicGameId=computed(()=>{const game=this.game();return !this.deleted()&&game?.status==='active'&&game.gameId!=='preview'?game.gameId:null});
   private readonly arcadeMusicEffect=effect(onCleanup=>{
     if(!this.arcadeMusicGameId())return;
     this.feedback.registerArcadeMusic(this.arcadeMusicOwner);
@@ -43,8 +44,8 @@ export class AsteroidDuelBoardComponent{
   private readonly explodingMark=signal<TicTacToeMark|null>(null);
   private animatedHitKey:string|null=null;
   private readonly hitFeedbackEffect=effect(onCleanup=>{
-    const game=this.game(),animate=this.animateHit(),move=game?.lastMove,disabled=this.disabled();
-    if(disabled||!game||!animate||!move?.hitPlayer)return;
+    const game=this.game(),animate=this.animateHit(),move=game?.lastMove,deleted=this.deleted();
+    if(deleted||!game||!animate||!move?.hitPlayer)return;
     const key=`${game.gameId}:${move.moveNumber}`;if(this.animatedHitKey===key)return;this.animatedHitKey=key;
     if(game.status==='won'){
       const defeated:TicTacToeMark=game.winnerUserId===game.playerXUserId?'O':'X';

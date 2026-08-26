@@ -15,6 +15,7 @@ export class MinefieldHideSeekBoardComponent{
  readonly animateInitialMine=input(false);
  readonly placementMode=input(false);
  readonly disabled=input(false);
+ readonly deleted=input(false);
  readonly showHiddenMines=input(false);
  readonly search=output<number>();
  readonly placement=output<number[]>();
@@ -119,7 +120,7 @@ export class MinefieldHideSeekBoardComponent{
   this.detonatingMine.set(mine);
   this.explodedMines.set(new Set());
   await this.feedback.notifyMineCountdown();
-  if(this.disabled()||this.detonatingMine()!==mine)return;
+  if(this.deleted()||this.detonatingMine()!==mine)return;
   this.detonatingMine.set(null);
   this.explodedMines.set(new Set([mine]));
   this.feedback.notifyExplosion();
@@ -131,7 +132,7 @@ export class MinefieldHideSeekBoardComponent{
   this.explodedMines.set(new Set());
   this.roundResultAnimationComplete.set(!completed);
   await this.feedback.notifyMineCountdown();
-  if(this.disabled()||this.detonatingMine()!==mine)return;
+  if(this.deleted()||this.detonatingMine()!==mine)return;
   this.detonatingMine.set(null);
   this.explodedMines.set(new Set([mine]));
   this.feedback.notifyExplosion();

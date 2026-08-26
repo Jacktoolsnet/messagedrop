@@ -233,30 +233,30 @@
             } @else if(game.type==='checkers'){
             <app-checkers-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayCheckers(msg)" (action)="playCheckers(msg,$event)"></app-checkers-board>
             } @else if (game.type === 'minefield') {
-            <app-minefield-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayMinefield(msg)"
+            <app-minefield-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayMinefield(msg)" [deleted]="msg.status === 'deleted'"
               (move)="playMinefieldMove(msg, $event)"></app-minefield-board>
             } @else if (game.type === 'minefieldHideSeek') {
             <app-minefield-hide-seek-board [game]="game" [currentUserId]="getCurrentUserId()"
               [animateInitialMine]="shouldAnimateIncomingMine(msg, game)"
-              [disabled]="!canPlayMinefieldHideSeek(msg)" [showHiddenMines]="isMinefieldLayoutVisible(game.gameId)" (search)="playMinefieldHideSeekMove(msg, $event)"
+              [disabled]="!canPlayMinefieldHideSeek(msg)" [deleted]="msg.status === 'deleted'" [showHiddenMines]="isMinefieldLayoutVisible(game.gameId)" (search)="playMinefieldHideSeekMove(msg, $event)"
               (placement)="placeSecondMinefield(msg, $event)"></app-minefield-hide-seek-board>
             } @else if (game.type === 'treasureMap') {
-            <app-treasure-map-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayTreasureMap(msg)"
+            <app-treasure-map-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayTreasureMap(msg)" [deleted]="msg.status === 'deleted'"
               (action)="playTreasureMap(msg, $event)" (requestPlacement)="openTreasureMapPlacement(msg)" (planningStarted)="startTreasureMapPlanning(msg)"></app-treasure-map-board>
             } @else if (game.type === 'wordRescue') {
             <app-word-rescue-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayWordRescue(msg)"
               (action)="playWordRescue(msg, $event)"></app-word-rescue-board>
             } @else if (game.type === 'coinToss') {
-            <app-coin-toss-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canTossCoin(msg)"
+            <app-coin-toss-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canTossCoin(msg)" [deleted]="msg.status === 'deleted'"
               (toss)="tossCoin(msg)"></app-coin-toss-board>
             } @else if (game.type === 'diceRoll') {
-            <app-dice-roll-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canRollDice(msg)"
+            <app-dice-roll-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canRollDice(msg)" [deleted]="msg.status === 'deleted'"
               (roll)="rollDiceForMessage(msg)"></app-dice-roll-board>
             } @else if (game.type === 'fortuneWheel') {
             <app-fortune-wheel-board [game]="game" [currentUserId]="getCurrentUserId()"
-              [disabled]="!canSpinFortuneWheel(msg)" (spin)="spinFortuneWheelForMessage(msg)"></app-fortune-wheel-board>
+              [disabled]="!canSpinFortuneWheel(msg)" [deleted]="msg.status === 'deleted'" (spin)="spinFortuneWheelForMessage(msg)"></app-fortune-wheel-board>
             } @else if (game.type === 'asteroidDuel') {
-            <app-asteroid-duel-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayAsteroidDuel(msg)"
+            <app-asteroid-duel-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayAsteroidDuel(msg)" [deleted]="msg.status === 'deleted'"
               [animateHit]="shouldAnimateAsteroidHit(game)" (action)="playAsteroidDuel(msg, $event)"></app-asteroid-duel-board>
             } @else {
             <app-code-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayCode(msg)"
@@ -544,30 +544,30 @@
             } @else if(game.type==='checkers'){
             <app-checkers-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayCheckers(msg)" (action)="playCheckers(msg,$event)"></app-checkers-board>
             } @else if (game.type === 'minefield') {
-            <app-minefield-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayMinefield(msg)"
+            <app-minefield-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayMinefield(msg)" [deleted]="msg.status === 'deleted'"
               (move)="playMinefieldMove(msg, $event)"></app-minefield-board>
             } @else if (game.type === 'minefieldHideSeek') {
             <app-minefield-hide-seek-board [game]="game" [currentUserId]="getCurrentUserId()"
               [animateInitialMine]="shouldAnimateIncomingMine(msg, game)"
-              [disabled]="!canPlayMinefieldHideSeek(msg)" [showHiddenMines]="isMinefieldLayoutVisible(game.gameId)" (search)="playMinefieldHideSeekMove(msg, $event)"
+              [disabled]="!canPlayMinefieldHideSeek(msg)" [deleted]="msg.status === 'deleted'" [showHiddenMines]="isMinefieldLayoutVisible(game.gameId)" (search)="playMinefieldHideSeekMove(msg, $event)"
               (placement)="placeSecondMinefield(msg, $event)"></app-minefield-hide-seek-board>
             } @else if (game.type === 'treasureMap') {
-            <app-treasure-map-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayTreasureMap(msg)"
+            <app-treasure-map-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayTreasureMap(msg)" [deleted]="msg.status === 'deleted'"
               (action)="playTreasureMap(msg, $event)" (requestPlacement)="openTreasureMapPlacement(msg)" (planningStarted)="startTreasureMapPlanning(msg)"></app-treasure-map-board>
             } @else if (game.type === 'wordRescue') {
             <app-word-rescue-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayWordRescue(msg)"
               (action)="playWordRescue(msg, $event)"></app-word-rescue-board>
             } @else if (game.type === 'coinToss') {
-            <app-coin-toss-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canTossCoin(msg)"
+            <app-coin-toss-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canTossCoin(msg)" [deleted]="msg.status === 'deleted'"
               (toss)="tossCoin(msg)"></app-coin-toss-board>
             } @else if (game.type === 'diceRoll') {
-            <app-dice-roll-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canRollDice(msg)"
+            <app-dice-roll-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canRollDice(msg)" [deleted]="msg.status === 'deleted'"
               (roll)="rollDiceForMessage(msg)"></app-dice-roll-board>
             } @else if (game.type === 'fortuneWheel') {
             <app-fortune-wheel-board [game]="game" [currentUserId]="getCurrentUserId()"
-              [disabled]="!canSpinFortuneWheel(msg)" (spin)="spinFortuneWheelForMessage(msg)"></app-fortune-wheel-board>
+              [disabled]="!canSpinFortuneWheel(msg)" [deleted]="msg.status === 'deleted'" (spin)="spinFortuneWheelForMessage(msg)"></app-fortune-wheel-board>
             } @else if (game.type === 'asteroidDuel') {
-            <app-asteroid-duel-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayAsteroidDuel(msg)"
+            <app-asteroid-duel-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayAsteroidDuel(msg)" [deleted]="msg.status === 'deleted'"
               [animateHit]="shouldAnimateAsteroidHit(game)" (action)="playAsteroidDuel(msg, $event)"></app-asteroid-duel-board>
             } @else {
             <app-code-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayCode(msg)"
