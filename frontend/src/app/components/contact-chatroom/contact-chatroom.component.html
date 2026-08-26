@@ -246,6 +246,9 @@
             } @else if (game.type === 'diceRoll') {
             <app-dice-roll-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canRollDice(msg)"
               (roll)="rollDiceForMessage(msg)"></app-dice-roll-board>
+            } @else if (game.type === 'fortuneWheel') {
+            <app-fortune-wheel-board [game]="game" [currentUserId]="getCurrentUserId()"
+              [disabled]="!canSpinFortuneWheel(msg)" (spin)="spinFortuneWheelForMessage(msg)"></app-fortune-wheel-board>
             } @else if (game.type === 'asteroidDuel') {
             <app-asteroid-duel-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayAsteroidDuel(msg)"
               [animateHit]="shouldAnimateAsteroidHit(game)" (action)="playAsteroidDuel(msg, $event)"></app-asteroid-duel-board>
@@ -337,6 +340,13 @@
               <button mat-mini-fab color="primary"
                 [attr.aria-label]="'common.contact.chatroom.decisions.diceSettingsAria' | transloco"
                 (click)="openDiceRollSettings(msg)">
+                <mat-icon>tune</mat-icon>
+              </button>
+              }
+              @if (actionGame.type === 'fortuneWheel') {
+              <button mat-mini-fab color="primary"
+                [attr.aria-label]="'common.contact.chatroom.decisions.wheelSettingsAria' | transloco"
+                (click)="openFortuneWheelSettings(msg)">
                 <mat-icon>tune</mat-icon>
               </button>
               }
@@ -539,6 +549,9 @@
             } @else if (game.type === 'diceRoll') {
             <app-dice-roll-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canRollDice(msg)"
               (roll)="rollDiceForMessage(msg)"></app-dice-roll-board>
+            } @else if (game.type === 'fortuneWheel') {
+            <app-fortune-wheel-board [game]="game" [currentUserId]="getCurrentUserId()"
+              [disabled]="!canSpinFortuneWheel(msg)" (spin)="spinFortuneWheelForMessage(msg)"></app-fortune-wheel-board>
             } @else if (game.type === 'asteroidDuel') {
             <app-asteroid-duel-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayAsteroidDuel(msg)"
               [animateHit]="shouldAnimateAsteroidHit(game)" (action)="playAsteroidDuel(msg, $event)"></app-asteroid-duel-board>
@@ -625,6 +638,13 @@
               <button mat-mini-fab color="primary"
                 [attr.aria-label]="'common.contact.chatroom.decisions.diceSettingsAria' | transloco"
                 (click)="openDiceRollSettings(msg)">
+                <mat-icon>tune</mat-icon>
+              </button>
+              }
+              @if (actionGame.type === 'fortuneWheel') {
+              <button mat-mini-fab color="primary"
+                [attr.aria-label]="'common.contact.chatroom.decisions.wheelSettingsAria' | transloco"
+                (click)="openFortuneWheelSettings(msg)">
                 <mat-icon>tune</mat-icon>
               </button>
               }

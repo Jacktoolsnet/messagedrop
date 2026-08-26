@@ -1,0 +1,30 @@
+@if (game(); as game) {
+  <section class="fortune-wheel-board">
+    <div class="wheel-stage"
+      [attr.aria-label]="game.resultIndex === null ? ('common.contact.chatroom.decisions.fortuneWheel' | transloco) : ('common.contact.chatroom.decisions.wheelResultAria' | transloco: { value: game.entries[game.resultIndex] })">
+      <span class="wheel-pointer" aria-hidden="true"></span>
+      <div class="wheel" [class.wheel--spinning]="animating()"
+        [style.background]="wheelGradient()" [style.transform]="'rotate(' + rotation() + 'deg)'">
+        @if (winnerIndex() !== null) {
+          <span class="wheel-winner-segment" [style.background]="winnerGradient()" aria-hidden="true"></span>
+        }
+        @for (entry of game.entries; track $index) {
+          <div class="wheel-label" [style.transform]="'rotate(' + segmentCenter($index, game.entries.length) + 'deg)'">
+            <span [class.wheel-label--winner]="winnerIndex() === $index">
+              @if (winnerIndex() === $index) { <mat-icon>star</mat-icon> }
+              <b>{{ entry }}</b>
+            </span>
+          </div>
+        }
+      </div>
+      @if (!disabled()) {
+        <button mat-fab color="primary" type="button" class="wheel-spin" [disabled]="animating()"
+          (click)="requestSpin()" [attr.aria-label]="'common.contact.chatroom.decisions.spinWheel' | transloco">
+          <mat-icon>rotate_right</mat-icon>
+        </button>
+      } @else {
+        <span class="wheel-hub" aria-hidden="true"><mat-icon>data_usage</mat-icon></span>
+      }
+    </div>
+  </section>
+}

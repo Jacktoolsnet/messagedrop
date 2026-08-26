@@ -889,7 +889,25 @@
           "diceRuleResult": "Cada tirada usa un generador aleatorio criptográficamente seguro y muestra la suma.",
           "diceSettingsTitle": "Configurar dados",
           "diceSettingsAria": "Cambiar el número de dados",
-          "saveDiceSettingsAria": "Aplicar configuración de dados"
+          "saveDiceSettingsAria": "Aplicar configuración de dados",
+          "fortuneWheel": "Ruleta de la suerte",
+          "fortuneWheelDescription": "Añade nombres, tareas u opciones y deja que la ruleta elija.",
+          "startFortuneWheelAria": "Crear ruleta de la suerte",
+          "newFortuneWheelTitle": "Crear ruleta de la suerte",
+          "wheelEntry": "Entrada {{ number }}",
+          "removeWheelEntryAria": "Eliminar entrada {{ number }}",
+          "addWheelEntry": "Añadir entrada",
+          "wheelSettingsTitle": "Configurar la ruleta",
+          "wheelSettingsAria": "Cambiar las entradas de la ruleta",
+          "saveWheelSettingsAria": "Aplicar la configuración de la ruleta",
+          "wheelStartFailed": "No se pudo crear la ruleta.",
+          "spinWheel": "Girar la ruleta",
+          "wheelResultAria": "La ruleta eligió {{ value }}.",
+          "wheelRulesTitle": "Ruleta de la suerte – Cómo funciona",
+          "wheelRuleEntries": "Añade entre dos y doce nombres, tareas u opciones. Las entradas repetidas aumentan su probabilidad.",
+          "wheelRuleTurns": "El destinatario gira primero. Después, ambos participantes se alternan.",
+          "wheelRuleResult": "Un generador aleatorio criptográficamente seguro determina el resultado. La ruleta gira hasta el segmento elegido en ambos dispositivos.",
+          "wheelRuleSettings": "Ambos participantes pueden cambiar las entradas en cualquier momento con el botón de configuración."
         }
       },
       "message": {

@@ -312,7 +312,22 @@ export interface DiceRollGame {
   moveNumber: number;
 }
 
-export type ChatGame = TicTacToeGame | ConnectFourGame | DotsAndBoxesGame | RockPaperScissorsGame | CodeGame | MemoryGame | MinefieldGame | MinefieldHideSeekGame | MorrisGame | CheckersGame | AsteroidDuelGame | TreasureMapGame | WordRescueGame | CoinTossGame | DiceRollGame;
+export interface FortuneWheelGame {
+  type: 'fortuneWheel';
+  version: 1;
+  gameId: string;
+  playerXUserId: string;
+  playerOUserId: string;
+  entries: string[];
+  resultIndex: number | null;
+  lastSpinUserId: string | null;
+  nextPlayerUserId: string;
+  status: 'active';
+  winnerUserId: null;
+  moveNumber: number;
+}
+
+export type ChatGame = TicTacToeGame | ConnectFourGame | DotsAndBoxesGame | RockPaperScissorsGame | CodeGame | MemoryGame | MinefieldGame | MinefieldHideSeekGame | MorrisGame | CheckersGame | AsteroidDuelGame | TreasureMapGame | WordRescueGame | CoinTossGame | DiceRollGame | FortuneWheelGame;
 
 export interface GameStats {
   played: number;

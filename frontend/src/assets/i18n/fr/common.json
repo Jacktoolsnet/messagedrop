@@ -889,7 +889,25 @@
           "diceRuleResult": "Chaque lancer utilise un générateur aléatoire cryptographiquement sûr et affiche la somme.",
           "diceSettingsTitle": "Réglage des dés",
           "diceSettingsAria": "Modifier le nombre de dés",
-          "saveDiceSettingsAria": "Appliquer le réglage des dés"
+          "saveDiceSettingsAria": "Appliquer le réglage des dés",
+          "fortuneWheel": "Roue de la chance",
+          "fortuneWheelDescription": "Ajoutez des noms, des tâches ou des choix et laissez la roue décider.",
+          "startFortuneWheelAria": "Créer une roue de la chance",
+          "newFortuneWheelTitle": "Créer une roue de la chance",
+          "wheelEntry": "Entrée {{ number }}",
+          "removeWheelEntryAria": "Supprimer l’entrée {{ number }}",
+          "addWheelEntry": "Ajouter une entrée",
+          "wheelSettingsTitle": "Réglage de la roue",
+          "wheelSettingsAria": "Modifier les entrées de la roue",
+          "saveWheelSettingsAria": "Appliquer les réglages de la roue",
+          "wheelStartFailed": "La roue de la chance n’a pas pu être créée.",
+          "spinWheel": "Faire tourner la roue",
+          "wheelResultAria": "La roue a sélectionné {{ value }}.",
+          "wheelRulesTitle": "Roue de la chance – Explication",
+          "wheelRuleEntries": "Ajoutez entre deux et douze noms, tâches ou choix. Les entrées répétées augmentent leur probabilité.",
+          "wheelRuleTurns": "Le destinataire commence. Ensuite, les deux participants jouent à tour de rôle.",
+          "wheelRuleResult": "Un générateur aléatoire cryptographiquement sûr détermine le résultat. La roue tourne vers le segment choisi sur les deux appareils.",
+          "wheelRuleSettings": "Les deux participants peuvent modifier les entrées à tout moment avec le bouton de réglage."
         }
       },
       "message": {

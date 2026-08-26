@@ -890,7 +890,25 @@
           "diceRuleResult": "Jeder Wurf wird mit einem kryptografisch sicheren Zufallsgenerator bestimmt und samt Summe angezeigt.",
           "diceSettingsTitle": "Würfel einstellen",
           "diceSettingsAria": "Anzahl der Würfel ändern",
-          "saveDiceSettingsAria": "Würfeleinstellungen übernehmen"
+          "saveDiceSettingsAria": "Würfeleinstellungen übernehmen",
+          "fortuneWheel": "Glücksrad",
+          "fortuneWheelDescription": "Trage Namen, Aufgaben oder Möglichkeiten ein und lass das Glücksrad auswählen.",
+          "startFortuneWheelAria": "Glücksrad erstellen",
+          "newFortuneWheelTitle": "Glücksrad erstellen",
+          "wheelEntry": "Eintrag {{ number }}",
+          "removeWheelEntryAria": "Eintrag {{ number }} entfernen",
+          "addWheelEntry": "Eintrag hinzufügen",
+          "wheelSettingsTitle": "Glücksrad einstellen",
+          "wheelSettingsAria": "Einträge des Glücksrads ändern",
+          "saveWheelSettingsAria": "Glücksrad-Einstellungen übernehmen",
+          "wheelStartFailed": "Das Glücksrad konnte nicht erstellt werden.",
+          "spinWheel": "Glücksrad drehen",
+          "wheelResultAria": "Das Glücksrad hat {{ value }} ausgewählt.",
+          "wheelRulesTitle": "Glücksrad – Erklärung",
+          "wheelRuleEntries": "Trage zwei bis zwölf Namen, Aufgaben oder Möglichkeiten ein. Mehrfach vorhandene Einträge erhöhen entsprechend ihre Chance.",
+          "wheelRuleTurns": "Der Empfänger dreht zuerst. Danach wechseln sich beide Chatteilnehmer ab.",
+          "wheelRuleResult": "Das Ergebnis wird mit einem kryptografisch sicheren Zufallsgenerator bestimmt. Das Rad dreht sich auf beiden Geräten zum ausgewählten Segment.",
+          "wheelRuleSettings": "Beide Chatteilnehmer können die Einträge jederzeit über den Einstellungsbutton ändern."
         }
       },
       "message": {

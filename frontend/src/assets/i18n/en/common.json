@@ -890,7 +890,25 @@
           "diceRuleResult": "Each roll uses a cryptographically secure random generator and is displayed with its total.",
           "diceSettingsTitle": "Dice settings",
           "diceSettingsAria": "Change number of dice",
-          "saveDiceSettingsAria": "Apply dice settings"
+          "saveDiceSettingsAria": "Apply dice settings",
+          "fortuneWheel": "Fortune Wheel",
+          "fortuneWheelDescription": "Add names, tasks, or choices and let the fortune wheel pick one.",
+          "startFortuneWheelAria": "Create fortune wheel",
+          "newFortuneWheelTitle": "Create fortune wheel",
+          "wheelEntry": "Entry {{ number }}",
+          "removeWheelEntryAria": "Remove entry {{ number }}",
+          "addWheelEntry": "Add entry",
+          "wheelSettingsTitle": "Fortune wheel settings",
+          "wheelSettingsAria": "Change fortune wheel entries",
+          "saveWheelSettingsAria": "Apply fortune wheel settings",
+          "wheelStartFailed": "The fortune wheel could not be created.",
+          "spinWheel": "Spin the wheel",
+          "wheelResultAria": "The fortune wheel selected {{ value }}.",
+          "wheelRulesTitle": "Fortune Wheel – How it works",
+          "wheelRuleEntries": "Add between two and twelve names, tasks, or choices. Repeated entries increase their chance accordingly.",
+          "wheelRuleTurns": "The recipient spins first. The two chat participants then alternate.",
+          "wheelRuleResult": "A cryptographically secure random generator determines the result. The wheel spins to the selected segment on both devices.",
+          "wheelRuleSettings": "Either chat participant can change the entries at any time using the settings button."
         }
       },
       "message": {

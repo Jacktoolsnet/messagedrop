@@ -722,7 +722,9 @@ export class ContactlistComponent {
   getPreviewIcon(preview: ContactMessagePreview): string {
     if (preview.kind === 'game') {
       const gameType = preview.payload?.game?.type;
-      return gameType==='diceRoll'
+      return gameType==='fortuneWheel'
+        ?'data_usage'
+        :gameType==='diceRoll'
         ?'casino'
         :gameType==='coinToss'
         ?'toll'
@@ -806,7 +808,9 @@ export class ContactlistComponent {
         const result=payload.game.result==='A'?payload.game.optionA:payload.game.optionB;
         return `${this.translation.t('common.contact.chatroom.decisions.coinToss')}: ${result}`;
       }
-      const prefixKey = payload.game.type === 'diceRoll'
+      const prefixKey = payload.game.type === 'fortuneWheel'
+        ? 'common.contact.chatroom.decisions.fortuneWheel'
+        : payload.game.type === 'diceRoll'
         ? 'common.contact.chatroom.decisions.diceRoll'
         : payload.game.type === 'coinToss'
         ? 'common.contact.chatroom.decisions.coinToss'

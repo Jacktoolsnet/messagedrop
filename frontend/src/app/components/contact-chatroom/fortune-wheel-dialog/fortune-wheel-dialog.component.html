@@ -1,0 +1,36 @@
+<app-dialog-header icon="data_usage"
+  [title]="(settings ? 'common.contact.chatroom.decisions.wheelSettingsTitle' : 'common.contact.chatroom.decisions.newFortuneWheelTitle') | transloco">
+</app-dialog-header>
+
+<mat-dialog-content class="wheel-dialog-content">
+  <div class="wheel-entry-list">
+    @for (entry of entries(); track $index) {
+      <div class="wheel-entry-row">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'common.contact.chatroom.decisions.wheelEntry' | transloco: { number: $index + 1 } }}</mat-label>
+          <input matInput [maxlength]="maxEntryLength" [ngModel]="entry"
+            (ngModelChange)="updateEntry($index, $event)">
+        </mat-form-field>
+        <button mat-icon-button type="button" [disabled]="!canRemove()" (click)="removeEntry($index)"
+          [attr.aria-label]="'common.contact.chatroom.decisions.removeWheelEntryAria' | transloco: { number: $index + 1 }">
+          <mat-icon>remove_circle</mat-icon>
+        </button>
+      </div>
+    }
+  </div>
+  @if (canAdd()) {
+    <button mat-stroked-button type="button" class="add-entry" (click)="addEntry()">
+      <mat-icon>add</mat-icon>
+      {{ 'common.contact.chatroom.decisions.addWheelEntry' | transloco }}
+    </button>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-icon-button class="action-close" type="button" (click)="close()"
+    [attr.aria-label]="'common.actions.close' | transloco"><mat-icon>close</mat-icon></button>
+  <button mat-icon-button color="primary" type="button" [disabled]="!valid()" (click)="submit()"
+    [attr.aria-label]="(settings ? 'common.contact.chatroom.decisions.saveWheelSettingsAria' : 'common.contact.chatroom.decisions.startFortuneWheelAria') | transloco">
+    <mat-icon>{{ settings ? 'check' : 'play_arrow' }}</mat-icon>
+  </button>
+</mat-dialog-actions>

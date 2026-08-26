@@ -12,6 +12,7 @@ import { firstValueFrom } from 'rxjs';
 import { Contact } from '../../interfaces/contact';
 import {
   ChatGame,
+  FortuneWheelGame,
   AsteroidDuelAction,
   AsteroidDuelGame,
   TreasureIslandItem,
@@ -106,6 +107,8 @@ import { DecisionSelectDialogComponent, DecisionHelperType } from './decision-se
 import { NewCoinTossDialogComponent, NewCoinTossDialogResult } from './new-coin-toss-dialog/new-coin-toss-dialog.component';
 import { DiceRollBoardComponent } from './dice-roll-board/dice-roll-board.component';
 import { NewDiceRollDialogComponent, NewDiceRollDialogResult } from './new-dice-roll-dialog/new-dice-roll-dialog.component';
+import { FortuneWheelBoardComponent } from './fortune-wheel-board/fortune-wheel-board.component';
+import { FortuneWheelDialogComponent, FortuneWheelDialogResult } from './fortune-wheel-dialog/fortune-wheel-dialog.component';
 import { DeleteContactMessageComponent } from './delete-contact-message/delete-contact-message.component';
 import { DisplayMessageService } from '../../services/display-message.service';
 import { ProtectedStickerImageComponent } from '../utils/protected-sticker-image/protected-sticker-image.component';
@@ -129,6 +132,7 @@ import { applyTreasureMapAction, createTreasureMapGame, placeTreasureMapOpponent
 import { applyWordRescueAction, createWordRescueGame } from '../../utils/word-rescue-game';
 import { createCoinToss, flipCoin } from '../../utils/coin-toss';
 import { createDiceRollGame, rollDice } from '../../utils/dice-roll';
+import { createFortuneWheelGame, normalizeWheelEntries, spinFortuneWheel } from '../../utils/fortune-wheel';
 
 interface ChatroomMessage {
   id: string;
@@ -186,6 +190,7 @@ interface ContactChatroomDialogData {
     WordRescueBoardComponent,
     CoinTossBoardComponent,
     DiceRollBoardComponent,
+    FortuneWheelBoardComponent,
     TranslocoPipe
   ],
   templateUrl: './contact-chatroom.component.html',
@@ -649,7 +654,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   openDecisionSelection():void{
     const contact=this.contact();if(!contact||contact.status==='removed_by_contact')return;
     const ref=this.matDialog.open(DecisionSelectDialogComponent,{width:'min(760px,94vw)',maxWidth:'94vw',maxHeight:'85vh',hasBackdrop:true,backdropClass:'dialog-backdrop',autoFocus:false});
-    ref.afterClosed().subscribe((type?:DecisionHelperType)=>{if(type==='coinToss')this.openNewCoinTossDialog(contact);else if(type==='diceRoll')this.openNewDiceRollDialog(contact)});
+    ref.afterClosed().subscribe((type?:DecisionHelperType)=>{if(type==='coinToss')this.openNewCoinTossDialog(contact);else if(type==='diceRoll')this.openNewDiceRollDialog(contact);else if(type==='fortuneWheel')this.openNewFortuneWheelDialog(contact)});
   }
 
   private openNewCoinTossDialog(contact:Contact,revisionOfMessageId?:string):void{
@@ -660,6 +665,11 @@ export class ContactChatroomComponent implements AfterViewInit {
   private openNewDiceRollDialog(contact:Contact,revisionOfMessageId?:string):void{
     const ref=this.matDialog.open(NewDiceRollDialogComponent,{width:'min(470px,96vw)',maxWidth:'96vw',maxHeight:'90vh',hasBackdrop:true,backdropClass:'dialog-backdrop',autoFocus:false});
     ref.afterClosed().subscribe((result?:NewDiceRollDialogResult)=>{if(!result)return;try{const payload=this.createEmptyMessage();payload.game=createDiceRollGame(contact.userId,contact.contactUserId,result.diceCount);void this.sendAsNewMessage(contact,payload,revisionOfMessageId,'decision_started')}catch{this.snackBar.open(this.translation.t('common.contact.chatroom.decisions.diceStartFailed'),'',{duration:3000})}})
+  }
+
+  private openNewFortuneWheelDialog(contact:Contact,revisionOfMessageId?:string):void{
+    const ref=this.matDialog.open(FortuneWheelDialogComponent,{width:'min(500px,96vw)',maxWidth:'96vw',maxHeight:'90vh',hasBackdrop:true,backdropClass:'dialog-backdrop',autoFocus:false});
+    ref.afterClosed().subscribe((result?:FortuneWheelDialogResult)=>{if(!result)return;try{const payload=this.createEmptyMessage();payload.game=createFortuneWheelGame(contact.userId,contact.contactUserId,result.entries);void this.sendAsNewMessage(contact,payload,revisionOfMessageId,'decision_started')}catch{this.snackBar.open(this.translation.t('common.contact.chatroom.decisions.wheelStartFailed'),'',{duration:3000})}})
   }
 
   private openNewConnectFourDialog(contact: Contact, variant: ConnectFourVariant, revisionOfMessageId?:string): void {
@@ -845,6 +855,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getChatGameIcon(game: ChatGame): string {
+    if(game.type==='fortuneWheel')return'data_usage';
     if(game.type==='diceRoll')return'casino';
     if(game.type==='coinToss')return'toll';
     if(game.type==='wordRescue')return'spellcheck';
@@ -862,7 +873,9 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getChatGameTitle(game: ChatGame): string {
-    const key = game.type === 'diceRoll'
+    const key = game.type === 'fortuneWheel'
+      ? 'common.contact.chatroom.decisions.fortuneWheel'
+      : game.type === 'diceRoll'
       ? 'common.contact.chatroom.decisions.diceRoll'
       : game.type === 'coinToss'
       ? 'common.contact.chatroom.decisions.coinToss'
@@ -895,6 +908,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getChatGameVariantLabel(game: ChatGame): string {
+    if(game.type==='fortuneWheel')return this.translation.t('common.contact.chatroom.decisions.categoryTitle');
     if(game.type==='diceRoll')return this.translation.t('common.contact.chatroom.decisions.categoryTitle');
     if(game.type==='coinToss')return this.translation.t('common.contact.chatroom.decisions.categoryTitle');
     if(game.type==='wordRescue')return this.translation.t('common.contact.chatroom.games.standardVariant');
@@ -957,6 +971,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   getCurrentUserGamePieceLabel(game: ChatGame): TicTacToeMark | null {
+    if (game.type === 'fortuneWheel') return null;
     if (game.type === 'diceRoll') return null;
     if (game.type === 'ticTacToe') return this.getTicTacToePlayerMark(game);
     if (game.type === 'dotsAndBoxes') {
@@ -989,7 +1004,7 @@ export class ContactChatroomComponent implements AfterViewInit {
     this.matDialog.open(GameRulesDialogComponent, {
       data: {
         gameType: game.type,
-        variant: game.type === 'diceRoll' || game.type === 'dotsAndBoxes' || game.type === 'rockPaperScissors' || game.type === 'code' || game.type === 'memory' || game.type === 'minefield' || game.type === 'minefieldHideSeek'||game.type==='morris'||game.type==='checkers'||game.type==='asteroidDuel'||game.type==='treasureMap'||game.type==='wordRescue'||game.type==='coinToss' ? 'standard' : game.variant ?? 'standard'
+        variant: game.type === 'fortuneWheel' || game.type === 'diceRoll' || game.type === 'dotsAndBoxes' || game.type === 'rockPaperScissors' || game.type === 'code' || game.type === 'memory' || game.type === 'minefield' || game.type === 'minefieldHideSeek'||game.type==='morris'||game.type==='checkers'||game.type==='asteroidDuel'||game.type==='treasureMap'||game.type==='wordRescue'||game.type==='coinToss' ? 'standard' : game.variant ?? 'standard'
       },
       width: 'min(440px, 94vw)',
       maxWidth: '94vw',
@@ -1032,6 +1047,8 @@ export class ContactChatroomComponent implements AfterViewInit {
       this.openNewCoinTossDialog(contact,message.messageId);
     }else if(game.type==='diceRoll'){
       this.openNewDiceRollDialog(contact,message.messageId);
+    }else if(game.type==='fortuneWheel'){
+      this.openNewFortuneWheelDialog(contact,message.messageId);
     } else {
       this.openNewCodeDialog(contact, message.messageId);
     }
@@ -1062,6 +1079,10 @@ export class ContactChatroomComponent implements AfterViewInit {
   canConfigureDice(message:ChatroomMessage):boolean{const g=message.payload?.game;return !!g&&g.type==='diceRoll'}
   openDiceRollSettings(message:ChatroomMessage):void{const contact=this.contact(),g=message.payload?.game;if(!contact||!g||g.type!=='diceRoll'||!this.canConfigureDice(message))return;const ref=this.matDialog.open(NewDiceRollDialogComponent,{data:{diceCount:g.diceCount,settings:true},width:'min(470px,96vw)',maxWidth:'96vw',maxHeight:'90vh',hasBackdrop:true,backdropClass:'dialog-backdrop',autoFocus:false});ref.afterClosed().subscribe((result?:NewDiceRollDialogResult)=>{if(!result||result.diceCount===g.diceCount)return;void this.updateDiceRollSettings(contact,message,g,result.diceCount)})}
   private async updateDiceRollSettings(contact:Contact,message:ChatroomMessage,game:Extract<ChatGame,{type:'diceRoll'}>,diceCount:number):Promise<void>{if(!this.canConfigureDice(message))return;this.setGameMoveInFlight(game.gameId,true);try{const payload=this.createEmptyMessage();payload.game={...game,diceCount,lastRoll:[],lastRollUserId:null};await this.sendAsNewMessage(contact,payload,message.messageId,'decision_result')}finally{this.setGameMoveInFlight(game.gameId,false)}}
+  canSpinFortuneWheel(message:ChatroomMessage):boolean{const g=message.payload?.game;return !!g&&g.type==='fortuneWheel'&&g.nextPlayerUserId===this.userService.getUser().id&&!this.gameMovesInFlight().has(g.gameId)}
+  async spinFortuneWheelForMessage(message:ChatroomMessage):Promise<void>{const contact=this.contact(),g=message.payload?.game;if(!contact||!g||g.type!=='fortuneWheel'||!this.canSpinFortuneWheel(message))return;const next=spinFortuneWheel(g,this.userService.getUser().id);if(!next)return;this.setGameMoveInFlight(g.gameId,true);try{const payload=this.createEmptyMessage();payload.game=next;await this.sendAsNewMessage(contact,payload,message.messageId,'decision_result')}finally{this.setGameMoveInFlight(g.gameId,false)}}
+  openFortuneWheelSettings(message:ChatroomMessage):void{const contact=this.contact(),g=message.payload?.game;if(!contact||!g||g.type!=='fortuneWheel')return;const ref=this.matDialog.open(FortuneWheelDialogComponent,{data:{entries:g.entries,settings:true},width:'min(500px,96vw)',maxWidth:'96vw',maxHeight:'90vh',hasBackdrop:true,backdropClass:'dialog-backdrop',autoFocus:false});ref.afterClosed().subscribe((result?:FortuneWheelDialogResult)=>{if(!result||result.entries.join('\u0000')===g.entries.join('\u0000'))return;void this.updateFortuneWheelSettings(contact,message,g,result.entries)})}
+  private async updateFortuneWheelSettings(contact:Contact,message:ChatroomMessage,game:FortuneWheelGame,entries:string[]):Promise<void>{const normalized=normalizeWheelEntries(entries);if(!normalized)return;this.setGameMoveInFlight(game.gameId,true);try{const payload=this.createEmptyMessage();payload.game={...game,entries:normalized,resultIndex:null,lastSpinUserId:null};await this.sendAsNewMessage(contact,payload,message.messageId,'decision_result')}finally{this.setGameMoveInFlight(game.gameId,false)}}
   async startTreasureMapPlanning(message:ChatroomMessage):Promise<void>{const contact=this.contact(),currentPayload=message.payload,g=currentPayload?.game,userId=this.userService.getUser().id;if(!contact||!currentPayload||!g||g.type!=='treasureMap'||g.status!=='active'||g.phase!=='active'||g.nextPlayerUserId!==userId||g.planningPlayerUserId===userId||this.gameMovesInFlight().has(g.gameId))return;const next:TreasureMapGame={...g,planningPlayerUserId:userId},payload:ShortMessage={...currentPayload,game:next};this.setGameMoveInFlight(g.gameId,true);try{const encrypted=await this.contactMessageService.encryptMessageForContact(contact,payload);if(!this.isEncryptedMessageWithinLimit(encrypted.encryptedMessageForUser,encrypted.encryptedMessageForContact))throw new Error('message_too_large');await firstValueFrom(this.contactMessageService.updateMessage({messageId:message.messageId,contactId:contact.id,userId:contact.userId,contactUserId:contact.contactUserId,encryptedMessageForUser:encrypted.encryptedMessageForUser,encryptedMessageForContact:encrypted.encryptedMessageForContact,signature:encrypted.signature}));this.messages.update(messages=>messages.map(entry=>entry.messageId===message.messageId?{...entry,payload}:entry));void this.persistPayloadBatch(contact.id,[{messageId:message.messageId,payload}]);this.socketioService.sendUpdatedContactMessage({id:message.id,messageId:message.messageId,contactId:contact.id,userId:contact.userId,contactUserId:contact.contactUserId,messageSignature:encrypted.signature,userEncryptedMessage:encrypted.encryptedMessageForUser,contactUserEncryptedMessage:encrypted.encryptedMessageForContact,createdAt:new Date().toISOString()})}catch{this.snackBar.open(this.translation.t('common.contact.chatroom.sendFailed'),'',{duration:3000})}finally{this.setGameMoveInFlight(g.gameId,false)}}
   openTreasureMapPlacement(message:ChatroomMessage):void{const contact=this.contact(),g=message.payload?.game;if(!contact||!g||g.type!=='treasureMap'||g.phase!=='placingO'||g.nextPlayerUserId!==this.userService.getUser().id)return;const ref=this.matDialog.open(NewTreasureMapDialogComponent,{width:'min(520px,96vw)',maxWidth:'96vw',maxHeight:'90vh',hasBackdrop:true,backdropClass:'dialog-backdrop',autoFocus:false});ref.afterClosed().subscribe(async(layout?:(TreasureIslandItem|null)[])=>{if(!layout)return;const next=placeTreasureMapOpponent(g,this.userService.getUser().id,layout);if(!next)return;this.setGameMoveInFlight(g.gameId,true);try{const payload=this.createEmptyMessage();payload.game=next;await this.sendAsNewMessage(contact,payload,message.messageId,'game_move')}finally{this.setGameMoveInFlight(g.gameId,false)}})}
 

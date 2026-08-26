@@ -56,6 +56,24 @@
         </button>
       </div>
     </article>
+    <article class="decision-tile">
+      <div class="decision-avatar-box">
+        <span class="decision-avatar-box__avatar" aria-hidden="true"><mat-icon>data_usage</mat-icon></span>
+        <span class="decision-avatar-box__text">
+          <span class="decision-avatar-box__title">{{ 'common.contact.chatroom.decisions.fortuneWheel' | transloco }}</span>
+        </span>
+      </div>
+      <div class="decision-tile__actions">
+        <button mat-mini-fab color="primary" type="button" (click)="select('fortuneWheel')"
+          [attr.aria-label]="'common.contact.chatroom.decisions.startFortuneWheelAria' | transloco">
+          <mat-icon>play_arrow</mat-icon>
+        </button>
+        <button mat-mini-fab type="button" (click)="openHelp('fortuneWheel')"
+          [attr.aria-label]="'common.contact.chatroom.games.rulesAria' | transloco">
+          <mat-icon>help</mat-icon>
+        </button>
+      </div>
+    </article>
   </div>
 </mat-dialog-content>
 

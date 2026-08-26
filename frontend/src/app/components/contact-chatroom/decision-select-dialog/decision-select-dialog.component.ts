@@ -6,7 +6,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
 import { GameRulesDialogComponent } from '../game-rules-dialog/game-rules-dialog.component';
 
-export type DecisionHelperType = 'coinToss' | 'diceRoll';
+export type DecisionHelperType = 'coinToss' | 'diceRoll' | 'fortuneWheel';
 
 @Component({
   selector: 'app-decision-select-dialog',
