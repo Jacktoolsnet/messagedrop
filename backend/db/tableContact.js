@@ -234,6 +234,16 @@ const setStatus = function (db, contactId, status, callback) {
     }
 };
 
+const clearLastMessage = function (db, contactId, callback) {
+    const sql = `
+    UPDATE ${tableName}
+    SET ${columnLastMessageFrom} = '',
+        ${columnLastMessageAt} = NULL
+    WHERE ${columnContactId} = ?;
+  `;
+    db.run(sql, [contactId], (err) => callback(err));
+};
+
 const deleteById = function (db, contactId, callback) {
     try {
         let sql = `
@@ -275,5 +285,6 @@ module.exports = {
     getByUserId,
     deleteById,
     setStatus,
+    clearLastMessage,
     getByUserAndContactUser
 }

@@ -51,6 +51,11 @@ interface DeleteMessagePayload {
   contactUserId?: string;
 }
 
+interface ClearChatHistoryPayload {
+  contactId: string;
+  userId: string;
+}
+
 interface ReactionPayload {
   messageId: string;
   contactId: string;
@@ -175,6 +180,14 @@ export class ContactMessageService {
   deleteMessage(payload: DeleteMessagePayload) {
     return this.http.post<{ status: number; messageId: string }>(
       `${environment.apiUrl}/contactMessage/delete`,
+      payload,
+      this.httpOptions
+    ).pipe(catchError(this.handleError));
+  }
+
+  clearChatHistory(payload: ClearChatHistoryPayload) {
+    return this.http.post<{ status: number; messageIds: string[] }>(
+      `${environment.apiUrl}/contactMessage/clear`,
       payload,
       this.httpOptions
     ).pipe(catchError(this.handleError));

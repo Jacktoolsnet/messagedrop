@@ -708,6 +708,10 @@
         "title": "Ajustar transparencia del fondo",
         "desc": "Con esta función cambias el porcentaje de transparencia del fondo del chat."
       },
+      "clearChatHistory": {
+        "title": "Eliminar historial del chat",
+        "desc": "Elimina permanentemente de tu historial todos los mensajes de este chat. El historial se elimina solo para ti y tu contacto lo conserva."
+      },
       "syncProfile": {
         "title": "Solicitar actualización del perfil",
         "desc": "Con esta función solicitas los datos de perfil actuales al contacto cuando esta opción está disponible."

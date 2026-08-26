@@ -708,6 +708,10 @@
         "title": "Ajuster la transparence du fond",
         "desc": "Cette fonction modifie le pourcentage de transparence de l'arrière-plan du chat."
       },
+      "clearChatHistory": {
+        "title": "Supprimer l’historique du chat",
+        "desc": "Supprime définitivement de votre historique tous les messages de ce chat. L’historique est supprimé uniquement pour vous et reste disponible pour votre contact."
+      },
       "syncProfile": {
         "title": "Demander une mise à jour du profil",
         "desc": "Cette fonction demande les données de profil actuelles au contact lorsque cette option est disponible."

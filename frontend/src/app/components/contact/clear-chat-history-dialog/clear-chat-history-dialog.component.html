@@ -1,0 +1,14 @@
+<app-dialog-header [title]="'common.contact.profile.clearChatHistoryDialogTitle' | transloco"></app-dialog-header>
+<mat-dialog-content class="confirm-content">
+  <div class="confirm-box">{{ 'common.contact.profile.clearChatHistoryConfirm' | transloco }}</div>
+</mat-dialog-content>
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button [mat-dialog-close]="false" mat-icon-button class="action-close"
+    [attr.aria-label]="'common.cancel' | transloco">
+    <mat-icon>close</mat-icon>
+  </button>
+  <button [mat-dialog-close]="true" mat-icon-button color="warn"
+    [attr.aria-label]="'common.contact.profile.clearChatHistory' | transloco">
+    <mat-icon>delete_sweep</mat-icon>
+  </button>
+</mat-dialog-actions>

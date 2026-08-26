@@ -253,3 +253,13 @@ button {
   gap: 8px;
   min-width: 260px;
 }
+
+.chat-history-area {
+  text-align: center;
+}
+
+.clear-chat-button {
+  color: var(--mat-sys-error, #b3261e);
+  border: 1px solid color-mix(in srgb, var(--mat-sys-error, #b3261e) 55%, transparent);
+  background: color-mix(in srgb, var(--mat-sys-error, #b3261e) 10%, transparent);
+}

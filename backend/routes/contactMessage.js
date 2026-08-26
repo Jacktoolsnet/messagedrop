@@ -344,6 +344,44 @@ router.post('/delete',
   }
 );
 
+// Clear the authenticated user's local history for one contact.
+router.post('/clear',
+  [
+    security.authenticate,
+    express.json({ type: 'application/json' }),
+    metric.count('contactMessage.clear', { when: 'always', timezone: 'utc', amount: 1 })
+  ],
+  (req, res, next) => {
+    const { contactId, userId } = req.body ?? {};
+    if (!contactId || !userId) {
+      return next(apiError.badRequest('missing_required_fields'));
+    }
+    if (!ensureSameUser(req, res, userId, next)) {
+      return;
+    }
+
+    withContactOwnership(req, res, contactId, () => {
+      tableContactMessage.getMessageIdsByContact(req.database.db, contactId, (listErr, rows) => {
+        if (listErr) {
+          return next(apiError.internal('db_error'));
+        }
+        const messageIds = [...new Set(rows.map((row) => row.messageId).filter(Boolean))];
+        tableContactMessage.deleteByContactId(req.database.db, contactId, (deleteErr) => {
+          if (deleteErr) {
+            return next(apiError.internal('db_error'));
+          }
+          tableContact.clearLastMessage(req.database.db, contactId, (contactErr) => {
+            if (contactErr) {
+              return next(apiError.internal('db_error'));
+            }
+            return res.status(200).json({ status: 200, messageIds });
+          });
+        });
+      });
+    }, next);
+  }
+);
+
 // React to a message (single reaction shared across both copies)
 router.post('/reaction',
   [

@@ -252,6 +252,23 @@ const deleteByContactAndMessageId = function (db, contactId, messageId, callback
     db.run(sql, [messageId, contactId], (err) => callback(err));
 };
 
+const getMessageIdsByContact = function (db, contactId, callback) {
+    const sql = `
+    SELECT ${columnMessageId}
+    FROM ${tableName}
+    WHERE ${columnContactId} = ?;
+  `;
+    db.all(sql, [contactId], (err, rows) => callback(err, rows ?? []));
+};
+
+const deleteByContactId = function (db, contactId, callback) {
+    const sql = `
+    DELETE FROM ${tableName}
+    WHERE ${columnContactId} = ?;
+  `;
+    db.run(sql, [contactId], (err) => callback(err));
+};
+
 const markAsReadByContactAndMessageId = function (db, contactId, messageId, callback) {
     const sql = `
     UPDATE ${tableName}
@@ -360,6 +377,8 @@ module.exports = {
     setTranslatedMessageForContact,
     deleteByMessageId,
     deleteByContactAndMessageId,
+    getMessageIdsByContact,
+    deleteByContactId,
     markAsReadByContactAndMessageId,
     setReactionForContact,
     setReactionByMessageId,

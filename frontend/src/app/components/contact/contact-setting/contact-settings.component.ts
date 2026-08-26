@@ -1,5 +1,5 @@
 
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
@@ -26,6 +26,9 @@ import { UnsplashComponent } from '../../utils/unsplash/unsplash.component';
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
 import { DisplayMessageService } from '../../../services/display-message.service';
 import { ProtectedStickerImageComponent } from '../../utils/protected-sticker-image/protected-sticker-image.component';
+import { ContactMessageService } from '../../../services/contact-message.service';
+import { ContactService } from '../../../services/contact.service';
+import { ClearChatHistoryDialogComponent } from '../clear-chat-history-dialog/clear-chat-history-dialog.component';
 
 @Component({
   selector: 'app-profile',
@@ -55,10 +58,13 @@ export class ContactSettingsComponent {
   private readonly avatarStorage = inject(AvatarStorageService);
   private readonly unsplashService = inject(UnsplashService);
   private readonly languageService = inject(LanguageService);
+  private readonly contactMessageService = inject(ContactMessageService);
+  private readonly contactService = inject(ContactService);
   private readonly dialog = inject(MatDialog);
   readonly help = inject(HelpDialogService);
   readonly dialogRef = inject(MatDialogRef<ContactSettingsComponent>);
   readonly data = inject<{ contact: Contact }>(MAT_DIALOG_DATA);
+  readonly clearingChatHistory = signal(false);
 
   public contact: Contact = this.data.contact;
   readonly joinedUserRoom = this.socketioService.joinedUserRoom;
@@ -257,6 +263,47 @@ export class ContactSettingsComponent {
   formatPercentLabel(value: number): string {
     const numeric = Number.isFinite(value) ? Math.round(value) : 0;
     return `${numeric}%`;
+  }
+
+  clearChatHistory(): void {
+    const confirmation = this.dialog.open(ClearChatHistoryDialogComponent, {
+      closeOnNavigation: true,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+
+    confirmation.afterClosed().subscribe((confirmed?: boolean) => {
+      if (!confirmed || this.clearingChatHistory()) {
+        return;
+      }
+      this.clearingChatHistory.set(true);
+      void firstValueFrom(this.contactMessageService.clearChatHistory({
+        contactId: this.contact.id,
+        userId: this.contact.userId
+      })).then(async response => {
+        await Promise.all(response.messageIds.map(messageId =>
+          this.contactMessageService.deleteLocalPayload(messageId).catch(() => undefined)
+        ));
+        this.contactMessageService.emitUnreadCountUpdate(this.contact.id);
+        this.contact.lastMessageFrom = '';
+        this.contact.lastMessageAt = null;
+        this.contactService.refreshContact(this.contact.id);
+        this.contactService.emitContactResetForContactUser(this.contact.contactUserId);
+        this.snackBar.open(
+          this.translation.t('common.contact.profile.clearChatHistorySuccess'),
+          this.translation.t('common.actions.ok'),
+          { duration: 2000 }
+        );
+      }).catch(() => {
+        this.snackBar.open(
+          this.translation.t('common.contact.profile.clearChatHistoryFailed'),
+          this.translation.t('common.actions.ok'),
+          { duration: 3000 }
+        );
+      }).finally(() => this.clearingChatHistory.set(false));
+    });
   }
 
   private showStorageUnsupported(): void {

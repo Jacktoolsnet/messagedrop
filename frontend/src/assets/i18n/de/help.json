@@ -726,6 +726,10 @@
         "title": "Hintergrund-Transparenz anpassen",
         "desc": "Mit dieser Funktion änderst du den Transparenzwert des Chat-Hintergrunds in Prozent."
       },
+      "clearChatHistory": {
+        "title": "Chatverlauf löschen",
+        "desc": "Löscht alle Nachrichten dieses Chats dauerhaft aus deinem Chatverlauf. Der gesamte Chatverlauf wird nur für dich gelöscht. Beim Kontakt bleibt er erhalten."
+      },
       "syncProfile": {
         "title": "Profil-Aktualisierung anfordern",
         "desc": "Mit dieser Funktion forderst du aktuelle Profildaten vom Kontakt an, wenn diese Option verfügbar ist."

@@ -1176,6 +1176,11 @@ const HELP_TOPICS = {
         descriptionKey: 'myContactSettings.items.transparency.desc'
       },
       {
+        icon: 'delete_sweep',
+        titleKey: 'myContactSettings.items.clearChatHistory.title',
+        descriptionKey: 'myContactSettings.items.clearChatHistory.desc'
+      },
+      {
         icon: 'connect_without_contact',
         titleKey: 'myContactSettings.items.syncProfile.title',
         descriptionKey: 'myContactSettings.items.syncProfile.desc'
