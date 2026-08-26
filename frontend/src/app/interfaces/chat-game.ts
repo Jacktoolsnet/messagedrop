@@ -327,7 +327,25 @@ export interface FortuneWheelGame {
   moveNumber: number;
 }
 
-export type ChatGame = TicTacToeGame | ConnectFourGame | DotsAndBoxesGame | RockPaperScissorsGame | CodeGame | MemoryGame | MinefieldGame | MinefieldHideSeekGame | MorrisGame | CheckersGame | AsteroidDuelGame | TreasureMapGame | WordRescueGame | CoinTossGame | DiceRollGame | FortuneWheelGame;
+export type BlackjackSuit = 'hearts' | 'diamonds' | 'clubs' | 'spades';
+export type BlackjackRank = 'A'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'|'10'|'J'|'Q'|'K';
+export interface BlackjackCard { suit: BlackjackSuit; rank: BlackjackRank; }
+export interface BlackjackGame {
+  type: 'blackjack'; version: 1; gameId: string;
+  playerXUserId: string; playerOUserId: string;
+  encryptedPlayerXDeck: string; playerXCommitment: string;
+  encryptedPlayerODeck: string | null; playerOCommitment: string | null;
+  playerXDrawCount: number; playerODrawCount: number;
+  playerXDone: boolean; playerODone: boolean;
+  revealedPlayerXHand: BlackjackCard[] | null; playerXRevealNonce: string | null;
+  revealedPlayerOHand: BlackjackCard[] | null; playerORevealNonce: string | null;
+  revealedPlayerXDeck: BlackjackCard[] | null; revealedPlayerODeck: BlackjackCard[] | null;
+  phase: 'setupO'|'turnX'|'turnO'|'revealX'|'finished';
+  nextPlayerUserId: string | null;
+  status: 'active'|'won'|'draw'; winnerUserId: string | null; moveNumber: number;
+}
+
+export type ChatGame = TicTacToeGame | ConnectFourGame | DotsAndBoxesGame | RockPaperScissorsGame | CodeGame | MemoryGame | MinefieldGame | MinefieldHideSeekGame | MorrisGame | CheckersGame | AsteroidDuelGame | TreasureMapGame | WordRescueGame | CoinTossGame | DiceRollGame | FortuneWheelGame | BlackjackGame;
 
 export interface GameStats {
   played: number;

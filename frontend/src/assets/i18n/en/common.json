@@ -842,7 +842,24 @@
             "flower": "Flower",
             "rocket": "Rocket",
             "snowman": "Snowman"
-          }
+          },
+          "blackjack": "Blackjack",
+          "playBlackjackAria": "Start blackjack",
+          "blackjackDescription": "Take turns playing hidden hands against each other and get as close to 21 as possible.",
+          "blackjackStartFailed": "Blackjack could not be started.",
+          "blackjackActionFailed": "The blackjack move could not be completed.",
+          "blackjackRulesTitle": "Blackjack – Rules",
+          "blackjackRuleSetup": "Each player receives a private, cryptographically shuffled deck and two starting cards.",
+          "blackjackRuleTurns": "The first player hits or stands until their turn ends. The second player then takes their turn. The starting player changes in the next round.",
+          "blackjackRuleAce": "Number cards count at face value, picture cards count ten, and aces count as one or eleven. A hand over 21 is bust.",
+          "blackjackRuleReveal": "Both hands are revealed and cryptographically verified only after both turns have ended.",
+          "blackjackRuleWin": "The highest hand up to 21 wins. A two-card blackjack beats a regular 21; equal values and two busts are draws.",
+          "yourBlackjackHand": "Your hand",
+          "opponentBlackjackHand": "Opponent's hand",
+          "prepareBlackjack": "Prepare cards",
+          "revealBlackjack": "Reveal hands",
+          "blackjackHit": "Hit",
+          "blackjackStand": "Stand"
         },
         "revisionHistory": {
           "title": "Change history",

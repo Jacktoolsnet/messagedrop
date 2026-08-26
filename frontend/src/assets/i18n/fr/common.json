@@ -841,7 +841,24 @@
             "flower": "Fleur",
             "rocket": "Fusée",
             "snowman": "Bonhomme de neige"
-          }
+          },
+          "blackjack": "Blackjack",
+          "playBlackjackAria": "Démarrer le blackjack",
+          "blackjackDescription": "Jouez à tour de rôle avec des mains cachées et approchez-vous le plus possible de 21.",
+          "blackjackStartFailed": "Le blackjack n’a pas pu démarrer.",
+          "blackjackActionFailed": "Le coup de blackjack n’a pas pu être effectué.",
+          "blackjackRulesTitle": "Blackjack – Règles",
+          "blackjackRuleSetup": "Chaque joueur reçoit un paquet privé mélangé cryptographiquement et deux cartes initiales.",
+          "blackjackRuleTurns": "Le premier joueur tire ou reste jusqu’à la fin de son tour. Le second joue ensuite. Le joueur qui commence change à la manche suivante.",
+          "blackjackRuleAce": "Les cartes numérotées valent leur valeur, les figures dix et les as un ou onze. Une main au-dessus de 21 saute.",
+          "blackjackRuleReveal": "Les deux mains ne sont révélées et vérifiées cryptographiquement qu’après la fin des deux tours.",
+          "blackjackRuleWin": "La main la plus élevée jusqu’à 21 gagne. Un blackjack en deux cartes bat un 21 normal ; deux valeurs égales ou deux dépassements donnent un nul.",
+          "yourBlackjackHand": "Votre main",
+          "opponentBlackjackHand": "Main adverse",
+          "prepareBlackjack": "Préparer les cartes",
+          "revealBlackjack": "Révéler les mains",
+          "blackjackHit": "Tirer",
+          "blackjackStand": "Rester"
         },
         "revisionHistory": {
           "title": "Historique des modifications",

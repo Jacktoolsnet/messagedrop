@@ -219,6 +219,9 @@
             <app-rock-paper-scissors-board [game]="game" [currentUserId]="getCurrentUserId()"
               [disabled]="!canPlayRockPaperScissors(msg)" [statusText]="getRockPaperScissorsStatusText(game)"
               [showStatus]="false" (choice)="playRockPaperScissorsChoice(msg, $event)"></app-rock-paper-scissors-board>
+            } @else if (game.type === 'blackjack') {
+            <app-blackjack-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayBlackjack(msg)"
+              (action)="playBlackjack(msg,$event)"></app-blackjack-board>
             } @else if (game.type === 'memory') {
             <app-memory-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayMemory(msg)"
               (turn)="playMemoryTurn(msg, $event)"></app-memory-board>
@@ -522,6 +525,9 @@
             <app-rock-paper-scissors-board [game]="game" [currentUserId]="getCurrentUserId()"
               [disabled]="!canPlayRockPaperScissors(msg)" [statusText]="getRockPaperScissorsStatusText(game)"
               [showStatus]="false" (choice)="playRockPaperScissorsChoice(msg, $event)"></app-rock-paper-scissors-board>
+            } @else if (game.type === 'blackjack') {
+            <app-blackjack-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayBlackjack(msg)"
+              (action)="playBlackjack(msg,$event)"></app-blackjack-board>
             } @else if (game.type === 'memory') {
             <app-memory-board [game]="game" [currentUserId]="getCurrentUserId()" [disabled]="!canPlayMemory(msg)"
               (turn)="playMemoryTurn(msg, $event)"></app-memory-board>

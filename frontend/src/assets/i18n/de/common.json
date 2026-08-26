@@ -842,7 +842,24 @@
             "flower": "Blume",
             "rocket": "Rakete",
             "snowman": "Schneemann"
-          }
+          },
+          "blackjack": "Blackjack",
+          "playBlackjackAria": "Blackjack starten",
+          "blackjackDescription": "Spielt nacheinander verdeckt gegeneinander und kommt möglichst nah an 21.",
+          "blackjackStartFailed": "Blackjack konnte nicht gestartet werden.",
+          "blackjackActionFailed": "Der Blackjack-Zug konnte nicht ausgeführt werden.",
+          "blackjackRulesTitle": "Blackjack – Regeln",
+          "blackjackRuleSetup": "Jeder Spieler erhält einen eigenen, verdeckten und kryptografisch gemischten Kartenstapel sowie zwei Anfangskarten.",
+          "blackjackRuleTurns": "Der erste Spieler zieht Karten oder hält, bis sein Zug beendet ist. Danach spielt der zweite Spieler. In der nächsten Runde wechselt der Startspieler.",
+          "blackjackRuleAce": "Zahlenkarten zählen ihren Wert, Bilder zählen zehn und Asse flexibel eins oder elf. Bei mehr als 21 ist das Blatt überkauft.",
+          "blackjackRuleReveal": "Erst nachdem beide Züge beendet sind, werden beide Blätter offengelegt und kryptografisch geprüft.",
+          "blackjackRuleWin": "Das höchste Blatt bis 21 gewinnt. Ein Blackjack aus zwei Karten schlägt eine normale 21; gleiche Werte und beidseitiges Überkaufen sind unentschieden.",
+          "yourBlackjackHand": "Dein Blatt",
+          "opponentBlackjackHand": "Blatt des Gegners",
+          "prepareBlackjack": "Karten vorbereiten",
+          "revealBlackjack": "Blätter aufdecken",
+          "blackjackHit": "Karte ziehen",
+          "blackjackStand": "Halten"
         },
         "revisionHistory": {
           "title": "Änderungshistorie",
