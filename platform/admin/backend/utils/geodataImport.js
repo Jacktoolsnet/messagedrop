@@ -56,6 +56,9 @@ function validateSettings(body) {
       || !Number.isInteger(minute) || minute < 0 || minute > 59) throw new Error('invalid_schedule');
   if (Object.entries(subcategories).some(([category, values]) => !CATEGORIES.includes(category)
       || values.some((item) => typeof item !== 'string' || !/^[a-z0-9_-]+$/.test(item)))) throw new Error('invalid_subcategories');
+  if (!categories.some((category) => subcategories[category]?.length > 0)) {
+    throw new Error('no_import_subcategories_selected');
+  }
   return { enabled: Boolean(value.enabled), datasets, categories, subcategories, scheduleType, weekday, hour, minute,
     timezone, refreshSource: value.refreshSource !== false };
 }

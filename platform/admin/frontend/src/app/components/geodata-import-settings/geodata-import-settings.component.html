@@ -8,7 +8,8 @@
     <mat-icon>refresh</mat-icon>
   </button>
   <button mat-icon-button type="button" class="save-button" (click)="save()"
-    [disabled]="!hasChanges() || saving() || enabledCategories().size === 0 || enabledDatasets().size === 0" [attr.aria-label]="i18n.t('Save settings')">
+    [disabled]="!hasChanges() || saving() || enabledCategories().size === 0 || enabledDatasets().size === 0 || !hasSelectedSubcategories()"
+    [attr.aria-label]="i18n.t('Save settings')">
     <mat-icon>save</mat-icon>
   </button>
 </mat-toolbar>
@@ -86,6 +87,9 @@
                 </label>
               }
             </div>
+            @if (!hasSelectedSubcategories()) {
+              <div class="validation-hint"><mat-icon>warning</mat-icon>{{ i18n.t('Select at least one subcategory.') }}</div>
+            }
           } @else {
             <div class="empty-state"><mat-icon>touch_app</mat-icon> {{ i18n.t('Please select a category.') }}</div>
           }
@@ -194,10 +198,12 @@
                 </mat-form-field>
               </div>
               <div class="manual-actions">
-                <button mat-flat-button type="button" (click)="startImport()" [disabled]="hasChanges() || importing()">
+                <button mat-flat-button type="button" (click)="startImport()"
+                  [disabled]="hasChanges() || importing() || !hasSelectedSubcategories()">
                   <mat-icon>play_arrow</mat-icon>{{ importing() ? i18n.t('Starting…') : i18n.t('Import now') }}
                 </button>
-                <button mat-stroked-button type="button" (click)="startImport(true)" [disabled]="hasChanges() || importing()">
+                <button mat-stroked-button type="button" (click)="startImport(true)"
+                  [disabled]="hasChanges() || importing() || !hasSelectedSubcategories()">
                   <mat-icon>sync</mat-icon>{{ i18n.t('Force import') }}
                 </button>
                 @if (hasChanges()) { <small>{{ i18n.t('Save your changes before starting a manual import.') }}</small> }

@@ -68,6 +68,8 @@ export class GeodataImportSettingsComponent {
     const category = this.selectedCategory();
     return category ? this.catalog()?.categories[category] ?? [] : [];
   });
+  readonly hasSelectedSubcategories = computed(() => [...this.enabledCategories()]
+    .some((category) => (this.selectedSubcategories()[category] ?? []).length > 0));
   readonly countryGroups = computed(() => {
     const groups = new Map<string, GeodataImportCatalog['datasets']>();
     for (const dataset of (this.catalog()?.datasets ?? [])
@@ -218,7 +220,8 @@ export class GeodataImportSettingsComponent {
 
   save(): void {
     const settings = this.settings();
-    if (!settings || this.saving() || this.enabledCategories().size === 0 || this.enabledDatasets().size === 0) return;
+    if (!settings || this.saving() || this.enabledCategories().size === 0
+      || this.enabledDatasets().size === 0 || !this.hasSelectedSubcategories()) return;
     const payload = this.buildPayload(settings);
     this.saving.set(true);
     this.service.updateSettings(payload)
@@ -248,7 +251,7 @@ export class GeodataImportSettingsComponent {
   }
 
   startImport(force = false): void {
-    if (this.importing() || this.hasChanges()) return;
+    if (this.importing() || this.hasChanges() || !this.hasSelectedSubcategories()) return;
     this.importing.set(true);
     this.service.startImport(force)
       .pipe(finalize(() => this.importing.set(false)), takeUntilDestroyed(this.destroyRef))

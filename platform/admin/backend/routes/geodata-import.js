@@ -7,6 +7,11 @@ const { callbackResult, dispatchImports, requestService, validateSettings } = re
 
 const router = express.Router();
 
+function isSettingsValidationError(error) {
+  return String(error?.message || '').startsWith('invalid_')
+    || error?.message === 'no_import_subcategories_selected';
+}
+
 router.get('/active-categories', checkToken, async (req, res, next) => {
   try {
     const settings = await callbackResult((cb) => settingsTable.get(req.database.db, cb));
@@ -32,7 +37,7 @@ router.put('/settings', async (req, res, next) => {
     const settings = await callbackResult((cb) => settingsTable.upsert(req.database.db, value, cb));
     return res.json({ status: 200, settings });
   } catch (error) {
-    if (String(error.message).startsWith('invalid_')) return next(apiError.badRequest(error.message));
+    if (isSettingsValidationError(error)) return next(apiError.badRequest(error.message));
     return next(error);
   }
 });
@@ -45,10 +50,15 @@ router.get('/catalog', async (_req, res, next) => {
 router.post('/jobs', async (req, res, next) => {
   try {
     const stored = await callbackResult((cb) => settingsTable.get(req.database.db, cb));
-    const selected = req.body && Object.keys(req.body).length ? validateSettings({ ...stored, ...req.body, enabled: true }) : stored;
+    const selected = validateSettings(req.body && Object.keys(req.body).length
+      ? { ...stored, ...req.body, enabled: true }
+      : stored);
     const jobs = await dispatchImports(req.database.db, selected, 'manual', { force: Boolean(req.body?.force) });
     return res.status(202).json({ status: 202, jobs });
-  } catch (error) { return next(error); }
+  } catch (error) {
+    if (isSettingsValidationError(error)) return next(apiError.badRequest(error.message));
+    return next(error);
+  }
 });
 
 router.get('/jobs', async (req, res, next) => {
