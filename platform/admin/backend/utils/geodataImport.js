@@ -39,10 +39,14 @@ function validateSettings(body) {
   const value = body && typeof body === 'object' ? body : {};
   const datasets = [...new Set(Array.isArray(value.datasets) ? value.datasets : [])];
   const categories = [...new Set(Array.isArray(value.categories) ? value.categories : [])];
-  const subcategories = value.subcategories && typeof value.subcategories === 'object' && !Array.isArray(value.subcategories)
-    ? Object.fromEntries(categories.map((category) => [category,
-      [...new Set(Array.isArray(value.subcategories[category]) ? value.subcategories[category] : [])]
-    ])) : {};
+  const subcategoryInput = value.subcategories && typeof value.subcategories === 'object'
+    && !Array.isArray(value.subcategories) ? value.subcategories : {};
+  // A missing category entry means "all subcategories" throughout the Geodata API.
+  // Preserve that distinction instead of converting missing entries to empty arrays.
+  const subcategories = Object.fromEntries(categories.flatMap((category) =>
+    Object.hasOwn(subcategoryInput, category)
+      ? [[category, [...new Set(Array.isArray(subcategoryInput[category]) ? subcategoryInput[category] : [])]]]
+      : []));
   const scheduleType = value.scheduleType === 'daily' ? 'daily' : value.scheduleType === 'weekly' ? 'weekly' : null;
   const weekday = Number(value.weekday);
   const hour = Number(value.hour);
@@ -56,7 +60,8 @@ function validateSettings(body) {
       || !Number.isInteger(minute) || minute < 0 || minute > 59) throw new Error('invalid_schedule');
   if (Object.entries(subcategories).some(([category, values]) => !CATEGORIES.includes(category)
       || values.some((item) => typeof item !== 'string' || !/^[a-z0-9_-]+$/.test(item)))) throw new Error('invalid_subcategories');
-  if (!categories.some((category) => subcategories[category]?.length > 0)) {
+  if (!categories.some((category) => !Object.hasOwn(subcategories, category)
+      || subcategories[category].length > 0)) {
     throw new Error('no_import_subcategories_selected');
   }
   return { enabled: Boolean(value.enabled), datasets, categories, subcategories, scheduleType, weekday, hour, minute,
