@@ -21,6 +21,20 @@ function getCallerFile() {
   return 'unknown';
 }
 
+function formatForwardMessage(args) {
+  const [message, ...metadata] = args;
+  const base = typeof message === 'string' ? message : JSON.stringify(message);
+  if (metadata.length === 0) return base;
+  const context = metadata.length === 1 ? metadata[0] : metadata;
+  try {
+    return `${base} ${JSON.stringify(context, (_key, value) => value instanceof Error
+      ? { name: value.name, message: value.message, stack: value.stack }
+      : value)}`;
+  } catch {
+    return `${base} ${String(context)}`;
+  }
+}
+
 function createForwarder({ baseUrl, token, audience, source }) {
   if (!baseUrl) {
     return () => { /* disabled */ };
@@ -67,12 +81,13 @@ function attachForwarding(logger, opts) {
     if (!orig) return;
     logger[level] = (...args) => {
       orig(...args);
-      forward(level, args[0]);
+      forward(level, formatForwardMessage(args));
     };
   });
 }
 
 module.exports = {
   resolveBaseUrl,
-  attachForwarding
+  attachForwarding,
+  formatForwardMessage
 };
