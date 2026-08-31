@@ -149,7 +149,7 @@ function registerProcessHandlers(logger) {
 let startupLogger = null;
 
 function createApp({
-  client = createTripGoClient(), logger = createLogger(), persistentLocationsCache
+  client = createTripGoClient(), database, logger = createLogger(), persistentLocationsCache
 } = {}) {
   const regionsCache = new BoundedTtlCache({
     ttlMs: numberSetting('TRIPGO_REGIONS_CACHE_TTL_MS', 6 * 60 * 60 * 1000),
@@ -181,6 +181,10 @@ function createApp({
   app.use(traceId());
   app.use(express.json({ limit: '32kb' }));
   app.use(loggerMw(logger));
+  app.use((req, _res, next) => {
+    req.database = database;
+    next();
+  });
   app.use(headerMw());
   app.use(normalizeErrorResponses);
   app.use('/', root);
@@ -231,7 +235,7 @@ async function start() {
     void persistentLocationsCache.cleanExpired(numberSetting('TRIPGO_LOCATIONS_DATABASE_RETENTION_DAYS', 30));
   }, 24 * 60 * 60 * 1000);
   cleanupTimer.unref();
-  const app = createApp({ logger, persistentLocationsCache });
+  const app = createApp({ database, logger, persistentLocationsCache });
   logStartupStep(logger, 'Starting HTTP server', { port });
   const server = app.listen(port, () => {
     const address = server.address();
