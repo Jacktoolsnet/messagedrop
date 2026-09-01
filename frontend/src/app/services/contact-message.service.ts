@@ -279,11 +279,15 @@ export class ContactMessageService {
     this.socketioService.initSocket();
     const eventName = `receiveContactMessage:${this.userService.getUser().id}`;
     this.socketioService.getSocket().off(eventName);
-    this.socketioService.getSocket().on(eventName, (payload: { status: number; envelope: Envelope; }) => {
+    this.socketioService.getSocket().on(eventName, (
+      payload: { status: number; envelope: Envelope; },
+      acknowledge?: (response: { status: number; processed: boolean; messageId?: string }) => void
+    ) => {
       if (payload?.status === 200 && payload.envelope) {
         // Map incoming message to the local contact by sender userId
         const contact = this.contactService.sortedContactsSignal().find((c) => c.contactUserId === payload.envelope.userId);
         if (!contact) {
+          acknowledge?.({ status: 404, processed: false });
           return;
         }
         const msgId = (payload.envelope as unknown as { id?: string }).id ?? crypto.randomUUID();
@@ -303,7 +307,10 @@ export class ContactMessageService {
         this.liveMessages.set(msg);
         // Ensure unread badge updates even if chatroom not open
         this.emitUnreadCountUpdate(contact.id);
+        acknowledge?.({ status: 200, processed: true, messageId: msg.messageId });
+        return;
       }
+      acknowledge?.({ status: 422, processed: false });
     });
 
     const updateEventName = `receiveUpdatedContactMessage:${this.userService.getUser().id}`;

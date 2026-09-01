@@ -75,6 +75,7 @@ const robotsSitemap = require('./middleware/robots-sitemap');
 
 const contactHandlers = require('./socketIo/contactHandlers');
 const userHandlers = require('./socketIo/userHandlers');
+const { deliverToAnySocket, normalizeAckTimeout } = require('./socketIo/delivery');
 
 const app = express();
 
@@ -199,8 +200,8 @@ app.use(robotsSitemap());
 
 app.get('/health', healthLimiter, (_, res) => res.json({ status: 'ok' }));
 
-app.post('/emit/user', security.checkToken, (req, res) => {
-  const { userId, event, payload } = req.body || {};
+app.post('/emit/user', security.checkToken, async (req, res, next) => {
+  const { userId, event, payload, awaitAck = false, ackTimeoutMs } = req.body || {};
   if (!userId) {
     return res.status(400).json({ error: 'userId is required' });
   }
@@ -211,6 +212,14 @@ app.post('/emit/user', security.checkToken, (req, res) => {
   const payloadBytes = estimatePayloadBytes(payload);
   if (payloadBytes > socketEventPayloadMaxBytes) {
     return res.status(413).json({ error: 'payload too large' });
+  }
+  if (awaitAck === true) {
+    try {
+      const result = await deliverToAnySocket(io, userId, eventName, payload ?? {}, normalizeAckTimeout(ackTimeoutMs));
+      return res.json({ ok: true, ...result });
+    } catch (error) {
+      return next(error);
+    }
   }
   io.to(String(userId)).emit(eventName, payload ?? {});
   return res.json({ ok: true });

@@ -2844,7 +2844,7 @@ export class ContactChatroomComponent implements AfterViewInit {
         this.finalizeOptimisticMessage(tempId, res.messageId, res.sharedMessageId, res.createdAt);
       }
       void this.persistPayloadBatch(contact.id, [{ messageId: res.sharedMessageId, payload: versionedPayload }]);
-      this.socketioService.sendContactMessage({
+      if (!res.socketDelivered) this.socketioService.sendContactMessage({
         id: res.mirrorMessageId ?? res.messageId,
         messageId: res.sharedMessageId,
         contactId: contact.id,

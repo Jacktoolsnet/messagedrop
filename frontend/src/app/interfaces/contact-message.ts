@@ -23,4 +23,5 @@ export interface ContactMessageSendResponse {
   mirrorMessageId?: string;
   sharedMessageId: string;
   createdAt?: string;
+  socketDelivered?: boolean;
 }

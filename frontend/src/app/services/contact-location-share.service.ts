@@ -59,7 +59,7 @@ export class ContactLocationShareService {
     }));
 
     await this.contactMessageService.storeLocalPayload(response.sharedMessageId, payload);
-    this.socketioService.sendContactMessage({
+    if (!response.socketDelivered) this.socketioService.sendContactMessage({
       id: response.mirrorMessageId ?? response.messageId,
       messageId: response.sharedMessageId,
       contactId: contact.id,

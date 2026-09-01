@@ -2248,7 +2248,7 @@ export class UserService {
           encryptedMessageForContact,
           signature
         }));
-        socketioService.sendContactMessage({
+        if (!res.socketDelivered) socketioService.sendContactMessage({
           id: res.mirrorMessageId ?? res.messageId,
           messageId: res.sharedMessageId,
           contactId: contact.id,

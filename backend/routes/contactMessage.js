@@ -7,6 +7,7 @@ const security = require('../middleware/security');
 const metric = require('../middleware/metric');
 const tableContactMessage = require('../db/tableContactMessage');
 const notify = require('../utils/notify');
+const { deliverContactMessage } = require('../utils/socketDelivery');
 const { apiError } = require('../middleware/api-error');
 const { createUtcTimestamp, normalizeUtcTimestamp } = require('../utils/utcTimestamp');
 
@@ -145,6 +146,14 @@ router.post('/send',
         }
         // Try to find reciprocal contact and store mirrored message for recipient
         tableContact.getByUserAndContactUser(req.database.db, contactUserId, userId, (lookupErr, reciprocal) => {
+          const respond = (socketDelivered = false) => res.status(200).json({
+            status: 200,
+            messageId: recordId,
+            mirrorMessageId,
+            sharedMessageId,
+            createdAt: messageCreatedAt,
+            socketDelivered
+          });
           if (!lookupErr && reciprocal?.id && (reciprocal.status || 'active') === 'active') {
             tableContactMessage.createMessage(req.database.db, {
               id: mirrorMessageId,
@@ -155,7 +164,7 @@ router.post('/send',
               signature,
               status: 'delivered',
               createdAt: messageCreatedAt
-            }, (mirrorErr) => {
+            }, async (mirrorErr) => {
               if (mirrorErr) {
                 req.logger?.warn?.('contactMessage.send mirror insert failed; skipping push notification', {
                   error: mirrorErr?.message,
@@ -164,17 +173,39 @@ router.post('/send',
                   contactId,
                   reciprocalContactId: reciprocal.id
                 });
-                return;
+                return respond(false);
               }
-              notify.contactSubscriptions(
-                req.logger,
-                req.database.db,
+              const envelope = {
+                id: mirrorMessageId,
+                messageId: sharedMessageId,
+                contactId,
                 userId,
                 contactUserId,
-                CONTACT_PUSH_BODY,
-                sharedMessageId,
-                normalizedNotificationType
-              );
+                messageSignature: signature,
+                userEncryptedMessage: encryptedMessageForUser,
+                contactUserEncryptedMessage: encryptedMessageForContact,
+                createdAt: messageCreatedAt
+              };
+              const socketDelivered = await deliverContactMessage(req.logger, envelope);
+              if (socketDelivered) {
+                req.logger?.info?.('Web Push suppressed after acknowledged live Socket.IO delivery', {
+                  userId,
+                  contactUserId,
+                  messageId: sharedMessageId,
+                  notificationType: normalizedNotificationType || 'message'
+                });
+              } else {
+                notify.contactSubscriptions(
+                  req.logger,
+                  req.database.db,
+                  userId,
+                  contactUserId,
+                  CONTACT_PUSH_BODY,
+                  sharedMessageId,
+                  normalizedNotificationType
+                );
+              }
+              return respond(socketDelivered);
             });
           } else if (lookupErr) {
             req.logger?.warn?.('contactMessage.send reciprocal lookup failed; skipping push notification', {
@@ -184,13 +215,8 @@ router.post('/send',
               contactId
             });
           }
-          return res.status(200).json({
-            status: 200,
-            messageId: recordId,
-            mirrorMessageId,
-            sharedMessageId,
-            createdAt: messageCreatedAt
-          });
+          if (lookupErr || !reciprocal?.id || (reciprocal.status || 'active') !== 'active') return respond(false);
+          return undefined;
         });
       });
     }, next);
