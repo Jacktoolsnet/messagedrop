@@ -720,7 +720,7 @@
     (click)="closeChatroom()">
     <mat-icon>close</mat-icon>
   </button>
-  <button mat-icon-button type="button" (click)="help.open('myContactChatroom')"
+  <button mat-icon-button class="chatroom-secondary-action" type="button" (click)="help.open('myContactChatroom')"
     [attr.aria-label]="'common.actions.help' | transloco">
     <mat-icon>help</mat-icon>
   </button>
@@ -732,7 +732,7 @@
     [attr.aria-label]="'common.contact.chatroom.decisions.addAria' | transloco" [disabled]="contactRemoved()">
     <mat-icon>casino</mat-icon>
   </button>
-  <button mat-icon-button type="button" [attr.aria-label]="'common.contact.chatroom.addExperienceAria' | transloco"
+  <button mat-icon-button class="chatroom-secondary-action" type="button" [attr.aria-label]="'common.contact.chatroom.addExperienceAria' | transloco"
     [matMenuTriggerFor]="experienceMenu" [disabled]="contactRemoved()">
     <mat-icon>bookmark_add</mat-icon>
   </button>
@@ -768,7 +768,7 @@
     </button>
     }
   </mat-menu>
-  <button mat-icon-button type="button" [attr.aria-label]="'common.contact.chatroom.addVoiceAria' | transloco"
+  <button mat-icon-button class="chatroom-secondary-action" type="button" [attr.aria-label]="'common.contact.chatroom.addVoiceAria' | transloco"
     (click)="openAudioRecorder()" [disabled]="audioLimitReached() || contactRemoved()">
     <mat-icon>mic</mat-icon>
   </button>
@@ -776,4 +776,23 @@
     (click)="requestCompose()" [disabled]="contactRemoved()">
     <mat-icon>add_comment</mat-icon>
   </button>
+  <button mat-icon-button class="chatroom-overflow-action" type="button"
+    [matMenuTriggerFor]="chatroomOverflowMenu" [attr.aria-label]="'common.actions.more' | transloco">
+    <mat-icon>more_horiz</mat-icon>
+  </button>
+  <mat-menu #chatroomOverflowMenu="matMenu" panelClass="accent-menu">
+    <button mat-menu-item type="button" (click)="help.open('myContactChatroom')">
+      <mat-icon>help</mat-icon>
+      <span>{{ 'common.actions.help' | transloco }}</span>
+    </button>
+    <button mat-menu-item type="button" [matMenuTriggerFor]="experienceMenu" [disabled]="contactRemoved()">
+      <mat-icon>bookmark_add</mat-icon>
+      <span>{{ 'common.contact.chatroom.addExperienceAria' | transloco }}</span>
+    </button>
+    <button mat-menu-item type="button" (click)="openAudioRecorder()"
+      [disabled]="audioLimitReached() || contactRemoved()">
+      <mat-icon>mic</mat-icon>
+      <span>{{ 'common.contact.chatroom.addVoiceAria' | transloco }}</span>
+    </button>
+  </mat-menu>
 </mat-dialog-actions>

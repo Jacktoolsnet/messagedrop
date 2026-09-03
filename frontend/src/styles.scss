@@ -230,6 +230,26 @@ app-contact-chatroom .game-turn-box__name {
   white-space: nowrap;
 }
 
+app-contact-chatroom .sticky-actions .chatroom-overflow-action {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  app-contact-chatroom .sticky-actions {
+    flex-wrap: nowrap;
+    gap: 0.25rem;
+    padding-inline: 0.5rem;
+  }
+
+  app-contact-chatroom .sticky-actions .chatroom-secondary-action {
+    display: none;
+  }
+
+  app-contact-chatroom .sticky-actions .chatroom-overflow-action {
+    display: inline-flex;
+  }
+}
+
 /* === MENUS === */
 .mat-mdc-menu-panel,
 .mat-menu-panel {
