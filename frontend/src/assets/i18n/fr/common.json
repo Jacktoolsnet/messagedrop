@@ -227,6 +227,7 @@
         "description": "Vous êtes déjà à destination. Aucun calcul d’itinéraire n’est nécessaire."
       },
       "noRoutes": "Aucun trajet n’a été trouvé pour ce parcours.",
+      "routeUnavailable": "L’itinéraire n’a pas pu être calculé.",
       "direct": "Direct",
       "oneTransfer": "1 correspondance",
       "direction": "Direction {{ direction }}",

@@ -368,20 +368,25 @@
           }
         </article>
         } @else {
-          <article class="route-card route-card--placeholder">
-            <header class="route-card__summary route-card__summary--placeholder">
+          <article class="route-card route-card--placeholder"
+            [class.route-card--unavailable]="!isRouteCategoryLoading(category)">
+            <header class="route-card__summary route-card__summary--placeholder"
+              [class.route-card__summary--unavailable]="!isRouteCategoryLoading(category)">
               <div class="route-card__category" [attr.aria-label]="routeCategoryLabel(category)">
                 <mat-icon aria-hidden="true">{{ routeCategoryIcon(category) }}</mat-icon>
               </div>
-            </header>
-            <div class="route-card__placeholder-content" role="status">
-              @if (isRouteCategoryLoading(category)) {
-                <mat-spinner diameter="36" [attr.aria-label]="'common.tripGo.routing' | transloco"></mat-spinner>
-              } @else {
-                <mat-icon aria-hidden="true">route</mat-icon>
-                <span>{{ 'common.tripGo.noRoutes' | transloco }}</span>
+              @if (!isRouteCategoryLoading(category)) {
+                <span class="route-card__unavailable" role="status">
+                  <mat-icon aria-hidden="true">warning</mat-icon>
+                  <span>{{ 'common.tripGo.routeUnavailable' | transloco }}</span>
+                </span>
               }
-            </div>
+            </header>
+            @if (isRouteCategoryLoading(category)) {
+              <div class="route-card__placeholder-content" role="status">
+                <mat-spinner diameter="36" [attr.aria-label]="'common.tripGo.routing' | transloco"></mat-spinner>
+              </div>
+            }
           </article>
         }
       }
@@ -451,10 +456,9 @@
         [attr.aria-label]="'common.actions.help' | transloco">
         <mat-icon>help</mat-icon>
       </button>
-      <button mat-flat-button color="primary" type="button" (click)="calculateRoute()"
+      <button mat-mini-fab color="primary" type="button" (click)="calculateRoute()"
         [disabled]="isBusy() || !origin()" [attr.aria-label]="'common.tripGo.calculateRoute' | transloco">
         <mat-icon>route</mat-icon>
-        <span>{{ 'common.tripGo.calculateRoute' | transloco }}</span>
       </button>
     }
   </span>

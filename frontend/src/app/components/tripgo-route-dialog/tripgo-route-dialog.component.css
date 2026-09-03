@@ -233,6 +233,30 @@
   box-sizing: border-box;
 }
 
+.route-card__summary--unavailable {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  padding-right: 0.85rem;
+  border-bottom: 0;
+}
+
+.route-card__unavailable {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--mat-sys-error);
+  font-size: 0.82rem;
+  line-height: 1.25;
+}
+
+.route-card__unavailable mat-icon {
+  flex: 0 0 auto;
+  width: 1.1rem;
+  height: 1.1rem;
+  font-size: 1.1rem;
+}
+
 .route-card__placeholder-content {
   display: flex;
   min-height: 8rem;

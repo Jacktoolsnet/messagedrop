@@ -12,7 +12,7 @@
   @if (viewMode === 'list') {
   <div class="location-picker-list">
     <app-nominatim-results-list [places]="searchResults" [showAddButton]="false" (flyTo)="flyTo($event)"
-      (navigate)="navigate($event)">
+      (navigate)="navigate($event)" (apply)="applyPlace($event)">
     </app-nominatim-results-list>
   </div>
   }

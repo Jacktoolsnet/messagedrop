@@ -228,6 +228,7 @@
         "description": "Du befindest dich bereits am Ziel. Eine Routenberechnung ist nicht erforderlich."
       },
       "noRoutes": "Für diese Strecke wurden keine Verbindungen gefunden.",
+      "routeUnavailable": "Route konnte nicht ermittelt werden.",
       "direct": "Direkt",
       "oneTransfer": "1 Umstieg",
       "direction": "Richtung {{ direction }}",

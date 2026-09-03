@@ -227,6 +227,7 @@
         "description": "Ya estás en el destino. No es necesario calcular una ruta."
       },
       "noRoutes": "No se encontraron conexiones para este trayecto.",
+      "routeUnavailable": "No se pudo calcular la ruta.",
       "direct": "Directo",
       "oneTransfer": "1 transbordo",
       "direction": "Dirección {{ direction }}",

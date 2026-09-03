@@ -110,6 +110,14 @@ export class LocationPickerDialogComponent implements AfterViewInit, OnDestroy {
     this.dialogRef.close({ ...this.location });
   }
 
+  applyPlace(place: NominatimPlace): void {
+    const latitude = Number(place.lat);
+    const longitude = Number(place.lon);
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return;
+    this.selectResult(place, false);
+    this.apply();
+  }
+
   locateMe(): void {
     const dialogRef = this.dialog.open(DisplayMessage, {
       panelClass: '',

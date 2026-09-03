@@ -228,6 +228,7 @@
         "description": "You are already at the destination. No route calculation is necessary."
       },
       "noRoutes": "No connections were found for this journey.",
+      "routeUnavailable": "The route could not be calculated.",
       "direct": "Direct",
       "oneTransfer": "1 transfer",
       "direction": "Towards {{ direction }}",
