@@ -70,7 +70,9 @@ h2[mat-dialog-title].dialog-title {
   /* Auto-fit auf Basis einer Mindestbreite: 450px, gedeckelt auf 95vw */
   grid-template-columns: repeat(auto-fit, minmax(min(320px, 95vw), 1fr));
   justify-content: center;
-  gap: 0.5rem;
+  /* Leave room for the identity/avatar badge protruding above the next tile. */
+  column-gap: 0.5rem;
+  row-gap: 2rem;
   white-space: normal;
 }
 
