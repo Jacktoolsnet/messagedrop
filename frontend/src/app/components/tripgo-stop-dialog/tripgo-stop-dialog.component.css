@@ -387,13 +387,35 @@
     grid-template-columns: 1fr;
   }
 
-  .line-card__heading,
   .departure-row {
     flex-wrap: wrap;
   }
 
-  .departure-times,
-  .departure-times--compact {
+  .line-card__heading {
+    display: grid;
+    grid-template-areas:
+      'times action'
+      'title action';
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+
+  .line-card__heading > .departure-times--compact {
+    grid-area: times;
+    min-width: 0;
+  }
+
+  .line-card__heading > .line-card__title {
+    grid-area: title;
+  }
+
+  .line-card__heading > button {
+    grid-area: action;
+    align-self: center;
+    justify-self: end;
+  }
+
+  .departure-row > .departure-times {
     flex: 1 1 12rem;
   }
 }
