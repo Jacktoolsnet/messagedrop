@@ -477,6 +477,7 @@
         "subscribeFailed": "Could not subscribe to the contact.",
         "unsubscribeFailed": "Could not unsubscribe from the contact.",
         "previewDeleted": "Message deleted",
+        "previewLoading": "Loading message preview…",
         "previewAudio": "Voice message",
         "previewLocation": "Location message",
         "previewExperience": "Experience",

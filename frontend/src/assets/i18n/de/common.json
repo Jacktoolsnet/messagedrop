@@ -477,6 +477,7 @@
         "subscribeFailed": "Kontakt konnte nicht abonniert werden.",
         "unsubscribeFailed": "Kontakt-Abo konnte nicht beendet werden.",
         "previewDeleted": "Nachricht gelöscht",
+        "previewLoading": "Nachrichtenvorschau wird geladen …",
         "previewAudio": "Sprachnachricht",
         "previewLocation": "Standortnachricht",
         "previewExperience": "Erlebnis",

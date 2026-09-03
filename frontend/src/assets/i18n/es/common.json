@@ -476,6 +476,7 @@
         "subscribeFailed": "No se pudo suscribir al contacto.",
         "unsubscribeFailed": "No se pudo cancelar la suscripción al contacto.",
         "previewDeleted": "Mensaje eliminado",
+        "previewLoading": "Cargando vista previa del mensaje…",
         "previewAudio": "Mensaje de voz",
         "previewLocation": "Mensaje de ubicación",
         "previewExperience": "Experiencia",

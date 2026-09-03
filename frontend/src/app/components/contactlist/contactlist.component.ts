@@ -6,6 +6,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
 import { Connect } from '../../interfaces/connect';
@@ -70,6 +71,7 @@ interface ContactMessagePreview {
     MatDialogActions,
     MatIcon,
     MatMenuModule,
+    MatProgressSpinnerModule,
     TranslocoPipe
   ],
   templateUrl: './contactlist.component.html',
@@ -94,6 +96,7 @@ export class ContactlistComponent {
   readonly contactsSignal: Signal<Contact[]> = this.contactService.sortedContactsSignal;
   readonly unreadCounts = signal<Record<string, number>>({});
   readonly latestMessagePreviews = signal<Record<string, ContactMessagePreview[]>>({});
+  readonly latestMessagePreviewsLoading = signal<Record<string, boolean>>({});
   readonly backendActionsAvailable = computed(() =>
     this.userService.hasJwt() && this.networkService.browserOnline() && this.networkService.backendOnline()
   );
@@ -188,10 +191,15 @@ export class ContactlistComponent {
         const nextEntries = Object.entries(current).filter(([contactId]) => activeContactIds.has(contactId));
         return nextEntries.length === Object.keys(current).length ? current : Object.fromEntries(nextEntries);
       });
+      this.latestMessagePreviewsLoading.update((current) => {
+        const nextEntries = Object.entries(current).filter(([contactId]) => activeContactIds.has(contactId));
+        return nextEntries.length === Object.keys(current).length ? current : Object.fromEntries(nextEntries);
+      });
 
       if (!hasJwt) {
         this.previewRequestKeys.clear();
         this.latestMessagePreviews.set({});
+        this.latestMessagePreviewsLoading.set({});
         return;
       }
 
@@ -202,6 +210,7 @@ export class ContactlistComponent {
         }
 
         this.previewRequestKeys.set(contact.id, requestKey);
+        this.setLatestMessagePreviewLoading(contact.id, true);
         void this.loadLatestMessagePreview(contact, requestKey);
       });
     });
@@ -247,6 +256,10 @@ export class ContactlistComponent {
 
   getLatestMessagePreviews(contact: Contact): ContactMessagePreview[] {
     return this.latestMessagePreviews()[contact.id] ?? [];
+  }
+
+  isLatestMessagePreviewLoading(contact: Contact): boolean {
+    return this.latestMessagePreviewsLoading()[contact.id] ?? false;
   }
 
   hasUnsplashBadge(contact: Contact): boolean {
@@ -640,6 +653,7 @@ export class ContactlistComponent {
   private reloadLatestMessagePreview(contact: Contact): void {
     if (!this.backendActionsAvailable()) {
       this.setLatestMessagePreviews(contact.id, []);
+      this.setLatestMessagePreviewLoading(contact.id, false);
       this.previewRequestKeys.delete(contact.id);
       return;
     }
@@ -647,6 +661,7 @@ export class ContactlistComponent {
     const requestKey = `${contact.id}:${contact.lastMessageAt ?? ''}`;
     this.previewRequestKeys.delete(contact.id);
     this.previewRequestKeys.set(contact.id, requestKey);
+    this.setLatestMessagePreviewLoading(contact.id, true);
     void this.loadLatestMessagePreview(contact, requestKey);
   }
 
@@ -680,12 +695,17 @@ export class ContactlistComponent {
       if (this.previewRequestKeys.get(contact.id) === requestKey) {
         this.setLatestMessagePreviews(contact.id, []);
       }
+    } finally {
+      if (this.previewRequestKeys.get(contact.id) === requestKey) {
+        this.setLatestMessagePreviewLoading(contact.id, false);
+      }
     }
   }
 
   private async applyIncomingLatestMessagePreview(contact: Contact, message: ContactMessage): Promise<void> {
     const payload = await this.resolvePreviewPayload(contact, message);
     this.previewRequestKeys.set(contact.id, `${contact.id}:${message.createdAt}`);
+    this.setLatestMessagePreviewLoading(contact.id, false);
     const nextPreview = this.buildLatestMessagePreview(message, payload);
     this.latestMessagePreviews.update((current) => {
       const existing = current[contact.id] ?? [];
@@ -942,5 +962,9 @@ export class ContactlistComponent {
 
   private setLatestMessagePreviews(contactId: string, previews: ContactMessagePreview[]): void {
     this.latestMessagePreviews.update((current) => ({ ...current, [contactId]: previews }));
+  }
+
+  private setLatestMessagePreviewLoading(contactId: string, loading: boolean): void {
+    this.latestMessagePreviewsLoading.update((current) => ({ ...current, [contactId]: loading }));
   }
 }

@@ -476,6 +476,7 @@
         "subscribeFailed": "Impossible de s'abonner au contact.",
         "unsubscribeFailed": "Impossible de se désabonner du contact.",
         "previewDeleted": "Message supprimé",
+        "previewLoading": "Chargement de l’aperçu du message…",
         "previewAudio": "Message vocal",
         "previewLocation": "Message de localisation",
         "previewExperience": "Expérience",

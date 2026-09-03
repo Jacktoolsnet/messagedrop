@@ -40,7 +40,12 @@
                             }
                         </span>
                     </div>
-                    @if (backendActionsAvailable() && getLatestMessagePreviews(contact).length > 0) {
+                    @if (backendActionsAvailable() && isLatestMessagePreviewLoading(contact)) {
+                    <div class="chat-preview-loading" role="status"
+                        [attr.aria-label]="'common.contact.list.previewLoading' | transloco">
+                        <mat-spinner [diameter]="38" aria-hidden="true"></mat-spinner>
+                    </div>
+                    } @else if (backendActionsAvailable() && getLatestMessagePreviews(contact).length > 0) {
                     <div class="chat-preview-stack">
                         @for (preview of getLatestMessagePreviews(contact); track preview.messageId) {
                         <div class="chat-preview-row" [class.chat-preview-row--me]="preview.outgoing"

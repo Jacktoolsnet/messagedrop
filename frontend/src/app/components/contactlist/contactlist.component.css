@@ -128,7 +128,7 @@ button,
   border-radius: inherit;
 }
 
-.tile-header > *:not(.unsplash-badge):not(.identity-badge):not(.chat-preview-stack) {
+.tile-header > *:not(.unsplash-badge):not(.identity-badge):not(.chat-preview-stack):not(.chat-preview-loading) {
   position: relative;
   z-index: 1;
 }
@@ -220,6 +220,17 @@ button,
   overflow: hidden;
 }
 
+.chat-preview-loading {
+  position: absolute;
+  inset-inline: 0.75rem;
+  inset-block-start: 2.75rem;
+  inset-block-end: 1rem;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
 @media (max-width: 600px) {
   .identity-badge {
     transform: translate(-0.5rem, -50%);
@@ -227,7 +238,8 @@ button,
   }
 }
 
-.tile-header--with-unsplash-badge .chat-preview-stack {
+.tile-header--with-unsplash-badge .chat-preview-stack,
+.tile-header--with-unsplash-badge .chat-preview-loading {
   inset-block-end: 2.85rem;
 }
 
