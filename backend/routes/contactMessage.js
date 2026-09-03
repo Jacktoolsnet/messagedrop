@@ -321,13 +321,21 @@ router.post('/delete',
   (req, res, next) => {
     const {
       messageId,
+      messageIds,
       contactId,
       scope = 'single',
       userId,
       contactUserId
     } = req.body ?? {};
 
-    if (!messageId || !contactId) {
+    const normalizedMessageIds = [...new Set([
+      ...(Array.isArray(messageIds) ? messageIds : []),
+      messageId
+    ]
+      .map((id) => (typeof id === 'string' ? id.trim() : ''))
+      .filter(Boolean))];
+
+    if (!contactId || normalizedMessageIds.length === 0 || normalizedMessageIds.length > 200) {
       return next(apiError.badRequest('missing_required_fields'));
     }
 
@@ -336,11 +344,11 @@ router.post('/delete',
         return;
       }
       return withContactOwnership(req, res, contactId, () => {
-        tableContactMessage.deleteByMessageId(req.database.db, messageId, (err) => {
+        tableContactMessage.deleteByMessageIds(req.database.db, normalizedMessageIds, (err, deletedCount) => {
           if (err) {
             return next(apiError.internal('db_error'));
           }
-          return res.status(200).json({ status: 200, messageId });
+          return res.status(200).json({ status: 200, messageId, messageIds: normalizedMessageIds, deletedCount });
         });
       }, next);
     }
@@ -350,7 +358,7 @@ router.post('/delete',
     }
 
     withContactOwnership(req, res, contactId, () => {
-      tableContactMessage.deleteByContactAndMessageId(req.database.db, contactId, messageId, (err) => {
+      tableContactMessage.deleteByContactAndMessageIds(req.database.db, contactId, normalizedMessageIds, (err, deletedCount) => {
         if (err) {
           return next(apiError.internal('db_error'));
         }
@@ -358,13 +366,15 @@ router.post('/delete',
         if (userId && contactUserId) {
           tableContact.getByUserAndContactUser(req.database.db, contactUserId, userId, (lookupErr, reciprocal) => {
             if (!lookupErr && reciprocal?.id) {
-              tableContactMessage.updateMessageForContact(req.database.db, reciprocal.id, messageId, {
-                status: 'deleted'
-              }, () => { /* best-effort */ });
+              normalizedMessageIds.forEach((id) => {
+                tableContactMessage.updateMessageForContact(req.database.db, reciprocal.id, id, {
+                  status: 'deleted'
+                }, () => { /* best-effort */ });
+              });
             }
           });
         }
-        return res.status(200).json({ status: 200, messageId });
+        return res.status(200).json({ status: 200, messageId, messageIds: normalizedMessageIds, deletedCount });
       });
     }, next);
   }

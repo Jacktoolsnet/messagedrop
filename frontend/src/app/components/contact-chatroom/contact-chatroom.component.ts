@@ -2253,20 +2253,42 @@ export class ContactChatroomComponent implements AfterViewInit {
     });
   }
 
-  private async deleteMessageWithRevisions(contact:Contact,message:ChatroomMessage):Promise<void>{
-    const scope=message.direction==='user'?'both':'single',revisions=message.payload?.game?[...this.getRevisionHistory(message)].reverse():[message],deletedIds=new Set<string>();
-    try{
-      for(const revision of revisions){
-        await firstValueFrom(this.contactMessageService.deleteMessage({messageId:revision.messageId,contactId:contact.id,scope,userId:contact.userId,contactUserId:contact.contactUserId}));
-        deletedIds.add(revision.messageId);
-        this.socketioService.sendDeletedContactMessage({contactId:contact.id,userId:contact.userId,contactUserId:contact.contactUserId,messageId:revision.messageId,remove:scope==='both'});
-      }
-    }catch{
-      this.snackBar.open(this.translation.t('common.message.deleteFailed'),'',{duration:3000});
+  private async deleteMessageWithRevisions(contact: Contact, message: ChatroomMessage): Promise<void> {
+    const scope = message.direction === 'user' ? 'both' : 'single';
+    const gameId = message.payload?.game?.gameId;
+    const candidates = gameId
+      ? this.messages().filter((entry) => entry.payload?.game?.gameId === gameId)
+      : [message];
+    const messageIds = [...new Set([
+      ...candidates.flatMap((entry) => this.getRevisionHistory(entry).map((revision) => revision.messageId)),
+      message.messageId
+    ])];
+
+    try {
+      await firstValueFrom(this.contactMessageService.deleteMessage({
+        messageIds,
+        contactId: contact.id,
+        scope,
+        userId: contact.userId,
+        contactUserId: contact.contactUserId
+      }));
+    } catch {
+      this.snackBar.open(this.translation.t('common.message.deleteFailed'), '', { duration: 3000 });
+      return;
     }
-    if(!deletedIds.size)return;
-    this.messages.update(messages=>messages.filter(entry=>!deletedIds.has(entry.messageId)));
-    for(const messageId of deletedIds)void this.contactMessageService.deleteLocalPayload(messageId);
+
+    const deletedIds = new Set(messageIds);
+    this.messages.update((messages) => messages.filter((entry) => !deletedIds.has(entry.messageId)));
+    for (const messageId of messageIds) {
+      void this.contactMessageService.deleteLocalPayload(messageId);
+      this.socketioService.sendDeletedContactMessage({
+        contactId: contact.id,
+        userId: contact.userId,
+        contactUserId: contact.contactUserId,
+        messageId,
+        remove: scope === 'both'
+      });
+    }
     this.contactMessageService.emitUnreadCountUpdate(contact.id);
   }
 

@@ -252,6 +252,47 @@ const deleteByContactAndMessageId = function (db, contactId, messageId, callback
     db.run(sql, [messageId, contactId], (err) => callback(err));
 };
 
+const deleteByMessageIds = function (db, messageIds, callback) {
+    const normalizedMessageIds = normalizeMessageIds(messageIds);
+    if (normalizedMessageIds.length === 0) {
+        callback(null, 0);
+        return;
+    }
+    const placeholders = normalizedMessageIds.map(() => '?').join(', ');
+    const sql = `
+    DELETE FROM ${tableName}
+    WHERE ${columnMessageId} IN (${placeholders});
+  `;
+    db.run(sql, normalizedMessageIds, function (err) {
+        callback(err, this?.changes ?? 0);
+    });
+};
+
+const deleteByContactAndMessageIds = function (db, contactId, messageIds, callback) {
+    const normalizedMessageIds = normalizeMessageIds(messageIds);
+    if (normalizedMessageIds.length === 0) {
+        callback(null, 0);
+        return;
+    }
+    const placeholders = normalizedMessageIds.map(() => '?').join(', ');
+    const sql = `
+    DELETE FROM ${tableName}
+    WHERE ${columnContactId} = ?
+      AND ${columnMessageId} IN (${placeholders});
+  `;
+    db.run(sql, [contactId, ...normalizedMessageIds], function (err) {
+        callback(err, this?.changes ?? 0);
+    });
+};
+
+function normalizeMessageIds(messageIds) {
+    return Array.isArray(messageIds)
+        ? [...new Set(messageIds
+            .map((id) => (typeof id === 'string' ? id.trim() : ''))
+            .filter(Boolean))]
+        : [];
+}
+
 const getMessageIdsByContact = function (db, contactId, callback) {
     const sql = `
     SELECT ${columnMessageId}
@@ -377,6 +418,8 @@ module.exports = {
     setTranslatedMessageForContact,
     deleteByMessageId,
     deleteByContactAndMessageId,
+    deleteByMessageIds,
+    deleteByContactAndMessageIds,
     getMessageIdsByContact,
     deleteByContactId,
     markAsReadByContactAndMessageId,

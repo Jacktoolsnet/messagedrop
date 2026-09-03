@@ -44,7 +44,8 @@ interface UpdateMessagePayload {
 }
 
 interface DeleteMessagePayload {
-  messageId: string;
+  messageId?: string;
+  messageIds?: string[];
   contactId: string;
   scope: 'single' | 'both';
   userId?: string;
@@ -178,7 +179,7 @@ export class ContactMessageService {
   }
 
   deleteMessage(payload: DeleteMessagePayload) {
-    return this.http.post<{ status: number; messageId: string }>(
+    return this.http.post<{ status: number; messageId?: string; messageIds?: string[]; deletedCount?: number }>(
       `${environment.apiUrl}/contactMessage/delete`,
       payload,
       this.httpOptions
