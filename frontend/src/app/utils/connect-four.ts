@@ -106,7 +106,7 @@ export function createConnectFourGame(
     winnerUserId: null,
     moveNumber: 1,
     variant,
-    moves: variant === 'vanishing' ? [{ mark: 'R', cellIndex: dropIndex }] : undefined
+    moves: [{ mark: 'R', cellIndex: dropIndex }]
   };
 }
 
@@ -119,8 +119,8 @@ export function applyConnectFourMove(
   const board = normalizeConnectFourBoard(game.board);
   const mark = userId === game.playerRedUserId ? 'R' : userId === game.playerYellowUserId ? 'Y' : null;
   if (!mark) return null;
-  let moves = game.variant === 'vanishing' ? normalizeConnectFourMoves(game, board) : undefined;
-  if (game.variant === 'vanishing' && moves) {
+  let moves = normalizeConnectFourMoves(game, board);
+  if (game.variant === 'vanishing') {
     const ownMoves = moves.filter(move => move.mark === mark);
     if (ownMoves.length >= 4) {
       const oldestMove = ownMoves[0];
@@ -132,7 +132,7 @@ export function applyConnectFourMove(
   const dropIndex = getConnectFourDropIndex(board, column);
   if (dropIndex === null) return null;
   board[dropIndex] = mark;
-  moves?.push({ mark, cellIndex: dropIndex });
+  moves.push({ mark, cellIndex: dropIndex });
   const winningMarks = new Set(getConnectFourWinningCellIndexes(board).map(index => board[index]).filter(Boolean));
   const moveNumber = game.moveNumber + 1;
   if (winningMarks.size > 1) {

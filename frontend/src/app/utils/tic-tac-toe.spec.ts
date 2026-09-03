@@ -11,13 +11,16 @@ describe('tic-tac-toe', () => {
     expect(game.board[4]).toBe('X');
     expect(game.nextPlayerUserId).toBe('recipient');
     expect(game.moveNumber).toBe(1);
+    expect(game.moves).toEqual([{ mark: 'X', cellIndex: 4 }]);
   });
 
   it('only accepts a move from the active player on an empty cell', () => {
     const game = createTicTacToeGame('sender', 'recipient', 4);
     expect(applyTicTacToeMove(game, 'sender', 0)).toBeNull();
     expect(applyTicTacToeMove(game, 'recipient', 4)).toBeNull();
-    expect(applyTicTacToeMove(game, 'recipient', 0)?.board[0]).toBe('O');
+    const next = applyTicTacToeMove(game, 'recipient', 0);
+    expect(next?.board[0]).toBe('O');
+    expect(next?.moves?.at(-1)).toEqual({ mark: 'O', cellIndex: 0 });
   });
 
   it('detects wins and draws', () => {

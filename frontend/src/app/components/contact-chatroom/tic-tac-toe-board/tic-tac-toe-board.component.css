@@ -159,7 +159,8 @@
   opacity: 0.6;
 }
 
-.tic-tac-toe__cell--winning {
+.tic-tac-toe__cell--winning,
+.tic-tac-toe__cell--last-move {
   border: 2px solid currentColor;
   background: color-mix(in srgb, currentColor 28%, var(--tic-tac-toe-cell-color));
   box-shadow:
@@ -167,8 +168,15 @@
     0 0 10px color-mix(in srgb, currentColor 58%, transparent);
 }
 
-.tic-tac-toe__cell--winning .tic-tac-toe__mark {
+.tic-tac-toe__cell--winning .tic-tac-toe__mark,
+.tic-tac-toe__cell--last-move .tic-tac-toe__mark {
   opacity: 1;
+}
+
+.tic-tac-toe__cell--last-move.tic-tac-toe__cell--fading {
+  border-style: solid;
+  border-color: currentColor;
+  background: color-mix(in srgb, currentColor 28%, var(--tic-tac-toe-cell-color));
 }
 
 .tic-tac-toe__status {

@@ -67,7 +67,7 @@ export function createTicTacToeGame(
     winnerUserId: null,
     moveNumber: 1,
     variant,
-    moves: variant === 'vanishing' ? [{ mark: 'X', cellIndex: firstCell }] : undefined
+    moves: [{ mark: 'X', cellIndex: firstCell }]
   };
 }
 
@@ -98,8 +98,8 @@ export function applyTicTacToeMove(
   }
 
   board[cellIndex] = mark;
-  let moves = game.variant === 'vanishing' ? normalizeMoves(game, board, cellIndex) : undefined;
-  if (game.variant === 'vanishing' && moves) {
+  let moves = normalizeMoves(game, board, cellIndex);
+  if (game.variant === 'vanishing') {
     const ownMoves = moves.filter((move) => move.mark === mark);
     if (ownMoves.length >= 3) {
       const oldestMove = ownMoves[0];
@@ -107,8 +107,8 @@ export function applyTicTacToeMove(
       moves = moves.filter((move) => move !== oldestMove);
     }
     board[cellIndex] = mark;
-    moves.push({ mark, cellIndex });
   }
+  moves.push({ mark, cellIndex });
   const winner = getTicTacToeWinner(board);
   const moveNumber = game.moveNumber + 1;
   if (winner) {

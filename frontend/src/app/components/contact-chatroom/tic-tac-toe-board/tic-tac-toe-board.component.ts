@@ -25,6 +25,22 @@ export class TicTacToeBoardComponent {
   readonly move = output<number>();
   readonly cells = computed(() => normalizeTicTacToeBoard(this.board()));
   readonly winningCellIndexes = computed(() => new Set(getTicTacToeWinningCellIndexes(this.cells())));
+  readonly lastMoveCellIndex = computed(() => {
+    const cells = this.cells();
+    const moves = this.moves();
+    for (let index = moves.length - 1; index >= 0; index -= 1) {
+      const move = moves[index];
+      if (
+        Number.isInteger(move.cellIndex)
+        && move.cellIndex >= 0
+        && move.cellIndex < cells.length
+        && cells[move.cellIndex] === move.mark
+      ) {
+        return move.cellIndex;
+      }
+    }
+    return null;
+  });
   readonly fadingCellIndexes = computed(() => {
     if (this.variant() !== 'vanishing') {
       return new Set<number>();

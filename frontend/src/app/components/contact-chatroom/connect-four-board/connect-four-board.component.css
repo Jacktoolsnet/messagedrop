@@ -82,7 +82,8 @@
   box-shadow: 0 3px 8px color-mix(in srgb, var(--connect-four-primary) 24%, transparent);
 }
 
-.connect-four__cell--winning {
+.connect-four__cell--winning,
+.connect-four__cell--last-move {
   border: 2px solid currentColor;
   background: color-mix(in srgb, currentColor 28%, var(--connect-four-cell-color));
   box-shadow:
@@ -109,11 +110,13 @@
   opacity: 0.6;
 }
 
-.connect-four__cell--winning .connect-four__stone {
+.connect-four__cell--winning .connect-four__stone,
+.connect-four__cell--last-move .connect-four__stone {
   opacity: 1;
 }
 
-.connect-four__cell--winning.connect-four__cell--fading {
+.connect-four__cell--winning.connect-four__cell--fading,
+.connect-four__cell--last-move.connect-four__cell--fading {
   border-style: solid;
   border-color: currentColor;
   background: color-mix(in srgb, currentColor 28%, var(--connect-four-cell-color));

@@ -14,6 +14,7 @@
       [class.tic-tac-toe__cell--x]="cell === 'X'" [class.tic-tac-toe__cell--o]="cell === 'O'"
       [class.tic-tac-toe__cell--fading]="fadingCellIndexes().has($index)"
       [class.tic-tac-toe__cell--winning]="winningCellIndexes().has($index)"
+      [class.tic-tac-toe__cell--last-move]="lastMoveCellIndex() === $index"
       [disabled]="disabled() || cell !== null" [attr.aria-label]="getCellAriaLabel($index, cell)"
       (pointerenter)="previewCell($index, $event)"
       (click)="selectCell($index)">

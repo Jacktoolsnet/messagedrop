@@ -3,7 +3,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { TicTacToeCell, TicTacToeVariant } from '../../../interfaces/chat-game';
+import { TicTacToeCell, TicTacToeMove, TicTacToeVariant } from '../../../interfaces/chat-game';
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
 import { TicTacToeBoardComponent } from '../tic-tac-toe-board/tic-tac-toe-board.component';
 
@@ -19,12 +19,14 @@ export class NewTicTacToeDialogComponent {
   private readonly dialogRef = inject(MatDialogRef<NewTicTacToeDialogComponent, number>);
   readonly data = inject<{ variant: TicTacToeVariant }>(MAT_DIALOG_DATA);
   readonly board = signal<TicTacToeCell[]>(Array<TicTacToeCell>(9).fill(null));
+  readonly moves = signal<TicTacToeMove[]>([]);
   readonly selectedCell = signal<number | null>(null);
 
   selectCell(index: number): void {
     const board = Array<TicTacToeCell>(9).fill(null);
     board[index] = 'X';
     this.board.set(board);
+    this.moves.set([{ mark: 'X', cellIndex: index }]);
     this.selectedCell.set(index);
   }
 

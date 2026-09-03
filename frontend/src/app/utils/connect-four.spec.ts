@@ -10,6 +10,7 @@ describe('connect-four', () => {
     const game = createConnectFourGame('sender', 'recipient', 3);
     expect(game.board[38]).toBe('R');
     expect(game.nextPlayerUserId).toBe('recipient');
+    expect(game.moves).toEqual([{ mark: 'R', cellIndex: 38 }]);
   });
 
   it('stacks stones and alternates players', () => {
@@ -17,6 +18,7 @@ describe('connect-four', () => {
     const next = applyConnectFourMove(game, 'recipient', 3)!;
     expect(next.board[31]).toBe('Y');
     expect(next.nextPlayerUserId).toBe('sender');
+    expect(next.moves?.at(-1)).toEqual({ mark: 'Y', cellIndex: 31 });
   });
 
   it('detects horizontal, vertical and diagonal wins', () => {

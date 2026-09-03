@@ -21,7 +21,7 @@ export interface TicTacToeGame {
   moveNumber: number;
   /** Missing on existing production messages and therefore treated as standard. */
   variant?: TicTacToeVariant;
-  /** Current placements in chronological order; used by the vanishing variant. */
+  /** Current placements in chronological order; optional for compatibility with older messages. */
   moves?: TicTacToeMove[];
 }
 
@@ -46,7 +46,7 @@ export interface ConnectFourGame {
   moveNumber: number;
   /** Missing on existing production messages and therefore treated as standard. */
   variant?: ConnectFourVariant;
-  /** Current placements in chronological order; used by the vanishing variant. */
+  /** Current placements in chronological order; optional for compatibility with older messages. */
   moves?: ConnectFourMove[];
 }
 
