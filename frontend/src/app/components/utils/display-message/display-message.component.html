@@ -53,6 +53,9 @@
                     class="display-action-button display-action-button--primary"
                     (click)="onPrimaryClick()"
                 >
+                    @if (data.buttonIcon) {
+                    <mat-icon aria-hidden="true">{{ data.buttonIcon }}</mat-icon>
+                    }
                     {{ data.button }}
                 </button>
                 }
@@ -133,6 +136,9 @@
             class="display-action-button display-action-button--primary"
             (click)="onPrimaryClick()"
         >
+            @if (data.buttonIcon) {
+            <mat-icon aria-hidden="true">{{ data.buttonIcon }}</mat-icon>
+            }
             {{ data.button }}
         </button>
         }

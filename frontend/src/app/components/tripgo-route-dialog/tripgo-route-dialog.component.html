@@ -447,7 +447,7 @@
         <mat-icon>list</mat-icon>
       </button>
     }
-    @if (viewMode() !== 'map' || simulationState() === 'idle') {
+    @if (viewMode() !== 'map') {
       <button mat-icon-button type="button" (click)="openRouteOptions()"
         [disabled]="isBusy()" [attr.aria-label]="'common.tripGo.routeOptions' | transloco">
         <mat-icon>settings</mat-icon>

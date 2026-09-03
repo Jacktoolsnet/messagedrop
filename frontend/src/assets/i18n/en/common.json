@@ -173,7 +173,7 @@
         "wikipediaTitle": "Preparing content along the route",
         "wikipediaMessage": "Searching for content along the route.",
         "wikipediaProgress": "Searched {{ completed }} of {{ total }} areas",
-        "withoutWikipedia": "Simulate without additional pins",
+        "withoutWikipedia": "Skip",
         "start": "Start journey simulation",
         "pause": "Pause journey simulation",
         "resume": "Resume journey simulation",

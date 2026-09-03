@@ -172,7 +172,7 @@
         "wikipediaTitle": "Préparation du contenu le long de l’itinéraire",
         "wikipediaMessage": "Recherche de contenu le long de l’itinéraire.",
         "wikipediaProgress": "{{ completed }} zone(s) sur {{ total }} parcourue(s)",
-        "withoutWikipedia": "Simuler sans repères supplémentaires",
+        "withoutWikipedia": "Ignorer",
         "start": "Démarrer la simulation du trajet",
         "pause": "Mettre la simulation en pause",
         "resume": "Reprendre la simulation du trajet",

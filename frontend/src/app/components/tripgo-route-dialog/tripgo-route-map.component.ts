@@ -1272,6 +1272,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
         icon: 'menu_book',
         message: this.transloco.translate('common.tripGo.simulation.wikipediaMessage'),
         button: this.transloco.translate('common.tripGo.simulation.withoutWikipedia'),
+        buttonIcon: 'skip_next',
         delay: 0,
         showSpinner: true,
         progress: this.wikipediaPreparationProgress,

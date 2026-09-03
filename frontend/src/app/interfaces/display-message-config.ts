@@ -7,6 +7,7 @@ export interface DisplayMessageConfig {
     icon: string,
     message: string,
     button: string,
+    buttonIcon?: string,
     secondaryButton?: string,
     delay: number,
     showSpinner: boolean,

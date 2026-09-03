@@ -172,7 +172,7 @@
         "wikipediaTitle": "Preparando contenido a lo largo de la ruta",
         "wikipediaMessage": "Se busca contenido a lo largo de la ruta.",
         "wikipediaProgress": "{{ completed }} de {{ total }} zonas consultadas",
-        "withoutWikipedia": "Simular sin marcadores adicionales",
+        "withoutWikipedia": "Omitir",
         "start": "Iniciar simulación del viaje",
         "pause": "Pausar simulación del viaje",
         "resume": "Continuar simulación del viaje",

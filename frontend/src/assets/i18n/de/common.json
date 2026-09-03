@@ -173,7 +173,7 @@
         "wikipediaTitle": "Inhalte entlang der Route vorbereiten",
         "wikipediaMessage": "Inhalte entlang der Route werden gesucht.",
         "wikipediaProgress": "{{ completed }} von {{ total }} Bereichen durchsucht",
-        "withoutWikipedia": "Ohne zusätzliche Pins simulieren",
+        "withoutWikipedia": "Überspringen",
         "start": "Reisesimulation starten",
         "pause": "Reisesimulation pausieren",
         "resume": "Reisesimulation fortsetzen",
