@@ -170,7 +170,7 @@
       "setAsDestination": "Set as destination",
       "currentWeather": "Current weather: {{ temperature }} degrees Celsius",
       "simulation": {
-        "wikipediaTitle": "Preparing content along the route",
+        "wikipediaTitle": "Route information",
         "wikipediaMessage": "Searching for content along the route.",
         "wikipediaProgress": "Searched {{ completed }} of {{ total }} areas",
         "withoutWikipedia": "Skip",

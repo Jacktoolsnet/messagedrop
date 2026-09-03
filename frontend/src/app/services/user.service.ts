@@ -157,6 +157,7 @@ export class UserService {
   readonly moderationAppeals = this.moderationAppealsSignal.asReadonly();
 
   private tokenRenewalTimeout: ReturnType<typeof setTimeout> | null = null;
+  private readonly tokenRenewalRetryDelayMs = 30_000;
   private accountStatusRefreshPromise?: Promise<void>;
   private lastAccountStatusRefreshAt = 0;
   private readonly accountStatusRefreshCooldownMs = 60_000;
@@ -1017,65 +1018,18 @@ export class UserService {
           this.user.jwtExpiresAt = payload.exp! * 1000;
           this.startJwtRenewal();
         } else {
-          this.logout();
-          const dialogRef = this.displayMessage.open(DisplayMessage, {
-            panelClass: '',
-            closeOnNavigation: false,
-            data: {
-              showAlways: true,
-              title: this.i18n.t('auth.sessionExpiredTitle'),
-              image: '',
-              icon: 'logout', // oder: 'schedule', 'lock', 'warning'
-              message: this.i18n.t('auth.sessionExpiredMessage'),
-              button: this.i18n.t('common.actions.ok'),
-              delay: 0,
-              showSpinner: false
-            },
-            maxWidth: '90vw',
-            maxHeight: '90vh',
-            hasBackdrop: true,
-            backdropClass: 'dialog-backdrop',
-            disableClose: false,
-            autoFocus: false
-          });
-
-          dialogRef.afterClosed().subscribe(() => {
-            this.blocked = false;
-          });
+          this.scheduleJwtRecovery();
         }
       },
       error: (err) => {
-        console.error('Failed to load user details', err);
-        this.logout();
-        const dialogRef = this.displayMessage.open(DisplayMessage, {
-          panelClass: '',
-          closeOnNavigation: false,
-          data: {
-            showAlways: true,
-            title: this.i18n.t('auth.sessionExpiredTitle'),
-            image: '',
-            icon: 'logout', // oder: 'schedule', 'lock', 'warning'
-            message: this.i18n.t('auth.sessionExpiredMessage'),
-            button: this.i18n.t('common.actions.ok'),
-            delay: 0,
-            showSpinner: false
-          },
-          maxWidth: '90vw',
-          maxHeight: '90vh',
-          hasBackdrop: true,
-          backdropClass: 'dialog-backdrop',
-          disableClose: false,
-          autoFocus: false
-        });
-
-        dialogRef.afterClosed().subscribe(() => {
-          this.blocked = false;
-        });
+        console.warn('JWT renewal failed; retrying without ending the local session', err);
+        this.scheduleJwtRecovery();
       }
     });
   }
 
   private startJwtRenewal(): void {
+    this.clearJwtRenewal();
     if (!this.user?.jwtExpiresAt) return;
 
     const now = Date.now();
@@ -1083,13 +1037,42 @@ export class UserService {
     const delay = this.user.jwtExpiresAt - now - bufferTime;
 
     if (delay <= 0) {
-      this.logout();
+      this.scheduleJwtRecovery(0);
       return;
     }
 
     this.tokenRenewalTimeout = setTimeout(() => {
+      this.tokenRenewalTimeout = null;
       this.renewJwt();
     }, delay);
+  }
+
+  private scheduleJwtRecovery(delay = this.hasJwt() ? this.tokenRenewalRetryDelayMs : 0): void {
+    this.clearJwtRenewal();
+    if (!this.user?.id || !this.user.signingKeyPair?.privateKey) {
+      return;
+    }
+
+    this.tokenRenewalTimeout = setTimeout(() => {
+      this.tokenRenewalTimeout = null;
+      if (this.hasJwt()) {
+        this.renewJwt();
+        return;
+      }
+      void this.reauthenticateExpiredJwt();
+    }, delay);
+  }
+
+  private async reauthenticateExpiredJwt(): Promise<void> {
+    const userId = this.user.id;
+    const authenticated = await this.attemptBackendLogin(this.user, {
+      showAlways: false,
+      showError: false,
+      blockUi: false
+    });
+    if (!authenticated && this.user.id === userId) {
+      this.scheduleJwtRecovery(this.tokenRenewalRetryDelayMs);
+    }
   }
 
   getUserMessages(user: User, showAlways = false): Observable<GetMessageResponse> {

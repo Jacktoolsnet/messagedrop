@@ -169,7 +169,7 @@
       "setAsDestination": "Définir comme destination",
       "currentWeather": "Météo actuelle : {{ temperature }} degrés Celsius",
       "simulation": {
-        "wikipediaTitle": "Préparation du contenu le long de l’itinéraire",
+        "wikipediaTitle": "Informations sur l’itinéraire",
         "wikipediaMessage": "Recherche de contenu le long de l’itinéraire.",
         "wikipediaProgress": "{{ completed }} zone(s) sur {{ total }} parcourue(s)",
         "withoutWikipedia": "Ignorer",
