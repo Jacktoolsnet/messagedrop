@@ -123,19 +123,15 @@ const EMPTY_ROUTE_CONTENT: TripGoRouteContent = {
           [style.--simulation-color]="simulationPointColor(point)"
           [style.--simulation-contrast]="simulationPointContrast(point)">
           <header>
-            <mat-icon aria-hidden="true">{{ simulationPointIcon(point) }}</mat-icon>
-            <div>
-              <small>{{ simulationPointKindKey(point) | transloco }}</small>
+            @if (point.turnInstruction; as instruction) {
+              <mat-icon aria-hidden="true">{{ turnInstructionIcon(instruction) }}</mat-icon>
+              <strong>{{ turnInstructionLabel(instruction) }}</strong>
+            } @else {
+              <mat-icon aria-hidden="true">{{ simulationPointIcon(point) }}</mat-icon>
               <strong>{{ point.title }}</strong>
-            </div>
+            }
           </header>
           <div class="simulation-overlay__facts">
-            @if (point.turnInstruction; as instruction) {
-              <span class="simulation-overlay__instruction">
-                <mat-icon aria-hidden="true">{{ turnInstructionIcon(instruction) }}</mat-icon>
-                <strong>{{ turnInstructionLabel(instruction) }}</strong>
-              </span>
-            }
             <span class="simulation-overlay__time">
               <mat-icon aria-hidden="true">schedule</mat-icon>
               @if (simulatedTime(); as time) { {{ formatTime(time) }} } @else { &ndash; }
@@ -317,12 +313,6 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     if (point.kind === 'start') return 'my_location';
     if (point.kind === 'arrival') return 'location_on';
     return point.segment ? tripGoSegmentIcon(point.segment) : 'location_on';
-  }
-
-  simulationPointKindKey(point: TripGoSimulationPoint): string {
-    if (point.kind === 'start') return 'common.tripGo.simulation.startPoint';
-    if (point.kind === 'arrival') return 'common.tripGo.simulation.destinationPoint';
-    return 'common.tripGo.simulation.routePoint';
   }
 
   simulationPointColor(point: TripGoSimulationPoint): string {
