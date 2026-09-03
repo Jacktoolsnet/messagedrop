@@ -33,6 +33,21 @@ describe('MapService', () => {
     expect(String(geodataPoiMarker(poi).options.html)).toContain('>wc</text>');
   });
 
+  it('uses a dedicated info icon for tourist information', () => {
+    const poi = geodataPoi('tourist-info', 'tourism', 'information');
+
+    expect(String(geodataPoiMarker(poi).options.html)).toContain('>info</text>');
+  });
+
+  it('keeps the info icon when grouped places are all tourist information', () => {
+    const pois = [
+      geodataPoi('first', 'tourism', 'information'),
+      geodataPoi('second', 'tourism', 'information')
+    ];
+
+    expect(String(geodataPoiGroupMarker(pois, pois[0]).options.html)).toContain('>info</text>');
+  });
+
   it('uses the neutral icon for a grouped toilet and government office', () => {
     const pois = [
       geodataPoi('toilet', 'amenities', 'toilets'),

@@ -11,7 +11,7 @@ import {
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
-import { GEODATA_CATEGORY_ICONS, GeodataCategory, GeodataPoi } from '../../interfaces/geodata';
+import { GeodataPoi, geodataPoiIcon } from '../../interfaces/geodata';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 
@@ -52,8 +52,8 @@ export class GeodataPoiListComponent {
   private readonly transloco = inject(TranslocoService);
   private readonly dialogRef = inject(MatDialogRef<GeodataPoiListComponent, GeodataPoiListResult>);
 
-  categoryIcon(category: GeodataCategory): string {
-    return GEODATA_CATEGORY_ICONS[category];
+  poiIcon(poi: GeodataPoi): string {
+    return geodataPoiIcon(poi);
   }
 
   address(poi: GeodataPoi): string {

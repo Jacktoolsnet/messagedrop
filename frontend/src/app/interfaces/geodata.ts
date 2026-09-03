@@ -80,6 +80,12 @@ export interface GeodataPoi {
   source: { provider: 'OpenStreetMap'; url: string };
 }
 
+export function geodataPoiIcon(poi: Pick<GeodataPoi, 'category' | 'subtype'>): string {
+  if (poi.subtype === 'toilets') return 'wc';
+  if (poi.subtype === 'information') return 'info';
+  return GEODATA_CATEGORY_ICONS[poi.category] || 'location_on';
+}
+
 export interface GeodataNearbyResponse {
   status: number;
   pois: GeodataPoi[];

@@ -6,7 +6,7 @@ import { MarkerLocation } from '../interfaces/marker-location';
 import { MapContextMenuEvent } from '../interfaces/map-context-menu-event';
 import { MarkerType } from '../interfaces/marker-type';
 import { TripGoStop } from '../interfaces/tripgo';
-import { GEODATA_CATEGORY_ICONS, GeodataCategory, GeodataPoi } from '../interfaces/geodata';
+import { GEODATA_CATEGORY_ICONS, GeodataCategory, GeodataPoi, geodataPoiIcon } from '../interfaces/geodata';
 import { GeolocationService } from './geolocation.service';
 
 const messageMarker = leaflet.icon({
@@ -168,12 +168,6 @@ export function geodataPlacesMarker(): leaflet.DivIcon {
 
 export function geodataCategoryMarker(category: GeodataCategory): leaflet.DivIcon {
   return geodataMarker(GEODATA_CATEGORY_ICONS[category] || 'location_on');
-}
-
-function geodataPoiIcon(poi: GeodataPoi): string {
-  return poi.subtype === 'toilets'
-    ? 'wc'
-    : GEODATA_CATEGORY_ICONS[poi.category] || 'location_on';
 }
 
 function geodataMarker(icon: string): leaflet.DivIcon {
