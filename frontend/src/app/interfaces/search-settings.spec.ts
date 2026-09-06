@@ -1,4 +1,25 @@
-import { applyGeodataAvailability, DEFAULT_SEARCH_SETTINGS } from './search-settings';
+import { GEODATA_SUBCATEGORIES, GeodataCategory } from './geodata';
+import {
+  applyGeodataAvailability,
+  DEFAULT_SEARCH_SETTINGS,
+  normalizePoiSetting,
+  POSITIONED_EXTERNAL_PINS_MIN_ZOOM
+} from './search-settings';
+
+describe('search settings zoom limits', () => {
+  it('starts Wikipedia and Geodata pins at the individually positioned zoom level', () => {
+    expect(DEFAULT_SEARCH_SETTINGS.wikipedia.minZoom).toBe(POSITIONED_EXTERNAL_PINS_MIN_ZOOM);
+    for (const category of Object.keys(GEODATA_SUBCATEGORIES) as GeodataCategory[]) {
+      expect(DEFAULT_SEARCH_SETTINGS[category].minZoom).toBe(POSITIONED_EXTERNAL_PINS_MIN_ZOOM);
+    }
+  });
+
+  it('raises previously stored Geodata zoom levels to the new minimum', () => {
+    const normalized = normalizePoiSetting('tourism', { enabled: true, minZoom: 14 });
+
+    expect(normalized.minZoom).toBe(POSITIONED_EXTERNAL_PINS_MIN_ZOOM);
+  });
+});
 
 describe('applyGeodataAvailability', () => {
   it('disables unavailable categories and subcategories', () => {

@@ -12,6 +12,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { Location } from '../../../interfaces/location';
 import {
   DEFAULT_SEARCH_SETTINGS,
+  POSITIONED_EXTERNAL_PINS_MIN_ZOOM,
   PoiSearchSettingsEntry,
   SearchSettings,
   SearchSettingsKey,
@@ -236,7 +237,9 @@ export class SearchSettingsComponent {
     if (key === 'publicTransportStops') {
       return 16;
     }
-    if (key === 'wikipedia' || Object.hasOwn(GEODATA_SUBCATEGORIES, key)) return 14;
+    if (key === 'wikipedia' || Object.hasOwn(GEODATA_SUBCATEGORIES, key)) {
+      return POSITIONED_EXTERNAL_PINS_MIN_ZOOM;
+    }
     return this.minZoom;
   }
 
@@ -270,7 +273,10 @@ export class SearchSettingsComponent {
       wikipedia: {
         ...DEFAULT_SEARCH_SETTINGS.wikipedia,
         ...settings.wikipedia,
-        minZoom: Math.min(19, Math.max(14, settings.wikipedia?.minZoom ?? DEFAULT_SEARCH_SETTINGS.wikipedia.minZoom))
+        minZoom: Math.min(19, Math.max(
+          POSITIONED_EXTERNAL_PINS_MIN_ZOOM,
+          settings.wikipedia?.minZoom ?? DEFAULT_SEARCH_SETTINGS.wikipedia.minZoom
+        ))
       },
       publicTransportStops: {
         ...DEFAULT_SEARCH_SETTINGS.publicTransportStops,

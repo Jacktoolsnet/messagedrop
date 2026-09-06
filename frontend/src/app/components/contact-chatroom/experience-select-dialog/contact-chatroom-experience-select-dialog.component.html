@@ -4,11 +4,6 @@
 </app-dialog-header>
 
 <mat-dialog-content class="experience-select-content">
-  @if (!hasExperiences()) {
-  <div class="experience-select-empty">
-    {{ 'common.contact.chatroom.noSavedExperiences' | transloco }}
-  </div>
-  } @else {
   <mat-action-list class="experience-select-list" role="list"
     [attr.aria-label]="'common.contact.chatroom.experienceSourceMyExperiences' | transloco">
     @for (bookmark of experiences(); track bookmark.productCode) {
@@ -28,7 +23,6 @@
     </button>
     }
   </mat-action-list>
-  }
 </mat-dialog-content>
 
 <mat-dialog-actions class="sticky-actions" align="end">

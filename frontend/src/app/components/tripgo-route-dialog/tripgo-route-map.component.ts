@@ -19,7 +19,11 @@ import { Subscription, catchError, forkJoin, from, map, mergeMap, of, retry, tap
 import { Location } from '../../interfaces/location';
 import { MarkerLocation } from '../../interfaces/marker-location';
 import { MarkerType } from '../../interfaces/marker-type';
-import { DEFAULT_SEARCH_SETTINGS, SearchSettings } from '../../interfaces/search-settings';
+import {
+  DEFAULT_SEARCH_SETTINGS,
+  POSITIONED_EXTERNAL_PINS_MIN_ZOOM,
+  SearchSettings
+} from '../../interfaces/search-settings';
 import { TripGoLocation, TripGoRouteOption, TripGoRouteSegment, TripGoStop, TripGoTurnInstruction } from '../../interfaces/tripgo';
 import { WikipediaArticle } from '../../interfaces/wikipedia';
 import { GeolocationService } from '../../services/geolocation.service';
@@ -1244,7 +1248,8 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     this.wikipediaPreparationTotal.set(searches.length);
     const firstPoint = this.simulationPoints[0];
     if (firstPoint && this.validTripGoLocation(firstPoint.location)) {
-      const startZoom = this.simulationZoom(firstPoint) ?? Math.max(14, this.searchSettings.wikipedia.minZoom);
+      const startZoom = this.simulationZoom(firstPoint)
+        ?? Math.max(POSITIONED_EXTERNAL_PINS_MIN_ZOOM, this.searchSettings.wikipedia.minZoom);
       // setView changes centre and zoom together without flyTo's intentional
       // zoom-out arc, which can look as though the map visits another place.
       this.map.setView(
@@ -1281,7 +1286,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     this.wikipediaPreparationDialog = dialogRef;
 
     const language = this.transloco.getActiveLang() || 'de';
-    const zoom = Math.max(14, this.searchSettings.wikipedia.minZoom);
+    const zoom = Math.max(POSITIONED_EXTERNAL_PINS_MIN_ZOOM, this.searchSettings.wikipedia.minZoom);
     this.wikipediaPreparation = from(searches).pipe(
       mergeMap((bounds) => forkJoin({
         articles: this.searchSettings.wikipedia.enabled

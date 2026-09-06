@@ -732,7 +732,7 @@
     [attr.aria-label]="'common.contact.chatroom.decisions.addAria' | transloco" [disabled]="contactRemoved()">
     <mat-icon>casino</mat-icon>
   </button>
-  <button mat-icon-button class="chatroom-secondary-action" type="button" [attr.aria-label]="'common.contact.chatroom.addExperienceAria' | transloco"
+  <button mat-icon-button type="button" [attr.aria-label]="'common.contact.chatroom.addExperienceAria' | transloco"
     [matMenuTriggerFor]="experienceMenu" [disabled]="contactRemoved()">
     <mat-icon>bookmark_add</mat-icon>
   </button>
@@ -745,12 +745,6 @@
       <mat-icon>search</mat-icon>
       <span>{{ 'common.menu.searchExperiences' | transloco }}</span>
     </button>
-    @if (!hasSavedExperiences()) {
-    <button mat-menu-item type="button" disabled>
-      <mat-icon>info</mat-icon>
-      <span>{{ 'common.contact.chatroom.noSavedExperiences' | transloco }}</span>
-    </button>
-    }
   </mat-menu>
   <mat-menu #experienceEditMenu="matMenu" panelClass="accent-menu" (closed)="clearExperienceEditTarget()">
     <button mat-menu-item type="button" (click)="editSelectedExperienceFromSaved()" [disabled]="!hasSavedExperiences()">
@@ -761,12 +755,6 @@
       <mat-icon>search</mat-icon>
       <span>{{ 'common.menu.searchExperiences' | transloco }}</span>
     </button>
-    @if (!hasSavedExperiences()) {
-    <button mat-menu-item type="button" disabled>
-      <mat-icon>info</mat-icon>
-      <span>{{ 'common.contact.chatroom.noSavedExperiences' | transloco }}</span>
-    </button>
-    }
   </mat-menu>
   <button mat-icon-button class="chatroom-secondary-action" type="button" [attr.aria-label]="'common.contact.chatroom.addVoiceAria' | transloco"
     (click)="openAudioRecorder()" [disabled]="audioLimitReached() || contactRemoved()">
@@ -784,10 +772,6 @@
     <button mat-menu-item type="button" (click)="help.open('myContactChatroom')">
       <mat-icon>help</mat-icon>
       <span>{{ 'common.actions.help' | transloco }}</span>
-    </button>
-    <button mat-menu-item type="button" [matMenuTriggerFor]="experienceMenu" [disabled]="contactRemoved()">
-      <mat-icon>bookmark_add</mat-icon>
-      <span>{{ 'common.contact.chatroom.addExperienceAria' | transloco }}</span>
     </button>
     <button mat-menu-item type="button" (click)="openAudioRecorder()"
       [disabled]="audioLimitReached() || contactRemoved()">

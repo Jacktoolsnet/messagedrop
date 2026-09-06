@@ -83,7 +83,13 @@ import { Note } from './interfaces/note';
 import { NotificationAction } from './interfaces/notification-action';
 import { Place } from './interfaces/place';
 import { PlusCodeArea } from './interfaces/plus-code-area';
-import { applyGeodataAvailability, DEFAULT_SEARCH_SETTINGS, SearchSettings, normalizePoiSetting } from './interfaces/search-settings';
+import {
+  applyGeodataAvailability,
+  DEFAULT_SEARCH_SETTINGS,
+  normalizePoiSetting,
+  POSITIONED_EXTERNAL_PINS_MIN_ZOOM,
+  SearchSettings
+} from './interfaces/search-settings';
 import { GEODATA_SUBCATEGORIES, GeodataCategory, GeodataPoi, GeodataSubcategory } from './interfaces/geodata';
 import {
   DEFAULT_ROUTE_OPTIONS,
@@ -1985,7 +1991,10 @@ export class AppComponent implements OnInit {
       wikipedia: {
         ...DEFAULT_SEARCH_SETTINGS.wikipedia,
         ...(settings?.wikipedia ?? {}),
-        minZoom: Math.min(19, Math.max(14, settings?.wikipedia?.minZoom ?? DEFAULT_SEARCH_SETTINGS.wikipedia.minZoom))
+        minZoom: Math.min(19, Math.max(
+          POSITIONED_EXTERNAL_PINS_MIN_ZOOM,
+          settings?.wikipedia?.minZoom ?? DEFAULT_SEARCH_SETTINGS.wikipedia.minZoom
+        ))
       },
       publicTransportStops: {
         ...DEFAULT_SEARCH_SETTINGS.publicTransportStops,

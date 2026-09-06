@@ -101,15 +101,6 @@
   margin-right: 0.3rem;
 }
 
-.experience-select-empty {
-  padding: 1.5rem 1rem;
-  text-align: center;
-  color: var(--mat-card-subtitle-text-color);
-  border-radius: 1rem;
-  background: var(--mat-sys-color-surface-container);
-  border: 1px solid color-mix(in srgb, var(--mat-card-outlined-outline-color) 30%, transparent);
-}
-
 .sticky-actions {
   position: sticky;
   bottom: 0;

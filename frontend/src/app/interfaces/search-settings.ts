@@ -29,7 +29,9 @@ export interface SearchSettings {
 
 export type SearchSettingsKey = keyof SearchSettings;
 
-function poiDefaults(category: GeodataCategory, minZoom = 14): PoiSearchSettingsEntry {
+export const POSITIONED_EXTERNAL_PINS_MIN_ZOOM = 16;
+
+function poiDefaults(category: GeodataCategory, minZoom = POSITIONED_EXTERNAL_PINS_MIN_ZOOM): PoiSearchSettingsEntry {
   return {
     enabled: false,
     minZoom,
@@ -45,13 +47,13 @@ export const DEFAULT_SEARCH_SETTINGS: SearchSettings = {
   privateDocuments: { enabled: true, minZoom: 3 },
   experiences: { enabled: true, minZoom: 8 },
   myExperiences: { enabled: true, minZoom: 3 },
-  wikipedia: { enabled: true, minZoom: 14 },
+  wikipedia: { enabled: true, minZoom: POSITIONED_EXTERNAL_PINS_MIN_ZOOM },
   publicTransportStops: { enabled: true, minZoom: 16 },
   accommodation: poiDefaults('accommodation'),
   tourism: poiDefaults('tourism'),
   leisure: poiDefaults('leisure'),
   food_drink: poiDefaults('food_drink'),
-  amenities: poiDefaults('amenities', 15),
+  amenities: poiDefaults('amenities'),
   religion: poiDefaults('religion')
 };
 
@@ -64,7 +66,7 @@ export function normalizePoiSetting(
   return {
     ...fallback,
     ...setting,
-    minZoom: Math.min(19, Math.max(14, setting?.minZoom ?? fallback.minZoom)),
+    minZoom: Math.min(19, Math.max(POSITIONED_EXTERNAL_PINS_MIN_ZOOM, setting?.minZoom ?? fallback.minZoom)),
     subcategories: Object.fromEntries(GEODATA_SUBCATEGORIES[category]
       .map((subcategory) => [subcategory, stored[subcategory] ?? fallback.subcategories[subcategory]]))
   };
