@@ -92,22 +92,46 @@
 }
 
 .connect-four__cell--fading {
+  opacity: 0.6;
+  filter: saturate(0.5);
   border-style: dashed;
-  border-color: var(--mat-sys-error, var(--mat-warn-color, #b3261e));
+  border-color: color-mix(
+    in srgb,
+    var(--mat-sys-on-surface-variant, #6f6f6f) 58%,
+    transparent
+  );
   background: color-mix(
     in srgb,
-    var(--mat-sys-error-container, #ffdad6) 68%,
-    var(--connect-four-cell-color)
+    var(--mat-sys-surface-container-high, #d7d7d7) 62%,
+    transparent
   );
   box-shadow: inset 0 0 0 1px color-mix(
     in srgb,
-    var(--mat-sys-error, var(--mat-warn-color, #b3261e)) 28%,
+    var(--mat-sys-on-surface-variant, #6f6f6f) 22%,
     transparent
   );
 }
 
 .connect-four__cell--fading .connect-four__stone {
-  opacity: 0.6;
+  opacity: 0.58;
+}
+
+.connect-four__cell--red.connect-four__cell--fading {
+  border-color: color-mix(in srgb, var(--game-x) 38%, #80858c);
+  background: color-mix(
+    in srgb,
+    color-mix(in srgb, var(--game-x) 16%, var(--mat-sys-surface-container-high, #d7d7d7)) 58%,
+    transparent
+  );
+}
+
+.connect-four__cell--yellow.connect-four__cell--fading {
+  border-color: color-mix(in srgb, var(--game-o) 38%, #8c8085);
+  background: color-mix(
+    in srgb,
+    color-mix(in srgb, var(--game-o) 16%, var(--mat-sys-surface-container-high, #d7d7d7)) 58%,
+    transparent
+  );
 }
 
 .connect-four__cell--winning .connect-four__stone,
@@ -117,6 +141,8 @@
 
 .connect-four__cell--winning.connect-four__cell--fading,
 .connect-four__cell--last-move.connect-four__cell--fading {
+  opacity: 1;
+  filter: none;
   border-style: solid;
   border-color: currentColor;
   background: color-mix(in srgb, currentColor 28%, var(--connect-four-cell-color));
