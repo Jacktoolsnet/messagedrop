@@ -199,6 +199,7 @@ export class AppComponent implements OnInit {
   initWatchingPosition = false;
   public mode: typeof Mode = Mode;
   lastMarkerUpdate = 0;
+  private markerUpdateTimer?: ReturnType<typeof setTimeout>;
   locationSubscriptionError = false;
   isPartOfPlace = false;
   private searchSettings: SearchSettings = structuredClone(DEFAULT_SEARCH_SETTINGS);
@@ -311,6 +312,10 @@ export class AppComponent implements OnInit {
     this.setupExitBackupPrompt();
     this.destroyRef.onDestroy(() => {
       this.usageProtectionService.stopTracking();
+      if (this.markerUpdateTimer !== undefined) {
+        clearTimeout(this.markerUpdateTimer);
+        this.markerUpdateTimer = undefined;
+      }
     });
     effect(async () => {
       this.appService.settingsSet(); // <-- track changes
@@ -4116,8 +4121,20 @@ export class AppComponent implements OnInit {
       }
     });
 
-    // Save last markerupdet to fire the angular change listener
-    this.lastMarkerUpdate = Date.now();
+    this.scheduleMarkerUpdate();
+  }
+
+  private scheduleMarkerUpdate(): void {
+    if (this.markerUpdateTimer !== undefined) {
+      return;
+    }
+    // Marker data can be rebuilt by effects while Angular is still checking the
+    // map view. Notify the child in the next task to avoid changing its input
+    // during the same change-detection pass.
+    this.markerUpdateTimer = setTimeout(() => {
+      this.markerUpdateTimer = undefined;
+      this.lastMarkerUpdate += 1;
+    });
   }
 
   private async updateExperiencePins(
