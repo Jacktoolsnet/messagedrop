@@ -3,10 +3,16 @@
 }
 
 .poi-dialog-content {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
   width: 100%;
   max-height: none;
+  min-height: 0;
+  box-sizing: border-box;
   padding: 0;
   overflow: hidden;
+  overflow-x: hidden;
 }
 
 :host ::ng-deep .mat-mdc-dialog-surface {
@@ -18,8 +24,16 @@
 }
 
 .poi-scroll {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 0.75rem 1rem;
+  scroll-padding-top: 0.75rem;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .poi-results {
