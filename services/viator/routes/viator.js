@@ -207,11 +207,12 @@ function normalizeCacheInputs(query, body) {
   return { normalizedQuery, normalizedBody };
 }
 
-function buildCacheKey(method, path, query, body) {
+function buildCacheKey(method, path, query, body, acceptLanguage) {
   const { normalizedQuery, normalizedBody } = normalizeCacheInputs(query, body);
   const queryString = stableStringify(normalizedQuery);
   const bodyString = stableStringify(normalizedBody);
-  return `${method}:${path}?${queryString}|${bodyString}`;
+  const language = normalizeAcceptLanguage(acceptLanguage)?.toLowerCase() || '';
+  return `${method}:${path}?lang=${language}|${queryString}|${bodyString}`;
 }
 
 function extractForwardHeaders(req) {
@@ -462,7 +463,13 @@ router.use(async (req, res, next) => {
   const sanitizedQuery = sanitizeQuery(req.query);
   const sanitizedBody = req.method === 'POST' ? sanitizePayload(req.body || {}) : undefined;
 
-  const cacheKey = buildCacheKey(req.method, req.path, sanitizedQuery, sanitizedBody);
+  const cacheKey = buildCacheKey(
+    req.method,
+    req.path,
+    sanitizedQuery,
+    sanitizedBody,
+    req.get('accept-language') || process.env.VIATOR_ACCEPT_LANGUAGE
+  );
 
   if (endpoint.cacheTtl) {
     try {

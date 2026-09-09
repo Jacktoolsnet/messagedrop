@@ -14,6 +14,7 @@ import {
 } from '../interfaces/viator';
 import { NetworkService } from './network.service';
 import { AppService } from './app.service';
+import { LanguageService } from './language.service';
 import { TranslationHelperService } from './translation-helper.service';
 
 @Injectable({
@@ -24,14 +25,18 @@ export class ViatorService {
   private readonly networkService = inject(NetworkService);
   private readonly i18n = inject(TranslationHelperService);
   private readonly appService = inject(AppService);
+  private readonly language = inject(LanguageService);
 
-  private readonly httpOptions = {
-    headers: new HttpHeaders({
-      'Content-Type': 'application/json',
-      'x-skip-backend-status': 'true',
-      withCredentials: 'true'
-    })
-  };
+  private get httpOptions() {
+    return {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Accept-Language': this.language.effectiveLanguage(),
+        'x-skip-backend-status': 'true',
+        withCredentials: 'true'
+      })
+    };
+  }
 
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error);
