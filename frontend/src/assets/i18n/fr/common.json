@@ -307,7 +307,8 @@
         "comingSoon": "La recherche à proximité sera ajoutée à l’étape suivante."
       },
       "errors": {
-        "locationPermission": "L’autorisation de localisation est nécessaire pour calculer un itinéraire.",
+        "locationPermission": "La détection automatique de la position nécessite une autorisation. Vous pouvez aussi sélectionner le départ manuellement.",
+        "missingOrigin": "Veuillez sélectionner un point de départ.",
         "location": "Votre position actuelle n’a pas pu être déterminée.",
         "route": "Les itinéraires ne peuvent pas être calculés pour le moment."
       }
@@ -2991,6 +2992,9 @@
     "title": "Météo",
     "titleForLocation": "Météo pour {{ location }}",
     "selectedHour": "Heure sélectionnée : {{ hour }}:00",
+    "previousMetric": "Afficher la valeur météo précédente",
+    "closeMetric": "Fermer la vue détaillée",
+    "nextMetric": "Afficher la valeur météo suivante",
     "dataSourceFull": "Données météo fournies par open-meteo.com.",
     "dataSource": "Données météo fournies par",
     "location": {
@@ -3070,6 +3074,7 @@
       "headerFor": "{{ category }} pour {{ location }}",
       "dataSourceFull": "Données de qualité de l'air fournies par open-meteo.com.",
       "selectedHour": "Heure sélectionnée : {{ hour }}:00",
+      "categorySelection": "Sélectionner la catégorie de qualité de l’air",
       "dataSource": "Données de qualité de l'air fournies par",
       "noDescription": "Aucune description disponible.",
       "category": {

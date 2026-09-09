@@ -308,7 +308,8 @@
         "comingSoon": "Nearby search will be added in the next step."
       },
       "errors": {
-        "locationPermission": "Location permission is required to calculate a route.",
+        "locationPermission": "Automatic location detection requires location permission. You can also select the origin manually.",
+        "missingOrigin": "Please select an origin.",
         "location": "Your current location could not be determined.",
         "route": "Routes cannot be calculated at the moment."
       }
@@ -3000,6 +3001,9 @@
     "title": "Weather",
     "titleForLocation": "Weather for {{ location }}",
     "selectedHour": "Selected hour: {{ hour }}:00",
+    "previousMetric": "Show previous weather value",
+    "closeMetric": "Close detail view",
+    "nextMetric": "Show next weather value",
     "dataSourceFull": "Weather data provided by open-meteo.com.",
     "dataSource": "Weather data provided by",
     "location": {
@@ -3079,6 +3083,7 @@
       "headerFor": "{{ category }} for {{ location }}",
       "dataSourceFull": "Air quality data provided by open-meteo.com.",
       "selectedHour": "Selected hour: {{ hour }}:00",
+      "categorySelection": "Select air quality category",
       "dataSource": "Air quality data provided by",
       "noDescription": "No description available.",
       "category": {

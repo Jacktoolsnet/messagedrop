@@ -45,7 +45,7 @@
 
         <section class="usage-slider-block">
           <div class="usage-slider-header">
-            <p class="usage-slider-label">{{ 'settings.usageProtection.dailyLimit' | transloco }}</p>
+            <p id="usage-daily-limit-label" class="usage-slider-label">{{ 'settings.usageProtection.dailyLimit' | transloco }}</p>
             <button mat-icon-button type="button" class="usage-slider-edit-button" (click)="openUsageDailyLimitEditor()"
               [disabled]="isParentalModeWithoutPin()"
               [attr.aria-label]="('common.actions.edit' | transloco) + ' ' + ('settings.usageProtection.dailyLimit' | transloco)">
@@ -55,6 +55,7 @@
           <mat-slider [min]="usageDailyLimitMin" [max]="usageDailyLimitMax" [step]="usageDailyLimitStep" discrete
             [disabled]="isParentalModeWithoutPin()">
             <input matSliderThumb [value]="appSettings.usageProtection.dailyLimitMinutes"
+              aria-labelledby="usage-daily-limit-label"
               [disabled]="isParentalModeWithoutPin()"
               (valueChange)="setUsageDailyLimitMinutes($event)">
           </mat-slider>
@@ -64,7 +65,7 @@
         @if (appSettings.usageProtection.mode === 'self') {
           <section class="usage-slider-block">
             <div class="usage-slider-header">
-              <p class="usage-slider-label">{{ 'settings.usageProtection.selfExtension' | transloco }}</p>
+              <p id="usage-self-extension-label" class="usage-slider-label">{{ 'settings.usageProtection.selfExtension' | transloco }}</p>
               <button mat-icon-button type="button" class="usage-slider-edit-button" (click)="openUsageSelfExtensionEditor()"
                 [attr.aria-label]="('common.actions.edit' | transloco) + ' ' + ('settings.usageProtection.selfExtension' | transloco)">
                 <mat-icon>edit</mat-icon>
@@ -72,6 +73,7 @@
             </div>
             <mat-slider [min]="usageSelfExtensionMin" [max]="usageSelfExtensionMax" [step]="usageSelfExtensionStep" discrete>
               <input matSliderThumb [value]="appSettings.usageProtection.selfExtensionMinutes"
+                aria-labelledby="usage-self-extension-label"
                 (valueChange)="setUsageSelfExtensionMinutes($event)">
             </mat-slider>
             <p class="usage-slider-value">{{ appSettings.usageProtection.selfExtensionMinutes }}</p>
@@ -79,7 +81,7 @@
 
           <section class="usage-slider-block">
             <div class="usage-slider-header">
-              <p class="usage-slider-label">{{ 'settings.usageProtection.selfExtensionCount' | transloco }}</p>
+              <p id="usage-self-extension-count-label" class="usage-slider-label">{{ 'settings.usageProtection.selfExtensionCount' | transloco }}</p>
               <button mat-icon-button type="button" class="usage-slider-edit-button" (click)="openUsageSelfExtensionCountEditor()"
                 [attr.aria-label]="('common.actions.edit' | transloco) + ' ' + ('settings.usageProtection.selfExtensionCount' | transloco)">
                 <mat-icon>edit</mat-icon>
@@ -87,6 +89,7 @@
             </div>
             <mat-slider [min]="usageSelfExtensionCountMin" [max]="usageSelfExtensionCountMax" [step]="usageSelfExtensionCountStep" discrete>
               <input matSliderThumb [value]="appSettings.usageProtection.selfExtensionMaxCount"
+                aria-labelledby="usage-self-extension-count-label"
                 (valueChange)="setUsageSelfExtensionMaxCount($event)">
             </mat-slider>
             <p class="usage-slider-value">{{ appSettings.usageProtection.selfExtensionMaxCount }}</p>
@@ -96,7 +99,7 @@
         @if (appSettings.usageProtection.mode === 'parental') {
           <section class="usage-slider-block">
             <div class="usage-slider-header">
-              <p class="usage-slider-label">{{ 'settings.usageProtection.parentalExtension' | transloco }}</p>
+              <p id="usage-parental-extension-label" class="usage-slider-label">{{ 'settings.usageProtection.parentalExtension' | transloco }}</p>
               <button mat-icon-button type="button" class="usage-slider-edit-button" (click)="openUsageParentalExtensionEditor()"
                 [disabled]="isParentalModeWithoutPin()"
                 [attr.aria-label]="('common.actions.edit' | transloco) + ' ' + ('settings.usageProtection.parentalExtension' | transloco)">
@@ -106,6 +109,7 @@
             <mat-slider [min]="usageParentalExtensionMin" [max]="usageParentalExtensionMax" [step]="usageParentalExtensionStep" discrete
               [disabled]="isParentalModeWithoutPin()">
               <input matSliderThumb [value]="appSettings.usageProtection.parentalExtensionMinutes"
+                aria-labelledby="usage-parental-extension-label"
                 [disabled]="isParentalModeWithoutPin()"
                 (valueChange)="setUsageParentalExtensionMinutes($event)">
             </mat-slider>
@@ -114,7 +118,7 @@
 
           <section class="usage-slider-block">
             <div class="usage-slider-header">
-              <p class="usage-slider-label">{{ 'settings.usageProtection.parentalExtensionCount' | transloco }}</p>
+              <p id="usage-parental-extension-count-label" class="usage-slider-label">{{ 'settings.usageProtection.parentalExtensionCount' | transloco }}</p>
               <button mat-icon-button type="button" class="usage-slider-edit-button" (click)="openUsageParentalExtensionCountEditor()"
                 [disabled]="isParentalModeWithoutPin()"
                 [attr.aria-label]="('common.actions.edit' | transloco) + ' ' + ('settings.usageProtection.parentalExtensionCount' | transloco)">
@@ -124,6 +128,7 @@
             <mat-slider [min]="usageParentalExtensionCountMin" [max]="usageParentalExtensionCountMax" [step]="usageParentalExtensionCountStep" discrete
               [disabled]="isParentalModeWithoutPin()">
               <input matSliderThumb [value]="appSettings.usageProtection.parentalExtensionMaxCount"
+                aria-labelledby="usage-parental-extension-count-label"
                 [disabled]="isParentalModeWithoutPin()"
                 (valueChange)="setUsageParentalExtensionMaxCount($event)">
             </mat-slider>

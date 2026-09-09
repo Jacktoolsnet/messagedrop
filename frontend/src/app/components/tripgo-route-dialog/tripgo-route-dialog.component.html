@@ -25,8 +25,7 @@
   } @else {
   <section class="route-points" [attr.aria-label]="'common.tripGo.routePoints' | transloco">
     <article class="route-point route-point--action" role="button"
-      [attr.tabindex]="!origin() || state() === 'locating' ? -1 : 0"
-      [attr.aria-disabled]="!origin() || state() === 'locating'"
+      tabindex="0"
       [attr.aria-label]="'common.tripGo.editOrigin' | transloco"
       (click)="activateRoutePoint($event, 'origin')"
       (keydown.enter)="activateRoutePoint($event, 'origin')"
@@ -42,7 +41,7 @@
             <mat-icon>my_location</mat-icon>
           </button>
           <button mat-icon-button type="button" (click)="editRoutePoint('origin'); $event.stopPropagation()"
-            [disabled]="!origin() || isBusy()"
+            [disabled]="state() === 'routing'"
             [attr.aria-label]="'common.tripGo.editOrigin' | transloco">
             <mat-icon>edit</mat-icon>
           </button>
@@ -70,8 +69,7 @@
     </button>
 
     <article class="route-point route-point--action" role="button"
-      [attr.tabindex]="state() === 'locating' ? -1 : 0"
-      [attr.aria-disabled]="state() === 'locating'"
+      tabindex="0"
       [attr.aria-label]="'common.tripGo.editDestination' | transloco"
       (click)="activateRoutePoint($event, 'destination')"
       (keydown.enter)="activateRoutePoint($event, 'destination')"
@@ -87,7 +85,7 @@
             <mat-icon>my_location</mat-icon>
           </button>
           <button mat-icon-button type="button" (click)="editRoutePoint('destination'); $event.stopPropagation()"
-            [disabled]="isBusy()"
+            [disabled]="state() === 'routing'"
             [attr.aria-label]="'common.tripGo.editDestination' | transloco">
             <mat-icon>edit</mat-icon>
           </button>
@@ -457,7 +455,7 @@
         <mat-icon>help</mat-icon>
       </button>
       <button mat-mini-fab color="primary" type="button" (click)="calculateRoute()"
-        [disabled]="isBusy() || !origin()" [attr.aria-label]="'common.tripGo.calculateRoute' | transloco">
+        [disabled]="state() === 'routing'" [attr.aria-label]="'common.tripGo.calculateRoute' | transloco">
         <mat-icon>route</mat-icon>
       </button>
     }

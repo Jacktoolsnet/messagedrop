@@ -56,14 +56,17 @@
     <!-- TILE NAVIGATION BUTTONS -->
     @if (selectedTile) {
       <div class="tile-nav-buttons">
-        <button mat-mini-fab color="accent" (click)="selectPreviousTile()" [disabled]="tileIndex === 0">
-          <mat-icon>chevron_left</mat-icon>
+        <button mat-mini-fab color="accent" (click)="selectPreviousTile()" [disabled]="tileIndex === 0"
+          [attr.aria-label]="'weather.previousMetric' | transloco">
+          <mat-icon aria-hidden="true">chevron_left</mat-icon>
         </button>
-        <button mat-mini-fab color="primary" (click)="clearSelectedTile()">
-          <mat-icon>close</mat-icon>
+        <button mat-mini-fab color="primary" (click)="clearSelectedTile()"
+          [attr.aria-label]="'weather.closeMetric' | transloco">
+          <mat-icon aria-hidden="true">close</mat-icon>
         </button>
-        <button mat-mini-fab color="accent" (click)="selectNextTile()" [disabled]="tileIndex === tiles().length - 1">
-          <mat-icon>chevron_right</mat-icon>
+        <button mat-mini-fab color="accent" (click)="selectNextTile()" [disabled]="tileIndex === tiles().length - 1"
+          [attr.aria-label]="'weather.nextMetric' | transloco">
+          <mat-icon aria-hidden="true">chevron_right</mat-icon>
         </button>
       </div>
     }
@@ -88,7 +91,8 @@
         discrete
         [displayWith]="formatHourSliderLabel"
         (input)="onHourChange()">
-        <input matSliderThumb [(ngModel)]="selectedHour" />
+        <input matSliderThumb [(ngModel)]="selectedHour"
+          [attr.aria-label]="'weather.selectedHour' | transloco:{ hour: selectedHour }" />
       </mat-slider>
     </div>
   }

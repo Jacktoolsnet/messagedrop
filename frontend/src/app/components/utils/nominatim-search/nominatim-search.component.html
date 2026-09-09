@@ -2,8 +2,8 @@
     <input #searchInput type="search" enterkeyhint="search" [formControl]="searchTerm" (keyup.enter)="search()"
         [placeholder]="'common.location.searchPlaceholder' | transloco">
 
-    <button (click)="search()">
-        <mat-icon>search</mat-icon>
+    <button type="button" (click)="search()" [attr.aria-label]="'common.aria.search' | transloco">
+        <mat-icon aria-hidden="true">search</mat-icon>
     </button>
 </div>
 

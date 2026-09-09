@@ -3598,6 +3598,9 @@ export class AppComponent implements OnInit {
         const hasBounds = !(bounds.latMin === 0 && bounds.latMax === 0 && bounds.lonMin === 0 && bounds.lonMax === 0);
         if (hasBounds) {
           this.mapService.fitMapToBounds(bounds);
+          // Keep the selected result (including its name) as the route target;
+          // the visual map centre of its bounding box is not the selected place.
+          this.mapService.setMaplocation(this.nominatimService.getLocationFromNominatimPlace(result.selectedPlace));
         } else {
           this.mapService.flyTo(this.nominatimService.getLocationFromNominatimPlace(result.selectedPlace));
         }

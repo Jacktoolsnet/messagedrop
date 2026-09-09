@@ -198,7 +198,9 @@ export class NominatimService {
     const location: Location = {
       latitude: Number(place.lat),
       longitude: Number(place.lon),
-      plusCode: this.geolocationService.getPlusCode(Number(place.lat), Number(place.lon))
+      plusCode: this.geolocationService.getPlusCode(Number(place.lat), Number(place.lon)),
+      name: place.name?.trim() || undefined,
+      address: this.getFormattedAddress(place, ', ') || undefined
     };
     return location;
   }

@@ -5,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
-import { Subscription, catchError, concatMap, forkJoin, from, map, of, switchMap } from 'rxjs';
+import { Subscription, catchError, concatMap, forkJoin, from, map, of, switchMap, timeout } from 'rxjs';
 import { GetNominatimAddressResponse } from '../../interfaces/get-nominatim-address-response copy';
 import { Location } from '../../interfaces/location';
 import { MarkerLocation } from '../../interfaces/marker-location';
@@ -119,6 +119,7 @@ export class TripGoRouteDialogComponent implements OnInit, OnDestroy {
   private readonly transloco = inject(TranslocoService);
   private routeLoadSubscription?: Subscription;
   private serviceDetailsSubscription?: Subscription;
+  private locationRequestId = 0;
   readonly help = inject(HelpDialogService);
 
   readonly origin = signal<Location | null>(null);
@@ -175,12 +176,18 @@ export class TripGoRouteDialogComponent implements OnInit, OnDestroy {
 
   calculateRoute(): void {
     const origin = this.origin();
-    if (!origin || this.isBusy()) return;
+    if (this.state() === 'routing') return;
+    if (!origin) {
+      this.errorKey.set('common.tripGo.errors.missingOrigin');
+      this.state.set('error');
+      return;
+    }
     this.showList();
     this.loadRoutes(origin, this.destination());
   }
 
   useCurrentPosition(kind: RoutePointKind, initial = false): void {
+    const requestId = ++this.locationRequestId;
     if (!initial) this.routeSession.clear();
     this.cancelRouteRequests();
     this.showList();
@@ -196,8 +203,12 @@ export class TripGoRouteDialogComponent implements OnInit, OnDestroy {
       enableHighAccuracy: true,
       maximumAge: 0,
       timeout: 20_000
-    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    }).pipe(
+      timeout({ first: 21_000 }),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
       next: (position) => {
+        if (requestId !== this.locationRequestId) return;
         const location: Location = {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
@@ -220,6 +231,7 @@ export class TripGoRouteDialogComponent implements OnInit, OnDestroy {
         this.state.set('idle');
       },
       error: (error: GeolocationPositionError | unknown) => {
+        if (requestId !== this.locationRequestId) return;
         const code = typeof error === 'object' && error !== null && 'code' in error ? Number(error.code) : 0;
         this.errorKey.set(code === 1
           ? 'common.tripGo.errors.locationPermission'
@@ -442,8 +454,7 @@ export class TripGoRouteDialogComponent implements OnInit, OnDestroy {
   }
 
   editRoutePoint(kind: RoutePointKind): void {
-    const current = kind === 'origin' ? this.origin() : this.destination();
-    if (!current || this.state() === 'locating') return;
+    const current = kind === 'origin' ? (this.origin() ?? this.destination()) : this.destination();
 
     const dialogRef = this.dialog.open<LocationPickerDialogComponent, unknown, Location | undefined>(
       LocationPickerDialogComponent,
@@ -462,6 +473,7 @@ export class TripGoRouteDialogComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((selected) => {
       if (!selected) return;
+      if (kind === 'origin') ++this.locationRequestId;
       const location = this.withPlusCode(selected);
       if (kind === 'origin') {
         this.origin.set(location);
@@ -938,8 +950,8 @@ export class TripGoRouteDialogComponent implements OnInit, OnDestroy {
     }
     const address = this.nominatim.getFormattedAddress(place, ', ');
     const details: RoutePointDetails = {
-      name: this.routePointName(place, requestedLocation),
-      address
+      name: requestedLocation.name?.trim() || this.routePointName(place, requestedLocation),
+      address: requestedLocation.address?.trim() || address
     };
     this.routePointDetailsSignal(kind).set(details);
   }
@@ -947,16 +959,23 @@ export class TripGoRouteDialogComponent implements OnInit, OnDestroy {
   private routePointName(place: NominatimPlace, fallback: Location): string {
     const address = place.address;
     const locality = address?.city || address?.town || address?.village || address?.hamlet;
+    const street = this.nominatim.getFormattedStreet(place, ' ').trim();
+    const displayName = place.display_name?.split(',')[0]?.trim() || '';
+    const isHouseNumberOnly = (value: string) => /^\d+[\p{L}]?$/u.test(value);
     return place.name?.trim()
-      || this.nominatim.getFormattedStreet(place, ' ').trim()
+      || (!isHouseNumberOnly(street) ? street : '')
       || locality?.trim()
-      || place.display_name?.split(',')[0]?.trim()
+      || (!isHouseNumberOnly(displayName) ? displayName : '')
+      || fallback.address?.trim()
       || fallback.plusCode;
   }
 
   private setFallbackRoutePointDetails(kind: RoutePointKind, location: Location): void {
     if (!this.isCurrentRoutePoint(kind, location)) return;
-    this.routePointDetailsSignal(kind).set({ name: location.plusCode, address: '' });
+    this.routePointDetailsSignal(kind).set({
+      name: location.name?.trim() || location.address?.trim() || location.plusCode,
+      address: location.name?.trim() ? location.address?.trim() || '' : ''
+    });
   }
 
   private routePointDetailsSignal(kind: RoutePointKind) {
@@ -965,7 +984,10 @@ export class TripGoRouteDialogComponent implements OnInit, OnDestroy {
 
   private isCurrentRoutePoint(kind: RoutePointKind, requested: Location): boolean {
     const current = kind === 'origin' ? this.origin() : this.destination();
-    return current?.latitude === requested.latitude && current.longitude === requested.longitude;
+    return current?.latitude === requested.latitude
+      && current.longitude === requested.longitude
+      && current.name === requested.name
+      && current.address === requested.address;
   }
 
   private withPlusCode(location: Location): Location {

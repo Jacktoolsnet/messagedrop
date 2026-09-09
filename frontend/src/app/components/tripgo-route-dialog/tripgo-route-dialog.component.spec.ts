@@ -1,7 +1,7 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { TranslocoService } from '@jsverse/transloco';
-import { of } from 'rxjs';
+import { Subject, of, throwError } from 'rxjs';
 import { RouteOptions, normalizeRouteOptions } from '../../interfaces/route-options';
 import { TripGoRouteOption } from '../../interfaces/tripgo';
 import { GeolocationService } from '../../services/geolocation.service';
@@ -91,6 +91,78 @@ describe('TripGoRouteDialogComponent', () => {
     expect(tripGo.calculateRoute).not.toHaveBeenCalled();
     expect(fixture.componentInstance.state()).toBe('idle');
     expect(fixture.componentInstance.originDetails()?.name).toBe('Berlin');
+  });
+
+  it('allows a manual origin and routing after automatic location permission was denied', () => {
+    geolocation.getCurrentPosition.and.returnValue(throwError(() => ({ code: 1 })));
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.state()).toBe('error');
+    expect(fixture.componentInstance.origin()).toBeNull();
+
+    const manualOrigin = { latitude: 52.264, longitude: 10.526, plusCode: '9F4G7G7G+XX' };
+    dialog.open.and.returnValue({ afterClosed: () => of(manualOrigin) } as MatDialogRef<unknown>);
+    fixture.componentInstance.editRoutePoint('origin');
+    fixture.componentInstance.calculateRoute();
+
+    expect(fixture.componentInstance.origin()).toEqual(manualOrigin);
+    expect(tripGo.calculateRoute).toHaveBeenCalled();
+    expect(tripGo.calculateRoute.calls.allArgs().every(([origin]) => origin.latitude === manualOrigin.latitude)).toBeTrue();
+  });
+
+  it('does not replace a manually selected origin with a late geolocation result', () => {
+    const position$ = new Subject<GeolocationPosition>();
+    geolocation.getCurrentPosition.and.returnValue(position$);
+    fixture.detectChanges();
+
+    const manualOrigin = { latitude: 52.264, longitude: 10.526, plusCode: '9F4G7G7G+XX' };
+    dialog.open.and.returnValue({ afterClosed: () => of(manualOrigin) } as MatDialogRef<unknown>);
+    fixture.componentInstance.editRoutePoint('origin');
+    position$.next({
+      coords: {
+        latitude: 48.137, longitude: 11.575, accuracy: 5,
+        altitude: null, altitudeAccuracy: null, heading: null, speed: null,
+        toJSON: () => ({})
+      },
+      timestamp: Date.now(),
+      toJSON: () => ({})
+    });
+
+    expect(fixture.componentInstance.origin()).toEqual(manualOrigin);
+    expect(fixture.componentInstance.state()).toBe('idle');
+  });
+
+  it('ends automatic locating when the browser does not answer', fakeAsync(() => {
+    geolocation.getCurrentPosition.and.returnValue(new Subject<GeolocationPosition>());
+
+    fixture.detectChanges();
+    tick(21_001);
+
+    expect(fixture.componentInstance.state()).toBe('error');
+    expect(fixture.componentInstance.errorKey()).toBe('common.tripGo.errors.location');
+  }));
+
+  it('keeps the selected place name instead of a house-number-only reverse-geocoding label', () => {
+    fixture.componentInstance.destination.set({
+      latitude: 52.264, longitude: 10.526, plusCode: '9F4G7G7G+XX',
+      name: 'Braunschweiger Dom', address: 'Domplatz 5, 38100 Braunschweig'
+    });
+    nominatim.getNominatimPlaceByLocation.and.returnValue(of({
+      status: 200,
+      nominatimPlace: {
+        place_id: 2, licence: '', osm_type: 'node', osm_id: 2,
+        lat: 52.264, lon: 10.526, class: 'place', type: 'house', place_rank: 1,
+        importance: 1, addresstype: 'house', name: '', display_name: '7, 38100 Braunschweig',
+        address: { house_number: '7', city: 'Braunschweig', postcode: '38100' },
+        boundingbox: ['0', '0', '0', '0']
+      }
+    }));
+
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.destinationDetails()).toEqual({
+      name: 'Braunschweiger Dom', address: 'Domplatz 5, 38100 Braunschweig'
+    });
   });
 
   it('calculates routes only after the explicit action', () => {

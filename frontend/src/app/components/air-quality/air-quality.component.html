@@ -52,25 +52,30 @@
 
     @if (selectedTile) {
     <div class="tile-nav-buttons">
-        <button mat-mini-fab color="accent" (click)="selectPreviousTile()" [disabled]="tileIndex === 0">
-            <mat-icon>chevron_left</mat-icon>
+        <button mat-mini-fab color="accent" (click)="selectPreviousTile()" [disabled]="tileIndex === 0"
+            [attr.aria-label]="'weather.previousMetric' | transloco">
+            <mat-icon aria-hidden="true">chevron_left</mat-icon>
         </button>
-        <button mat-mini-fab color="primary" (click)="clearSelectedTile()">
-            <mat-icon>close</mat-icon>
+        <button mat-mini-fab color="primary" (click)="clearSelectedTile()"
+            [attr.aria-label]="'weather.closeMetric' | transloco">
+            <mat-icon aria-hidden="true">close</mat-icon>
         </button>
-        <button mat-mini-fab color="accent" (click)="selectNextTile()" [disabled]="tileIndex === allKeys().length - 1">
-            <mat-icon>chevron_right</mat-icon>
+        <button mat-mini-fab color="accent" (click)="selectNextTile()" [disabled]="tileIndex === allKeys().length - 1"
+            [attr.aria-label]="'weather.nextMetric' | transloco">
+            <mat-icon aria-hidden="true">chevron_right</mat-icon>
         </button>
     </div>
     }
 
     @if (!selectedTile) {
     <mat-button-toggle-group [hideSingleSelectionIndicator]="true" class="category-toggle-group"
-        [value]="selectedCategory" (change)="onCategoryToggle($event.value)" multiple="false">
+        [value]="selectedCategory" (change)="onCategoryToggle($event.value)" multiple="false"
+        [attr.aria-label]="'weather.airQuality.categorySelection' | transloco">
 
         @for (category of categoryModes; track category) {
-            <mat-button-toggle [value]="category" [matTooltip]="getCategoryLabel(category)">
-            <mat-icon>
+            <mat-button-toggle [value]="category" [matTooltip]="getCategoryLabel(category)"
+                [attr.aria-label]="getCategoryLabel(category)">
+            <mat-icon aria-hidden="true">
                 {{ getCategoryIcon(category) }}
             </mat-icon>
         </mat-button-toggle>
@@ -99,7 +104,8 @@
                 discrete
                 [displayWith]="formatHourSliderLabel"
                 (input)="onHourChange()">
-                <input matSliderThumb [(ngModel)]="selectedHour">
+                <input matSliderThumb [(ngModel)]="selectedHour"
+                    [attr.aria-label]="'weather.airQuality.selectedHour' | transloco:{ hour: selectedHour }">
             </mat-slider>
         </div>
     }

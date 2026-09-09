@@ -214,11 +214,7 @@ export class LocationPickerDialogComponent implements AfterViewInit, OnDestroy {
     if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
       return;
     }
-    this.location = {
-      latitude,
-      longitude,
-      plusCode: this.geolocationService.getPlusCode(latitude, longitude)
-    };
+    this.location = this.nominatimService.getLocationFromNominatimPlace(place);
     this.marker?.setLatLng([latitude, longitude]);
 
     if (!this.map || !shouldNavigate) {

@@ -234,8 +234,8 @@
       "direction": "Richtung {{ direction }}",
       "platform": "Steig {{ platform }}",
       "waitingTime": "Wartezeit",
-      "toLocation": "{{ mode }} zum {{ location }}",
-      "toLocationPlatform": "{{ mode }} zum {{ location }} · Steig {{ platform }}",
+      "toLocation": "{{ mode }} zu {{ location }}",
+      "toLocationPlatform": "{{ mode }} zu {{ location }} · Steig {{ platform }}",
       "waitingAt": "{{ mode }} am {{ location }}",
       "serviceToLocation": "{{ service }} bis {{ location }}",
       "untilLocation": "bis {{ location }}",
@@ -308,7 +308,8 @@
         "comingSoon": "Die Umkreissuche wird im nächsten Schritt ergänzt."
       },
       "errors": {
-        "locationPermission": "Für die Routenberechnung wird die Standortberechtigung benötigt.",
+        "locationPermission": "Die automatische Standortbestimmung benötigt eine Standortberechtigung. Du kannst den Startort auch manuell auswählen.",
+        "missingOrigin": "Bitte wähle einen Startort aus.",
         "location": "Der aktuelle Standort konnte nicht ermittelt werden.",
         "route": "Die Routen konnten derzeit nicht berechnet werden."
       }
@@ -3000,6 +3001,9 @@
     "title": "Wetter",
     "titleForLocation": "Wetter für {{ location }}",
     "selectedHour": "Ausgewählte Stunde: {{ hour }}:00",
+    "previousMetric": "Vorherigen Wetterwert anzeigen",
+    "closeMetric": "Detailansicht schließen",
+    "nextMetric": "Nächsten Wetterwert anzeigen",
     "dataSourceFull": "Wetterdaten bereitgestellt von open-meteo.com.",
     "dataSource": "Wetterdaten bereitgestellt von",
     "location": {
@@ -3079,6 +3083,7 @@
       "headerFor": "{{ category }} für {{ location }}",
       "dataSourceFull": "Luftqualitätsdaten bereitgestellt von open-meteo.com.",
       "selectedHour": "Ausgewählte Stunde: {{ hour }}:00",
+      "categorySelection": "Luftqualitätskategorie auswählen",
       "dataSource": "Luftqualitätsdaten bereitgestellt von",
       "noDescription": "Keine Beschreibung verfügbar.",
       "category": {
