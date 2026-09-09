@@ -16,6 +16,7 @@ import { NominatimService } from '../../services/nominatim.service';
 import { Location } from '../../interfaces/location';
 import { Place } from '../../interfaces/place';
 import { DatasetState, OpenMeteoRefreshService } from '../../services/open-meteo-refresh.service';
+import { LanguageService } from '../../services/language.service';
 import { AirQualityDetailComponent } from './air-quality-detail/air-quality-detail.component';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
@@ -54,6 +55,7 @@ export class AirQualityComponent implements OnInit {
   }>(MAT_DIALOG_DATA);
   private readonly refreshService = inject(OpenMeteoRefreshService);
   private readonly translation = inject(TranslationHelperService);
+  private readonly language = inject(LanguageService);
   private readonly injector = inject(Injector);
   readonly help = inject(HelpDialogService);
 
@@ -67,9 +69,9 @@ export class AirQualityComponent implements OnInit {
     const times = this.airQuality?.hourly.time ?? [];
     const uniqueDates = Array.from(new Set(times.map(t => t.split('T')[0])));
     return uniqueDates.map(dateStr => {
-      const date = new Date(dateStr);
+      const date = this.localCalendarDate(dateStr);
       const options: Intl.DateTimeFormatOptions = { weekday: 'short', day: '2-digit', month: '2-digit' };
-      return date.toLocaleDateString(undefined, options);
+      return new Intl.DateTimeFormat(this.language.effectiveLanguage(), options).format(date);
     });
   });
   categoryModes: AirQualityCategory[] = ['pollen', 'particulateMatter', 'pollutants'];
@@ -203,10 +205,15 @@ export class AirQualityComponent implements OnInit {
     const times = this.airQuality?.hourly.time ?? [];
     const uniqueDates = Array.from(new Set(times.map(t => t.split('T')[0])));
     return uniqueDates.map(dateStr => {
-      const date = new Date(dateStr);
+      const date = this.localCalendarDate(dateStr);
       const options: Intl.DateTimeFormatOptions = { weekday: 'short', day: '2-digit', month: '2-digit' };
-      return date.toLocaleDateString(undefined, options);
+      return new Intl.DateTimeFormat(this.language.effectiveLanguage(), options).format(date);
     });
+  }
+
+  private localCalendarDate(value: string): Date {
+    const [year, month, day] = value.split('-').map(Number);
+    return new Date(year, month - 1, day, 12);
   }
 
   getCurrentValue(key: AirQualityMetricKey): number {

@@ -1,3 +1,4 @@
+import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Observable, of } from 'rxjs';
@@ -5,6 +6,7 @@ import { Location } from '../../interfaces/location';
 import { Weather } from '../../interfaces/weather';
 import { NominatimService } from '../../services/nominatim.service';
 import { OpenMeteoRefreshService } from '../../services/open-meteo-refresh.service';
+import { LanguageService, SupportedLang } from '../../services/language.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { WeatherComponent } from './weather.component';
@@ -12,6 +14,7 @@ import { WeatherTile } from './weather-tile.interface';
 
 describe('WeatherComponent', () => {
   let nominatimResult$: Observable<{ nominatimPlace: { address: { city?: string; country?: string } } }>;
+  let effectiveLanguage: ReturnType<typeof signal<SupportedLang>>;
   const location: Location = {
     latitude: 52.52,
     longitude: 13.405,
@@ -48,6 +51,7 @@ describe('WeatherComponent', () => {
   };
 
   beforeEach(async () => {
+    effectiveLanguage = signal<SupportedLang>('en');
     nominatimResult$ = of({
       nominatimPlace: {
         address: {
@@ -81,6 +85,7 @@ describe('WeatherComponent', () => {
           }
         },
         { provide: TranslationHelperService, useValue: { t: (key: string) => key } },
+        { provide: LanguageService, useValue: { effectiveLanguage } },
         { provide: HelpDialogService, useValue: { open: jasmine.createSpy('open') } }
       ]
     })
@@ -98,6 +103,22 @@ describe('WeatherComponent', () => {
     fixture.detectChanges();
 
     expect(component).toBeTruthy();
+  });
+
+  it('formats day labels with the currently selected app language', () => {
+    const fixture = TestBed.createComponent(WeatherComponent);
+    const component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    expect(component.getDayLabel(0)).toBe(new Intl.DateTimeFormat('en', {
+      weekday: 'short', day: '2-digit', month: '2-digit'
+    }).format(new Date(2026, 3, 23, 12)));
+
+    effectiveLanguage.set('de');
+
+    expect(component.getDayLabel(0)).toBe(new Intl.DateTimeFormat('de', {
+      weekday: 'short', day: '2-digit', month: '2-digit'
+    }).format(new Date(2026, 3, 23, 12)));
   });
 
   it('should use the plus code when Nominatim returns no place name', (done) => {

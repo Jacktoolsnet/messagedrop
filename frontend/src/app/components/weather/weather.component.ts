@@ -15,6 +15,7 @@ import { Place } from '../../interfaces/place';
 import { Weather } from '../../interfaces/weather';
 import { NominatimService } from '../../services/nominatim.service';
 import { DatasetState, OpenMeteoRefreshService } from '../../services/open-meteo-refresh.service';
+import { LanguageService } from '../../services/language.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { getWeatherLevelInfo } from '../../utils/weather-level.util';
 import { WeatherDetailComponent } from './weather-detail/weather-detail.component';
@@ -48,6 +49,7 @@ export class WeatherComponent implements OnInit {
   private readonly dialogData = inject<{ weather?: Weather; location: Location; place?: Place; locationName?: string }>(MAT_DIALOG_DATA);
   private readonly refreshService = inject(OpenMeteoRefreshService);
   private readonly translation = inject(TranslationHelperService);
+  private readonly language = inject(LanguageService);
   private readonly injector = inject(Injector);
   readonly help = inject(HelpDialogService);
 
@@ -146,9 +148,14 @@ export class WeatherComponent implements OnInit {
   }
 
   getDayLabel(index: number): string {
-    const date = new Date(this.weather!.daily[index].date);
+    const date = this.localCalendarDate(this.weather!.daily[index].date);
     const options: Intl.DateTimeFormatOptions = { weekday: 'short', day: '2-digit', month: '2-digit' };
-    return date.toLocaleDateString(undefined, options);
+    return new Intl.DateTimeFormat(this.language.effectiveLanguage(), options).format(date);
+  }
+
+  private localCalendarDate(value: string): Date {
+    const [year, month, day] = value.split('-').map(Number);
+    return new Date(year, month - 1, day, 12);
   }
 
   getLocationName(): void {
