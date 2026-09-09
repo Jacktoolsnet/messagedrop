@@ -14,6 +14,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSliderModule } from '@angular/material/slider';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { startWith } from 'rxjs';
 import { DisplayMessageConfig } from '../../../interfaces/display-message-config';
@@ -51,6 +52,7 @@ import {
 } from '../range-edit-dialog/range-edit-dialog.component';
 import { SearchSettingsMapPreviewComponent } from '../search-settings/search-settings-map-preview.component';
 import { ExperienceSearchDetailDialogComponent } from './detail-dialog/experience-search-detail-dialog.component';
+import { getExperienceBookmarkActionKey } from './experience-bookmark-action';
 import { ExperienceSearchPinDialogComponent } from './pin-dialog/experience-search-pin-dialog.component';
 
 interface ExperienceSearchDialogData {
@@ -106,6 +108,7 @@ const DEFAULT_CURRENCY = resolveCurrencyFromLocale();
     MatSelectModule,
     MatRadioModule,
     MatSliderModule,
+    MatTooltipModule,
     MatIcon,
     MatProgressSpinnerModule,
     TranslocoPipe,
@@ -670,6 +673,10 @@ export class ExperienceSearchComponent {
     const productCode = result.productCode;
     if (!productCode) return false;
     return this.bookmarkService.bookmarksSignal().some((bookmark) => bookmark.productCode === productCode);
+  }
+
+  bookmarkActionKey(result: ExperienceResult): string {
+    return getExperienceBookmarkActionKey(this.userService.hasJwt(), this.isBookmarked(result));
   }
 
   onToggleBookmark(result: ExperienceResult, event?: Event): void {

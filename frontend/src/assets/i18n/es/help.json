@@ -2408,7 +2408,7 @@
     "items": {
       "query": {
         "title": "Iniciar búsqueda",
-        "desc": "Introduce un término y empieza la búsqueda. En páginas posteriores, el mismo botón carga más resultados."
+        "desc": "Introduce un término y empieza la búsqueda. La búsqueda de texto busca en Viator en todo el mundo. Un lugar se trata como término de búsqueda, no como límite geográfico. En páginas posteriores, el mismo botón carga más resultados."
       },
       "filter": {
         "title": "Configurar filtros",

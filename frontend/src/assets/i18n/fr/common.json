@@ -2164,6 +2164,8 @@
       "openOn": "Ouvrir sur {{ provider }}",
       "sendToChat": "Partager dans le chat",
       "save": "Enregistrer l'expérience",
+      "loginToSave": "Se connecter et enregistrer l’expérience",
+      "removeSaved": "Supprimer l’expérience enregistrée",
       "saved": "Enregistré",
       "saveTitle": "Ajouté à mes expériences",
       "saveMessage": "L’expérience a été ajoutée à votre liste.",
@@ -2187,6 +2189,7 @@
       "toggle": "Activer la recherche",
       "zoomLabel": "Rechercher à partir du niveau de zoom",
       "zoomValue": "Zoom",
+      "zoomValueAria": "Niveau de zoom {{ zoom }}",
       "items": {
         "publicMessages": "Messages publics",
         "secretDrops": "SecretDrops",

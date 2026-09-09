@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
 import { DisplayMessageConfig } from '../../../../interfaces/display-message-config';
@@ -30,6 +31,7 @@ import { HelpDialogService } from '../../help-dialog/help-dialog.service';
 import { DisplayMessage } from '../../display-message/display-message.component';
 import { DialogHeaderComponent } from '../../dialog-header/dialog-header.component';
 import { TileQuickAction, TileSetting } from '../../../../interfaces/tile-settings';
+import { getExperienceBookmarkActionKey } from '../experience-bookmark-action';
 
 const DEFAULT_CENTER: Location = { latitude: 0, longitude: 0, plusCode: '' };
 
@@ -43,6 +45,7 @@ const DEFAULT_CENTER: Location = { latitude: 0, longitude: 0, plusCode: '' };
     MatButtonModule,
     MatCardModule,
     MatIcon,
+    MatTooltipModule,
     TranslocoPipe,
     SearchSettingsMapPreviewComponent,
     DialogHeaderComponent
@@ -89,6 +92,10 @@ export class ExperienceSearchDetailDialogComponent implements OnDestroy {
     if (!productCode) return false;
     return bookmarks.some((bookmark) => bookmark.productCode === productCode);
   });
+
+  bookmarkActionKey(): string {
+    return getExperienceBookmarkActionKey(this.userService.hasJwt(), this.isBookmarked());
+  }
 
   constructor() {
     this.loadDetails();

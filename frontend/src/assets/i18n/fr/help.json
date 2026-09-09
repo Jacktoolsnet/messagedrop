@@ -2408,7 +2408,7 @@
     "items": {
       "query": {
         "title": "Lancer la recherche",
-        "desc": "Saisissez un terme de recherche puis lancez la recherche. Sur les pages suivantes, le même bouton charge plus de résultats."
+        "desc": "Saisissez un terme de recherche puis lancez la recherche. La recherche textuelle interroge Viator dans le monde entier. Un lieu est traité comme un terme de recherche, sans restriction géographique. Sur les pages suivantes, le même bouton charge plus de résultats."
       },
       "filter": {
         "title": "Définir les filtres",

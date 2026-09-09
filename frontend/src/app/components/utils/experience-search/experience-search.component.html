@@ -201,9 +201,8 @@
               </button>
               } @else {
               <button mat-mini-fab color="secondary" type="button" (click)="onToggleBookmark(result, $event)"
-                [attr.aria-label]="isBookmarked(result)
-                  ? ('common.experiences.saveRemovedTitle' | transloco)
-                  : ('common.experiences.saveTitle' | transloco)">
+                [attr.aria-label]="bookmarkActionKey(result) | transloco"
+                [matTooltip]="bookmarkActionKey(result) | transloco">
                 <mat-icon>{{ isBookmarked(result) ? 'bookmark_remove' : 'bookmark_add' }}</mat-icon>
               </button>
               }

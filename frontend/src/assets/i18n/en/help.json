@@ -2426,7 +2426,7 @@
     "items": {
       "query": {
         "title": "Start search",
-        "desc": "Enter a search term and start searching. On later pages, the same button loads more results."
+        "desc": "Enter a search term and start searching. Text search searches Viator worldwide. A place name is treated as a search term, not as a geographic restriction. On later pages, the same button loads more results."
       },
       "filter": {
         "title": "Set filters",

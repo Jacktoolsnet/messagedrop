@@ -318,7 +318,8 @@
     <mat-icon>{{ getReadAloudIcon() }}</mat-icon>
   </button>
   <button mat-icon-button type="button" (click)="onBookmark()"
-    [attr.aria-label]="(isBookmarked() ? 'common.experiences.saved' : 'common.experiences.save') | transloco">
+    [attr.aria-label]="bookmarkActionKey() | transloco"
+    [matTooltip]="bookmarkActionKey() | transloco">
     <mat-icon>{{ isBookmarked() ? 'bookmark_remove' : 'bookmark_add' }}</mat-icon>
   </button>
   <button mat-stroked-button class="open-viator-button" type="button" (click)="onOpen()"

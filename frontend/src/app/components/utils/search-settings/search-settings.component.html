@@ -9,17 +9,20 @@
     <div class="search-settings-tile">
       <div class="tile-header">
         <mat-icon aria-hidden="true">{{ item.icon }}</mat-icon>
-        <h3>{{ item.titleKey | transloco }}</h3>
+        <h3 [id]="'search-setting-title-' + item.key">{{ item.titleKey | transloco }}</h3>
       </div>
 
       <mat-slide-toggle color="primary" [checked]="searchSettings[item.key].enabled"
+        [aria-labelledby]="'search-setting-title-' + item.key + ' search-setting-toggle-' + item.key"
         (change)="updateEnabled(item.key, $event.checked)">
-        {{ 'common.searchSettings.toggle' | transloco }}
+        <span [id]="'search-setting-toggle-' + item.key">{{ 'common.searchSettings.toggle' | transloco }}</span>
       </mat-slide-toggle>
 
       @if (item.poiCategory; as category) {
       <details class="subcategories">
-        <summary>{{ 'common.searchSettings.subcategories' | transloco }}</summary>
+        <summary [attr.aria-labelledby]="'search-setting-title-' + item.key + ' search-setting-subcategories-' + item.key">
+          <span [id]="'search-setting-subcategories-' + item.key">{{ 'common.searchSettings.subcategories' | transloco }}</span>
+        </summary>
         <div class="subcategory-grid">
           @for (subcategory of getSubcategories(category); track subcategory) {
           <mat-checkbox [checked]="isSubcategoryEnabled(category, subcategory)"
@@ -41,12 +44,14 @@
 
       <div class="slider">
         <div class="slider-header">
-          <span>{{ 'common.searchSettings.zoomLabel' | transloco }}</span>
+          <span [id]="'search-setting-zoom-' + item.key">{{ 'common.searchSettings.zoomLabel' | transloco }}</span>
           <span class="slider-value">{{ searchSettings[item.key].minZoom }}</span>
         </div>
         <mat-slider [min]="getMinZoom(item.key)" [max]="maxZoom" step="1" thumbLabel tickInterval="1"
           [disabled]="!searchSettings[item.key].enabled">
           <input matSliderThumb [ngModel]="searchSettings[item.key].minZoom"
+            [attr.aria-labelledby]="'search-setting-title-' + item.key + ' search-setting-zoom-' + item.key"
+            [attr.aria-valuetext]="'common.searchSettings.zoomValueAria' | transloco:{ zoom: searchSettings[item.key].minZoom }"
             (ngModelChange)="updateZoom(item.key, $event)" />
         </mat-slider>
       </div>

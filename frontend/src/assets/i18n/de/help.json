@@ -2426,7 +2426,7 @@
     "items": {
       "query": {
         "title": "Suche starten",
-        "desc": "Gib einen Suchbegriff ein und starte die Suche. Bei weiteren Seiten lädt dieselbe Taste zusätzliche Ergebnisse nach."
+        "desc": "Gib einen Suchbegriff ein und starte die Suche. Die Textsuche durchsucht Viator weltweit. Eine Ortsangabe ist dabei ein Suchbegriff und keine geografische Eingrenzung. Bei weiteren Seiten lädt dieselbe Taste zusätzliche Ergebnisse nach."
       },
       "filter": {
         "title": "Filter einstellen",

@@ -2162,6 +2162,8 @@
       "openOn": "Open on {{ provider }}",
       "sendToChat": "Send to chat",
       "save": "Save experience",
+      "loginToSave": "Sign in and save experience",
+      "removeSaved": "Remove saved experience",
       "saved": "Saved",
       "saveTitle": "Added to my experiences",
       "saveMessage": "The experience was added to your saved list.",
@@ -2188,6 +2190,7 @@
       "toggle": "Enable search",
       "zoomLabel": "Search from zoom level",
       "zoomValue": "Zoom",
+      "zoomValueAria": "Zoom level {{ zoom }}",
       "items": {
         "publicMessages": "Public messages",
         "secretDrops": "SecretDrops",
