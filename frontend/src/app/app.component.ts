@@ -1118,6 +1118,18 @@ export class AppComponent implements OnInit {
     if (!this.userService.isReady()) {
       if (!this.contactNotificationLoginRequested && !this.isCheckPinDialogOpen()) {
         this.contactNotificationLoginRequested = true;
+        // A notification click can arrive while the asynchronous remembered-login
+        // restoration is still running. Wait for it before falling back to PIN login.
+        try {
+          await this.userService.initUserId();
+        } catch (error) {
+          console.warn('Remembered login restoration before notification handling failed', error);
+        }
+        if (this.userService.isReady()) {
+          this.contactNotificationLoginRequested = false;
+          await this.openPendingContactNotification(action);
+          return;
+        }
         void this.userService.loginWithBackend(() => {
           this.contactNotificationLoginRequested = false;
           const pendingAction = this.pendingContactNotificationAction();

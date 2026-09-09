@@ -144,6 +144,38 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
+  it('waits for remembered login restoration before requesting a PIN for a contact notification', async () => {
+    const userService = TestBed.inject(UserService) as unknown as {
+      initUserId: jasmine.Spy;
+      isReady: () => boolean;
+      hasJwt: () => boolean;
+      loginWithBackend: jasmine.Spy;
+    };
+    const contactService = TestBed.inject(ContactService) as unknown as {
+      isReady?: () => boolean;
+      initContacts: jasmine.Spy;
+    };
+    const appService = TestBed.inject(AppService) as unknown as { isConsentCompleted: () => boolean };
+    let ready = false;
+    userService.isReady = () => ready;
+    userService.hasJwt = () => ready;
+    userService.initUserId.and.callFake(async () => {
+      ready = true;
+    });
+    contactService.isReady = () => false;
+    const fixture = TestBed.createComponent(AppComponent);
+    appService.isConsentCompleted = () => true;
+    const app = fixture.componentInstance as unknown as {
+      openPendingContactNotification: (action: { type: string; id: string }) => Promise<void>;
+    };
+
+    await app.openPendingContactNotification({ type: 'contact', id: 'contact-1' });
+
+    expect(userService.initUserId).toHaveBeenCalled();
+    expect(userService.loginWithBackend).not.toHaveBeenCalled();
+    expect(contactService.initContacts).toHaveBeenCalledWith(true);
+  });
+
   it('should open my experience marker dialog with 95vw width', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
