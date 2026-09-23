@@ -1,4 +1,5 @@
 const express = require('express');
+const { sendAdminNotification } = require('../utils/adminNotification');
 const crypto = require('crypto');
 const axios = require('axios');
 const { checkToken } = require('../middleware/security');
@@ -39,18 +40,6 @@ function resolveBackendBase() {
     const base = (process.env.BASE_URL || '').replace(/\/+$/, '');
     if (!base) return null;
     return process.env.PORT ? `${base}:${process.env.PORT}` : base;
-}
-
-/* ---------------------- Minimaler Make-Notifier (axios) ---------------------- */
-function notifyMake(title, text) {
-    const url = process.env.MAKE_PUSHBULLET_WEBHOOK_URL;
-    const apiKey = process.env.MAKE_API_KEY;
-    if (!url || !apiKey) return;
-
-    // fire-and-forget: nicht awaiten, Fehler nur loggen
-    axios.post(url, { title, text }, {
-        headers: { 'x-make-apikey': apiKey }
-    }).catch(() => { });
 }
 
 /* ------------------------------ Rate Limits ------------------------------ */
@@ -272,11 +261,12 @@ router.post('/signals', signalLimiter, async (req, res, next) => {
                 token,
                 statusUrl
             });
-            // Make-Push (sehr knapp gehalten)
-            notifyMake(
-                'New Signal',
-                `Type: ${normalizedReportedContentType}\nContentId: ${contentId}\nCategory: ${category || '-'}\nReason: ${reasonText || '-'}`
-            );
+            // Notify the admin by email.
+            void sendAdminNotification({
+                logger: req.logger,
+                title: 'New Signal',
+                body: `Type: ${normalizedReportedContentType}\nContentId: ${contentId}\nCategory: ${category || '-'}\nReason: ${reasonText || '-'}`
+            });
         }
     );
 });
@@ -393,11 +383,12 @@ router.post('/notices', noticeLimiter, async (req, res, next) => {
                 },
                 statusUrl
             });
-            // Make-Push (kurz & bündig)
-            notifyMake(
-                'New Notice',
-                `Status: ${status}\nType: ${normalizedReportedContentType}\nContentId: ${contentId}\nReporter: ${reporterName || '-'} (${reporterEmail || '-'})\nCategory: ${category || '-'}`
-            );
+            // Notify the admin by email.
+            void sendAdminNotification({
+                logger: req.logger,
+                title: 'New Notice',
+                body: `Status: ${status}\nType: ${normalizedReportedContentType}\nContentId: ${contentId}\nReporter: ${reporterName || '-'} (${reporterEmail || '-'})\nCategory: ${category || '-'}`
+            });
         }
     );
 });

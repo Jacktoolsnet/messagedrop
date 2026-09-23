@@ -36,7 +36,7 @@
         } @else if (step === 'otp') {
           <form (ngSubmit)="onSubmitOtp()" #otpForm="ngForm" class="form">
             <p class="info">
-              {{ i18n.t('We sent you a 6-digit code via Pushbullet. If available, you will also receive it by email. Enter it here to complete the sign-in.') }}
+              {{ i18n.t('We sent you a 6-digit code by email. Enter it here to complete the sign-in.') }}
             </p>
 
             <mat-form-field appearance="outline" class="full-width">

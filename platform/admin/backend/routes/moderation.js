@@ -6,7 +6,8 @@ const { signServiceJwt } = require('../utils/serviceJwt');
 const tableModerationRequest = require('../db/tableModerationRequest');
 const tableModerationState = require('../db/tableModerationState');
 const tableModerationVoluntaryReview = require('../db/tableModerationVoluntaryReview');
-const { formatExcerpt, sendPushbulletNotification } = require('../utils/pushbullet');
+const { formatExcerpt } = require('../utils/formatExcerpt');
+const { sendAdminNotification } = require('../utils/adminNotification');
 const { apiError } = require('../middleware/api-error');
 
 const router = express.Router();
@@ -256,7 +257,7 @@ router.post('/requests', (req, res, next) => {
             `Type: ${payload.messageType || 'unknown'}`,
             `Excerpt: ${formatExcerpt(messageText)}`
         ].join('\n');
-        void sendPushbulletNotification({ title, body, logger: req.logger });
+        void sendAdminNotification({ title, body, logger: req.logger });
         res.status(201).json({ id });
     });
 });

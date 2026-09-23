@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const axios = require('axios');
+const { sendAdminNotification } = require('./adminNotification');
 const tablePowLog = require('../db/tablePowLog');
 
 function safeText(value, maxLen) {
@@ -11,16 +11,7 @@ function toNumber(value, fallback = null) {
   return Number.isFinite(value) ? Number(value) : fallback;
 }
 
-function getMakeConfig() {
-  return {
-    url: process.env.MAKE_PUSHBULLET_WEBHOOK_URL,
-    apiKey: process.env.MAKE_API_KEY
-  };
-}
-
 async function notifyPowEnabled(entry, logger) {
-  const { url, apiKey } = getMakeConfig();
-  if (!url || !apiKey) return;
   const title = 'Messagedrop PoW aktiviert';
   const text = [
     `Scope: ${entry.scope}`,
@@ -33,15 +24,7 @@ async function notifyPowEnabled(entry, logger) {
     `Required until: ${entry.requiredUntil ? new Date(entry.requiredUntil).toISOString() : 'n/a'}`
   ].join('\n');
 
-  try {
-    await axios.post(url, { title, text }, {
-      headers: { 'x-make-apikey': apiKey },
-      timeout: 4000,
-      validateStatus: () => true
-    });
-  } catch (err) {
-    logger?.warn?.('PoW notify failed', { error: err?.message });
-  }
+  await sendAdminNotification({ title, body: text, logger, throttleKey: 'pow-enabled' });
 }
 
 function normalizePayload(payload) {

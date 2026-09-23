@@ -16,7 +16,7 @@ const tableAudit = require('../db/tableDsaAuditLog');
 const { requireAdminJwt, requireRole } = require('../middleware/security');
 const { apiError } = require('../middleware/api-error');
 const { sendMail } = require('../utils/mailer');
-const { sendPushbulletNotification } = require('../utils/pushbullet');
+const { sendAdminNotification } = require('../utils/adminNotification');
 const { signServiceJwt } = require('../utils/serviceJwt');
 const { resolveBaseUrl } = require('../utils/adminLogForwarder');
 
@@ -38,15 +38,6 @@ const rateLimitMessage = (message) => ({
 const toNumber = (value, fallback) => {
     const parsed = Number(value);
     return Number.isFinite(parsed) ? parsed : fallback;
-};
-
-const toBool = (value, fallback = false) => {
-    if (value === undefined || value === null) return fallback;
-    if (typeof value === 'boolean') return value;
-    const normalized = String(value).trim().toLowerCase();
-    if (['1', 'true', 'yes', 'on'].includes(normalized)) return true;
-    if (['0', 'false', 'no', 'off'].includes(normalized)) return false;
-    return fallback;
 };
 
 const normalizeEmail = (value) => (typeof value === 'string' ? value.trim().toLowerCase() : '');
@@ -71,7 +62,6 @@ const VERIFY_SLOWDOWN_MAX_MS = toNumber(process.env.ADMIN_LOGIN_VERIFY_SLOWDOWN_
 const ALLOWED_ROLES = new Set(['author', 'editor', 'moderator', 'legal', 'admin', 'root']);
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const backendAudience = process.env.SERVICE_JWT_AUDIENCE_BACKEND || 'service.backend';
-const OTP_PUSH_REQUIRED = toBool(process.env.ADMIN_OTP_PUSH_REQUIRED, false);
 
 function createSlowdown({ windowMs, delayAfter, delayMs, maxDelayMs, keyGenerator }) {
     const hits = new Map();
@@ -215,39 +205,16 @@ async function sendOtp({ username, email, role, otp, logger }) {
       <p>Falls du den Login nicht angefordert hast, melde dich bitte sofort beim Root-Admin.</p>
     `;
 
-    let pushSent = false;
     let emailSent = false;
     const deliveryDetail = {
         username,
         email: normalizedEmail || null,
-        pushRequired: OTP_PUSH_REQUIRED,
-        pushSent: false,
         emailSent: false,
         emailAttempted: false,
         mailConfigured: isMailConfigured(),
         validEmail: isValidEmail(normalizedEmail),
         reasons: []
     };
-
-    try {
-        pushSent = await sendPushbulletNotification({
-            title,
-            body: text,
-            logger
-        });
-    } catch (error) {
-        pushSent = false;
-        deliveryDetail.reasons.push(`push_exception:${error?.message || error}`);
-    }
-
-    deliveryDetail.pushSent = pushSent;
-    if (!pushSent) {
-        logger?.warn?.('OTP push delivery failed', { username, email: normalizedEmail || null, pushRequired: OTP_PUSH_REQUIRED });
-        deliveryDetail.reasons.push('push_failed');
-        if (OTP_PUSH_REQUIRED) {
-            throw createOtpDeliveryError('otp_push_required_delivery_failed', deliveryDetail);
-        }
-    }
 
     if (!deliveryDetail.validEmail) {
         logger?.warn?.('Skipping OTP e-mail delivery (missing/invalid recipient)', { username });
@@ -264,8 +231,8 @@ async function sendOtp({ username, email, role, otp, logger }) {
             html,
             logger
         });
-        if (!mailResult || mailResult.success === false) {
-            logger?.warn?.('OTP e-mail delivery failed (non-blocking)', { username, email: normalizedEmail });
+        if (!mailResult?.success) {
+            logger?.warn?.('OTP e-mail delivery failed', { username, email: normalizedEmail });
             deliveryDetail.reasons.push('email_send_failed');
         } else {
             emailSent = true;
@@ -273,17 +240,17 @@ async function sendOtp({ username, email, role, otp, logger }) {
         }
     }
 
-    if (!pushSent && !emailSent) {
+    if (!emailSent) {
         throw createOtpDeliveryError('otp_delivery_failed', deliveryDetail);
     }
 
-    return { pushSent, emailSent };
+    return { emailSent };
 }
 
 async function notifyLoginFailure(username, reason, logger) {
     const title = 'Messagedrop Admin Login Failure';
     const text = `User: ${username || 'unknown'}\nReason: ${reason}`;
-    await sendPushbulletNotification({ title, body: text, logger });
+    void sendAdminNotification({ title, body: text, logger, throttleKey: 'login-failure' });
 }
 
 function createChallenge(db, username, email, payload, logger) {

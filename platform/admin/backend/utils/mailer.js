@@ -32,6 +32,9 @@ function getTransport(logger) {
         port,
         secure,
         auth: { user, pass },
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 20000,
         tls: asBool(process.env.MAIL_TLS_IGNORE_INVALID, false) ? { rejectUnauthorized: false } : undefined
     });
 
@@ -45,11 +48,11 @@ function getTransport(logger) {
 async function sendMail({ to, subject, text, html, from, logger }) {
     if (!to || !subject || (!text && !html)) {
         logger?.warn?.('sendMail called without required fields', { to, subject });
-        return false;
+        return { success: false, reason: 'invalid_payload' };
     }
 
     const transport = getTransport(logger);
-    if (!transport) return false;
+    if (!transport) return { success: false, reason: 'not_configured' };
 
     const payload = {
         to,
@@ -61,6 +64,10 @@ async function sendMail({ to, subject, text, html, from, logger }) {
 
     try {
         const info = await transport.sendMail(payload);
+        if (!info.accepted?.length || info.rejected?.length) {
+            logger?.warn?.('Mail recipient rejected', { to, subject });
+            return { success: false, info, error: { responseCode: 550 } };
+        }
         return { success: true, info };
     } catch (err) {
         logger?.warn?.('Failed to send mail', { to, subject, error: err.message });
