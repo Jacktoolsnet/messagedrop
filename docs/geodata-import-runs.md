@@ -63,7 +63,11 @@ an admin dispatch record could be written, remain visible after an admin restart
 The latest batch's completed jobs remain listed; additional jobs outside that
 batch are shown while active. The heading reflects the combined run/queue view.
 
-The frontend queries jobs immediately on opening and then every five seconds.
+The frontend queries jobs immediately on opening, then every five seconds while
+jobs are running/queued or a manual import is being dispatched. While idle it
+queries only once per minute, so scheduled imports are detected within that
+interval. Manual starts and refreshes query immediately. Failed requests retry
+after 30 seconds. Requests do not overlap, and leaving the page stops polling.
 Failed polling shows an explicit stale-status warning; successful polling clears
 it. A failed live-queue read fails the refresh rather than presenting a
 completed-only batch as the current state.

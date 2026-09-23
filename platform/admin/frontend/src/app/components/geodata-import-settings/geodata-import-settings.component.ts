@@ -12,7 +12,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterLink } from '@angular/router';
-import { catchError, EMPTY, finalize, forkJoin, exhaustMap, timer } from 'rxjs';
+import { catchError, EMPTY, finalize, forkJoin, exhaustMap, filter, merge, Subject, timer } from 'rxjs';
 import {
   GeodataDatabaseInfo,
   GeodataImportCatalog,
@@ -36,6 +36,8 @@ export class GeodataImportSettingsComponent {
   private readonly service = inject(GeodataImportService);
   private readonly messages = inject(DisplayMessageService);
   readonly i18n = inject(TranslationHelperService);
+  private readonly refreshJobs = new Subject<void>();
+  private nextJobPollAt = 0;
 
   readonly loading = signal(true);
   readonly saving = signal(false);
@@ -100,20 +102,29 @@ export class GeodataImportSettingsComponent {
 
   constructor() {
     this.load();
-    timer(0, 5000).pipe(
+    merge(timer(0, 5000), this.refreshJobs).pipe(
+      filter(() => Date.now() >= this.nextJobPollAt),
       exhaustMap(() => this.service.getJobs().pipe(catchError(() => {
         this.importStatusUnavailable.set(true);
+        this.nextJobPollAt = Date.now() + 30000;
         return EMPTY;
       }))),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe((value) => {
       this.importStatusUnavailable.set(false);
+      const active = this.importing() || value.jobs.some(job => job.status === 'running' || job.status === 'queued');
+      this.nextJobPollAt = Date.now() + (active ? 5000 : 60000);
       this.databaseInfo.update((current) => ({
         ...(current ?? { status: 200, health: { status: 200 } }),
         jobs: value.jobs,
         batchId: value.batchId
       }));
     });
+  }
+
+  private refreshImportStatus(): void {
+    this.nextJobPollAt = 0;
+    this.refreshJobs.next();
   }
 
   load(): void {
@@ -258,6 +269,7 @@ export class GeodataImportSettingsComponent {
   loadDatabaseInfo(): void {
     const jobsAtRequest = this.databaseInfo()?.jobs;
     this.loadingDatabaseInfo.set(true);
+    this.refreshImportStatus();
     this.service.getDatabaseInfo()
       .pipe(finalize(() => this.loadingDatabaseInfo.set(false)), takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -275,6 +287,7 @@ export class GeodataImportSettingsComponent {
   startImport(force = false): void {
     if (this.importing() || this.hasChanges() || !this.hasSelectedSubcategories()) return;
     this.importing.set(true);
+    this.refreshImportStatus();
     this.service.startImport(force)
       .pipe(finalize(() => this.importing.set(false)), takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -282,7 +295,10 @@ export class GeodataImportSettingsComponent {
           this.messages.open(this.i18n.t('Import started.'), undefined, { panelClass: 'snack-success', verticalPosition: 'top' });
           this.loadDatabaseInfo();
         },
-        error: () => this.showError(this.i18n.t('Could not start import.'))
+        error: () => {
+          this.refreshImportStatus();
+          this.showError(this.i18n.t('Could not start import.'));
+        }
       });
   }
 
