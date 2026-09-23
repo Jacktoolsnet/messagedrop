@@ -101,6 +101,7 @@ async function cleanupClosedDsaCases(db, logger, options = {}) {
   const threshold = subtractMonths(Date.now(), retentionMonths);
   const legalHoldOutcome = options.legalHoldOutcome || 'FORWARD_TO_AUTHORITY';
 
+  // PostgreSQL does not resolve SELECT aliases in HAVING; repeat the expression there.
   const noticeRows = await dbAll(
     db,
     `
@@ -117,7 +118,7 @@ async function cleanupClosedDsaCases(db, logger, options = {}) {
               AND d_hold.${tableDecision.columns.outcome} = ?
          )
        GROUP BY n.${tableNotice.columns.id}
-      HAVING closedAt <= ?
+      HAVING COALESCE(MAX(d.${tableDecision.columns.decidedAt}), n.${tableNotice.columns.updatedAt}) <= ?
     `,
     [legalHoldOutcome, threshold]
   );
