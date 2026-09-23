@@ -96,3 +96,18 @@ test('latest batch query does not limit its members', () => {
     }
   });
 });
+
+test('a Geodata HTTP 429 rejects only that request and later requests still succeed', async () => {
+  let calls = 0;
+  const { requestService } = loadUtility([], async () => {
+    if (++calls === 1) {
+      throw Object.assign(new Error('Too many requests'), {
+        response: { status: 429, data: { message: 'Too many requests' } }
+      });
+    }
+    return { data: { jobs: [] } };
+  });
+  await assert.rejects(requestService('get', '/geodata/import-jobs'), error => error.status === 429);
+  const result = await requestService('get', '/geodata/import-jobs');
+  assert.equal(result.jobs.length, 0);
+});

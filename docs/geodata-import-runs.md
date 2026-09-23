@@ -27,3 +27,29 @@ ist ohne gespeicherte Lauf-ID nicht möglich.
 Die bestehende Aufbewahrungsfrist für Import-/Dispatch-Daten gilt weiterhin.
 Bei fehlenden Service-Jobs bleibt ein Eintrag mit Fehlerhinweis sichtbar,
 statt stillschweigend aus der Liste zu verschwinden.
+
+## Rate limits and log forwarding
+
+The Admin backend's global IP budget (600 requests / 10 minutes) and shared
+log-route budget also counted incoming Geodata service logs. A burst of rapidly
+completed imports could exhaust those budgets and, with a shared client IP,
+temporarily block browser requests with HTTP 429. This response alone does not
+indicate a process crash.
+
+POSTs to `/info-log`, `/warn-log`, and `/error-log` now bypass those two
+budgets **only after cryptographic service-JWT verification** (including audience).
+Route authentication still applies. Browser tokens, invalid tokens, log reads,
+and other routes retain their previous limits. The Geodata import API itself
+does not have an application-level rate limiter; proxy/Plesk limits are independent.
+
+The Geodata forwarder allows at most four concurrent HTTP requests and queues
+up to 200 further entries in memory. Overflow entries are not forwarded but remain
+in local service logs, with a local warning throttled to once per 30 seconds.
+HTTP 429 pauses forwarding according to Retry-After (default 60 seconds, capped
+at one hour); queued and newly arriving entries during this pause remain local.
+There is no persistent forwarding/replay queue. Forwarding failures must not
+escape to the import caller, and forwarding warnings are never forwarded recursively.
+
+Deploy/restart both Admin backend and Geodata service. If a process actually exits
+after this change, collect its process-manager/Plesk output and exit signal:
+the rate-limit response is not proof of the cause of that exit.

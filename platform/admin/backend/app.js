@@ -99,6 +99,7 @@ const helmet = require('helmet');
 const cron = require('node-cron');
 const winston = require('winston');
 const rateLimit = require('express-rate-limit');
+const { identifyServiceLogIngestion, skipServiceLogIngestion } = require('./middleware/service-log-rate-limit');
 const jwt = require('jsonwebtoken');
 const { generateOrLoadKeypairs } = require('./utils/keyStore');
 const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder');
@@ -520,7 +521,7 @@ const adminDefaultLimit = rateLimit({
   windowMs: 10 * 60 * 1000,
   limit: 600,
   ...rateLimitDefaults,
-  skip: (req) => req.path === '/stickers' || req.path.startsWith('/stickers/'),
+  skip: (req) => skipServiceLogIngestion(req) || req.path === '/stickers' || req.path.startsWith('/stickers/'),
   message: rateLimitMessage('Too many requests, please slow down.')
 });
 
@@ -574,12 +575,14 @@ const adminStickerLimit = rateLimit({
 });
 
 const adminLogLimit = rateLimit({
+  skip: skipServiceLogIngestion,
   windowMs: 5 * 60 * 1000,
   limit: 300,
   ...rateLimitDefaults,
   message: rateLimitMessage('Too many log requests, please try again later.')
 });
 
+app.use(identifyServiceLogIngestion);
 app.use(adminDefaultLimit);
 
 // ROUTES
