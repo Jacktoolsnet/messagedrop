@@ -147,3 +147,20 @@ startup. Configure its connection to this service with `GEODATA_BASE_URL` and
 npm test
 npm run lint
 ```
+
+### Log files
+
+The service writes separate, daily rotating files under `services/geodata/logs/`:
+
+- `geodata-info-YYYY-MM-DD.log`
+- `geodata-warn-YYYY-MM-DD.log`
+- `geodata-error-YYYY-MM-DD.log`
+
+Each file contains only its corresponding severity, formatted as
+`timestamp [LEVEL] message {metadata}`. Retention uses `LOG_RETENTION_INFO`
+(default `2d`), `LOG_RETENTION_WARN` (defaults to info retention), and
+`LOG_RETENTION_ERROR` (default `2d`). Console logging outside production
+and forwarding to the admin backend remain unchanged.
+
+Restart the Geodata service after deployment. Existing combined
+`geodata-YYYY-MM-DD.log` files are not migrated or deleted by this change.

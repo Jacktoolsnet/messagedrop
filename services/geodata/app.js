@@ -52,11 +52,11 @@ process.on('uncaughtExceptionMonitor', (error) => {
 process.env.SERVICE_JWT_ISSUER = process.env.GEODATA_SERVICE_JWT_ISSUER || 'service.geodata';
 process.env.SERVICE_JWT_AUDIENCE ||= 'service.geodata';
 process.env.SERVICE_JWT_TRUSTED_JWKS_PATH ||= path.join(__dirname, 'config', 'service-jwks.json');
-require('winston-daily-rotate-file');
 const compression = require('compression');
 const express = require('express');
 const helmet = require('helmet');
 const winston = require('winston');
+const { createFileTransports } = require('./utils/logTransports');
 const Database = require('./db/database');
 const tableGeodataPoi = require('./db/tableGeodataPoi');
 const { LocalPoiStore } = require('./local-poi-store');
@@ -93,11 +93,7 @@ function cleanupJobHistory(database, retentionDays, logger) {
 }
 
 function createLogger() {
-  const transports = [new winston.transports.DailyRotateFile({
-    filename: path.join(__dirname, 'logs', 'geodata-%DATE%.log'),
-    datePattern: 'YYYY-MM-DD',
-    maxFiles: process.env.LOG_RETENTION_INFO || '2d'
-  })];
+  const transports = createFileTransports(path.join(__dirname, 'logs'));
   if (process.env.NODE_ENV !== 'production') {
     transports.push(new winston.transports.Console({ format: winston.format.simple() }));
   }
