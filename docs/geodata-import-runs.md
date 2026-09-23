@@ -53,3 +53,22 @@ escape to the import caller, and forwarding warnings are never forwarded recursi
 Deploy/restart both Admin backend and Geodata service. If a process actually exits
 after this change, collect its process-manager/Plesk output and exit signal:
 the rate-limit response is not proof of the cause of that exit.
+
+## Queue visibility after restart
+
+For a known admin batch, every status refresh now also queries the Geodata
+service's complete active queue (`activeOnly=true`, no history limit) and merges
+it by job ID. Thus jobs from earlier runs, or jobs accepted by the service before
+an admin dispatch record could be written, remain visible after an admin restart.
+The latest batch's completed jobs remain listed; additional jobs outside that
+batch are shown while active. The heading reflects the combined run/queue view.
+
+The frontend queries jobs immediately on opening and then every five seconds.
+Failed polling shows an explicit stale-status warning; successful polling clears
+it. A failed live-queue read fails the refresh rather than presenting a
+completed-only batch as the current state.
+
+This does not change worker recovery: an Admin restart leaves Geodata workers
+alone. On a Geodata-service restart, its existing recovery marks interrupted
+running jobs as failed and launches remaining queued jobs; it does not mark them
+as successfully imported. Deploy all three components (Geodata first).

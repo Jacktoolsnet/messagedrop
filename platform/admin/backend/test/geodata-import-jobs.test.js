@@ -32,6 +32,7 @@ test('current import run returns all 135 jobs in bounded queries, including old 
   }));
   const requests = [];
   const { currentImportJobs } = loadUtility(dispatches, async ({ url }) => {
+    if (new URL(url).searchParams.get('activeOnly')) return { data: { jobs: [] } };
     const ids = new URL(url).searchParams.get('jobIds').split(',');
     requests.push(ids.length);
     return { data: { jobs: ids.map(jobId => ({ jobId, status: jobId === 'job-0' ? 'running' : 'queued' })) } };
@@ -110,4 +111,46 @@ test('a Geodata HTTP 429 rejects only that request and later requests still succ
   await assert.rejects(requestService('get', '/geodata/import-jobs'), error => error.status === 429);
   const result = await requestService('get', '/geodata/import-jobs');
   assert.equal(result.jobs.length, 0);
+});
+
+test('restart: completed latest batch cannot hide running and queued jobs from other runs', async () => {
+  const dispatches = [{
+    batchId: 'last-run', dispatchId: 'dispatch', serviceJobId: 'finished', datasetId: 'germany'
+  }];
+  const jobs = Array.from({ length: 135 }, (_, i) => ({
+    jobId: 'active-' + i, datasetId: 'country-' + i, status: i === 0 ? 'running' : 'queued'
+  }));
+  const request = async ({ url }) => ({
+    data: { jobs: new URL(url).searchParams.has('activeOnly')
+      ? jobs : [{ jobId: 'finished', datasetId: 'germany', status: 'succeeded' }] }
+  });
+  // A fresh module instance models restart/reload without any previous in-memory state.
+  for (let restart = 0; restart < 2; restart++) {
+    const result = await loadUtility(dispatches, request).currentImportJobs({});
+    assert.equal(result.jobs.length, 136);
+    assert.equal(result.jobs.filter(job => job.status === 'running').length, 1);
+    assert.equal(result.jobs.filter(job => job.status === 'queued').length, 134);
+  }
+});
+
+test('live queue updates existing batch jobs without duplicate entries', async () => {
+  const { currentImportJobs } = loadUtility([{
+    batchId: 'run', dispatchId: 'dispatch', serviceJobId: 'same', datasetId: 'germany'
+  }], async ({ url }) => ({
+    data: { jobs: [{ jobId: 'same', datasetId: 'germany',
+      status: new URL(url).searchParams.has('activeOnly') ? 'running' : 'queued' }] }
+  }));
+  const result = await currentImportJobs({});
+  assert.equal(result.jobs.length, 1);
+  assert.equal(result.jobs[0].status, 'running');
+});
+
+test('live queue failure is reported instead of returning a misleading completed-only list', async () => {
+  const { currentImportJobs } = loadUtility([{
+    batchId: 'run', dispatchId: 'dispatch', serviceJobId: 'finished', datasetId: 'germany'
+  }], async ({ url }) => {
+    if (new URL(url).searchParams.has('activeOnly')) throw new Error('service unavailable');
+    return { data: { jobs: [{ jobId: 'finished', status: 'succeeded' }] } };
+  });
+  await assert.rejects(currentImportJobs({}), /geodata_service_unavailable/);
 });

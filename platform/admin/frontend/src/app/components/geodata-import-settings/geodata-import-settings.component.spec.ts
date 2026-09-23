@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { EMPTY } from 'rxjs';
+import { EMPTY, of, throwError } from 'rxjs';
 import { GeodataImportSettingsComponent } from './geodata-import-settings.component';
 import { GeodataImportJob } from '../../interfaces/geodata-import.interface';
 import { GeodataImportService } from '../../services/geodata-import.service';
@@ -10,6 +10,7 @@ describe('Geodata import run display', () => {
   let component: GeodataImportSettingsComponent;
 
   beforeEach(() => {
+    jasmine.clock().install();
     TestBed.configureTestingModule({
       providers: [
         { provide: GeodataImportService, useValue: { getSettings: () => EMPTY, getCatalog: () => EMPTY, getJobs: () => EMPTY } },
@@ -18,6 +19,11 @@ describe('Geodata import run display', () => {
       ]
     });
     component = TestBed.runInInjectionContext(() => new GeodataImportSettingsComponent());
+  });
+
+  afterEach(() => {
+    TestBed.resetTestingModule();
+    jasmine.clock().uninstall();
   });
 
   it('keeps all 135 jobs and puts the running country first', () => {
@@ -45,6 +51,22 @@ describe('Geodata import run display', () => {
     component.databaseInfo.set({ status: 200, health: { status: 200 }, jobs: [{ ...job, status: 'succeeded' }] });
     expect(component.runningJobs()).toEqual([]);
     expect(component.importJobs().length).toBe(1);
+  });
+
+  it('warns on failed polling and restores the live queue on the next successful poll', () => {
+    const job: GeodataImportJob = {
+      jobId: 'resumed', datasetId: 'germany', status: 'running', stage: 'importing',
+      progress: 30, error: null, createdAt: '2026-09-23T10:00:00Z', startedAt: null, completedAt: null
+    };
+    spyOn(TestBed.inject(GeodataImportService), 'getJobs').and.returnValues(
+      throwError(() => new Error('429')),
+      of({ status: 200, batchId: 'run', jobs: [job] })
+    );
+    jasmine.clock().tick(0);
+    expect(component.importStatusUnavailable()).toBeTrue();
+    jasmine.clock().tick(5000);
+    expect(component.importStatusUnavailable()).toBeFalse();
+    expect(component.runningJobs().map(value => value.jobId)).toEqual(['resumed']);
   });
 
   it('uses localized country names and retains a dataset fallback', () => {

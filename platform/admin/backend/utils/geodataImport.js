@@ -123,6 +123,10 @@ async function currentImportJobs(db) {
     const service = await requestService('get', `/geodata/import-jobs?${query}`);
     for (const job of service.jobs || []) jobsById.set(job.jobId, job);
   }
+  // The service queue is authoritative, even when admin dispatch records are
+  // incomplete, belong to a different run, or predate a restart.
+  const active = await requestService('get', '/geodata/import-jobs?activeOnly=true');
+  for (const job of active.jobs || []) jobsById.set(job.jobId, job);
   const jobs = [];
   const seen = new Set();
   for (const row of dispatches) {
@@ -134,6 +138,11 @@ async function currentImportJobs(db) {
       error: row.error || 'Import job is no longer available.',
       createdAt: new Date(Number(row.createdAt)).toISOString(), startedAt: null, completedAt: null
     });
+  }
+  for (const job of active.jobs || []) {
+    if (seen.has(job.jobId)) continue;
+    seen.add(job.jobId);
+    jobs.push(job);
   }
   return { jobs, batchId: dispatches[0].batchId };
 }

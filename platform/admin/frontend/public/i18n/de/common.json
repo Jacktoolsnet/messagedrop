@@ -1904,5 +1904,7 @@
   "Active data and current import run": "Aktive Daten und aktueller Importlauf",
   "Currently importing": "Wird gerade importiert",
   "Current import run": "Aktueller Importlauf",
-  "{{completed}} of {{total}} import jobs finished": "{{completed}} von {{total}} Importaufträgen abgeschlossen"
+  "{{completed}} of {{total}} import jobs finished": "{{completed}} von {{total}} Importaufträgen abgeschlossen",
+  "Import run and active queue": "Importlauf und aktive Warteschlange",
+  "Import status could not be updated. The displayed jobs may be outdated. Retrying automatically.": "Der Importstatus konnte nicht aktualisiert werden. Die angezeigten Aufträge sind möglicherweise veraltet. Die Aktualisierung wird automatisch erneut versucht."
 }

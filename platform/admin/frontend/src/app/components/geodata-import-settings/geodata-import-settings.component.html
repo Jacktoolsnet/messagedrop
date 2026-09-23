@@ -226,6 +226,12 @@
             </mat-card-header>
             <mat-card-content>
               @if (loadingDatabaseInfo()) { <mat-progress-bar mode="indeterminate"></mat-progress-bar> }
+              @if (importStatusUnavailable()) {
+                <p class="import-status-warning" role="status">
+                  <mat-icon>warning</mat-icon>
+                  {{ i18n.t('Import status could not be updated. The displayed jobs may be outdated. Retrying automatically.') }}
+                </p>
+              }
               @if (databaseInfo(); as info) {
                 <div class="database-stats">
                   <article><span>{{ i18n.t('Mode') }}</span><strong>{{ info.health.mode || '—' }}</strong></article>
@@ -262,7 +268,7 @@
                     }
                   </section>
                 }
-                <h3>{{ info.batchId ? i18n.t('Current import run') : i18n.t('Recent import jobs') }} ({{ importJobs().length }})</h3>
+                <h3>{{ info.batchId ? i18n.t('Import run and active queue') : i18n.t('Recent import jobs') }} ({{ importJobs().length }})</h3>
                 @if (info.batchId) {
                   <p>{{ i18n.t('{{completed}} of {{total}} import jobs finished', { completed: completedJobCount(), total: importJobs().length }) }}</p>
                 }

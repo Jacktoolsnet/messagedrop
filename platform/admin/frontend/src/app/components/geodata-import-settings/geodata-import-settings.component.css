@@ -219,3 +219,6 @@ mat-toolbar {
 .current-import h3 { display: flex; align-items: center; gap: .5rem; margin: 0 0 .75rem; }
 .current-import-details { display: grid; gap: .5rem; min-width: 0; overflow-wrap: anywhere; }
 .current-import-details + .current-import-details { margin-top: 1rem; }
+
+.import-status-warning { display: flex; align-items: flex-start; gap: .5rem; padding: .75rem; border: 1px solid currentColor; border-radius: 10px; overflow-wrap: anywhere; }
+.import-status-warning mat-icon { flex-shrink: 0; }

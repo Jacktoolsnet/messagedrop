@@ -45,7 +45,7 @@ function createGeodataRouter({ localPoiStore, importJobManager, metrics = {} }) 
       if (jobIds && (jobIds.length > 100 || jobIds.some((id) => !/^[a-f0-9-]{36}$/i.test(id)))) {
         return res.status(400).json({ error: 'invalid_job_ids' });
       }
-      return res.status(200).json({ status: 200, jobs: await importJobManager.list(req.query.limit, { jobIds, includeActive: req.query.includeActive === 'true' }) });
+      return res.status(200).json({ status: 200, jobs: await importJobManager.list(req.query.limit, { jobIds, includeActive: req.query.includeActive === 'true', activeOnly: req.query.activeOnly === 'true' }) });
     } catch (error) { return next(error); }
   });
 

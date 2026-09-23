@@ -35,3 +35,15 @@ test('ordinary history requests keep their bounded limit', () => {
     }
   }, 999, () => {});
 });
+
+test('authoritative queue includes all running and queued jobs without history or limit', () => {
+  table.listJobs({
+    all(sql, params, cb) {
+      assert.match(sql, /WHERE status IN \('queued', 'running'\)/);
+      assert.doesNotMatch(sql, /LIMIT/);
+      assert.doesNotMatch(sql, /\bOR\b/);
+      assert.deepEqual(params, []);
+      cb(null, []);
+    }
+  }, 20, () => {}, { activeOnly: true });
+});

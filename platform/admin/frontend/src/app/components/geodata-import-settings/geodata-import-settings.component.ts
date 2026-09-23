@@ -41,6 +41,7 @@ export class GeodataImportSettingsComponent {
   readonly saving = signal(false);
   readonly importing = signal(false);
   readonly loadingDatabaseInfo = signal(false);
+  readonly importStatusUnavailable = signal(false);
   readonly catalog = signal<GeodataImportCatalog | null>(null);
   readonly settings = signal<GeodataImportSettings | null>(null);
   readonly databaseInfo = signal<GeodataDatabaseInfo | null>(null);
@@ -99,10 +100,14 @@ export class GeodataImportSettingsComponent {
 
   constructor() {
     this.load();
-    timer(5000, 5000).pipe(
-      exhaustMap(() => this.service.getJobs().pipe(catchError(() => EMPTY))),
+    timer(0, 5000).pipe(
+      exhaustMap(() => this.service.getJobs().pipe(catchError(() => {
+        this.importStatusUnavailable.set(true);
+        return EMPTY;
+      }))),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe((value) => {
+      this.importStatusUnavailable.set(false);
       this.databaseInfo.update((current) => ({
         ...(current ?? { status: 200, health: { status: 200 } }),
         jobs: value.jobs,
