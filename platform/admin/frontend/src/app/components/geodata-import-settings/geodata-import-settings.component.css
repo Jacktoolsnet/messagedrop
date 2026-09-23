@@ -214,3 +214,8 @@ mat-toolbar {
   .region-grid, .schedule-grid, .database-stats { grid-template-columns: 1fr; }
   .toolbar-title { font-size: 1.2rem; }
 }
+
+.current-import { margin: 1rem 0; padding: 1rem; border: 1px solid rgba(37, 99, 235, .35); border-radius: 14px; background: rgba(239, 246, 255, .82); }
+.current-import h3 { display: flex; align-items: center; gap: .5rem; margin: 0 0 .75rem; }
+.current-import-details { display: grid; gap: .5rem; min-width: 0; overflow-wrap: anywhere; }
+.current-import-details + .current-import-details { margin-top: 1rem; }

@@ -139,8 +139,8 @@ class ImportJobManager {
     return callbackResult((callback) => table.getJob(this.database.db, jobId, callback));
   }
 
-  list(limit) {
-    return callbackResult((callback) => table.listJobs(this.database.db, limit, callback));
+  list(limit, options = {}) {
+    return callbackResult((callback) => table.listJobs(this.database.db, limit, callback, options));
   }
 
   async fail(jobId, error) {

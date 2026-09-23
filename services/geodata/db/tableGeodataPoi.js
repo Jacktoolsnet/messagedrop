@@ -253,8 +253,18 @@ function getJob(db, jobId, callback) {
   db.get(`SELECT * FROM ${JOB_TABLE} WHERE jobId = ?`, [jobId], callback);
 }
 
-function listJobs(db, limit, callback) {
+function listJobs(db, limit, callback, { jobIds, includeActive = false } = {}) {
+  if (jobIds) {
+    return db.all(`SELECT * FROM ${JOB_TABLE} WHERE jobId IN (${jobIds.map(() => '?').join(',')}) ORDER BY createdAt ASC, jobId ASC`, jobIds, callback);
+  }
   const safeLimit = Math.max(1, Math.min(100, Number(limit) || 20));
+  if (includeActive) {
+    return db.all(`SELECT * FROM ${JOB_TABLE}
+      WHERE status IN ('queued', 'running')
+        OR createdAt >= (SELECT MIN(createdAt) FROM ${JOB_TABLE} WHERE status IN ('queued', 'running'))
+        OR jobId IN (SELECT jobId FROM ${JOB_TABLE} ORDER BY createdAt DESC LIMIT ?)
+      ORDER BY createdAt DESC, jobId ASC`, [safeLimit], callback);
+  }
   db.all(`SELECT * FROM ${JOB_TABLE} ORDER BY createdAt DESC LIMIT ?`, [safeLimit], callback);
 }
 

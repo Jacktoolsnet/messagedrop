@@ -1900,5 +1900,9 @@
   "successful": "erfolgreich",
   "failed": "fehlgeschlagen",
   "Federal states and test regions": "Bundesländer und Testregionen",
-  "No subdivisions are currently available.": "Momentan sind keine Unterregionen verfügbar."
+  "No subdivisions are currently available.": "Momentan sind keine Unterregionen verfügbar.",
+  "Active data and current import run": "Aktive Daten und aktueller Importlauf",
+  "Currently importing": "Wird gerade importiert",
+  "Current import run": "Aktueller Importlauf",
+  "{{completed}} of {{total}} import jobs finished": "{{completed}} von {{total}} Importaufträgen abgeschlossen"
 }

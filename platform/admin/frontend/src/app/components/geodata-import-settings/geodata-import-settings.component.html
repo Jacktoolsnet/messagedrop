@@ -220,7 +220,7 @@
             <mat-card-header>
               <div mat-card-avatar class="avatar avatar-category"><mat-icon>storage</mat-icon></div>
               <mat-card-title>{{ i18n.t('Local POI database') }}</mat-card-title>
-              <mat-card-subtitle>{{ i18n.t('Active data and recent import jobs') }}</mat-card-subtitle>
+              <mat-card-subtitle>{{ i18n.t('Active data and current import run') }}</mat-card-subtitle>
               <span class="header-spacer"></span>
               <button mat-icon-button type="button" (click)="loadDatabaseInfo()" [disabled]="loadingDatabaseInfo()"><mat-icon>refresh</mat-icon></button>
             </mat-card-header>
@@ -235,38 +235,50 @@
                   <article><span>{{ i18n.t('Database size') }}</span><strong>{{ info.health.local?.databaseBytes ? (info.health.local!.databaseBytes! / 1048576 | number:'1.1-1') + ' MB' : '—' }}</strong></article>
                   <article><span>{{ i18n.t('Last activation') }}</span><strong>{{ info.health.local?.importedAt ? (info.health.local.importedAt | date:'medium') : '—' }}</strong></article>
                 </div>
-                <h3>{{ i18n.t('Recent import jobs') }}</h3>
+
+                @if (runningJobs().length) {
+                  <section class="current-import" aria-labelledby="current-import-title">
+                    <h3 id="current-import-title"><mat-icon>sync</mat-icon>{{ i18n.t('Currently importing') }}</h3>
+                    @for (job of runningJobs(); track job.jobId) {
+                      <div class="current-import-details">
+                        <strong>{{ datasetLabel(job.datasetId) }}</strong>
+                        <span>{{ stepLabel(job) }}</span>
+                        <div class="progress-caption">
+                          <span>{{ i18n.t('Current step') }}</span>
+                          <strong>{{ job.stepProgress == null ? i18n.t('Processing…') : job.stepProgress + ' %' }}</strong>
+                        </div>
+                        <mat-progress-bar [mode]="job.stepProgress == null ? 'indeterminate' : 'determinate'"
+                          [value]="job.stepProgress ?? 0"></mat-progress-bar>
+                        <div class="progress-caption">
+                          <span>{{ i18n.t('Overall progress') }}</span><strong>{{ job.progress }} %</strong>
+                        </div>
+                        <mat-progress-bar mode="determinate" [value]="job.progress"></mat-progress-bar>
+                        <div class="progress-details">
+                          @if (processedDetails(job); as details) { <span>{{ details }}</span> }
+                          @if (elapsed(job); as duration) { <span>{{ i18n.t('Elapsed') }}: {{ duration }}</span> }
+                          @if (remaining(job); as duration) { <span>{{ i18n.t('Estimated remaining') }}: {{ duration }}</span> }
+                        </div>
+                      </div>
+                    }
+                  </section>
+                }
+                <h3>{{ info.batchId ? i18n.t('Current import run') : i18n.t('Recent import jobs') }} ({{ importJobs().length }})</h3>
+                @if (info.batchId) {
+                  <p>{{ i18n.t('{{completed}} of {{total}} import jobs finished', { completed: completedJobCount(), total: importJobs().length }) }}</p>
+                }
                 <div class="job-list">
-                  @for (job of info.jobs; track job.jobId) {
-                    <article class="job-row" [class.active-job]="job.status === 'running' || job.status === 'queued'">
-                      <mat-icon>{{ job.status === 'succeeded' ? 'check_circle' : job.status === 'failed' ? 'error' : 'sync' }}</mat-icon>
-                      <span class="job-content"><strong>{{ job.datasetId }}</strong>
-                        <small>{{ stepLabel(job) }}</small>
+                  @for (job of importJobs(); track job.jobId) {
+                    <article class="job-row" [class.active-job]="job.status === 'running'">
+                      <mat-icon>{{ job.status === 'succeeded' ? 'check_circle' : job.status === 'failed' ? 'error' : job.status === 'running' ? 'sync' : 'hourglass_empty' }}</mat-icon>
+                      <span class="job-content"><strong>{{ datasetLabel(job.datasetId) }}</strong>
+                        <small>{{ job.datasetId }}</small>
                         @if (job.sourceTimestamp) {
                           <small>{{ i18n.t('Source data') }}: {{ job.sourceTimestamp | date:'medium' }}</small>
                         }
-                        @if (job.status === 'running') {
-                          <div class="progress-section">
-                            <div class="progress-caption">
-                              <span>{{ i18n.t('Current step') }}</span>
-                              <strong>{{ job.stepProgress == null ? i18n.t('Processing…') : job.stepProgress + ' %' }}</strong>
-                            </div>
-                            <mat-progress-bar [mode]="job.stepProgress == null ? 'indeterminate' : 'determinate'"
-                              [value]="job.stepProgress ?? 0"></mat-progress-bar>
-                            <div class="progress-caption overall-progress">
-                              <span>{{ i18n.t('Overall progress') }}</span><strong>{{ job.progress }} %</strong>
-                            </div>
-                            <mat-progress-bar mode="determinate" [value]="job.progress"></mat-progress-bar>
-                            <div class="progress-details">
-                              @if (processedDetails(job); as details) { <span><mat-icon>data_usage</mat-icon>{{ details }}</span> }
-                              @if (elapsed(job); as duration) { <span><mat-icon>schedule</mat-icon>{{ i18n.t('Elapsed') }}: {{ duration }}</span> }
-                              @if (remaining(job); as duration) { <span><mat-icon>hourglass_top</mat-icon>{{ i18n.t('Estimated remaining') }}: {{ duration }}</span> }
-                            </div>
-                          </div>
-                        } @else {
-                          <small>{{ job.progress }} %
-                            @if (elapsed(job); as duration) { · {{ i18n.t('Duration') }}: {{ duration }} }
-                          </small>
+                        @if (job.status === 'succeeded' || job.status === 'failed') {
+                          @if (elapsed(job); as duration) {
+                            <small>{{ i18n.t('Duration') }}: {{ duration }}</small>
+                          }
                         }
                         @if (job.error) { <small class="job-error">{{ job.error }}</small> }
                       </span>

@@ -89,23 +89,53 @@ function isDue(settings, now = new Date()) {
 
 async function dispatchImports(db, settings, triggerType, options = {}) {
   const results = [];
+  const batchId = randomUUID();
   for (const datasetId of settings.datasets) {
     const dispatchId = randomUUID();
     const config = { datasetId, categories: settings.categories, subcategories: settings.subcategories || {},
       refresh: settings.refreshSource, force: Boolean(options.force) };
     try {
       const response = await requestService('post', '/geodata/import-jobs', config);
-      await callbackResult((callback) => dispatchTable.create(db, { dispatchId, serviceJobId: response.job?.jobId,
+      await callbackResult((callback) => dispatchTable.create(db, { dispatchId, batchId, serviceJobId: response.job?.jobId,
         datasetId, triggerType, status: response.job?.status || 'queued', requestedConfig: config }, callback));
       results.push({ dispatchId, datasetId, job: response.job, created: response.created });
     } catch (error) {
-      await callbackResult((callback) => dispatchTable.create(db, { dispatchId, datasetId, triggerType,
+      await callbackResult((callback) => dispatchTable.create(db, { dispatchId, batchId, datasetId, triggerType,
         status: 'failed', requestedConfig: config, error: error.response?.data?.message || error.message }, callback));
       throw error;
     }
   }
   await callbackResult((callback) => settingsTable.markTriggered(db, Date.now(), callback));
   return results;
+}
+
+async function currentImportJobs(db) {
+  const dispatches = await callbackResult((cb) => dispatchTable.latestBatch(db, cb));
+  if (!dispatches.length) {
+    // Legacy runs have no batch ID. Include the entire active queue, not just recent rows.
+    const service = await requestService('get', '/geodata/import-jobs?includeActive=true');
+    return { jobs: service.jobs || [], batchId: null };
+  }
+  const ids = [...new Set(dispatches.map((row) => row.serviceJobId).filter(Boolean))];
+  const jobsById = new Map();
+  for (let offset = 0; offset < ids.length; offset += 50) {
+    const query = new URLSearchParams({ jobIds: ids.slice(offset, offset + 50).join(',') });
+    const service = await requestService('get', `/geodata/import-jobs?${query}`);
+    for (const job of service.jobs || []) jobsById.set(job.jobId, job);
+  }
+  const jobs = [];
+  const seen = new Set();
+  for (const row of dispatches) {
+    const id = row.serviceJobId || row.dispatchId;
+    if (seen.has(id)) continue;
+    seen.add(id);
+    jobs.push(jobsById.get(id) || {
+      jobId: id, datasetId: row.datasetId, status: 'failed', stage: 'failed', progress: 0,
+      error: row.error || 'Import job is no longer available.',
+      createdAt: new Date(Number(row.createdAt)).toISOString(), startedAt: null, completedAt: null
+    });
+  }
+  return { jobs, batchId: dispatches[0].batchId };
 }
 
 let schedulerRunning = false;
@@ -123,4 +153,4 @@ async function runScheduledImports(db, logger = console) {
   }
 }
 
-module.exports = { CATEGORIES, callbackResult, dispatchImports, isDue, requestService, runScheduledImports, validateSettings };
+module.exports = { CATEGORIES, callbackResult, currentImportJobs, dispatchImports, isDue, requestService, runScheduledImports, validateSettings };

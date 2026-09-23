@@ -2,8 +2,7 @@ const express = require('express');
 const { checkToken, requireAdminJwt, requireRole } = require('../middleware/security');
 const { apiError } = require('../middleware/api-error');
 const settingsTable = require('../db/tableGeodataImportSettings');
-const dispatchTable = require('../db/tableGeodataImportDispatch');
-const { callbackResult, dispatchImports, requestService, validateSettings } = require('../utils/geodataImport');
+const { callbackResult, currentImportJobs, dispatchImports, requestService, validateSettings } = require('../utils/geodataImport');
 
 const router = express.Router();
 
@@ -63,22 +62,19 @@ router.post('/jobs', async (req, res, next) => {
 
 router.get('/jobs', async (req, res, next) => {
   try {
-    const dispatches = await callbackResult((cb) => dispatchTable.list(req.database.db, req.query.limit, cb));
-    const limit = Math.max(1, Math.min(100, Number(req.query.limit) || 20));
-    const service = await requestService('get', `/geodata/import-jobs?limit=${limit}`);
-    return res.json({ status: 200, dispatches, jobs: service.jobs || [] });
+    return res.json({ status: 200, ...await currentImportJobs(req.database.db) });
   } catch (error) { return next(error); }
 });
 
-router.get('/database-info', async (_req, res, next) => {
+router.get('/database-info', async (req, res, next) => {
   try {
     // Aggregate POI counts can take longer than ordinary API calls on large datasets.
     const databaseInfoTimeoutMs = Number(process.env.GEODATA_DATABASE_INFO_TIMEOUT_MS || 60000);
     const [health, service] = await Promise.all([
       requestService('get', '/geodata/health', undefined, { timeoutMs: databaseInfoTimeoutMs }),
-      requestService('get', '/geodata/import-jobs?limit=20')
+      currentImportJobs(req.database.db)
     ]);
-    return res.json({ status: 200, health, jobs: service.jobs || [] });
+    return res.json({ status: 200, health, ...service });
   } catch (error) { return next(error); }
 });
 

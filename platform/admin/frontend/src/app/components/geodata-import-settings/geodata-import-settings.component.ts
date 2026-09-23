@@ -12,7 +12,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterLink } from '@angular/router';
-import { catchError, EMPTY, finalize, forkJoin, switchMap, timer } from 'rxjs';
+import { catchError, EMPTY, finalize, forkJoin, exhaustMap, timer } from 'rxjs';
 import {
   GeodataDatabaseInfo,
   GeodataImportCatalog,
@@ -44,6 +44,14 @@ export class GeodataImportSettingsComponent {
   readonly catalog = signal<GeodataImportCatalog | null>(null);
   readonly settings = signal<GeodataImportSettings | null>(null);
   readonly databaseInfo = signal<GeodataDatabaseInfo | null>(null);
+  readonly runningJobs = computed(() => (this.databaseInfo()?.jobs ?? []).filter(job => job.status === 'running'));
+  readonly importJobs = computed(() => {
+    const rank = { running: 0, queued: 1, failed: 2, succeeded: 3 };
+    return [...(this.databaseInfo()?.jobs ?? [])].sort((a, b) => rank[a.status] - rank[b.status]
+      || a.createdAt.localeCompare(b.createdAt) || a.jobId.localeCompare(b.jobId));
+  });
+  readonly completedJobCount = computed(() => this.importJobs()
+    .filter(job => job.status === 'succeeded' || job.status === 'failed').length);
   readonly enabledCategories = signal<ReadonlySet<string>>(new Set());
   readonly enabledDatasets = signal<ReadonlySet<string>>(new Set());
   readonly selectedSubcategories = signal<Record<string, string[]>>({});
@@ -92,12 +100,13 @@ export class GeodataImportSettingsComponent {
   constructor() {
     this.load();
     timer(5000, 5000).pipe(
-      switchMap(() => this.service.getJobs().pipe(catchError(() => EMPTY))),
+      exhaustMap(() => this.service.getJobs().pipe(catchError(() => EMPTY))),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe((value) => {
       this.databaseInfo.update((current) => ({
         ...(current ?? { status: 200, health: { status: 200 } }),
-        jobs: value.jobs
+        jobs: value.jobs,
+        batchId: value.batchId
       }));
     });
   }
@@ -132,6 +141,11 @@ export class GeodataImportSettingsComponent {
 
   isDatasetEnabled(datasetId: string): boolean {
     return this.enabledDatasets().has(datasetId);
+  }
+
+  datasetLabel(datasetId: string): string {
+    const dataset = this.catalog()?.datasets.find(row => row.id === datasetId);
+    return dataset?.level === 'country' ? this.countryLabel(dataset.countryCode) : dataset?.label ?? datasetId;
   }
 
   countryLabel(countryCode: string): string {
@@ -237,11 +251,14 @@ export class GeodataImportSettingsComponent {
   }
 
   loadDatabaseInfo(): void {
+    const jobsAtRequest = this.databaseInfo()?.jobs;
     this.loadingDatabaseInfo.set(true);
     this.service.getDatabaseInfo()
       .pipe(finalize(() => this.loadingDatabaseInfo.set(false)), takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (value) => this.databaseInfo.set(value),
+        next: (value) => this.databaseInfo.update(current => current && current.jobs !== jobsAtRequest
+          ? { ...value, jobs: current.jobs, batchId: current.batchId }
+          : value),
         error: () => this.showError(this.i18n.t('Could not load database information.'))
       });
   }

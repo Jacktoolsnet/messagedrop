@@ -56,7 +56,14 @@ export interface GeodataImportJob {
   completedAt: string | null;
 }
 
+export interface GeodataImportJobsResponse {
+  status: number;
+  batchId: string | null;
+  jobs: GeodataImportJob[];
+}
+
 export interface GeodataDatabaseInfo {
+  batchId?: string | null;
   status: number;
   health: {
     status: number;
