@@ -36,7 +36,7 @@ completed imports could exhaust those budgets and, with a shared client IP,
 temporarily block browser requests with HTTP 429. This response alone does not
 indicate a process crash.
 
-POSTs to `/info-log`, `/warn-log`, and `/error-log` now bypass those two
+POSTs to `/info-log`, `/warn-log`, and `/error-log` bypass those two
 budgets **only after cryptographic service-JWT verification** (including audience).
 Route authentication still applies. Browser tokens, invalid tokens, log reads,
 and other routes retain their previous limits. The Geodata import API itself
@@ -63,16 +63,15 @@ an admin dispatch record could be written, remain visible after an admin restart
 The latest batch's completed jobs remain listed; additional jobs outside that
 batch are shown while active. The heading reflects the combined run/queue view.
 
-The frontend queries jobs immediately on opening, then every five seconds while
-jobs are running/queued or a manual import is being dispatched. While idle it
-queries only once per minute, so scheduled imports are detected within that
-interval. Manual starts and refreshes query immediately. Failed requests retry
-after 30 seconds. Requests do not overlap, and leaving the page stops polling.
-Failed polling shows an explicit stale-status warning; successful polling clears
-it. A failed live-queue read fails the refresh rather than presenting a
-completed-only batch as the current state.
+The frontend now subscribes to Socket.IO updates while the database-information
+tab is visible, with an initial snapshot and a fresh snapshot after reconnection.
+There is no periodic frontend job polling. See [deployment and operation of live updates](geodata-live-updates.md).
+A failed live-queue read fails the refresh rather than presenting a completed-only batch as current.
 
 This does not change worker recovery: an Admin restart leaves Geodata workers
 alone. On a Geodata-service restart, its existing recovery marks interrupted
 running jobs as failed and launches remaining queued jobs; it does not mark them
 as successfully imported. Deploy all three components (Geodata first).
+
+The authenticated Geodata push endpoint `/geodata-import/events` also bypasses
+the browser IP budget; its route additionally checks the Geodata issuer.

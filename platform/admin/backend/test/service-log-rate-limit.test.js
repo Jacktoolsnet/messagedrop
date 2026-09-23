@@ -25,6 +25,8 @@ test('only verified service POSTs to log ingestion bypass the limit', () => {
     ['POST', '/info-log', 'verified-service-token', true],
     ['POST', '/warn-log/', 'verified-service-token', true],
     ['POST', '/error-log', 'verified-service-token', true],
+    ['POST', '/geodata-import/events', 'verified-service-token', true],
+    ['POST', '/geodata-import/events', 'browser-token', false],
     ['GET', '/info-log', 'verified-service-token', false],
     ['DELETE', '/info-log', 'verified-service-token', false],
     ['POST', '/user/login', 'verified-service-token', false],

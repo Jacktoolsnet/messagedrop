@@ -268,11 +268,14 @@ attachForwarding(logger, {
 
 /**
  * Socket.io
- * Disable Apache proxymode in Plesk to avoid socket.io connection errors.
+ * Reverse proxies must forward WebSocket upgrades for /socket.io/.
  */
 const { Server } = require('socket.io');
 const contactHandlers = require("./socketIo/contactHandlers");
 const userHandlers = require('./socketIo/userHandlers');
+const { createGeodataUpdates } = require('./socketIo/geodataHandlers');
+const importJobEvents = require('./utils/importJobEvents');
+const { currentImportJobs } = require('./utils/geodataImport');
 const server = createServer(app);
 
 function parsePositiveInt(value, fallback) {
@@ -295,6 +298,8 @@ const adminSocketEventWindowMs = parsePositiveInt(process.env.ADMIN_SOCKETIO_EVE
 const adminSocketEventLimit = parsePositiveInt(process.env.ADMIN_SOCKETIO_EVENT_MAX, 300);
 const adminSocketEventPayloadMaxBytes = parsePositiveInt(process.env.ADMIN_SOCKETIO_EVENT_MAX_PAYLOAD_BYTES, 1024 * 1024);
 const knownAdminSocketEvents = new Set([
+  'geodata:subscribe',
+  'geodata:unsubscribe',
   'user:joinUserRoom',
   'contact:requestProfile',
   'contact:provideUserProfile',
@@ -312,9 +317,12 @@ const io = new Server(server, {
   }
 });
 
+const geodataUpdates = createGeodataUpdates(io, () => currentImportJobs(database.db), logger);
+importJobEvents.on('changed', () => geodataUpdates.changed());
+
 io.use((socket, next) => {
   const rawToken = socket.handshake.auth?.token || socket.handshake.headers?.authorization;
-  if (!rawToken) {
+  if (typeof rawToken !== 'string' || !rawToken) {
     logger.warn('admin socket auth failed', { error: 'missing_token' });
     return next(new Error('unauthorized'));
   }
@@ -425,6 +433,7 @@ const onConnection = (socket) => {
   });
 
   // Eigentliche Handler laden
+  geodataUpdates.attach(socket);
   userHandlers(io, socket);
   contactHandlers(io, socket);
 };

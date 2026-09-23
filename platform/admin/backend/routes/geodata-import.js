@@ -5,6 +5,16 @@ const settingsTable = require('../db/tableGeodataImportSettings');
 const { callbackResult, currentImportJobs, dispatchImports, requestService, validateSettings } = require('../utils/geodataImport');
 
 const router = express.Router();
+const { requireServiceJwt } = require('../utils/serviceJwt');
+const importJobEvents = require('../utils/importJobEvents');
+
+router.post('/events', requireServiceJwt, (req, res, next) => {
+  if (req.service?.iss !== (process.env.GEODATA_SERVICE_JWT_ISSUER || 'service.geodata')) {
+    return next(apiError.forbidden('invalid_geodata_event_source'));
+  }
+  importJobEvents.emit('changed');
+  res.sendStatus(202);
+});
 
 function isSettingsValidationError(error) {
   return String(error?.message || '').startsWith('invalid_')

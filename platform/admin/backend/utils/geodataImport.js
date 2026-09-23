@@ -1,4 +1,5 @@
 const axios = require('axios');
+const importJobEvents = require('./importJobEvents');
 const { randomUUID } = require('node:crypto');
 const { signServiceJwt } = require('./serviceJwt');
 const { resolveBaseUrl } = require('./adminLogForwarder');
@@ -98,10 +99,12 @@ async function dispatchImports(db, settings, triggerType, options = {}) {
       const response = await requestService('post', '/geodata/import-jobs', config);
       await callbackResult((callback) => dispatchTable.create(db, { dispatchId, batchId, serviceJobId: response.job?.jobId,
         datasetId, triggerType, status: response.job?.status || 'queued', requestedConfig: config }, callback));
+      importJobEvents.emit('changed');
       results.push({ dispatchId, datasetId, job: response.job, created: response.created });
     } catch (error) {
       await callbackResult((callback) => dispatchTable.create(db, { dispatchId, batchId, datasetId, triggerType,
         status: 'failed', requestedConfig: config, error: error.response?.data?.message || error.message }, callback));
+      importJobEvents.emit('changed');
       throw error;
     }
   }

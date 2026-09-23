@@ -18,6 +18,12 @@ const DATASETS = Object.freeze({
   ...FALLBACK_DATASETS
 });
 
+function notifyProgress() {
+  if (process.connected && process.send) {
+    try { process.send({ type: 'geodata:changed' }, () => {}); } catch { /* Parent may be restarting. */ }
+  }
+}
+
 async function main() {
   const options = parseArguments(process.argv.slice(2));
   const dataset = options.datasetDefinition || DATASETS[options.dataset];
@@ -38,10 +44,11 @@ async function main() {
     }, callback));
   }
   await callbackResult((callback) => tableGeodataPoi.startJob(database.db, jobId, callback));
+  notifyProgress();
   process.stdout.write(`Started import job ${jobId}.\n`);
   try {
     const updateProgress = (stage, progress, details = {}) => callbackResult((callback) =>
-      tableGeodataPoi.updateJobProgress(database.db, jobId, stage, progress, details, callback));
+      tableGeodataPoi.updateJobProgress(database.db, jobId, stage, progress, details, callback)).then(notifyProgress);
     const progress = createProgressTracker(dataset, updateProgress);
     await progress.update('checking_source', null);
     const activeSource = await callbackResult((callback) =>
@@ -650,6 +657,8 @@ if (require.main === module) {
   main().catch((error) => {
     process.stderr.write(`Could not import local Geodata dataset: ${error.message}\n`);
     process.exitCode = 1;
+  }).finally(() => {
+    if (process.connected) process.disconnect();
   });
 }
 

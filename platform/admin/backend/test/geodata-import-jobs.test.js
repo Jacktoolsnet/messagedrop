@@ -9,6 +9,7 @@ function loadUtility(dispatches, request, create = () => {}) {
   const settingsTable = { markTriggered: (_db, _time, cb) => cb(null) };
   const mocks = {
     axios: request,
+    './importJobEvents': { emit() {} },
     'node:crypto': require('node:crypto'),
     './serviceJwt': { signServiceJwt: async () => 'token' },
     './adminLogForwarder': { resolveBaseUrl: () => 'http://geodata.test' },

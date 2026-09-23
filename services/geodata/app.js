@@ -60,6 +60,7 @@ const { createFileTransports } = require('./utils/logTransports');
 const Database = require('./db/database');
 const tableGeodataPoi = require('./db/tableGeodataPoi');
 const { LocalPoiStore } = require('./local-poi-store');
+const { createImportNotifier } = require('./utils/importNotifier');
 const { ImportJobManager } = require('./import-job-manager');
 const loggerMw = require('./middleware/logger');
 const traceId = require('./middleware/trace-id');
@@ -217,7 +218,8 @@ async function start() {
   await database.init(logger);
   logStartupStep(logger, 'PostgreSQL database ready');
   const localPoiStore = new LocalPoiStore({ database, logger });
-  const importJobManager = new ImportJobManager({ database, logger });
+  const importNotifier = createImportNotifier(logger);
+  const importJobManager = new ImportJobManager({ database, logger, notifier: importNotifier });
   const exportStore = new ExportStore({ database });
   await cleanupExportStorage(database.db, logger);
   const jobRetentionDays = numberSetting('GEODATA_JOB_RETENTION_DAYS', 90);
@@ -238,6 +240,7 @@ async function start() {
   const shutdown = (signal) => {
     logger.info('Geodata service shutting down', { signal });
     clearInterval(cleanupTimer);
+    importNotifier.close();
     server.close(() => database.close());
   };
   process.on('SIGTERM', () => shutdown('SIGTERM'));

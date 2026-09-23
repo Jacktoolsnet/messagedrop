@@ -35,7 +35,7 @@
       <mat-card-content><mat-icon>cloud_off</mat-icon> {{ i18n.t('The Geodata catalog currently contains no categories.') }}</mat-card-content>
     </mat-card>
   } @else {
-    <mat-tab-group class="settings-tabs" animationDuration="180ms">
+    <mat-tab-group class="settings-tabs" animationDuration="180ms" (selectedIndexChange)="onTabChanged($event)">
       <mat-tab>
         <ng-template mat-tab-label><mat-icon>category</mat-icon><span>{{ i18n.t('Categories') }}</span></ng-template>
         <section class="tab-content settings-layout">
@@ -229,7 +229,7 @@
               @if (importStatusUnavailable()) {
                 <p class="import-status-warning" role="status">
                   <mat-icon>warning</mat-icon>
-                  {{ i18n.t('Import status could not be updated. The displayed jobs may be outdated. Retrying automatically.') }}
+                  {{ i18n.t('Live connection interrupted. The displayed jobs may be outdated. Reconnecting automatically.') }}
                 </p>
               }
               @if (databaseInfo(); as info) {

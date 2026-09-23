@@ -13,8 +13,9 @@ function callbackResult(register) {
 }
 
 class ImportJobManager {
-  constructor({ database, logger = console, datasetCatalog } = {}) {
+  constructor({ database, logger = console, datasetCatalog, notifier } = {}) {
     this.database = database;
+    this.notifier = notifier;
     this.logger = logger;
     this.children = new Map();
     this.launching = false;
@@ -30,6 +31,8 @@ class ImportJobManager {
       await this.launchNext();
     } catch (error) {
       this.logger.error('Could not recover Geodata import queue', { error: error.message });
+    } finally {
+      this.notifier?.changed();
     }
   }
 
@@ -85,6 +88,7 @@ class ImportJobManager {
         force: Boolean(force)
       }
     }, callback));
+    this.notifier?.changed();
     void this.launchNext();
     return { job: await this.get(jobId), created: true };
   }
@@ -120,13 +124,17 @@ class ImportJobManager {
     args.push('--subcategories-json', JSON.stringify(config.subcategories || {}));
     if (config.refresh) args.push('--refresh');
     if (config.force) args.push('--force');
-    const child = spawn(process.execPath, args, { cwd: __dirname, env: process.env, stdio: ['ignore', 'pipe', 'pipe'] });
+    const child = spawn(process.execPath, args, { cwd: __dirname, env: process.env, stdio: ['ignore', 'pipe', 'pipe', 'ipc'] });
     this.children.set(jobId, child);
+    child.on('message', message => {
+      if (message?.type === 'geodata:changed') this.notifier?.changed();
+    });
     child.stdout.on('data', (data) => this.logger.info('Geodata import', { jobId, output: String(data).trim() }));
     child.stderr.on('data', (data) => this.logger.warn('Geodata import', { jobId, output: String(data).trim() }));
     child.once('error', (error) => void this.fail(jobId, error).finally(() => this.launchNext()));
     child.once('exit', (code, signal) => {
       this.children.delete(jobId);
+      this.notifier?.changed();
       const completion = code !== 0
         ? this.fail(jobId, new Error(`Import process failed (${signal || `exit ${code}`})`))
         : Promise.resolve();
@@ -146,6 +154,7 @@ class ImportJobManager {
   async fail(jobId, error) {
     try {
       await callbackResult((callback) => table.failJob(this.database.db, jobId, error.message, callback));
+      this.notifier?.changed();
     } catch (dbError) {
       this.logger.error('Could not mark Geodata import as failed', { jobId, error: dbError.message });
     }

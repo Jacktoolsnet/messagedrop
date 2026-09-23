@@ -1906,5 +1906,5 @@
   "Current import run": "Aktueller Importlauf",
   "{{completed}} of {{total}} import jobs finished": "{{completed}} von {{total}} Importaufträgen abgeschlossen",
   "Import run and active queue": "Importlauf und aktive Warteschlange",
-  "Import status could not be updated. The displayed jobs may be outdated. Retrying automatically.": "Der Importstatus konnte nicht aktualisiert werden. Die angezeigten Aufträge sind möglicherweise veraltet. Die Aktualisierung wird automatisch erneut versucht."
+  "Live connection interrupted. The displayed jobs may be outdated. Reconnecting automatically.": "Die Live-Verbindung ist unterbrochen. Die angezeigten Aufträge sind möglicherweise veraltet. Die Verbindung wird automatisch wiederhergestellt."
 }

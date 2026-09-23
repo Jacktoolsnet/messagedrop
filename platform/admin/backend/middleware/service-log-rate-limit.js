@@ -1,9 +1,9 @@
 const { verifyServiceJwt } = require('../utils/serviceJwt');
 
 const verifiedRequests = new WeakMap();
-const logPaths = new Set(['/info-log', '/warn-log', '/error-log']);
+const logPaths = new Set(['/info-log', '/warn-log', '/error-log', '/geodata-import/events']);
 
-// Only authenticated service log ingestion bypasses the browser/IP budgets.
+// Only authenticated service log ingestion and Geodata events bypass the browser/IP budgets.
 // Never trust an IP, a source field, or an unverified JWT for this exception.
 function isServiceLogIngestion(req) {
   if (req.method !== 'POST' || !logPaths.has(req.path.replace(/\/$/, ''))) return false;
