@@ -145,3 +145,79 @@ test('reads record-separated GeoJSON with line breaks in OSM tag values', async 
   assert.equal(batches[0].name, 'Hotel first line\nsecond line');
   assert.equal(batches[1].subtype, 'toilets');
 });
+
+test('calculates the bounding-box centre of a polygon with 300,000 vertices without argument overflow', () => {
+  const ring = Array.from({ length: 300000 }, (_, i) => [-140 + i % 60, 50 + i % 30]);
+  assert.deepEqual(geometryCenter({ type: 'Polygon', coordinates: [ring] }), {
+    longitude: -110.5, latitude: 64.5
+  });
+});
+
+test('handles deeply nested geometry collections without recursive stack overflow', () => {
+  let geometry = { type: 'Point', coordinates: [-42, 70] };
+  for (let i = 0; i < 20000; i++) geometry = { type: 'GeometryCollection', geometries: [geometry] };
+  assert.deepEqual(geometryCenter(geometry), { longitude: -42, latitude: 70 });
+});
+
+test('combines multipart geometries and holes using the existing bounding-box semantics', () => {
+  assert.deepEqual(geometryCenter({
+    type: 'GeometryCollection',
+    geometries: [
+      { type: 'MultiPolygon', coordinates: [
+        [[[-20, 60], [-10, 70], [-20, 60]], [[-18, 62], [-12, 68]]],
+        [[[10, 20], [30, 40], [10, 20]]]
+      ] },
+      { type: 'LineString', coordinates: [[-30, 0], [50, 80]] },
+      { type: 'Point', coordinates: ['20', '30', 100] }
+    ]
+  }), { longitude: 10, latitude: 40 });
+});
+
+test('returns null for empty or invalid geometries without treating null or empty arrays as coordinates', () => {
+  for (const geometry of [
+    null, {}, { type: 'GeometryCollection', geometries: [] },
+    { type: 'Polygon', coordinates: [[], []] },
+    { type: 'Point', coordinates: [null, null] },
+    { type: 'Point', coordinates: ['', ''] },
+    { type: 'Point', coordinates: [Infinity, 20] }
+  ]) assert.equal(geometryCenter(geometry), null);
+  assert.deepEqual(geometryCenter({ type: 'MultiPoint', coordinates: [[NaN, 20], [0, 0]] }), {
+    longitude: 0, latitude: 0
+  });
+});
+
+test('streams a large polygon through the actual POI import path', async (t) => {
+  const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'geodata-large-polygon-'));
+  t.after(() => fs.rm(directory, { recursive: true, force: true }));
+  const inputPath = path.join(directory, 'pois.geojsonseq');
+  const feature = {
+    type: 'Feature',
+    properties: { '@type': 'relation', '@id': 123456, leisure: 'nature_reserve', name: 'Large test reserve' },
+    geometry: { type: 'Polygon', coordinates: [
+      Array.from({ length: 300000 }, (_, i) => [-140 + i % 60, 50 + i % 30])
+    ] }
+  };
+  await fs.writeFile(inputPath, '\x1e' + JSON.stringify(feature) + '\n');
+  const batches = [];
+  const count = await readPois(inputPath, ['leisure'], { leisure: ['nature_reserve'] }, async batch => batches.push(batch));
+  assert.equal(count, 1);
+  assert.equal(batches[0][0].id, 'osm:relation:123456');
+  assert.equal(batches[0][0].longitude, -110.5);
+  assert.equal(batches[0][0].latitude, 64.5);
+});
+
+test('processing errors retain the record, OSM context, and original stack as cause', async (t) => {
+  const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'geodata-record-error-'));
+  t.after(() => fs.rm(directory, { recursive: true, force: true }));
+  const inputPath = path.join(directory, 'pois.geojsonseq');
+  await fs.writeFile(inputPath, JSON.stringify({
+    type: 'Feature', geometry: { type: 'Point', coordinates: [10, 52] },
+    properties: { '@type': 'node', '@id': { toString: null, valueOf: null }, tourism: 'hotel' }
+  }));
+  await assert.rejects(readPois(inputPath), error => {
+    assert.match(error.message, /GeoJSON record 1 \(OSM node\/unknown, geometry Point\)/);
+    assert.ok(error.cause instanceof TypeError);
+    assert.match(error.cause.stack, /featureToElement/);
+    return true;
+  });
+});

@@ -5,6 +5,7 @@ const fsPromises = require('node:fs/promises');
 const path = require('node:path');
 const { spawn } = require('node:child_process');
 const { createHash, randomUUID } = require('node:crypto');
+const { inspect } = require('node:util');
 require('dotenv').config({ path: path.resolve(__dirname, '../../../.env'), quiet: true });
 const Database = require('../db/database');
 const tableGeodataPoi = require('../db/tableGeodataPoi');
@@ -330,10 +331,23 @@ async function readPois(
   for await (const rawRecord of readGeoJsonSequence(inputPath)) {
     recordNumber += 1;
     processedBytes += Buffer.byteLength(rawRecord) + 1;
-    const feature = parseGeoJsonRecord(rawRecord, recordNumber);
-    const element = featureToElement(feature);
-    const poi = element ? normalizeElement(element, categories, subcategories) : null;
-    if (poi) unique.set(poi.id, poi);
+    let feature;
+    try {
+      feature = parseGeoJsonRecord(rawRecord, recordNumber);
+      const element = featureToElement(feature);
+      const poi = element ? normalizeElement(element, categories, subcategories) : null;
+      if (poi) unique.set(poi.id, poi);
+    } catch (error) {
+      const label = (value) => typeof value === 'string' || typeof value === 'number'
+        ? String(value).replace(/[\r\n]/g, ' ').slice(0, 100) : 'unknown';
+      const osmType = label(feature?.properties?.['@type']);
+      const osmId = label(feature?.properties?.['@id']);
+      const geometryType = label(feature?.geometry?.type);
+      throw new Error(
+        `Could not process GeoJSON record ${recordNumber} (OSM ${osmType}/${osmId}, geometry ${geometryType}): ${error.message}`,
+        { cause: error }
+      );
+    }
     if (persistBatch && unique.size >= 1000) {
       const batch = [...unique.values()];
       await persistBatch(batch);
@@ -456,32 +470,42 @@ function featureToElement(feature) {
 }
 
 function geometryCenter(geometry) {
-  const points = [];
-  collectCoordinates(geometry, points);
-  if (!points.length) return null;
-  const longitudes = points.map(([longitude]) => longitude);
-  const latitudes = points.map(([, latitude]) => latitude);
-  return {
-    latitude: (Math.min(...latitudes) + Math.max(...latitudes)) / 2,
-    longitude: (Math.min(...longitudes) + Math.max(...longitudes)) / 2
-  };
-}
+  let west = Infinity;
+  let east = -Infinity;
+  let south = Infinity;
+  let north = -Infinity;
+  const isCoordinate = (value) => (typeof value === 'number'
+    || (typeof value === 'string' && value.trim() !== '')) && Number.isFinite(Number(value));
 
-function collectCoordinates(value, points) {
-  if (!value) return;
-  if (Array.isArray(value) && value.length >= 2
-      && Number.isFinite(Number(value[0])) && Number.isFinite(Number(value[1]))) {
-    points.push([Number(value[0]), Number(value[1])]);
-    return;
+  // Traverse one item at a time. Auxiliary storage grows only with nesting depth,
+  // not with the number of vertices. No recursive calls or argument spreading:
+  // large OSM polygons can contain hundreds of thousands of coordinate pairs.
+  const stack = [[geometry].values()];
+  while (stack.length) {
+    const item = stack[stack.length - 1].next();
+    if (item.done) {
+      stack.pop();
+      continue;
+    }
+    const value = item.value;
+    if (Array.isArray(value)) {
+      if (value.length >= 2 && isCoordinate(value[0]) && isCoordinate(value[1])) {
+        const longitude = Number(value[0]);
+        const latitude = Number(value[1]);
+        west = Math.min(west, longitude);
+        east = Math.max(east, longitude);
+        south = Math.min(south, latitude);
+        north = Math.max(north, latitude);
+      } else {
+        stack.push(value.values());
+      }
+    } else if (value && typeof value === 'object') {
+      if (Array.isArray(value.geometries)) stack.push(value.geometries.values());
+      if (Array.isArray(value.coordinates)) stack.push([value.coordinates].values());
+    }
   }
-  if (Array.isArray(value)) {
-    value.forEach((item) => collectCoordinates(item, points));
-    return;
-  }
-  if (typeof value === 'object') {
-    collectCoordinates(value.coordinates, points);
-    if (Array.isArray(value.geometries)) value.geometries.forEach((item) => collectCoordinates(item, points));
-  }
+  if (west === Infinity) return null;
+  return { latitude: (south + north) / 2, longitude: (west + east) / 2 };
 }
 
 function filterExpressions(categories = categoryNames(), selectedSubcategories = null) {
@@ -655,7 +679,7 @@ async function exists(filePath) {
 
 if (require.main === module) {
   main().catch((error) => {
-    process.stderr.write(`Could not import local Geodata dataset: ${error.message}\n`);
+    process.stderr.write(`Could not import local Geodata dataset: ${inspect(error, { depth: 5, colors: false })}\n`);
     process.exitCode = 1;
   }).finally(() => {
     if (process.connected) process.disconnect();
