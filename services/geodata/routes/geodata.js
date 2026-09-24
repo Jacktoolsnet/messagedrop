@@ -30,6 +30,13 @@ function createGeodataRouter({ localPoiStore, importJobManager, metrics = {} }) 
     } catch (error) { return next(error); }
   });
 
+  router.post('/import-plan', async (req, res, next) => {
+    if (!importJobManager) return res.status(503).json({ error: 'import_jobs_unavailable' });
+    try {
+      return res.status(200).json({ status: 200, datasets: await importJobManager.plan(req.body?.datasetIds) });
+    } catch (error) { return next(error); }
+  });
+
   router.post('/import-jobs', async (req, res, next) => {
     if (!importJobManager) return res.status(503).json({ error: 'import_jobs_unavailable' });
     try {

@@ -291,8 +291,36 @@ function findRunningJob(db, callback) {
   db.get(`SELECT * FROM ${JOB_TABLE} WHERE status = 'running' ORDER BY startedAt ASC LIMIT 1`, [], callback);
 }
 
+// Shared by dispatch planning and worker selection. Active jobs must not hide
+// the last completed attempt. Active versions survive job-history retention.
+function importPrioritySql(datasetId) {
+  return `CASE (
+    SELECT history.status FROM ${JOB_TABLE} history
+    WHERE history.datasetId = ${datasetId} AND history.status IN ('failed', 'succeeded')
+    ORDER BY history.createdAt DESC, history.completedAt DESC, history.jobId DESC LIMIT 1
+  )
+    WHEN 'failed' THEN 0
+    WHEN 'succeeded' THEN 2
+    ELSE CASE WHEN EXISTS (
+      SELECT 1 FROM ${DATASET_TABLE} dataset
+      WHERE dataset.datasetId = ${datasetId} AND dataset.activeVersionId IS NOT NULL
+    ) THEN 2 ELSE 1 END
+  END`;
+}
+
+function planImports(db, datasetIds, callback) {
+  if (!datasetIds.length) return callback(null, []);
+  db.all(`WITH selected(datasetId, ordinal) AS (
+      VALUES ${datasetIds.map((_, index) => `(?, ${index})`).join(', ')}
+    )
+    SELECT selected.datasetId, ${importPrioritySql('selected.datasetId')} AS priority
+    FROM selected ORDER BY priority ASC, selected.ordinal ASC`, datasetIds, callback);
+}
+
 function findQueuedJob(db, callback) {
-  db.get(`SELECT * FROM ${JOB_TABLE} WHERE status = 'queued' ORDER BY createdAt ASC LIMIT 1`, [], callback);
+  db.get(`SELECT job.* FROM ${JOB_TABLE} job WHERE job.status = 'queued'
+    ORDER BY ${importPrioritySql('job.datasetId')} ASC, job.createdAt ASC, job.jobId ASC
+    LIMIT 1`, [], callback);
 }
 
 function failInterruptedJobs(db, callback) {
@@ -528,6 +556,7 @@ module.exports = {
   cleanupJobs,
   findActiveJob,
   findRunningJob,
+  planImports,
   findQueuedJob,
   failInterruptedJobs,
   stageVersion,

@@ -90,8 +90,17 @@ function isDue(settings, now = new Date()) {
 
 async function dispatchImports(db, settings, triggerType, options = {}) {
   const results = [];
+  // Plan before the first POST: the service can start a worker immediately,
+  // before the remaining countries have been added to its queue.
+  const selected = new Set(settings.datasets);
+  const plan = await requestService('post', '/geodata/import-plan', { datasetIds: [...selected] });
+  const datasets = Array.isArray(plan?.datasets) ? plan.datasets.map((entry) => entry?.datasetId) : null;
+  if (!Array.isArray(datasets) || datasets.length !== selected.size
+    || new Set(datasets).size !== selected.size || datasets.some((id) => !selected.has(id))) {
+    throw Object.assign(new Error('invalid_geodata_import_plan'), { status: 502 });
+  }
   const batchId = randomUUID();
-  for (const datasetId of settings.datasets) {
+  for (const datasetId of datasets) {
     const dispatchId = randomUUID();
     const config = { datasetId, categories: settings.categories, subcategories: settings.subcategories || {},
       refresh: settings.refreshSource, force: Boolean(options.force) };

@@ -53,6 +53,18 @@ class ImportJobManager {
     }));
   }
 
+  async plan(datasetIds) {
+    if (!Array.isArray(datasetIds) || !datasetIds.length
+      || datasetIds.some((id) => typeof id !== 'string')) {
+      throw Object.assign(new Error('invalid_import_datasets'), { status: 400 });
+    }
+    const catalog = await this.datasetCatalog.get();
+    if (datasetIds.some((id) => !Object.hasOwn(catalog.definitions, id))) {
+      throw Object.assign(new Error('unknown_import_dataset'), { status: 400 });
+    }
+    return callbackResult((callback) => table.planImports(this.database.db, [...new Set(datasetIds)], callback));
+  }
+
   async start({ datasetId, categories = categoryNames(), subcategories = {}, refresh = true, force = false }) {
     const catalog = await this.datasetCatalog.get();
     const dataset = catalog.definitions[datasetId];

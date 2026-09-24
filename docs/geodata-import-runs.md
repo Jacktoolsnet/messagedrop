@@ -28,6 +28,35 @@ Die bestehende Aufbewahrungsfrist für Import-/Dispatch-Daten gilt weiterhin.
 Bei fehlenden Service-Jobs bleibt ein Eintrag mit Fehlerhinweis sichtbar,
 statt stillschweigend aus der Liste zu verschwinden.
 
+## Priorität der Länder
+
+Manuelle und geplante Läufe bearbeiten die ausgewählten Länder in dieser Reihenfolge:
+
+1. Letzter abgeschlossener Importversuch fehlgeschlagen.
+2. Noch kein erfolgreicher Import vorhanden.
+3. Bereits erfolgreich importiert (einschließlich unveränderter Daten).
+
+Nur der letzte abgeschlossene Versuch zählt: Ein späterer Erfolg hebt die
+Fehler-Priorität auf. Laufende und wartende Aufträge verdecken frühere Fehler
+nicht. Falls die Job-Historie bereits bereinigt wurde, erkennt der Service
+vorhandene Importe weiterhin an ihrer aktiven Datenversion. Gelöschte Fehler
+können dagegen nicht mehr zur Priorisierung herangezogen werden.
+
+Das Admin-Backend holt vor dem ersten Auftrag einen authentifizierten Importplan
+vom Geodata-Service (`POST /geodata/import-plan`). Innerhalb derselben Priorität
+bleibt die ausgewählte Reihenfolge erhalten. Bei einem fehlgeschlagenen Planabruf
+werden keine neuen Aufträge angelegt. Der Service wählt auch aus einer bestehenden
+Warteschlange nach derselben Priorität, innerhalb einer Priorität nach Anlagezeit.
+Die Priorität wird aus der Datenbank ermittelt und funktioniert daher auch nach
+einem Neustart. Ein laufender Auftrag wird nicht verdrängt; fehlgeschlagene
+Aufträge werden nicht automatisch erneut angelegt.
+
+Für diese Änderung zuerst den **Geodata-Service**, dann das **Admin-Backend**
+aktualisieren und neu starten. Frontend, Umgebungsvariablen und Datenbankschema
+bleiben unverändert. Den Geodata-Neustart möglichst außerhalb eines laufenden
+Imports durchführen: Die bestehende Recovery markiert unterbrochene Importe
+als fehlgeschlagen; wartende Aufträge bleiben erhalten.
+
 ## Rate limits and log forwarding
 
 The Admin backend's global IP budget (600 requests / 10 minutes) and shared

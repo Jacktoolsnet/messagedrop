@@ -69,7 +69,9 @@ test('legacy data uses active queue fallback', async () => {
 test('manual and scheduled dispatches persist a shared ID per run, including reused jobs', async () => {
   const rows = [];
   const { dispatchImports } = loadUtility([], async ({ data }) => ({
-    data: { job: { jobId: data.datasetId, status: 'queued' }, created: false }
+    data: data.datasetIds
+      ? { datasets: data.datasetIds.map(datasetId => ({ datasetId })) }
+      : { job: { jobId: data.datasetId, status: 'queued' }, created: false }
   }), row => rows.push(row));
   const config = { datasets: ['a', 'b'], categories: ['tourism'], refreshSource: true };
   await dispatchImports({}, config, 'manual');
@@ -82,7 +84,10 @@ test('manual and scheduled dispatches persist a shared ID per run, including reu
 
 test('dispatch failure is recorded with the batch ID', async () => {
   const rows = [];
-  const { dispatchImports } = loadUtility([], async () => { throw new Error('offline'); }, row => rows.push(row));
+  const { dispatchImports } = loadUtility([], async ({ data }) => {
+    if (data.datasetIds) return { data: { datasets: [{ datasetId: 'a' }] } };
+    throw new Error('offline');
+  }, row => rows.push(row));
   await assert.rejects(dispatchImports({}, { datasets: ['a'], categories: ['tourism'] }, 'manual'));
   assert.equal(rows[0].status, 'failed');
   assert.ok(rows[0].batchId);
@@ -154,4 +159,43 @@ test('live queue failure is reported instead of returning a misleading completed
     return { data: { jobs: [{ jobId: 'finished', status: 'succeeded' }] } };
   });
   await assert.rejects(currentImportJobs({}), /geodata_service_unavailable/);
+});
+
+for (const triggerType of ['manual', 'scheduled']) {
+  test(`${triggerType} dispatch plans all countries before starting the first import`, async () => {
+    const rows = [];
+    const selected = Array.from({ length: 166 }, (_, i) => 'country-' + i);
+    const ordered = [...selected].reverse();
+    const requests = [];
+    const { dispatchImports } = loadUtility([], async ({ url, data }) => {
+      requests.push(new URL(url).pathname);
+      if (url.endsWith('/import-plan')) {
+        assert.deepEqual(Array.from(data.datasetIds), selected);
+        return { data: { datasets: ordered.map(datasetId => ({ datasetId })) } };
+      }
+      return { data: { job: { jobId: data.datasetId, status: 'queued' }, created: true } };
+    }, row => rows.push(row));
+    await dispatchImports({}, { datasets: selected, categories: ['tourism'], refreshSource: true }, triggerType, { force: true });
+    assert.equal(requests[0], '/geodata/import-plan');
+    assert.equal(requests.length, 167);
+    assert.deepEqual(rows.map(row => row.datasetId), ordered);
+    assert.ok(rows.every(row => row.requestedConfig.force && row.requestedConfig.refresh));
+    assert.equal(new Set(rows.map(row => row.batchId)).size, 1);
+  });
+}
+
+test('unavailable or invalid plans fail before creating any import jobs', async () => {
+  for (const datasets of [null, {}, [], [null], [{ datasetId: 'other' }],
+    [{ datasetId: 'a' }, { datasetId: 'a' }], [{ datasetId: 'a' }]]) {
+    let calls = 0;
+    const { dispatchImports } = loadUtility([], async () => {
+      calls++;
+      return { data: { datasets } };
+    }, () => assert.fail('no dispatch should have been created'));
+    await assert.rejects(dispatchImports({}, { datasets: ['a', 'b'] }, 'manual'), /invalid_geodata_import_plan/);
+    assert.equal(calls, 1);
+  }
+  const { dispatchImports } = loadUtility([], async () => { throw new Error('offline'); },
+    () => assert.fail('no dispatch should have been created'));
+  await assert.rejects(dispatchImports({}, { datasets: ['a'] }, 'manual'), /geodata_service_unavailable/);
 });
