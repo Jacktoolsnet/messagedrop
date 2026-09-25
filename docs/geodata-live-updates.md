@@ -28,6 +28,48 @@ Socket.IO selbst läuft auf dem bereits vorhandenen HTTP-Port des Admin-Backends
 Direkt per CLI gestartete Importskripte ohne Service-Parent senden keine
 IPC-Live-Updates; beim Öffnen/Aktualisieren der Ansicht sind ihre DB-Daten sichtbar.
 
+## Keep-alive während Importen unter Plesk
+
+Das Admin-Backend ruft während aktiver Importe alle 60 Sekunden den vorhandenen
+Endpunkt `GET /geodata/import-jobs?activeOnly=true` mit Service-JWT auf. Diese
+Anfrage hält HTTP-Aktivität zum Geodata-Service aufrecht und prüft zugleich,
+ob noch laufende oder wartende Aufträge vorhanden sind. Es werden keine Importe
+angelegt oder erneut gestartet und keine vollständigen Importverläufe geladen.
+
+- Funktioniert unabhängig von geöffneten Browsern und Socket.IO-Abonnements.
+- Nach einem Admin-Neustart erfolgt einmalig eine Prüfung der bestehenden Queue.
+- Neue Dispatches und authentifizierte Service-Änderungshinweise aktivieren
+  die Überwachung wieder; häufige Fortschrittsmeldungen werden zusammengefasst.
+- Sobald eine Prüfung keine aktiven Aufträge mehr liefert, endet der Timer.
+  Im bestätigten Leerlauf gibt es keine regelmäßigen Keep-alive-Anfragen.
+- Bei Timeout, HTTP-Fehler oder ungültiger Antwort wird weiter versucht, auch
+  wenn die erste Prüfung nach dem Start fehlschlägt. Unbekannt bedeutet nicht
+  „Queue leer“. Anfragen überlappen nicht, ihr HTTP-Timeout beträgt 10 Sekunden.
+- Beginn und Ende stehen als `Geodata import keep-alive started` bzw.
+  `Geodata import keep-alive stopped: queue empty` im Admin-Info-Log.
+  Fehler werden als `Geodata import keep-alive failed; retrying` gedrosselt
+  im Warnlog protokolliert.
+
+**Für diese Ergänzung nur das Admin-Backend deployen und neu starten.**
+Keine neuen Abhängigkeiten, Pflicht-ENV-Variablen, Datenbankschema- oder
+Frontend-Änderungen. Der vorhandene Geodata-Service muss nicht neu gestartet werden.
+
+Verwendet werden `GEODATA_BASE_URL` und optional `GEODATA_PORT` wie bei allen
+anderen Admin→Geodata-Anfragen. Unter Plesk muss diese URL den von Passenger
+verwalteten HTTP-Zugang erreichen, nicht dessen Aktivitätserkennung über einen
+direkten Node-Port umgehen. Beispiel: HTTPS-Domain als `GEODATA_BASE_URL`,
+`GEODATA_PORT` leer, wenn die Domain bereits über HTTPS/443 erreichbar ist.
+Ein etwaiger Passenger-Prozess-Idle-Timeout muss größer als das Keep-alive-Intervall sein.
+
+**Grenzen:** Das ist eine Gegenmaßnahme gegen HTTP-Inaktivität, kein Nachweis der
+bisherigen Neustartursache. Passenger kann Prozesse je nach Pool- und
+Serverkonfiguration trotzdem beenden. Das Admin-Backend muss selbst weiterlaufen;
+auch ein dortiger Timer verhindert dessen Idle-Abschaltung nicht automatisch.
+Speichermangel, Deployments und erzwungene Neustarts werden nicht verhindert.
+Die Geodata-Queue setzt weiterhin genau eine Service-Instanz voraus; ein
+Keep-alive behebt keine konkurrierenden Startbereinigungen mehrerer Instanzen.
+Siehe [Passenger-Prozessverwaltung](https://www.phusionpassenger.com/docs/references/config_reference/nginx/#passenger_pool_idle_time).
+
 ## Deployment-Reihenfolge
 
 Nach Möglichkeit laufende Importe zunächst beenden lassen: Das bestehende

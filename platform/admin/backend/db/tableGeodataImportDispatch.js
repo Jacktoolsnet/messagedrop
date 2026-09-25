@@ -46,9 +46,20 @@ function latestBatch(db, callback = () => {}) {
 }
 
 function cleanupOlderThan(db, timestamp, callback = () => {}) {
-  // Dispatch rows are immutable hand-off records. The actual job lifecycle is
-  // protected separately in the Geodata service database.
+  // The actual job lifecycle is protected separately in the Geodata service DB.
   db.run(`DELETE FROM ${tableName} WHERE createdAt < ?`, [timestamp], callback);
 }
 
-module.exports = { tableName, init, create, list, latestBatch, cleanupOlderThan };
+function findForRetry(db, jobId, callback) {
+  db.get(`SELECT * FROM ${tableName} WHERE serviceJobId = ? OR dispatchId = ?
+    ORDER BY createdAt DESC, dispatchId DESC LIMIT 1`, [jobId, jobId], callback);
+}
+
+function replaceJob(db, dispatchId, job, callback) {
+  // Keep the country in its original run. The failed service job remains in
+  // service history; only the run's pointer changes to the new attempt.
+  db.run(`UPDATE ${tableName} SET serviceJobId = ?, status = ?, error = NULL, updatedAt = ?
+    WHERE dispatchId = ?`, [job.jobId, job.status, Date.now(), dispatchId], callback);
+}
+
+module.exports = { tableName, init, create, list, latestBatch, cleanupOlderThan, findForRetry, replaceJob };

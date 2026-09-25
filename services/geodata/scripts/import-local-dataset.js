@@ -111,6 +111,7 @@ async function main() {
     });
     const countRow = await callbackResult((callback) => tableGeodataPoi.countPois(database.db, versionId, callback));
     const poiCount = Number(countRow?.count || 0);
+    await callbackResult(callback => tableGeodataPoi.recordImportCount(database.db, jobId, poiCount, callback));
     if (!poiCount) throw new Error('The imported dataset contains no supported POIs');
     const importConfig = selectedImportConfig(options);
     await progress.update('exporting', 0, { processedItems: 0 });
@@ -141,6 +142,12 @@ async function main() {
     }
   } catch (error) {
     if (staged) {
+      // Capture actual stored rows (not parsed features, which can contain
+      // duplicates) before discarding an incomplete version.
+      try {
+        const row = await callbackResult(callback => tableGeodataPoi.countPois(database.db, versionId, callback));
+        await callbackResult(callback => tableGeodataPoi.recordImportCount(database.db, jobId, Number(row?.count || 0), callback));
+      } catch { /* Keep unknown/last recorded statistics if the database is unavailable. */ }
       try { await callbackResult((callback) => tableGeodataPoi.discardVersion(database.db, versionId, callback)); } catch { /* best effort */ }
       try { await cleanupExportStorage(database.db); } catch { /* best effort */ }
     }
@@ -608,6 +615,7 @@ function createProgressTracker(dataset, updateProgress = async () => {}) {
 
 async function downloadWithProgress(args, outputPath, headersPath, onProgress) {
   let progressChain = Promise.resolve();
+  let progressError;
   const report = () => {
     progressChain = progressChain.then(async () => {
       const [processedBytes, totalBytes] = await Promise.all([
@@ -618,16 +626,21 @@ async function downloadWithProgress(args, outputPath, headersPath, onProgress) {
         processedBytes,
         totalBytes
       });
-    });
+    }).catch(error => { progressError ||= error; });
   };
   const timer = setInterval(report, 1000);
+  let commandError;
   try {
     await command('curl', args, { stdio: ['ignore', 'ignore', 'inherit'] });
+  } catch (error) {
+    commandError = error;
   } finally {
     clearInterval(timer);
+    report();
+    await progressChain;
   }
-  report();
-  await progressChain;
+  if (commandError) throw commandError;
+  if (progressError) throw progressError;
   const processedBytes = await fileSize(outputPath);
   await onProgress(100, { processedBytes, totalBytes: processedBytes });
 }
@@ -689,6 +702,7 @@ if (require.main === module) {
 module.exports = {
   DATASETS,
   createProgressTracker,
+  downloadWithProgress,
   featureToElement,
   filterExpressions,
   geometryCenter,

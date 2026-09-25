@@ -519,5 +519,15 @@
   "successful": "successful",
   "failed": "failed",
   "Federal states and test regions": "Federal states and test regions",
-  "No subdivisions are currently available.": "No subdivisions are currently available."
+  "No subdivisions are currently available.": "No subdivisions are currently available.",
+  "Retry import": "Retry import",
+  "Retry import for {{country}}": "Retry import for {{country}}",
+  "Import retry started.": "Import retry started.",
+  "Could not retry import.": "Could not retry import.",
+  "Last import run statistics": "Last import run statistics",
+  "Downloaded": "Downloaded",
+  "Records generated": "Records generated",
+  "Cumulative import duration": "Cumulative import duration",
+  "Totals cover the latest attempt per country in this run, including recorded failed attempts.": "Totals cover the latest attempt per country in this run, including recorded failed attempts.",
+  "Some statistics are unavailable. Totals include only recorded values.": "Some statistics are unavailable. Totals include only recorded values."
 }

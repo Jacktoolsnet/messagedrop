@@ -2,7 +2,7 @@ const express = require('express');
 const { checkToken, requireAdminJwt, requireRole } = require('../middleware/security');
 const { apiError } = require('../middleware/api-error');
 const settingsTable = require('../db/tableGeodataImportSettings');
-const { callbackResult, currentImportJobs, dispatchImports, requestService, validateSettings } = require('../utils/geodataImport');
+const { callbackResult, currentImportJobs, dispatchImports, requestService, retryImport, validateSettings } = require('../utils/geodataImport');
 
 const router = express.Router();
 const { requireServiceJwt } = require('../utils/serviceJwt');
@@ -68,6 +68,13 @@ router.post('/jobs', async (req, res, next) => {
     if (isSettingsValidationError(error)) return next(apiError.badRequest(error.message));
     return next(error);
   }
+});
+
+router.post('/jobs/:jobId/retry', async (req, res, next) => {
+  try {
+    const result = await retryImport(req.database.db, req.params.jobId);
+    return res.status(202).json({ ...result, status: 202 });
+  } catch (error) { return next(error); }
 });
 
 router.get('/jobs', async (req, res, next) => {

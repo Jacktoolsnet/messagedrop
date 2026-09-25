@@ -121,12 +121,75 @@ async function dispatchImports(db, settings, triggerType, options = {}) {
   return results;
 }
 
+async function retryImport(db, jobId) {
+  if (!/^[a-f0-9-]{36}$/i.test(jobId)) {
+    throw Object.assign(new Error('invalid_import_job_id'), { status: 400 });
+  }
+  const dispatch = await callbackResult(cb => dispatchTable.findForRetry(db, jobId, cb));
+  let original;
+  if (!dispatch || dispatch.serviceJobId) {
+    try {
+      original = (await requestService('get', `/geodata/import-jobs/${dispatch?.serviceJobId || jobId}`)).job;
+      if (!original) throw Object.assign(new Error('invalid_geodata_job_response'), { status: 502 });
+    } catch (error) {
+      if (error.status !== 404 || !dispatch) throw error;
+      // Expired service history: the admin hand-off retains the configuration.
+    }
+  }
+  if (dispatch && !dispatch.serviceJobId && dispatch.status !== 'failed') {
+    throw Object.assign(new Error('import_job_not_failed'), { status: 409 });
+  }
+  if (original && original.status !== 'failed') {
+    throw Object.assign(new Error('import_job_not_failed'), { status: 409 });
+  }
+  if (!original && !dispatch) throw Object.assign(new Error('import_job_not_found'), { status: 404 });
+  const stored = original?.requestedConfig ?? dispatch?.requestedConfig;
+  const config = typeof stored === 'string' ? JSON.parse(stored) : stored;
+  if (!config || !Array.isArray(config.categories) || !config.categories.length) {
+    throw Object.assign(new Error('import_job_config_unavailable'), { status: 409 });
+  }
+  const datasetId = original?.datasetId || dispatch.datasetId;
+  const response = await requestService('post', '/geodata/import-jobs', {
+    datasetId, categories: config.categories, subcategories: config.subcategories || {},
+    refresh: config.refresh !== false, force: Boolean(config.force)
+  });
+  try {
+    if (dispatch) {
+      await callbackResult(cb => dispatchTable.replaceJob(db, dispatch.dispatchId, response.job, cb));
+    }
+  } finally {
+    // Wake live updates and keep-alive even if persisting the new pointer fails.
+    importJobEvents.emit('changed');
+  }
+  return response;
+}
+
+function summarizeImportJobs(jobs, now = Date.now()) {
+  const totals = { jobCount: jobs.length, downloadedBytes: null, importedRecords: null, durationMs: null, incomplete: false };
+  for (const job of jobs) {
+    for (const key of ['downloadedBytes', 'importedRecords']) {
+      const value = job.status === 'queued' ? 0 : job[key];
+      if (value != null && Number.isFinite(Number(value)) && Number(value) >= 0) {
+        totals[key] = (totals[key] ?? 0) + Number(value);
+      } else totals.incomplete = true;
+    }
+    const start = job.startedAt == null ? NaN : new Date(job.startedAt).getTime();
+    const end = job.status === 'running' ? now
+      : job.completedAt == null ? NaN : new Date(job.completedAt).getTime();
+    if (job.status === 'queued') totals.durationMs = (totals.durationMs ?? 0);
+    else if (Number.isFinite(start) && Number.isFinite(end) && end >= start) {
+      totals.durationMs = (totals.durationMs ?? 0) + end - start;
+    } else totals.incomplete = true;
+  }
+  return totals;
+}
+
 async function currentImportJobs(db) {
   const dispatches = await callbackResult((cb) => dispatchTable.latestBatch(db, cb));
   if (!dispatches.length) {
     // Legacy runs have no batch ID. Include the entire active queue, not just recent rows.
     const service = await requestService('get', '/geodata/import-jobs?includeActive=true');
-    return { jobs: service.jobs || [], batchId: null };
+    return { jobs: service.jobs || [], batchId: null, runStatistics: null };
   }
   const ids = [...new Set(dispatches.map((row) => row.serviceJobId).filter(Boolean))];
   const jobsById = new Map();
@@ -151,12 +214,14 @@ async function currentImportJobs(db) {
       createdAt: new Date(Number(row.createdAt)).toISOString(), startedAt: null, completedAt: null
     });
   }
+  // Only this run's jobs count, not additional active jobs from other runs.
+  const runStatistics = summarizeImportJobs(jobs);
   for (const job of active.jobs || []) {
     if (seen.has(job.jobId)) continue;
     seen.add(job.jobId);
     jobs.push(job);
   }
-  return { jobs, batchId: dispatches[0].batchId };
+  return { jobs, batchId: dispatches[0].batchId, runStatistics };
 }
 
 let schedulerRunning = false;
@@ -174,4 +239,4 @@ async function runScheduledImports(db, logger = console) {
   }
 }
 
-module.exports = { CATEGORIES, callbackResult, currentImportJobs, dispatchImports, isDue, requestService, runScheduledImports, validateSettings };
+module.exports = { CATEGORIES, callbackResult, currentImportJobs, dispatchImports, isDue, requestService, retryImport, runScheduledImports, summarizeImportJobs, validateSettings };

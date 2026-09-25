@@ -1906,5 +1906,15 @@
   "Current import run": "Aktueller Importlauf",
   "{{completed}} of {{total}} import jobs finished": "{{completed}} von {{total}} Importaufträgen abgeschlossen",
   "Import run and active queue": "Importlauf und aktive Warteschlange",
-  "Live connection interrupted. The displayed jobs may be outdated. Reconnecting automatically.": "Die Live-Verbindung ist unterbrochen. Die angezeigten Aufträge sind möglicherweise veraltet. Die Verbindung wird automatisch wiederhergestellt."
+  "Live connection interrupted. The displayed jobs may be outdated. Reconnecting automatically.": "Die Live-Verbindung ist unterbrochen. Die angezeigten Aufträge sind möglicherweise veraltet. Die Verbindung wird automatisch wiederhergestellt.",
+  "Retry import": "Import wiederholen",
+  "Retry import for {{country}}": "Import für {{country}} wiederholen",
+  "Import retry started.": "Import erneut gestartet.",
+  "Could not retry import.": "Import konnte nicht erneut gestartet werden.",
+  "Last import run statistics": "Statistik des letzten Importlaufs",
+  "Downloaded": "Heruntergeladen",
+  "Records generated": "Erzeugte Datensätze",
+  "Cumulative import duration": "Kumulierte Importdauer",
+  "Totals cover the latest attempt per country in this run, including recorded failed attempts.": "Die Summe umfasst den jeweils letzten Versuch pro Land in diesem Importlauf, einschließlich erfasster fehlgeschlagener Versuche.",
+  "Some statistics are unavailable. Totals include only recorded values.": "Einige Statistikwerte fehlen. Die Summen enthalten nur erfasste Werte."
 }

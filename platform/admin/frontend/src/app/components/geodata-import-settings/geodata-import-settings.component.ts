@@ -11,6 +11,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterLink } from '@angular/router';
 import { finalize, forkJoin, Subscription } from 'rxjs';
 import {
@@ -26,7 +27,7 @@ import { TranslationHelperService } from '../../services/translation-helper.serv
 @Component({
   selector: 'app-geodata-import-settings',
   imports: [DatePipe, DecimalPipe, RouterLink, MatButtonModule, MatCardModule, MatFormFieldModule, MatIconModule, MatInputModule,
-    MatProgressBarModule, MatSelectModule, MatSlideToggleModule, MatTabsModule, MatToolbarModule],
+    MatProgressBarModule, MatSelectModule, MatSlideToggleModule, MatTabsModule, MatToolbarModule, MatTooltipModule],
   templateUrl: './geodata-import-settings.component.html',
   styleUrl: './geodata-import-settings.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -41,6 +42,7 @@ export class GeodataImportSettingsComponent {
   readonly loading = signal(true);
   readonly saving = signal(false);
   readonly importing = signal(false);
+  readonly retryingDatasets = signal<ReadonlySet<string>>(new Set());
   readonly loadingDatabaseInfo = signal(false);
   readonly importStatusUnavailable = signal(false);
   readonly catalog = signal<GeodataImportCatalog | null>(null);
@@ -116,7 +118,8 @@ export class GeodataImportSettingsComponent {
       this.databaseInfo.update((current) => ({
         ...(current ?? { status: 200, health: { status: 200 } }),
         jobs: value.jobs,
-        batchId: value.batchId
+        batchId: value.batchId,
+        runStatistics: value.runStatistics
       }));
     });
   }
@@ -267,10 +270,42 @@ export class GeodataImportSettingsComponent {
       .pipe(finalize(() => this.loadingDatabaseInfo.set(false)), takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (value) => this.databaseInfo.update(current => current && current.jobs !== jobsAtRequest
-          ? { ...value, jobs: current.jobs, batchId: current.batchId }
+          ? { ...value, jobs: current.jobs, batchId: current.batchId, runStatistics: current.runStatistics }
           : value),
         error: () => this.showError(this.i18n.t('Could not load database information.'))
       });
+  }
+
+  canRetry(job: GeodataImportJob): boolean {
+    return job.status === 'failed' && !this.retryingDatasets().has(job.datasetId)
+      && !this.importJobs().some(other => other.datasetId === job.datasetId
+        && (other.status === 'queued' || other.status === 'running'));
+  }
+
+  retryImport(job: GeodataImportJob): void {
+    if (!this.canRetry(job)) return;
+    this.retryingDatasets.update(current => new Set([...current, job.datasetId]));
+    this.service.retryImport(job.jobId).pipe(
+      finalize(() => this.retryingDatasets.update(current => {
+        const next = new Set(current);
+        next.delete(job.datasetId);
+        return next;
+      })),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: ({ job: retry }) => {
+        this.databaseInfo.update(current => {
+          if (!current) return current;
+          // A live snapshot may already contain a more advanced state.
+          const latest = current.jobs.find(entry => entry.jobId === retry.jobId) ?? retry;
+          const jobs = current.jobs.filter(entry => entry.jobId !== job.jobId && entry.jobId !== retry.jobId);
+          return { ...current, jobs: [...jobs, latest], runStatistics: current.jobs.some(entry => entry.jobId === retry.jobId)
+            ? current.runStatistics : null };
+        });
+        this.messages.open(this.i18n.t('Import retry started.'), undefined, { panelClass: 'snack-success', verticalPosition: 'top' });
+      },
+      error: () => this.showError(this.i18n.t('Could not retry import.'))
+    });
   }
 
   startImport(force = false): void {
@@ -379,8 +414,21 @@ export class GeodataImportSettingsComponent {
   elapsed(job: GeodataImportJob): string | null {
     if (!job.startedAt) return null;
     const start = new Date(job.startedAt).getTime();
-    const end = job.completedAt ? new Date(job.completedAt).getTime() : Date.now();
-    return Number.isFinite(start) && Number.isFinite(end) ? this.formatDuration(Math.max(0, end - start)) : null;
+    const end = job.completedAt ? new Date(job.completedAt).getTime() : job.status === 'running' ? Date.now() : NaN;
+    return Number.isFinite(start) && Number.isFinite(end) ? this.statisticsDuration(Math.max(0, end - start)) : null;
+  }
+
+  downloadGb(value: number | string | null | undefined): string {
+    if (value == null || !Number.isFinite(Number(value)) || Number(value) < 0) return '—';
+    return `${new Intl.NumberFormat(this.i18n.lang(), { maximumFractionDigits: 6 }).format(Number(value) / 1e9)} GB`;
+  }
+
+  statisticsDuration(milliseconds: number | null | undefined): string {
+    if (milliseconds == null || !Number.isFinite(milliseconds) || milliseconds < 0) return '—';
+    const seconds = Math.floor(milliseconds / 1000);
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor(seconds % 3600 / 60);
+    return [hours ? `${hours} h` : '', minutes ? `${minutes} min` : '', `${seconds % 60} s`].filter(Boolean).join(' ');
   }
 
   remaining(job: GeodataImportJob): string | null {

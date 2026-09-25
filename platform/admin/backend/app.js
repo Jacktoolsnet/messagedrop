@@ -107,7 +107,8 @@ const { normalizeErrorResponses, notFoundHandler, errorHandler } = require('./mi
 const { cleanupClosedDsaCases } = require('./utils/dsaCleanup');
 const { parseRetentionMs, DAY_MS } = require('./utils/logRetention');
 const { runCertificateHealthCheck } = require('./utils/certificateHealth');
-const { runScheduledImports } = require('./utils/geodataImport');
+const { runScheduledImports, requestService } = require('./utils/geodataImport');
+const { createGeodataImportKeepAlive } = require('./utils/geodataImportKeepAlive');
 const robotsSitemap = require('./middleware/robots-sitemap');
 
 // ExpressJs
@@ -670,6 +671,12 @@ app.use(errorHandler);
       });
       database.init(logger);
       logStartupStep('PostgreSQL database initialization triggered');
+
+      if (process.env.GEODATA_BASE_URL) {
+        const geodataKeepAlive = createGeodataImportKeepAlive({ requestService, events: importJobEvents, logger });
+        server.once('close', () => geodataKeepAlive.close());
+        geodataKeepAlive.start();
+      }
 
       void runCertificateHealthCheck({
         db: database.db,

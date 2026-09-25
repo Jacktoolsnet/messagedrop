@@ -5,16 +5,18 @@ const vm = require('node:vm');
 const path = require('node:path');
 const dispatchTable = require('../db/tableGeodataImportDispatch');
 
-function loadUtility(dispatches, request, create = () => {}) {
+function loadUtility(dispatches, request, create = () => {}, retry = {}) {
   const settingsTable = { markTriggered: (_db, _time, cb) => cb(null) };
   const mocks = {
     axios: request,
-    './importJobEvents': { emit() {} },
+    './importJobEvents': { emit() { retry.changed?.(); } },
     'node:crypto': require('node:crypto'),
     './serviceJwt': { signServiceJwt: async () => 'token' },
     './adminLogForwarder': { resolveBaseUrl: () => 'http://geodata.test' },
     '../db/tableGeodataImportSettings': settingsTable,
     '../db/tableGeodataImportDispatch': {
+      findForRetry: (_db, _id, cb) => cb(null, retry.dispatch),
+      replaceJob: (_db, id, job, cb) => { retry.replace?.(id, job); cb(null); },
       latestBatch: (_db, cb) => cb(null, dispatches),
       create: (_db, row, cb) => { create(row); cb(null); }
     }
@@ -198,4 +200,113 @@ test('unavailable or invalid plans fail before creating any import jobs', async 
   const { dispatchImports } = loadUtility([], async () => { throw new Error('offline'); },
     () => assert.fail('no dispatch should have been created'));
   await assert.rejects(dispatchImports({}, { datasets: ['a'] }, 'manual'), /geodata_service_unavailable/);
+});
+
+const failedJobId = 'cc9d9e22-d5ac-4ccd-adbe-df0a03c6499d';
+const retryConfig = { categories: ['tourism'], subcategories: { tourism: ['museum'] }, refresh: false, force: true };
+
+test('retry sends only the failed country with its original configuration and preserves the batch', async () => {
+  const calls = [];
+  let changed = 0;
+  let replaced;
+  const job = { jobId: 'retry', datasetId: 'canada', status: 'queued' };
+  const { retryImport } = loadUtility([], async ({ method, url, data }) => {
+    calls.push({ method, url, data });
+    return { data: method === 'get'
+      ? { job: { jobId: failedJobId, datasetId: 'canada', status: 'failed', requestedConfig: retryConfig } }
+      : { job, created: true } };
+  }, () => assert.fail('must not create a new batch'), {
+    dispatch: { dispatchId: 'dispatch', serviceJobId: failedJobId, batchId: 'original-run' },
+    replace: (id, value) => { replaced = { id, value }; }, changed: () => changed++
+  });
+  assert.equal((await retryImport({}, failedJobId)).job.jobId, 'retry');
+  assert.equal(calls.length, 2);
+  assert.deepEqual(JSON.parse(JSON.stringify(calls[1].data)), { datasetId: 'canada', ...retryConfig });
+  assert.deepEqual(replaced, { id: 'dispatch', value: job });
+  assert.equal(changed, 1);
+});
+
+test('retry supports failed hand-offs and expired service history using stored configuration', async () => {
+  for (const serviceJobId of [null, failedJobId]) {
+    const { retryImport } = loadUtility([], async ({ method, data }) => {
+      if (method === 'get') throw Object.assign(new Error('gone'), { status: 404 });
+      assert.deepEqual(JSON.parse(JSON.stringify(data)), { datasetId: 'canada', ...retryConfig });
+      return { data: { job: { jobId: 'new', status: 'queued' }, created: true } };
+    }, () => {}, {
+      dispatch: { dispatchId: failedJobId, serviceJobId, datasetId: 'canada', status: 'failed',
+        requestedConfig: JSON.stringify(retryConfig) }
+    });
+    await retryImport({}, failedJobId);
+  }
+});
+
+test('retry rejects non-failed jobs, bad IDs, missing jobs and upstream errors without starting an import', async () => {
+  for (const status of ['running', 'queued', 'succeeded']) {
+    const { retryImport } = loadUtility([], async ({ method }) => {
+      assert.equal(method, 'get');
+      return { data: { job: { status } } };
+    });
+    await assert.rejects(retryImport({}, failedJobId), error => error.status === 409);
+  }
+  const { retryImport } = loadUtility([], async () => { throw Object.assign(new Error('offline'), { status: 503 }); });
+  await assert.rejects(retryImport({}, '../invalid'), error => error.status === 400);
+  await assert.rejects(retryImport({}, failedJobId), error => error.status === 503);
+  const missing = loadUtility([], async () => { throw Object.assign(new Error('gone'), { status: 404 }); });
+  await assert.rejects(missing.retryImport({}, failedJobId), error => error.status === 404);
+});
+
+test('retry passes through an already active job reused by the service', async () => {
+  const job = { jobId: 'existing', status: 'running', datasetId: 'canada' };
+  const { retryImport } = loadUtility([], async ({ method }) => ({ data: method === 'get'
+    ? { job: { status: 'failed', datasetId: 'canada', requestedConfig: retryConfig } }
+    : { job, created: false } }));
+  const result = await retryImport({}, failedJobId);
+  assert.equal(result.created, false);
+  assert.equal(result.job.jobId, 'existing');
+});
+
+test('replacing a retry pointer keeps run membership, timestamps and original configuration', () => {
+  dispatchTable.replaceJob({ run(sql, params, cb) {
+    assert.match(sql, /SET serviceJobId = \?, status = \?, error = NULL, updatedAt = \?/);
+    assert.doesNotMatch(sql, /SET.*(?:batchId|createdAt|requestedConfig)\s*=/);
+    assert.deepEqual([params[0], params[1], params[3]], ['new', 'queued', 'dispatch']);
+    cb(null);
+  } }, 'dispatch', { jobId: 'new', status: 'queued' }, () => {});
+});
+
+test('statistics sum actual per-job downloads, record counts and processing time, including zero and partial data', () => {
+  const { summarizeImportJobs } = loadUtility([], async () => {});
+  const now = Date.parse('2026-09-25T10:01:00Z');
+  const startedAt = '2026-09-25T10:00:00Z';
+  const result = summarizeImportJobs([
+    { status: 'succeeded', downloadedBytes: '1500000000', importedRecords: '1000', startedAt, completedAt: '2026-09-25T10:00:10Z' },
+    { status: 'succeeded', downloadedBytes: 0, importedRecords: 0, startedAt, completedAt: '2026-09-25T10:00:01Z' },
+    { status: 'running', downloadedBytes: '2000000000', importedRecords: null, startedAt },
+    { status: 'queued' },
+    { status: 'failed', downloadedBytes: '3000000', importedRecords: 10, startedAt, completedAt: '2026-09-25T10:00:05Z' }
+  ], now);
+  assert.deepEqual(JSON.parse(JSON.stringify(result)), {
+    jobCount: 5, downloadedBytes: 3503000000, importedRecords: 1010, durationMs: 76000, incomplete: true
+  });
+  const old = summarizeImportJobs([{ status: 'succeeded' }], now);
+  assert.equal(old.downloadedBytes, null);
+  assert.equal(old.importedRecords, null);
+  assert.equal(old.durationMs, null);
+  assert.equal(old.incomplete, true);
+});
+
+test('latest-run statistics exclude active jobs from other runs and deduplicate reused jobs', async () => {
+  const dispatch = { batchId: 'run', serviceJobId: 'job', datasetId: 'canada' };
+  const job = { jobId: 'job', status: 'succeeded', downloadedBytes: '1000000000', importedRecords: 10,
+    startedAt: '2026-09-25T10:00:00Z', completedAt: '2026-09-25T10:00:01Z' };
+  const { currentImportJobs } = loadUtility([dispatch, dispatch], async ({ url }) => ({ data: {
+    jobs: url.includes('activeOnly') ? [{ ...job, jobId: 'other', downloadedBytes: 5000000000, status: 'running' }] : [job]
+  } }));
+  const result = await currentImportJobs({});
+  assert.equal(result.jobs.length, 2);
+  assert.equal(result.runStatistics.jobCount, 1);
+  assert.equal(result.runStatistics.downloadedBytes, 1000000000);
+  assert.equal(result.runStatistics.importedRecords, 10);
+  assert.equal(result.runStatistics.durationMs, 1000);
+  assert.equal(result.runStatistics.incomplete, false);
 });

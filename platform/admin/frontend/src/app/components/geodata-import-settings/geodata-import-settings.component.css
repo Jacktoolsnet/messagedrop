@@ -193,6 +193,9 @@ mat-toolbar {
 .job-row small { color: var(--muted); }
 .job-row .job-error { color: #b91c1c; overflow-wrap: anywhere; }
 .job-content { min-width: 0; }
+.import-run-statistics { margin-block: 1rem; }
+.import-run-statistics p { color: var(--muted); font-size: .82rem; }
+.retry-import, .job-row > mat-icon { flex-shrink: 0; }
 .progress-section { display: grid; gap: .35rem; margin-top: .5rem; padding: .7rem; border-radius: 12px; background: rgba(255, 255, 255, .75); }
 .progress-caption { display: flex; align-items: center; justify-content: space-between; gap: 1rem; font-size: .78rem; color: var(--muted); }
 .progress-caption strong { color: var(--text); }

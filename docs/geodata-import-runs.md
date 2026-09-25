@@ -57,6 +57,70 @@ bleiben unverändert. Den Geodata-Neustart möglichst außerhalb eines laufenden
 Imports durchführen: Die bestehende Recovery markiert unterbrochene Importe
 als fehlgeschlagen; wartende Aufträge bleiben erhalten.
 
+## Einzelnes Land erneut versuchen
+
+Fehlgeschlagene Aufträge haben im Admin-Importverlauf ein Wiederholen-Symbol
+(`refresh`) mit Tooltip und zugänglicher Beschriftung. Es startet nur dieses
+Land mit den ursprünglichen Kategorien, Unterkategorien sowie Refresh-/Force-
+Optionen erneut, unabhängig von später geänderten oder ungespeicherten Einstellungen.
+Der Button ist während der Anfrage und bei einem bereits aktiven Auftrag für
+dasselbe Land gesperrt. Die bestehende Service-Deduplizierung bleibt erhalten.
+
+Der geschützte Admin-Endpunkt `POST /geodata-import/jobs/:jobId/retry` prüft den
+ursprünglichen Job. Laufende, wartende und erfolgreiche Jobs werden nicht erneut
+gestartet. Bei fehlgeschlagener Übergabe oder abgelaufener Service-Historie dient
+die gespeicherte Dispatch-Konfiguration als Rückfall. Ohne ursprüngliche
+Konfiguration wird kein Retry ausgeführt.
+
+Die Zuordnung des Landes im bestehenden Importlauf zeigt anschließend auf den
+neuen Versuch; die anderen Länder und die Lauf-ID bleiben unverändert. Der alte
+fehlgeschlagene Service-Job bleibt zu Diagnosezwecken in der Service-Historie.
+Ein Retry verändert weder die Einstellungen noch den Zeitpunkt des letzten
+geplanten Laufs. Live-Updates und Import-Keep-alive werden ebenfalls informiert.
+
+Deployment: **Admin-Backend und Admin-Frontend** aktualisieren (Backend zuerst).
+Kein Geodata-Neustart und keine Datenbankschema- oder ENV-Änderung erforderlich.
+
+## Importstatistik
+
+Ab diesem Deployment speichert der Geodata-Service je Auftrag dauerhaft
+`downloadedBytes` und `importedRecords`. Die nullable BIGINT-Spalten werden beim
+Start automatisch ergänzt; historische Aufträge werden nicht mit erfundenen
+Nullwerten aufgefüllt. Nach dem Start eines neuen Imports werden die Zähler
+initialisiert. Übersprungene Länder und reine Export-Reparaturen erhalten null
+neue Downloadbytes und null neue POI-Datensätze.
+
+Die Downloadgröße ist die heruntergeladene PBF-Nutzdatenmenge laut lokaler Datei,
+nicht HTTP-/TLS-Overhead oder zusätzlich übertragene Bytes durch Wiederholungen.
+Sie wird während des Downloads gespeichert und über spätere Phasen hinweg
+beibehalten. Bei einem regulären Downloadfehler wird noch die letzte Teilgröße
+erfasst; bei hartem Prozessabbruch bleibt der zuletzt gespeicherte Stand.
+Die Anzeige verwendet dezimale GB (1 GB = 1.000.000.000 Bytes).
+
+Die Datensatzanzahl zählt tatsächlich gespeicherte POI-Zeilen der neuen Version,
+nicht rohe OSM-Objekte oder mehrfach verarbeitete Features. Sie wird nach dem
+Einlesen erfasst und bei regulären Fehlern vor dem Verwerfen der Version nochmals
+gezählt. Erzeugte, aber wegen eines Fehlers anschließend verworfene Datensätze
+zählen somit zur geleisteten Importarbeit, nicht zum aktiven Datenbankbestand.
+Während des Einlesens bzw. nach einem harten Abbruch kann die Anzahl unbekannt sein.
+
+Die Zusammenfassung oberhalb der Auftragsliste enthält ausschließlich den letzten
+Admin-Importlauf; andere zusätzlich angezeigte aktive Jobs zählen nicht dazu.
+Jeder Job zählt einmal. Bei Retry zählt der zuletzt angezeigte Versuch pro Land,
+nicht zusätzlich die früheren Versuche. Die kumulierte Dauer ist die Summe der
+Bearbeitungszeiten ab `startedAt` bis `completedAt` bzw. bis zur Statusaufnahme
+bei laufenden Jobs. Wartezeit ist ausgeschlossen; dies ist nicht die verstrichene
+Kalenderzeit des gesamten Laufs. Fortschrittsereignisse aktualisieren die Summen.
+
+Fehlende Werte werden als „—“ angezeigt; bei teilweise bekannten Werten weist
+die Zusammenfassung darauf hin, dass nur erfasste Werte summiert werden.
+Ohne gespeicherte Importlauf-Zuordnung wird keine vermeintliche Lauf-Summe gebildet.
+
+Deployment: **Geodata-Service, Admin-Backend und Admin-Frontend** aktualisieren,
+Geodata zuerst. Keine neuen ENV-Variablen. Den Service möglichst erst nach Ende
+eines laufenden Imports neu starten. Vollständige Werte gibt es für neue Importe;
+alte Jobs werden nicht rückwirkend rekonstruiert.
+
 ## Rate limits and log forwarding
 
 The Admin backend's global IP budget (600 requests / 10 minutes) and shared

@@ -16,7 +16,7 @@ describe('Geodata import run display', () => {
     updates = new Subject<GeodataImportJobsResponse | null>();
     TestBed.configureTestingModule({
       providers: [
-        { provide: GeodataImportService, useValue: { getSettings: () => EMPTY, getCatalog: () => EMPTY, watchJobs: () => updates, getJobs: () => EMPTY, startImport: () => EMPTY, getDatabaseInfo: () => EMPTY } },
+        { provide: GeodataImportService, useValue: { getSettings: () => EMPTY, getCatalog: () => EMPTY, watchJobs: () => updates, getJobs: () => EMPTY, startImport: () => EMPTY, retryImport: () => EMPTY, getDatabaseInfo: () => EMPTY } },
         { provide: DisplayMessageService, useValue: { open: () => undefined } },
         { provide: TranslationHelperService, useValue: { lang: () => 'de', t: (value: string) => value } }
       ]
@@ -93,4 +93,76 @@ describe('Geodata import run display', () => {
     expect(component.datasetLabel('germany')).toBe('Deutschland');
     expect(component.datasetLabel('unknown')).toBe('unknown');
   });
+  function failedJob(): GeodataImportJob {
+    return { jobId: 'failed', datasetId: 'canada', status: 'failed', stage: 'failed',
+      progress: 0, error: 'interrupted', createdAt: '2026-09-23T10:00:00Z', startedAt: null, completedAt: null };
+  }
+
+  it('retries only the failed country, blocks double clicks and keeps the other countries', () => {
+    const job = failedJob();
+    const other = { ...job, jobId: 'other', datasetId: 'germany', status: 'succeeded' as const };
+    component.databaseInfo.set({ status: 200, health: { status: 200 }, batchId: 'run', jobs: [job, other] });
+    const response = new Subject<{ status: number; job: GeodataImportJob; created: boolean }>();
+    const retry = spyOn(TestBed.inject(GeodataImportService), 'retryImport').and.returnValue(response);
+    component.retryImport(job);
+    component.retryImport(job);
+    expect(retry).toHaveBeenCalledOnceWith('failed');
+    expect(component.canRetry(job)).toBeFalse();
+    response.next({ status: 202, job: { ...job, jobId: 'new', status: 'queued' }, created: true });
+    response.complete();
+    expect(component.databaseInfo()?.batchId).toBe('run');
+    expect(component.importJobs().map(value => value.jobId)).toEqual(['new', 'other']);
+    expect(component.retryingDatasets().size).toBe(0);
+    expect(component.canRetry(job)).toBeFalse();
+  });
+
+  it('keeps failures retryable after an HTTP error and refuses successful jobs', () => {
+    const job = failedJob();
+    const response = new Subject<{ status: number; job: GeodataImportJob; created: boolean }>();
+    const retry = spyOn(TestBed.inject(GeodataImportService), 'retryImport').and.returnValue(response);
+    const message = spyOn(TestBed.inject(DisplayMessageService), 'open');
+    component.retryImport({ ...job, status: 'succeeded' });
+    expect(retry).not.toHaveBeenCalled();
+    component.retryImport(job);
+    response.error(new Error('offline'));
+    expect(component.canRetry(job)).toBeTrue();
+    expect(message).toHaveBeenCalled();
+  });
+
+  it('does not overwrite a newer live update with the retry response or duplicate the job', () => {
+    const job = failedJob();
+    const response = new Subject<{ status: number; job: GeodataImportJob; created: boolean }>();
+    spyOn(TestBed.inject(GeodataImportService), 'retryImport').and.returnValue(response);
+    component.retryImport(job);
+    updates.next({ status: 200, batchId: 'run', jobs: [{ ...job, jobId: 'new', status: 'running' }] });
+    response.next({ status: 202, job: { ...job, jobId: 'new', status: 'queued' }, created: true });
+    response.complete();
+    expect(component.importJobs().length).toBe(1);
+    expect(component.runningJobs()[0].jobId).toBe('new');
+  });
+
+  it('formats download GB, exact short durations and unknown historic metrics honestly', () => {
+    expect(component.downloadGb('1500000000')).toBe('1,5 GB');
+    expect(component.downloadGb(0)).toBe('0 GB');
+    expect(component.downloadGb(null)).toBe('—');
+    expect(component.downloadGb(undefined)).toBe('—');
+    expect(component.statisticsDuration(5000)).toBe('5 s');
+    expect(component.statisticsDuration(3661000)).toBe('1 h 1 min 1 s');
+    expect(component.statisticsDuration(0)).toBe('0 s');
+    expect(component.statisticsDuration(null)).toBe('—');
+  });
+
+  it('updates run statistics over Socket.IO and does not overwrite them with an older health response', () => {
+    const stats = { jobCount: 1, downloadedBytes: 1000000000, importedRecords: 100, durationMs: 5000, incomplete: false };
+    const response = new Subject<import('../../interfaces/geodata-import.interface').GeodataDatabaseInfo>();
+    spyOn(TestBed.inject(GeodataImportService), 'getDatabaseInfo').and.returnValue(response);
+    component.loadDatabaseInfo();
+    updates.next({ status: 200, batchId: 'run', jobs: [], runStatistics: stats });
+    response.next({ status: 200, health: { status: 200 }, jobs: [], runStatistics: { ...stats, importedRecords: 0 } });
+    response.complete();
+    expect(component.databaseInfo()?.runStatistics).toEqual(stats);
+    updates.next({ status: 200, batchId: 'run', jobs: [], runStatistics: { ...stats, importedRecords: 200 } });
+    expect(component.databaseInfo()?.runStatistics?.importedRecords).toBe(200);
+  });
+
 });

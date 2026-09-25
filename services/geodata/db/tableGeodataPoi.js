@@ -103,6 +103,8 @@ function init(db, callback) {
     `ALTER TABLE ${JOB_TABLE} ADD COLUMN IF NOT EXISTS processedBytes BIGINT`,
     `ALTER TABLE ${JOB_TABLE} ADD COLUMN IF NOT EXISTS totalBytes BIGINT`,
     `ALTER TABLE ${JOB_TABLE} ADD COLUMN IF NOT EXISTS processedItems BIGINT`,
+    `ALTER TABLE ${JOB_TABLE} ADD COLUMN IF NOT EXISTS downloadedBytes BIGINT`,
+    `ALTER TABLE ${JOB_TABLE} ADD COLUMN IF NOT EXISTS importedRecords BIGINT`,
     `ALTER TABLE ${JOB_TABLE} ADD COLUMN IF NOT EXISTS stepStartedAt TIMESTAMPTZ`,
     `ALTER TABLE ${JOB_TABLE} ADD COLUMN IF NOT EXISTS sourceTimestamp TIMESTAMPTZ`,
     `ALTER TABLE ${JOB_TABLE} ADD COLUMN IF NOT EXISTS sourceEtag TEXT`,
@@ -185,7 +187,8 @@ function startJob(db, jobId, callback) {
     SET status = 'running', stage = 'starting', progress = 1,
       stepNumber = 0, stepProgress = NULL, processedBytes = NULL, totalBytes = NULL,
       processedItems = NULL, stepStartedAt = CURRENT_TIMESTAMP,
-      startedAt = CURRENT_TIMESTAMP, error = NULL
+      startedAt = CURRENT_TIMESTAMP, error = NULL,
+      downloadedBytes = 0, importedRecords = 0
     WHERE jobId = ? AND status = 'queued'
   `, [jobId], callback);
 }
@@ -204,12 +207,20 @@ function updateJobProgress(db, jobId, stage, progress, details, callback) {
     UPDATE ${JOB_TABLE}
     SET stage = ?, progress = ?, stepNumber = ?, stepCount = ?, stepProgress = ?,
       processedBytes = ?, totalBytes = ?, processedItems = ?,
+      downloadedBytes = CASE WHEN ? = 'downloading' THEN ? ELSE downloadedBytes END,
+      importedRecords = CASE WHEN ? = 'importing' THEN NULL ELSE importedRecords END,
       stepStartedAt = CASE WHEN stage <> ? THEN CURRENT_TIMESTAMP ELSE COALESCE(stepStartedAt, CURRENT_TIMESTAMP) END
     WHERE jobId = ? AND status = 'running'
   `, [normalizedStage, normalizedProgress, Math.max(0, Number(details?.stepNumber) || 0),
     Math.max(0, Number(details?.stepCount) || 0), stepProgress,
     finiteOrNull(details?.processedBytes), finiteOrNull(details?.totalBytes), finiteOrNull(details?.processedItems),
+    normalizedStage, finiteOrNull(details?.processedBytes), normalizedStage,
     normalizedStage, jobId], callback);
+}
+
+function recordImportCount(db, jobId, count, callback) {
+  db.run(`UPDATE ${JOB_TABLE} SET importedRecords = ? WHERE jobId = ? AND status = 'running'`,
+    [finiteOrNull(count), jobId], callback);
 }
 
 function activeSource(db, datasetId, callback) {
@@ -547,6 +558,7 @@ module.exports = {
   createJob,
   startJob,
   updateJobProgress,
+  recordImportCount,
   activeSource,
   updateJobSource,
   completeUnchangedJob,

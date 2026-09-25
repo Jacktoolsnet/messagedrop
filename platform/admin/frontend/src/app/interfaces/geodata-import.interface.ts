@@ -46,6 +46,8 @@ export interface GeodataImportJob {
   processedBytes?: number | string | null;
   totalBytes?: number | string | null;
   processedItems?: number | string | null;
+  downloadedBytes?: number | string | null;
+  importedRecords?: number | string | null;
   sourceTimestamp?: string | null;
   sourceEtag?: string | null;
   sourceChanged?: boolean | null;
@@ -56,13 +58,23 @@ export interface GeodataImportJob {
   completedAt: string | null;
 }
 
+export interface GeodataImportRunStatistics {
+  jobCount: number;
+  downloadedBytes: number | null;
+  importedRecords: number | null;
+  durationMs: number | null;
+  incomplete: boolean;
+}
+
 export interface GeodataImportJobsResponse {
+  runStatistics?: GeodataImportRunStatistics | null;
   status: number;
   batchId: string | null;
   jobs: GeodataImportJob[];
 }
 
 export interface GeodataDatabaseInfo {
+  runStatistics?: GeodataImportRunStatistics | null;
   batchId?: string | null;
   status: number;
   health: {

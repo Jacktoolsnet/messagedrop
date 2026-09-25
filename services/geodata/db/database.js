@@ -62,6 +62,8 @@ const ROW_KEY_MAP = new Map(Object.entries({
   processedbytes: 'processedBytes',
   totalbytes: 'totalBytes',
   processeditems: 'processedItems',
+  downloadedbytes: 'downloadedBytes',
+  importedrecords: 'importedRecords',
   stepstartedat: 'stepStartedAt'
 }));
 

@@ -6,6 +6,7 @@ import { environment } from '../../environments/environment';
 import {
   GeodataDatabaseInfo,
   GeodataImportCatalog,
+  GeodataImportJob,
   GeodataImportJobsResponse,
   GeodataImportSettings,
   GeodataImportSettingsResponse
@@ -79,5 +80,10 @@ export class GeodataImportService {
 
   startImport(force = false): Observable<{ status: number; jobs: unknown[] }> {
     return this.http.post<{ status: number; jobs: unknown[] }>(`${this.baseUrl}/jobs`, { force });
+  }
+
+  retryImport(jobId: string): Observable<{ status: number; job: GeodataImportJob; created: boolean }> {
+    return this.http.post<{ status: number; job: GeodataImportJob; created: boolean }>(
+      `${this.baseUrl}/jobs/${encodeURIComponent(jobId)}/retry`, {});
   }
 }

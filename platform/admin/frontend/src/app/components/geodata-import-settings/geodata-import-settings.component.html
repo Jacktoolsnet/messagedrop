@@ -242,6 +242,19 @@
                   <article><span>{{ i18n.t('Last activation') }}</span><strong>{{ info.health.local?.importedAt ? (info.health.local.importedAt | date:'medium') : '—' }}</strong></article>
                 </div>
 
+                @if (info.runStatistics; as stats) {
+                  <section class="import-run-statistics" aria-labelledby="import-statistics-title">
+                    <h3 id="import-statistics-title">{{ i18n.t('Last import run statistics') }}</h3>
+                    <div class="database-stats">
+                      <article><span>{{ i18n.t('Downloaded') }}</span><strong>{{ downloadGb(stats.downloadedBytes) }}</strong></article>
+                      <article><span>{{ i18n.t('Records generated') }}</span><strong>{{ stats.importedRecords == null ? '—' : (stats.importedRecords | number) }}</strong></article>
+                      <article><span>{{ i18n.t('Cumulative import duration') }}</span><strong>{{ statisticsDuration(stats.durationMs) }}</strong></article>
+                    </div>
+                    <p>{{ i18n.t('Totals cover the latest attempt per country in this run, including recorded failed attempts.') }}</p>
+                    @if (stats.incomplete) { <p>{{ i18n.t('Some statistics are unavailable. Totals include only recorded values.') }}</p> }
+                  </section>
+                }
+
                 @if (runningJobs().length) {
                   <section class="current-import" aria-labelledby="current-import-title">
                     <h3 id="current-import-title"><mat-icon>sync</mat-icon>{{ i18n.t('Currently importing') }}</h3>
@@ -282,13 +295,21 @@
                           <small>{{ i18n.t('Source data') }}: {{ job.sourceTimestamp | date:'medium' }}</small>
                         }
                         @if (job.status === 'succeeded' || job.status === 'failed') {
-                          @if (elapsed(job); as duration) {
-                            <small>{{ i18n.t('Duration') }}: {{ duration }}</small>
-                          }
+                          <small>{{ i18n.t('Downloaded') }}: {{ downloadGb(job.downloadedBytes) }}</small>
+                          <small>{{ i18n.t('Records generated') }}: {{ job.importedRecords == null ? '—' : (job.importedRecords | number) }}</small>
+                          <small>{{ i18n.t('Duration') }}: {{ elapsed(job) ?? '—' }}</small>
                         }
                         @if (job.error) { <small class="job-error">{{ job.error }}</small> }
                       </span>
                       <span class="job-status" [class]="'job-status status-' + job.status">{{ job.status }}</span>
+                      @if (job.status === 'failed') {
+                        <button mat-icon-button type="button" class="retry-import"
+                          [disabled]="!canRetry(job)" (click)="retryImport(job)"
+                          [matTooltip]="i18n.t('Retry import')"
+                          [attr.aria-label]="i18n.t('Retry import for {{country}}', { country: datasetLabel(job.datasetId) })">
+                          <mat-icon>refresh</mat-icon>
+                        </button>
+                      }
                     </article>
                   } @empty {
                     <div class="empty-state"><mat-icon>history</mat-icon>{{ i18n.t('No import jobs recorded yet.') }}</div>
